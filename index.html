@@ -1,0 +1,1649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Croft Finance | Institutional Client Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  :root {
+    --navy-dark: #0a1628;
+    --navy: #0f1c3f;
+    --navy-light: #1a2a4f;
+    --white: #ffffff;
+    --white-off: #f8f9fc;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--white);
+    color: var(--gray-900);
+  }
+
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-200);
+    z-index: 1000;
+    padding: 0 5%;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--navy);
+    letter-spacing: -0.5px;
+  }
+
+  .logo span {
+    color: var(--gray-400);
+    font-weight: 400;
+  }
+
+  .nav-buttons {
+    display: flex;
+    gap: 12px;
+  }
+
+  .btn {
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .btn-primary {
+    background: var(--navy);
+    color: var(--white);
+  }
+
+  .btn-primary:hover {
+    background: var(--navy-light);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--gray-300);
+    color: var(--gray-700);
+  }
+
+  .btn-outline:hover {
+    border-color: var(--navy);
+    color: var(--navy);
+  }
+
+  .btn-danger {
+    background: var(--error);
+    color: white;
+  }
+
+  .btn-danger:hover {
+    background: #dc2626;
+  }
+
+  .view {
+    display: none;
+    min-height: 100vh;
+  }
+
+  .view.active {
+    display: block;
+  }
+
+  .hero {
+    min-height: 100vh;
+    background: var(--navy);
+    display: flex;
+    align-items: center;
+    padding: 0 10%;
+    position: relative;
+  }
+
+  .hero-content {
+    max-width: 700px;
+    color: var(--white);
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 64px;
+    font-weight: 600;
+    line-height: 1.1;
+    margin-bottom: 24px;
+  }
+
+  .hero h1 .highlight {
+    color: var(--gray-300);
+  }
+
+  .hero-subtitle {
+    font-size: 18px;
+    margin-bottom: 32px;
+    line-height: 1.5;
+    color: var(--gray-300);
+  }
+
+  .hero-description {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--gray-400);
+    margin-bottom: 40px;
+  }
+
+  .hero-description p {
+    margin-bottom: 20px;
+  }
+
+  .portal-container {
+    display: flex;
+    min-height: 100vh;
+    padding-top: 80px;
+  }
+
+  .sidebar {
+    width: 280px;
+    background: var(--white);
+    border-right: 1px solid var(--gray-200);
+    position: fixed;
+    height: calc(100vh - 80px);
+    overflow-y: auto;
+  }
+
+  .sidebar-header {
+    padding: 24px;
+    border-bottom: 1px solid var(--gray-200);
+  }
+
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .user-avatar {
+    width: 48px;
+    height: 48px;
+    background: var(--navy);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .user-avatar i {
+    font-size: 20px;
+    color: var(--white);
+  }
+
+  .user-details h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .user-details p {
+    font-size: 12px;
+    color: var(--gray-500);
+  }
+
+  .nav-items {
+    padding: 16px 0;
+  }
+
+  .nav-item {
+    padding: 12px 24px;
+    margin: 4px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--gray-700);
+  }
+
+  .nav-item i {
+    width: 20px;
+    color: var(--gray-400);
+  }
+
+  .nav-item:hover {
+    background: var(--gray-100);
+  }
+
+  .nav-item.active {
+    background: var(--navy);
+    color: var(--white);
+  }
+
+  .nav-item.active i {
+    color: var(--white);
+  }
+
+  .main-content {
+    flex: 1;
+    margin-left: 280px;
+    padding: 32px 40px;
+  }
+
+  .card {
+    background: var(--white);
+    border-radius: 12px;
+    border: 1px solid var(--gray-200);
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+
+  .card-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .card-title {
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title i {
+    color: var(--navy);
+  }
+
+  .card-body {
+    padding: 24px;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .stat-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid var(--gray-200);
+  }
+
+  .stat-label {
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gray-500);
+    margin-bottom: 8px;
+  }
+
+  .stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+
+  .portal-tab {
+    display: none;
+  }
+
+  .portal-tab.active {
+    display: block;
+  }
+
+  .admin-tab {
+    display: none;
+  }
+
+  .admin-tab.active {
+    display: block;
+  }
+
+  .timeline {
+    position: relative;
+    padding-left: 40px;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 12px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: var(--gray-200);
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 32px;
+  }
+
+  .timeline-dot {
+    position: absolute;
+    left: -40px;
+    top: 4px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--white);
+    border: 2px solid var(--gray-300);
+  }
+
+  .timeline-dot.completed {
+    background: var(--success);
+    border-color: var(--success);
+  }
+
+  .timeline-dot.current {
+    background: var(--navy);
+    border-color: var(--navy);
+    box-shadow: 0 0 0 4px rgba(15, 28, 63, 0.1);
+  }
+
+  .timeline-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .timeline-desc {
+    font-size: 13px;
+    color: var(--gray-600);
+  }
+
+  .timeline-date {
+    font-size: 11px;
+    color: var(--gray-400);
+    margin-top: 4px;
+  }
+
+  .documents-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  .document-card {
+    background: var(--gray-100);
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid var(--gray-200);
+  }
+
+  .document-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--navy);
+  }
+
+  .document-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--white);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+  }
+
+  .document-icon i {
+    font-size: 20px;
+    color: var(--navy);
+  }
+
+  .document-name {
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .document-meta {
+    font-size: 11px;
+    color: var(--gray-500);
+  }
+
+  .document-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .doc-action-btn {
+    padding: 4px 8px;
+    font-size: 11px;
+    border-radius: 4px;
+    cursor: pointer;
+    background: var(--white);
+    border: 1px solid var(--gray-300);
+  }
+
+  .doc-action-btn:hover {
+    border-color: var(--navy);
+    background: var(--navy);
+    color: white;
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 500;
+    margin-top: 8px;
+  }
+
+  .status-signed {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+  }
+
+  .messages-container {
+    height: 450px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .messages-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    background: var(--gray-100);
+    border-radius: 12px;
+    margin-bottom: 16px;
+  }
+
+  .message {
+    margin-bottom: 16px;
+    display: flex;
+  }
+
+  .message.client {
+    justify-content: flex-end;
+  }
+
+  .message-bubble {
+    max-width: 70%;
+    padding: 10px 16px;
+    border-radius: 16px;
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+  }
+
+  .message.client .message-bubble {
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+  }
+
+  .message-meta {
+    font-size: 10px;
+    color: var(--gray-400);
+    margin-top: 4px;
+    padding: 0 8px;
+  }
+
+  .message-input {
+    display: flex;
+    gap: 12px;
+  }
+
+  .message-input input {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid var(--gray-300);
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--gray-700);
+  }
+
+  .form-input, .form-select, .form-textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--gray-300);
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+  }
+
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    outline: none;
+    border-color: var(--navy);
+  }
+
+  .admin-table {
+    width: 100%;
+    background: var(--white);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--gray-200);
+  }
+
+  .admin-table th {
+    text-align: left;
+    padding: 14px 16px;
+    background: var(--gray-100);
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--gray-600);
+    border-bottom: 1px solid var(--gray-200);
+  }
+
+  .admin-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--gray-100);
+  }
+
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-overlay.active {
+    display: flex;
+  }
+
+  .modal {
+    background: var(--white);
+    border-radius: 16px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .modal-body {
+    padding: 24px;
+  }
+
+  .modal-close {
+    cursor: pointer;
+    font-size: 24px;
+    color: var(--gray-400);
+  }
+
+  .modal-close:hover {
+    color: var(--gray-600);
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    padding: 12px 20px;
+    background: var(--gray-800);
+    color: var(--white);
+    border-radius: 8px;
+    z-index: 3000;
+    animation: slideIn 0.3s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(100px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .text-center { text-align: center; }
+  .mt-4 { margin-top: 16px; }
+  .mb-2 { margin-bottom: 8px; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="logo">CROFT <span>FINANCE</span></div>
+  <div class="nav-buttons">
+    <button class="btn btn-outline" onclick="showView('home')">Home</button>
+    <button class="btn btn-primary" onclick="openLoginModal()">Client Portal</button>
+    <button class="btn btn-outline" onclick="openAdminLogin()">Admin</button>
+  </div>
+</nav>
+
+<!-- Home View -->
+<div id="view-home" class="view active">
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Capital that moves<br><span class="highlight">with your vision.</span></h1>
+      <div class="hero-subtitle">Croft Finance provides structured financing solutions for exceptional projects.</div>
+      <div class="hero-description">
+        <p>Croft Finance operates at the intersection of private capital and structured finance, providing funding solutions to developers and project sponsors that require speed and flexibility that institutional lenders cannot offer.</p>
+        <p>We work with private capital partners to deploy equity and structured debt across real estate, infrastructure, mining and oil & gas, with a closing process that can be completed in as little as 14 business days from term sheet execution.</p>
+      </div>
+      <button class="btn btn-primary" onclick="openLoginModal()">Access Client Portal →</button>
+    </div>
+  </section>
+</div>
+
+<!-- Client Portal -->
+<div id="view-portal" class="view">
+  <div class="portal-container">
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <div class="user-info">
+          <div class="user-avatar"><i class="fas fa-user"></i></div>
+          <div class="user-details">
+            <h4 id="portalUserName">Loading...</h4>
+            <p id="portalUserEmail">Loading...</p>
+          </div>
+        </div>
+      </div>
+      <div class="nav-items">
+        <div class="nav-item active" onclick="switchPortalTab('dashboard')"><i class="fas fa-chart-pie"></i> Dashboard</div>
+        <div class="nav-item" onclick="switchPortalTab('progress')"><i class="fas fa-tasks"></i> Closing Process</div>
+        <div class="nav-item" onclick="switchPortalTab('documents')"><i class="fas fa-folder-open"></i> Documents</div>
+        <div class="nav-item" onclick="switchPortalTab('schedule')"><i class="fas fa-calendar"></i> Schedule Meeting</div>
+        <div class="nav-item" onclick="switchPortalTab('messages')"><i class="fas fa-comments"></i> Messages</div>
+        <div class="nav-item" onclick="switchPortalTab('project')"><i class="fas fa-building"></i> Project Info</div>
+        <div class="nav-item" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</div>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <div id="tab-dashboard" class="portal-tab active">
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-label">Current Step</div><div class="stat-value" id="dashboardStep">-</div></div>
+          <div class="stat-card"><div class="stat-label">Facility Amount</div><div class="stat-value" id="dashboardAmount">-</div></div>
+          <div class="stat-card"><div class="stat-label">Next Milestone</div><div class="stat-value" id="dashboardNext" style="font-size: 18px;">-</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fas fa-bell"></i> Recent Activity</div></div>
+          <div class="card-body"><div id="recentActivity"></div></div>
+        </div>
+      </div>
+
+      <div id="tab-progress" class="portal-tab">
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fas fa-tasks"></i> Closing Process</div><span>Step <span id="currentStepNum">1</span> of 8</span></div>
+          <div class="card-body"><div class="timeline" id="timeline"></div></div>
+        </div>
+      </div>
+
+      <div id="tab-documents" class="portal-tab">
+        <div class="documents-grid" id="documentsList"></div>
+      </div>
+
+      <div id="tab-schedule" class="portal-tab">
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fas fa-calendar"></i> Schedule a Meeting</div></div>
+          <div class="card-body">
+            <div class="form-group"><label class="form-label">Meeting Type</label><select id="meetingType" class="form-select"><option>Progress Review</option><option>Document Signing</option><option>Due Diligence</option><option>Closing</option></select></div>
+            <div class="form-group"><label class="form-label">Preferred Date</label><input type="date" id="meetingDate" class="form-input"></div>
+            <div class="form-group"><label class="form-label">Preferred Time</label><input type="time" id="meetingTime" class="form-input"></div>
+            <div class="form-group"><label class="form-label">Notes</label><textarea id="meetingNotes" rows="3" class="form-textarea"></textarea></div>
+            <button class="btn btn-primary" onclick="scheduleMeeting()">Request Meeting</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-messages" class="portal-tab">
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fas fa-comments"></i> Messages</div></div>
+          <div class="card-body">
+            <div class="messages-container">
+              <div class="messages-list" id="messagesList"></div>
+              <div class="message-input"><input type="text" id="messageInput" placeholder="Type your message..."><button class="btn btn-primary" onclick="sendMessage()">Send</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-project" class="portal-tab">
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fas fa-building"></i> Project Information</div></div>
+          <div class="card-body"><div class="stats-grid" id="projectInfo"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Admin Panel -->
+<div id="view-admin" class="view">
+  <div class="portal-container">
+    <div class="sidebar">
+      <div class="sidebar-header"><div class="user-info"><div class="user-avatar"><i class="fas fa-shield-alt"></i></div><div class="user-details"><h4>Administrator</h4><p>Suzana Aleksić</p></div></div></div>
+      <div class="nav-items">
+        <div class="nav-item active" onclick="switchAdminTab('overview')"><i class="fas fa-chart-pie"></i> Overview</div>
+        <div class="nav-item" onclick="switchAdminTab('clients')"><i class="fas fa-users"></i> Clients</div>
+        <div class="nav-item" onclick="switchAdminTab('documents-admin')"><i class="fas fa-file-alt"></i> Documents</div>
+        <div class="nav-item" onclick="switchAdminTab('messages-admin')"><i class="fas fa-envelope"></i> Messages</div>
+        <div class="nav-item" onclick="switchAdminTab('meetings')"><i class="fas fa-calendar"></i> Meetings</div>
+        <div class="nav-item" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</div>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <div id="admin-overview" class="admin-tab active">
+        <div id="emailjsSetupBanner" style="background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:16px 20px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <strong style="color:#92400e;">⚙️ Email notifications not yet configured</strong>
+            <p style="font-size:13px;color:#78350f;margin-top:4px;">To receive email alerts for new registrations, messages and meetings — set up EmailJS (free). <a href="https://emailjs.com" target="_blank" style="color:#92400e;font-weight:600;">Go to emailjs.com →</a> then open this file and paste your keys into EMAILJS_CONFIG near the top of the script.</p>
+          </div>
+          <button onclick="document.getElementById('emailjsSetupBanner').style.display='none'" style="background:none;border:none;font-size:20px;cursor:pointer;color:#92400e;margin-left:16px;flex-shrink:0;">✕</button>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-label">Total Clients</div><div class="stat-value" id="totalClients">0</div></div>
+          <div class="stat-card"><div class="stat-label">New Registrations</div><div class="stat-value" id="pendingClients" style="color:#f59e0b">0</div></div>
+          <div class="stat-card"><div class="stat-label">Pending Messages</div><div class="stat-value" id="pendingMessages">0</div></div>
+          <div class="stat-card"><div class="stat-label">Pending Meetings</div><div class="stat-value" id="scheduledMeetings">0</div></div>
+          <div class="stat-card"><div class="stat-label">Documents</div><div class="stat-value" id="totalDocuments">0</div></div>
+        </div>
+        <div id="pendingRegistrationsBlock" style="display:none;margin-top:24px;">
+          <h3 style="margin-bottom:16px;color:#f59e0b;display:flex;align-items:center;gap:8px;"><i class="fas fa-user-clock"></i> New Registrations — Awaiting Setup</h3>
+          <table class="admin-table"><thead><tr><th>Name</th><th>Email</th><th>Project</th><th>Registered</th><th>Action</th></tr></thead>
+          <tbody id="pendingRegistrationsTable"></tbody></table>
+        </div>
+      </div>
+
+      <div id="admin-clients" class="admin-tab">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;"><h2>Clients</h2><button class="btn btn-primary" onclick="showAddClientModal()">+ Add Client</button></div>
+        <table class="admin-table"><thead><tr><th>Client</th><th>Project</th><th>Amount</th><th>Step</th><th>ECF</th><th>Status</th><th>Actions</th></tr></thead><tbody id="adminClientsTable"></tbody></table>
+      </div>
+
+      <div id="admin-documents-admin" class="admin-tab">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;"><h2>Documents</h2><button class="btn btn-primary" onclick="showUploadDocumentModal()">+ Upload PDF</button></div>
+        <div class="documents-grid" id="adminDocumentsList"></div>
+      </div>
+
+      <div id="admin-messages-admin" class="admin-tab"><h2 style="margin-bottom: 20px;">All Messages</h2><div id="allMessagesList"></div></div>
+      <div id="admin-meetings" class="admin-tab"><h2 style="margin-bottom: 20px;">Meeting Requests</h2><div id="meetingsList"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Login Modal -->
+<div id="loginModal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header"><h3 id="loginModalTitle">Client Portal Login</h3><span class="modal-close" onclick="closeModal('loginModal')">&times;</span></div>
+    <div class="modal-body">
+      <div id="loginForm">
+        <div class="form-group"><label class="form-label">Email</label><input type="email" id="loginEmail" class="form-input" placeholder="client@croft.com"></div>
+        <div class="form-group"><label class="form-label">Password</label><input type="password" id="loginPassword" class="form-input" placeholder="••••••••"></div>
+        <button class="btn btn-primary" onclick="login()" style="width:100%">Sign In</button>
+        <div class="text-center mt-4"><a href="#" onclick="showRegisterForm()" style="color:var(--navy); text-decoration:none;">New client? Request portal access</a></div>
+      </div>
+      <div id="registerForm" style="display:none;">
+        <div class="form-group"><label class="form-label">Full Name</label><input type="text" id="regName" class="form-input" placeholder="John Smith"></div>
+        <div class="form-group"><label class="form-label">Email</label><input type="email" id="regEmail" class="form-input" placeholder="john@company.com"></div>
+        <div class="form-group"><label class="form-label">Password</label><input type="password" id="regPassword" class="form-input" placeholder="Create password"></div>
+        <div class="form-group"><label class="form-label">Confirm Password</label><input type="password" id="regConfirmPassword" class="form-input" placeholder="Confirm password"></div>
+        <div class="form-group"><label class="form-label">Company/Project Name</label><input type="text" id="regProject" class="form-input" placeholder="Your project name"></div>
+        <button class="btn btn-primary" onclick="register()" style="width:100%">Create Account</button>
+        <div class="text-center mt-4"><a href="#" onclick="showLoginForm()" style="color:var(--navy); text-decoration:none;">← Back to Login</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Upload PDF Modal -->
+<div id="uploadDocumentModal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header"><h3>Upload PDF Document</h3><span class="modal-close" onclick="closeModal('uploadDocumentModal')">&times;</span></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Select Client</label><select id="uploadClientId" class="form-select"></select></div>
+      <div class="form-group"><label class="form-label">Document Type</label><select id="documentType" class="form-select">
+        <option value="Funding Proposal">Funding Proposal</option>
+        <option value="Term Sheet">Term Sheet</option>
+        <option value="Deed of Undertaking">Deed of Undertaking</option>
+      </select></div>
+      <div class="form-group"><label class="form-label">PDF File</label><input type="file" id="pdfFile" class="form-input" accept=".pdf"></div>
+      <div class="form-group"><label class="form-label">Or PDF URL</label><input type="url" id="documentUrl" class="form-input" placeholder="https://..."></div>
+      <button class="btn btn-primary" onclick="uploadDocument()" style="width:100%">Upload PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Project Info Modal -->
+<div id="editProjectModal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header"><h3>Edit Project Information</h3><span class="modal-close" onclick="closeModal('editProjectModal')">&times;</span></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Term (months/years)</label><input type="text" id="editTerm" class="form-input" placeholder="e.g., 24 months"></div>
+      <div class="form-group"><label class="form-label">Interest Rate (%)</label><input type="text" id="editRate" class="form-input" placeholder="e.g., 8.5%"></div>
+      <div class="form-group"><label class="form-label">Grace Period</label><input type="text" id="editGrace" class="form-input" placeholder="e.g., 6 months"></div>
+      <div class="form-group"><label class="form-label">ECF (Equity Contribution Fee - $)</label><input type="text" id="editECF" class="form-input" placeholder="e.g., $2,500,000"></div>
+      <div class="form-group"><label class="form-label">Facility Amount ($)</label><input type="text" id="editAmount" class="form-input" placeholder="e.g., $85,000,000"></div>
+      <div class="form-group"><label class="form-label">Project Type</label><input type="text" id="editType" class="form-input" placeholder="e.g., Mixed-Use Real Estate"></div>
+      <div class="form-group"><label class="form-label">Next Milestone</label><input type="text" id="editNext" class="form-input" placeholder="e.g., Commitment Fee Payment"></div>
+      <button class="btn btn-primary" onclick="saveProjectInfo()" style="width:100%">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Admin Login Modal -->
+<div id="adminLoginModal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header"><h3>Admin Access</h3><span class="modal-close" onclick="closeModal('adminLoginModal')">&times;</span></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Username</label><input type="text" id="adminUsername" class="form-input" placeholder="Username" onkeydown="if(event.key==='Enter')doAdminLogin()"></div>
+      <div class="form-group"><label class="form-label">Password</label><input type="password" id="adminPassword" class="form-input" placeholder="Password" onkeydown="if(event.key==='Enter')doAdminLogin()"></div>
+      <p id="adminLoginError" style="color:#dc2626;font-size:13px;margin-bottom:12px;display:none;">Incorrect credentials. Please try again.</p>
+      <button class="btn btn-primary" onclick="doAdminLogin()" style="width:100%">Sign In</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Client Modal -->
+<div id="addClientModal" class="modal-overlay">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-header"><h3>Add New Client</h3><span class="modal-close" onclick="closeModal('addClientModal')">&times;</span></div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="form-group"><label class="form-label">Full Name *</label><input type="text" id="ncName" class="form-input" placeholder="Client full name"></div>
+        <div class="form-group"><label class="form-label">Email *</label><input type="email" id="ncEmail" class="form-input" placeholder="client@email.com"></div>
+        <div class="form-group"><label class="form-label">Password *</label><input type="text" id="ncPassword" class="form-input" placeholder="Set login password"></div>
+        <div class="form-group"><label class="form-label">Project Name *</label><input type="text" id="ncProject" class="form-input" placeholder="e.g. Hartley Tower"></div>
+        <div class="form-group"><label class="form-label">Facility Amount</label><input type="text" id="ncAmount" class="form-input" placeholder="e.g. $50,000,000"></div>
+        <div class="form-group"><label class="form-label">Project Type</label><input type="text" id="ncType" class="form-input" placeholder="e.g. Real Estate"></div>
+        <div class="form-group"><label class="form-label">Interest Rate</label><input type="text" id="ncRate" class="form-input" placeholder="e.g. SOFR + 4.50%"></div>
+        <div class="form-group"><label class="form-label">Term</label><input type="text" id="ncTerm" class="form-input" placeholder="e.g. Up to 5 years"></div>
+        <div class="form-group"><label class="form-label">Grace Period</label><input type="text" id="ncGrace" class="form-input" placeholder="e.g. 12 months"></div>
+        <div class="form-group"><label class="form-label">ECF</label><input type="text" id="ncECF" class="form-input" placeholder="e.g. 5%"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Next Milestone</label><input type="text" id="ncMilestone" class="form-input" placeholder="e.g. Awaiting Term Sheet Execution"></div>
+      <button class="btn btn-primary" onclick="createClient()" style="width:100%">Create Client Portal</button>
+    </div>
+  </div>
+</div>
+<script>
+// Data Store
+let clients = [];
+let documents = [];
+let messages = [];
+let meetings = [];
+let currentClient = null;
+let adminCredentials = { username: "suzana", password: "croft2025" };
+
+// ============================================================
+// EMAILJS — notify Suzana on new registrations & messages
+// SETUP: Go to https://emailjs.com, create free account, add
+// a Gmail service, create an email template, then paste your
+// Service ID, Template ID, and Public Key below.
+// ============================================================
+const EMAILJS_CONFIG = {
+  publicKey:   "YOUR_PUBLIC_KEY",   // from EmailJS dashboard → Account
+  serviceId:   "YOUR_SERVICE_ID",   // from EmailJS dashboard → Email Services
+  templateId:  "YOUR_TEMPLATE_ID",  // from EmailJS dashboard → Email Templates
+  adminEmail:  "suzana.aleksic@croftfinance.com"
+};
+
+function initEmailJS() {
+  if (EMAILJS_CONFIG.publicKey !== "YOUR_PUBLIC_KEY") {
+    emailjs.init({ publicKey: EMAILJS_CONFIG.publicKey });
+    const banner = document.getElementById('emailjsSetupBanner');
+    if (banner) banner.style.display = 'none';
+  }
+}
+
+function sendAdminNotification(subject, body) {
+  if (EMAILJS_CONFIG.publicKey === "YOUR_PUBLIC_KEY") return; // not configured yet
+  emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
+    to_email: EMAILJS_CONFIG.adminEmail,
+    subject: subject,
+    message: body,
+    from_name: "Croft Finance Portal"
+  }).catch(err => console.warn("EmailJS error:", err));
+}
+
+function loadData() {
+  const storedClients = localStorage.getItem('croft_clients');
+  const storedDocuments = localStorage.getItem('croft_documents');
+  const storedMessages = localStorage.getItem('croft_messages');
+  const storedMeetings = localStorage.getItem('croft_meetings');
+  
+  clients = storedClients ? JSON.parse(storedClients) : [];
+  documents = storedDocuments ? JSON.parse(storedDocuments) : [];
+  messages = storedMessages ? JSON.parse(storedMessages) : [];
+  meetings = storedMeetings ? JSON.parse(storedMeetings) : [];
+  
+  // No demo clients - real data only
+}
+
+function saveData() {
+  localStorage.setItem('croft_clients', JSON.stringify(clients));
+  localStorage.setItem('croft_documents', JSON.stringify(documents));
+  localStorage.setItem('croft_messages', JSON.stringify(messages));
+  localStorage.setItem('croft_meetings', JSON.stringify(meetings));
+}
+
+function showView(viewName) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(`view-${viewName}`).classList.add('active');
+}
+
+function openLoginModal() { 
+  document.getElementById('loginModal').classList.add('active');
+  showLoginForm();
+}
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+function showToast(msg, isError = false) {
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.style.background = isError ? '#dc2626' : 'var(--gray-800)';
+  toast.innerHTML = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+function showRegisterForm() {
+  document.getElementById('loginForm').style.display = 'none';
+  document.getElementById('registerForm').style.display = 'block';
+}
+
+function showLoginForm() {
+  document.getElementById('registerForm').style.display = 'none';
+  document.getElementById('loginForm').style.display = 'block';
+}
+
+function register() {
+  const name = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim().toLowerCase();
+  const password = document.getElementById('regPassword').value;
+  const confirmPassword = document.getElementById('regConfirmPassword').value;
+  const project = document.getElementById('regProject').value.trim();
+  
+  if (!name || !email || !password || !project) {
+    showToast('Please fill all fields', true);
+    return;
+  }
+  
+  if (password !== confirmPassword) {
+    showToast('Passwords do not match', true);
+    return;
+  }
+  
+  if (password.length < 6) {
+    showToast('Password must be at least 6 characters', true);
+    return;
+  }
+  
+  const existingClient = clients.find(c => c.email === email);
+  if (existingClient) {
+    showToast('Email already registered', true);
+    return;
+  }
+  
+  const newClient = {
+    id: Date.now(),
+    name: name,
+    email: email,
+    password: password,
+    project: project,
+    amount: "TBD",
+    type: "New Project",
+    step: 1,
+    nextMilestone: "Awaiting Term Sheet",
+    contact: "Suzana Aleksić",
+    term: "TBD",
+    interestRate: "TBD",
+    gracePeriod: "TBD",
+    ecf: "TBD",
+    status: "pending",
+    createdAt: new Date().toISOString()
+  };
+  
+  clients.push(newClient);
+  saveData();
+
+  // Notify admin by email
+  sendAdminNotification(
+    "New Client Registration — " + name,
+    "A new client has registered on the Croft Finance portal.\n\nName: " + name + "\nEmail: " + email + "\nProject: " + project + "\nTime: " + new Date().toLocaleString() + "\n\nLog in to your admin panel to review and update their details."
+  );
+
+  showToast('Thank you. Your registration has been submitted. Suzana will be in touch within 24 hours to activate your portal.');
+  showLoginForm();
+  document.getElementById('regName').value = '';
+  document.getElementById('regEmail').value = '';
+  document.getElementById('regPassword').value = '';
+  document.getElementById('regConfirmPassword').value = '';
+  document.getElementById('regProject').value = '';
+}
+
+function login() {
+  const email = document.getElementById('loginEmail').value.toLowerCase().trim();
+  const password = document.getElementById('loginPassword').value;
+  const client = clients.find(c => c.email === email && c.password === password);
+  
+  if (!client) {
+    showToast('Invalid email or password', true);
+    return;
+  }
+
+  if (client.status === 'pending') {
+    showToast('Your account is being reviewed. Suzana will be in touch shortly.', true);
+    return;
+  }
+
+  currentClient = client;
+  closeModal('loginModal');
+  loadClientPortal();
+  showView('portal');
+  showToast(`Welcome back, ${client.name}`);
+}
+
+function openAdminLogin() {
+  document.getElementById('adminLoginModal').classList.add('active');
+  setTimeout(() => document.getElementById('adminUsername').focus(), 100);
+}
+
+function doAdminLogin() {
+  const username = document.getElementById('adminUsername').value.trim();
+  const password = document.getElementById('adminPassword').value;
+  if (username === adminCredentials.username && password === adminCredentials.password) {
+    closeModal('adminLoginModal');
+    document.getElementById('adminUsername').value = '';
+    document.getElementById('adminPassword').value = '';
+    document.getElementById('adminLoginError').style.display = 'none';
+    showView('admin');
+    renderAdminTables();
+  } else {
+    document.getElementById('adminLoginError').style.display = 'block';
+  }
+}
+
+function logout() {
+  currentClient = null;
+  showView('home');
+}
+
+function switchPortalTab(tabName) {
+  const navItem = event.target.closest('.nav-item');
+  document.querySelectorAll('#view-portal .nav-item').forEach(item => item.classList.remove('active'));
+  if (navItem) navItem.classList.add('active');
+  
+  document.querySelectorAll('#view-portal .portal-tab').forEach(tab => tab.classList.remove('active'));
+  document.getElementById(`tab-${tabName}`).classList.add('active');
+}
+
+function switchAdminTab(tabName) {
+  const navItem = event.target.closest('.nav-item');
+  document.querySelectorAll('#view-admin .nav-item').forEach(item => item.classList.remove('active'));
+  if (navItem) navItem.classList.add('active');
+  
+  document.querySelectorAll('#view-admin .admin-tab').forEach(tab => tab.classList.remove('active'));
+  document.getElementById(`admin-${tabName}`).classList.add('active');
+}
+
+function loadClientPortal() {
+  document.getElementById('portalUserName').textContent = currentClient.name;
+  document.getElementById('portalUserEmail').textContent = currentClient.email;
+  document.getElementById('dashboardStep').textContent = `Step ${currentClient.step} of 8`;
+  document.getElementById('dashboardAmount').textContent = currentClient.amount;
+  document.getElementById('dashboardNext').textContent = currentClient.nextMilestone;
+  renderTimeline();
+  renderDocuments();
+  renderProjectInfo();
+  loadMessages();
+  loadRecentActivity();
+}
+
+function renderTimeline() {
+  const steps = [
+    { title: "Term Sheet", desc: "Commercial terms agreed", duration: "Day 1-2" },
+    { title: "Commitment Fee", desc: "Initial fee payment", duration: "Day 3" },
+    { title: "Deed of Undertaking", desc: "Legal execution", duration: "Day 4-5" },
+    { title: "Credit Support", desc: "Policy issuance", duration: "Day 6-7" },
+    { title: "Hard-Copy Submission", desc: "Document delivery", duration: "Day 8" },
+    { title: "ECF Escrow", desc: "Funds deposited", duration: "Day 9-10" },
+    { title: "Transfer to Agent", desc: "Funds released", duration: "Day 11-14" },
+    { title: "Funding", desc: "Capital deployed", duration: "Day 15-21" }
+  ];
+  
+  const container = document.getElementById('timeline');
+  container.innerHTML = '';
+  
+  steps.forEach((step, i) => {
+    const stepNum = i + 1;
+    const isCompleted = stepNum < currentClient.step;
+    const isCurrent = stepNum === currentClient.step;
+    const item = document.createElement('div');
+    item.className = 'timeline-item';
+    item.innerHTML = `
+      <div class="timeline-dot ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''}"></div>
+      <div class="timeline-title">${step.title}</div>
+      <div class="timeline-desc">${step.desc}</div>
+      <div class="timeline-date">${step.duration}</div>
+    `;
+    container.appendChild(item);
+  });
+  
+  document.getElementById('currentStepNum').textContent = currentClient.step;
+}
+
+function renderDocuments() {
+  const clientDocs = documents.filter(d => d.clientId === currentClient.id);
+  const orderedDocs = ['Funding Proposal', 'Term Sheet', 'Deed of Undertaking'];
+  const sortedDocs = orderedDocs.map(docType => clientDocs.find(d => d.type === docType)).filter(d => d);
+  const otherDocs = clientDocs.filter(d => !orderedDocs.includes(d.type));
+  const allDocs = [...sortedDocs, ...otherDocs];
+  
+  const container = document.getElementById('documentsList');
+  container.innerHTML = '';
+  
+  if (allDocs.length === 0) {
+    container.innerHTML = '<div class="card"><div class="card-body text-center" style="color:var(--gray-500);">No documents uploaded yet</div></div>';
+    return;
+  }
+  
+  allDocs.forEach(doc => {
+    const card = document.createElement('div');
+    card.className = 'document-card';
+    card.innerHTML = `
+      <div class="document-icon"><i class="fas fa-file-pdf"></i></div>
+      <div class="document-name">${doc.name || doc.type}</div>
+      <div class="document-meta">Uploaded: ${doc.date}</div>
+      <div class="document-actions">
+        <button class="doc-action-btn" onclick="viewPDF(${doc.id})"><i class="fas fa-eye"></i> View</button>
+        <button class="doc-action-btn" onclick="downloadPDF(${doc.id})"><i class="fas fa-download"></i> Download</button>
+      </div>
+      <span class="status-badge status-signed"><i class="fas fa-lock"></i> Secure PDF</span>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function viewPDF(docId) {
+  const doc = documents.find(d => d.id === docId);
+  if (doc && doc.url && doc.url !== '#') {
+    window.open(doc.url, '_blank');
+  } else {
+    showToast('PDF URL not available', true);
+  }
+}
+
+function downloadPDF(docId) {
+  const doc = documents.find(d => d.id === docId);
+  if (doc && doc.url && doc.url !== '#') {
+    const link = document.createElement('a');
+    link.href = doc.url;
+    link.download = (doc.name || doc.type) + '.pdf';
+    link.target = '_blank';
+    link.click();
+    showToast(`Downloading ${doc.name || doc.type}`);
+  } else {
+    showToast('PDF URL not available', true);
+  }
+}
+
+function renderProjectInfo() {
+  const container = document.getElementById('projectInfo');
+  container.innerHTML = `
+    <div class="stat-card"><div class="stat-label">Project Name</div><div class="stat-value" style="font-size:18px;">${currentClient.project}</div></div>
+    <div class="stat-card"><div class="stat-label">Facility Amount</div><div class="stat-value">${currentClient.amount}</div></div>
+    <div class="stat-card"><div class="stat-label">Project Type</div><div class="stat-value" style="font-size:18px;">${currentClient.type}</div></div>
+    <div class="stat-card"><div class="stat-label">Term</div><div class="stat-value" style="font-size:18px;">${currentClient.term}</div></div>
+    <div class="stat-card"><div class="stat-label">Interest Rate</div><div class="stat-value" style="font-size:18px;">${currentClient.interestRate}</div></div>
+    <div class="stat-card"><div class="stat-label">Grace Period</div><div class="stat-value" style="font-size:18px;">${currentClient.gracePeriod}</div></div>
+    <div class="stat-card"><div class="stat-label">ECF</div><div class="stat-value" style="font-size:18px;">${currentClient.ecf}</div></div>
+    <div class="stat-card"><div class="stat-label">Key Contact</div><div class="stat-value" style="font-size:18px;">${currentClient.contact}</div></div>
+    <div class="stat-card"><div class="stat-label">Current Step</div><div class="stat-value">${currentClient.step}/8</div></div>
+  `;
+}
+
+function loadMessages() {
+  const clientMessages = messages.filter(m => m.clientId === currentClient.id);
+  const container = document.getElementById('messagesList');
+  container.innerHTML = '';
+  
+  clientMessages.forEach(msg => {
+    const div = document.createElement('div');
+    div.className = `message ${msg.sender === 'client' ? 'client' : ''}`;
+    div.innerHTML = `<div class="message-bubble">${msg.content}</div><div class="message-meta">${new Date(msg.timestamp).toLocaleString()}</div>`;
+    container.appendChild(div);
+  });
+  container.scrollTop = container.scrollHeight;
+}
+
+function sendMessage() {
+  const input = document.getElementById('messageInput');
+  const content = input.value.trim();
+  if (!content) return;
+  
+  const newMsg = {
+    id: Date.now(),
+    clientId: currentClient.id,
+    clientName: currentClient.name,
+    sender: 'client',
+    content: content,
+    timestamp: new Date().toISOString()
+  };
+  messages.push(newMsg);
+  
+  saveData();
+  loadMessages();
+
+  // Notify admin by email
+  sendAdminNotification(
+    "New Message from " + currentClient.name,
+    "You have a new message in the Croft Finance portal.\n\nFrom: " + currentClient.name + " (" + currentClient.email + ")\nProject: " + currentClient.project + "\n\nMessage:\n" + content + "\n\nTime: " + new Date().toLocaleString()
+  );
+
+  input.value = '';
+  showToast('Message sent');
+}
+
+function scheduleMeeting() {
+  const meeting = {
+    id: Date.now(),
+    clientId: currentClient.id,
+    clientName: currentClient.name,
+    type: document.getElementById('meetingType').value,
+    date: document.getElementById('meetingDate').value,
+    time: document.getElementById('meetingTime').value,
+    notes: document.getElementById('meetingNotes').value,
+    status: 'pending',
+    timestamp: new Date().toISOString()
+  };
+  
+  meetings.push(meeting);
+  saveData();
+
+  // Notify admin by email
+  sendAdminNotification(
+    "Meeting Request from " + currentClient.name,
+    "A client has requested a meeting.\n\nClient: " + currentClient.name + "\nProject: " + currentClient.project + "\nMeeting Type: " + meeting.type + "\nRequested Date: " + (meeting.date || "TBD") + "\nRequested Time: " + (meeting.time || "TBD") + "\nNotes: " + (meeting.notes || "None") + "\n\nLog in to your admin panel to confirm."
+  );
+
+  showToast('Meeting request sent');
+  document.getElementById('meetingDate').value = '';
+  document.getElementById('meetingTime').value = '';
+  document.getElementById('meetingNotes').value = '';
+}
+
+function loadRecentActivity() {
+  const all = [...messages.filter(m => m.clientId === currentClient.id), ...meetings.filter(m => m.clientId === currentClient.id)]
+    .sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0,5);
+  
+  const container = document.getElementById('recentActivity');
+  if (all.length === 0) {
+    container.innerHTML = '<div style="color:var(--gray-500);">No recent activity</div>';
+    return;
+  }
+  
+  container.innerHTML = all.map(a => `
+    <div style="padding:12px 0; border-bottom:1px solid var(--gray-200);">
+      <div style="font-size:13px;">${a.content || a.type || 'Meeting request'}</div>
+      <div style="font-size:11px; color:var(--gray-500);">${new Date(a.timestamp).toLocaleString()}</div>
+    </div>
+  `).join('');
+}
+
+function renderAdminTables() {
+  const tbody = document.getElementById('adminClientsTable');
+  if (tbody) {
+    tbody.innerHTML = '';
+    clients.forEach(c => {
+      const statusColor = c.status === 'pending' ? '#f59e0b' : '#10b981';
+      const statusLabel = c.status === 'pending' ? 'Pending' : 'Active';
+      tbody.innerHTML += `<tr>
+        <td><strong>${c.name}</strong><br><span style="font-size:12px;color:var(--gray-500);">${c.email}</span></td>
+        <td>${c.project}</td>
+        <td>${c.amount}</td>
+        <td>Step ${c.step}/8</td>
+        <td>${c.ecf}</td>
+        <td><span style="font-size:11px;font-weight:600;color:${statusColor};">${statusLabel}</span></td>
+        <td>
+          ${c.status === 'pending' ? `<button class="btn btn-primary" style="padding:4px 12px;margin-right:4px;" onclick="activateClient(${c.id})">Activate</button>` : `<button class="btn btn-outline" style="padding:4px 12px;margin-right:4px;" onclick="editClientStep(${c.id})">Update Step</button>`}
+          <button class="btn btn-outline" style="padding:4px 12px; margin-right:4px;" onclick="editProjectInfo(${c.id})">Edit Info</button>
+          <button class="btn btn-outline" style="padding:4px 12px; color:#dc2626;" onclick="deleteClient(${c.id})">Delete</button>
+        </td>
+      `;
+    });
+  }
+  
+  const docsContainer = document.getElementById('adminDocumentsList');
+  if (docsContainer) {
+    docsContainer.innerHTML = '';
+    documents.forEach(d => {
+      const client = clients.find(c => c.id === d.clientId);
+      docsContainer.innerHTML += `
+        <div class="document-card">
+          <div class="document-icon"><i class="fas fa-file-pdf"></i></div>
+          <div class="document-name">${d.type}</div>
+          <div class="document-meta">${client?.name || 'Unknown'}<br>${d.date}</div>
+          <div class="document-actions">
+            <button class="doc-action-btn" onclick="viewPDF(${d.id})"><i class="fas fa-eye"></i> View</button>
+            <button class="doc-action-btn" onclick="deleteDocument(${d.id})" style="color:#dc2626;"><i class="fas fa-trash"></i> Delete</button>
+          </div>
+        </div>
+      `;
+    });
+  }
+  
+  const messagesContainer = document.getElementById('allMessagesList');
+  if (messagesContainer) {
+    messagesContainer.innerHTML = '';
+    [...messages].reverse().forEach(m => {
+      messagesContainer.innerHTML += `<div style="padding:12px; background:var(--gray-100); border-radius:8px; margin-bottom:12px;"><strong>${m.clientName}</strong> <span style="font-size:11px; color:var(--gray-500);">${new Date(m.timestamp).toLocaleString()}</span><div style="margin-top:8px;">${m.content}</div><div style="margin-top:8px;"><button class="btn btn-primary" style="padding:4px 12px;" onclick="replyToClient(${m.id})">Reply</button></div></div>`;
+    });
+  }
+  
+  const meetingsContainer = document.getElementById('meetingsList');
+  if (meetingsContainer) {
+    meetingsContainer.innerHTML = '';
+    [...meetings].reverse().forEach(m => {
+      meetingsContainer.innerHTML += `<div style="padding:12px; background:var(--gray-100); border-radius:8px; margin-bottom:12px;"><strong>${m.clientName}</strong> <span class="status-badge status-signed">${m.status}</span><div><strong>${m.type}</strong> - ${m.date || 'TBD'} ${m.time || ''}</div><div>${m.notes || ''}</div><div style="margin-top:8px;"><button class="btn btn-primary" style="padding:4px 12px;" onclick="updateMeetingStatus(${m.id},'confirmed')">Confirm</button> <button class="btn btn-outline" style="padding:4px 12px;" onclick="updateMeetingStatus(${m.id},'cancelled')">Decline</button></div></div>`;
+    });
+  }
+  
+  const pendingClients = clients.filter(c => c.status === 'pending');
+  const activeClients = clients.filter(c => c.status !== 'pending');
+  document.getElementById('totalClients').textContent = activeClients.length;
+  document.getElementById('pendingMessages').textContent = messages.filter(m => m.sender === 'client').length;
+  document.getElementById('scheduledMeetings').textContent = meetings.filter(m => m.status === 'pending').length;
+  document.getElementById('totalDocuments').textContent = documents.length;
+
+  const pcCount = document.getElementById('pendingClients');
+  if (pcCount) pcCount.textContent = pendingClients.length;
+
+  // Pending registrations block
+  const pendingBlock = document.getElementById('pendingRegistrationsBlock');
+  const pendingTbody = document.getElementById('pendingRegistrationsTable');
+  if (pendingBlock && pendingTbody) {
+    if (pendingClients.length > 0) {
+      pendingBlock.style.display = 'block';
+      pendingTbody.innerHTML = '';
+      pendingClients.forEach(c => {
+        pendingTbody.innerHTML += `<tr>
+          <td><strong>${c.name}</strong></td>
+          <td>${c.email}</td>
+          <td>${c.project}</td>
+          <td style="font-size:12px;color:var(--gray-500)">${new Date(c.createdAt).toLocaleString()}</td>
+          <td>
+            <button class="btn btn-primary" style="padding:4px 12px;margin-right:4px;" onclick="activateClient(${c.id})">Activate &amp; Setup</button>
+            <button class="btn btn-outline" style="padding:4px 12px;color:#dc2626;" onclick="deleteClient(${c.id})">Decline</button>
+          </td>
+        </tr>`;
+      });
+    } else {
+      pendingBlock.style.display = 'none';
+    }
+  }
+}
+
+function replyToClient(messageId) {
+  const originalMessage = messages.find(m => m.id === messageId);
+  if (!originalMessage) return;
+  const reply = prompt('Reply to message:', '');
+  if (reply) {
+    messages.push({
+      id: Date.now(),
+      clientId: originalMessage.clientId,
+      clientName: originalMessage.clientName,
+      sender: 'admin',
+      content: reply,
+      timestamp: new Date().toISOString()
+    });
+    saveData();
+    renderAdminTables();
+    if (currentClient && currentClient.id === originalMessage.clientId) {
+      loadMessages();
+    }
+    showToast('Reply sent');
+  }
+}
+
+function editClientStep(id) {
+  const client = clients.find(c => c.id === id);
+  const step = prompt(`Update step for ${client.name} (1-8):`, client.step);
+  if (step && step >= 1 && step <= 8) {
+    client.step = parseInt(step);
+    saveData();
+    renderAdminTables();
+    if (currentClient && currentClient.id === id) loadClientPortal();
+    showToast('Step updated');
+  }
+}
+
+function editProjectInfo(id) {
+  const client = clients.find(c => c.id === id);
+  if (client) {
+    document.getElementById('editTerm').value = client.term || '';
+    document.getElementById('editRate').value = client.interestRate || '';
+    document.getElementById('editGrace').value = client.gracePeriod || '';
+    document.getElementById('editECF').value = client.ecf || '';
+    document.getElementById('editAmount').value = client.amount || '';
+    document.getElementById('editType').value = client.type || '';
+    document.getElementById('editNext').value = client.nextMilestone || '';
+    window.editClientId = id;
+    document.getElementById('editProjectModal').classList.add('active');
+  }
+}
+
+function saveProjectInfo() {
+  const client = clients.find(c => c.id === window.editClientId);
+  if (client) {
+    client.term = document.getElementById('editTerm').value;
+    client.interestRate = document.getElementById('editRate').value;
+    client.gracePeriod = document.getElementById('editGrace').value;
+    client.ecf = document.getElementById('editECF').value;
+    client.amount = document.getElementById('editAmount').value;
+    client.type = document.getElementById('editType').value;
+    client.nextMilestone = document.getElementById('editNext').value;
+    saveData();
+    renderAdminTables();
+    if (currentClient && currentClient.id === window.editClientId) loadClientPortal();
+    closeModal('editProjectModal');
+    showToast('Project info updated');
+  }
+}
+
+function activateClient(id) {
+  const client = clients.find(c => c.id === id);
+  if (!client) return;
+  // Open the edit modal pre-filled so Suzana can set project details before activating
+  client.status = 'active';
+  saveData();
+  editProjectInfo(id);
+  renderAdminTables();
+  showToast(client.name + ' activated. Set their project details below.');
+}
+
+function deleteClient(id) {
+  if (confirm('Delete this client? This will remove all their data.')) {
+    clients = clients.filter(c => c.id !== id);
+    documents = documents.filter(d => d.clientId !== id);
+    messages = messages.filter(m => m.clientId !== id);
+    meetings = meetings.filter(m => m.clientId !== id);
+    saveData();
+    renderAdminTables();
+    showToast('Client deleted');
+  }
+}
+
+function deleteDocument(id) {
+  if (confirm('Delete this document?')) {
+    documents = documents.filter(d => d.id !== id);
+    saveData();
+    renderAdminTables();
+    if (currentClient) renderDocuments();
+    showToast('Document deleted');
+  }
+}
+
+function showAddClientModal() {
+  // Clear form
+  ['ncName','ncEmail','ncPassword','ncProject','ncAmount','ncType','ncRate','ncTerm','ncGrace','ncECF','ncMilestone'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('addClientModal').classList.add('active');
+}
+
+function createClient() {
+  const name = document.getElementById('ncName').value.trim();
+  const email = document.getElementById('ncEmail').value.trim().toLowerCase();
+  const password = document.getElementById('ncPassword').value.trim();
+  const project = document.getElementById('ncProject').value.trim();
+  if (!name || !email || !password || !project) {
+    showToast('Name, email, password and project are required', true);
+    return;
+  }
+  if (clients.find(c => c.email === email)) {
+    showToast('Email already exists', true);
+    return;
+  }
+  const newClient = {
+    id: Date.now(),
+    name,
+    email,
+    password,
+    project,
+    amount: document.getElementById('ncAmount').value || 'TBD',
+    type: document.getElementById('ncType').value || 'New Project',
+    step: 1,
+    nextMilestone: document.getElementById('ncMilestone').value || 'Awaiting Term Sheet',
+    contact: 'Suzana Aleksić',
+    term: document.getElementById('ncTerm').value || 'TBD',
+    interestRate: document.getElementById('ncRate').value || 'TBD',
+    gracePeriod: document.getElementById('ncGrace').value || 'TBD',
+    ecf: document.getElementById('ncECF').value || 'TBD',
+    status: 'active',
+    createdAt: new Date().toISOString()
+  };
+  clients.push(newClient);
+  saveData();
+  closeModal('addClientModal');
+  renderAdminTables();
+  showToast('Client portal created. Login: ' + email + ' / ' + password);
+}
+
+function showUploadDocumentModal() {
+  const select = document.getElementById('uploadClientId');
+  select.innerHTML = '<option value="">Select Client</option>' + clients.map(c => `<option value="${c.id}">${c.name} - ${c.project}</option>`).join('');
+  document.getElementById('uploadDocumentModal').classList.add('active');
+}
+
+function uploadDocument() {
+  const clientId = parseInt(document.getElementById('uploadClientId').value);
+  const docType = document.getElementById('documentType').value;
+  const fileInput = document.getElementById('pdfFile');
+  const urlInput = document.getElementById('documentUrl').value;
+  
+  if (!clientId) { showToast('Please select a client', true); return; }
+  
+  let finalUrl = urlInput;
+  
+  if (fileInput.files && fileInput.files[0]) {
+    const file = fileInput.files[0];
+    if (file.type !== 'application/pdf') {
+      showToast('Please upload a PDF file', true);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      finalUrl = e.target.result;
+      saveDocument(clientId, docType, finalUrl);
+    };
+    reader.readAsDataURL(file);
+  } else if (finalUrl) {
+    saveDocument(clientId, docType, finalUrl);
+  } else {
+    showToast('Please select a PDF file or provide a URL', true);
+  }
+}
+
+function saveDocument(clientId, docType, url) {
+  documents.push({ 
+    id: Date.now(), 
+    clientId, 
+    type: docType,
+    name: docType,
+    url: url, 
+    date: new Date().toISOString().split('T')[0],
+    isPDF: true 
+  });
+  saveData();
+  closeModal('uploadDocumentModal');
+  renderAdminTables();
+  if (currentClient && currentClient.id === clientId) renderDocuments();
+  showToast(`${docType} uploaded successfully`);
+  document.getElementById('pdfFile').value = '';
+  document.getElementById('documentUrl').value = '';
+}
+
+function updateMeetingStatus(id, status) {
+  const meeting = meetings.find(m => m.id === id);
+  if (meeting) { meeting.status = status; saveData(); renderAdminTables(); showToast(`Meeting ${status}`); }
+}
+
+initEmailJS();
+loadData();
+renderAdminTables();
+</script>
+</body>
+</html>
