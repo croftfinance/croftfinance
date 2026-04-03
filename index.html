@@ -8,6 +8,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <style>
   * {
     margin: 0;
@@ -661,6 +665,13 @@
 </head>
 <body>
 
+<!-- Loading overlay -->
+<div id="loadingOverlay" style="position:fixed;inset:0;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;">
+  <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:600;color:#fff;letter-spacing:-0.5px;margin-bottom:24px;">CROFT <span style="color:#9ca3af;font-weight:400;">FINANCE</span></div>
+  <div style="width:40px;height:40px;border:3px solid rgba(255,255,255,0.15);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+  <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+</div>
+
 <nav class="navbar">
   <div class="logo">CROFT <span>FINANCE</span></div>
   <div class="nav-buttons">
@@ -674,7 +685,7 @@
 <div id="view-home" class="view active">
   <section class="hero">
     <div class="hero-content">
-      <h1>Capital that moves<br><span class="highlight">with your vision.</span></h1>
+      <h1>Capital that moves.<br><span class="highlight">with your vision.</span></h1>
       <div class="hero-subtitle">Croft Finance provides structured financing solutions for exceptional projects.</div>
       <div class="hero-description">
         <p>Croft Finance operates at the intersection of private capital and structured finance, providing funding solutions to developers and project sponsors that require speed and flexibility that institutional lenders cannot offer.</p>
@@ -785,6 +796,10 @@
 
     <div class="main-content">
       <div id="admin-overview" class="admin-tab active">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+          <h2>Overview</h2>
+          <button class="btn btn-outline" onclick="loadFromFirebase && firebaseReady ? loadFromFirebase().then(()=>showToast('Refreshed')) : (loadFromLocalStorage(), showToast('Refreshed'))" style="font-size:13px;">↻ Refresh</button>
+        </div>
         <div id="emailjsSetupBanner" style="background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:16px 20px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;">
           <div>
             <strong style="color:#92400e;">⚙️ Email notifications not yet configured</strong>
@@ -918,7 +933,45 @@
   </div>
 </div>
 <script>
-// Data Store
+// ============================================================
+// FIREBASE CONFIG — paste your values from Firebase Console
+// Project Settings → Your Apps → Web App → firebaseConfig
+// ============================================================
+const FIREBASE_CONFIG = {
+  apiKey:            "PASTE_YOUR_API_KEY",
+  authDomain:        "PASTE_YOUR_AUTH_DOMAIN",
+  projectId:         "PASTE_YOUR_PROJECT_ID",
+  storageBucket:     "PASTE_YOUR_STORAGE_BUCKET",
+  messagingSenderId: "PASTE_YOUR_MESSAGING_SENDER_ID",
+  appId:             "PASTE_YOUR_APP_ID"
+};
+
+let db = null;
+let firebaseReady = false;
+
+function initFirebase() {
+  try {
+    if (FIREBASE_CONFIG.apiKey === "PASTE_YOUR_API_KEY") {
+      console.warn("Firebase not configured — using localStorage fallback");
+      firebaseReady = false;
+      loadFromLocalStorage();
+      return;
+    }
+    firebase.initializeApp(FIREBASE_CONFIG);
+    db = firebase.firestore();
+    firebaseReady = true;
+    console.log("Firebase connected");
+    loadFromFirebase();
+  } catch(e) {
+    console.error("Firebase init error:", e);
+    firebaseReady = false;
+    loadFromLocalStorage();
+  }
+}
+
+// ============================================================
+// Data Store (in-memory, synced to Firebase or localStorage)
+// ============================================================
 let clients = [];
 let documents = [];
 let messages = [];
@@ -957,25 +1010,133 @@ function sendAdminNotification(subject, body) {
   }).catch(err => console.warn("EmailJS error:", err));
 }
 
-function loadData() {
-  const storedClients = localStorage.getItem('croft_clients');
-  const storedDocuments = localStorage.getItem('croft_documents');
-  const storedMessages = localStorage.getItem('croft_messages');
-  const storedMeetings = localStorage.getItem('croft_meetings');
-  
-  clients = storedClients ? JSON.parse(storedClients) : [];
-  documents = storedDocuments ? JSON.parse(storedDocuments) : [];
-  messages = storedMessages ? JSON.parse(storedMessages) : [];
-  meetings = storedMeetings ? JSON.parse(storedMeetings) : [];
-  
-  // No demo clients - real data only
+// ============================================================
+// FIREBASE DATA LAYER
+// ============================================================
+async function loadFromFirebase() {
+  try {
+    const [cSnap, dSnap, mSnap, mtSnap] = await Promise.all([
+      db.collection('clients').get(),
+      db.collection('documents').get(),
+      db.collection('messages').get(),
+      db.collection('meetings').get()
+    ]);
+    clients   = cSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    documents = dSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    messages  = mSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    meetings  = mtSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    document.getElementById('loadingOverlay').style.display = 'none';
+    renderAdminTables();
+    if (currentClient) {
+      currentClient = clients.find(c => c.id === currentClient.id) || currentClient;
+      loadClientPortal();
+    }
+  } catch(e) {
+    console.error("Firebase load error:", e);
+    showToast("Connection error — retrying...", true);
+    setTimeout(loadFromFirebase, 3000);
+  }
 }
 
-function saveData() {
-  localStorage.setItem('croft_clients', JSON.stringify(clients));
-  localStorage.setItem('croft_documents', JSON.stringify(documents));
-  localStorage.setItem('croft_messages', JSON.stringify(messages));
-  localStorage.setItem('croft_meetings', JSON.stringify(meetings));
+function loadFromLocalStorage() {
+  clients   = JSON.parse(localStorage.getItem('croft_clients')   || '[]');
+  documents = JSON.parse(localStorage.getItem('croft_documents') || '[]');
+  messages  = JSON.parse(localStorage.getItem('croft_messages')  || '[]');
+  meetings  = JSON.parse(localStorage.getItem('croft_meetings')  || '[]');
+  document.getElementById('loadingOverlay').style.display = 'none';
+  renderAdminTables();
+}
+
+// Legacy aliases expected by existing code
+function loadData() {
+  // handled by initFirebase
+}
+
+async function saveData() {
+  if (!firebaseReady) {
+    localStorage.setItem('croft_clients',   JSON.stringify(clients));
+    localStorage.setItem('croft_documents', JSON.stringify(documents));
+    localStorage.setItem('croft_messages',  JSON.stringify(messages));
+    localStorage.setItem('croft_meetings',  JSON.stringify(meetings));
+    return;
+  }
+  // Firebase saves are done per-operation — this is a no-op
+}
+
+// ---- Firebase per-operation helpers ----
+
+async function fbSaveClient(client) {
+  if (!firebaseReady) { saveData(); return; }
+  const { id, ...data } = client;
+  await db.collection('clients').doc(String(id)).set(data);
+  await loadFromFirebase();
+}
+
+async function fbUpdateClient(id, updates) {
+  if (!firebaseReady) {
+    const c = clients.find(c => c.id === id);
+    if (c) Object.assign(c, updates);
+    saveData(); renderAdminTables(); return;
+  }
+  await db.collection('clients').doc(String(id)).update(updates);
+  await loadFromFirebase();
+}
+
+async function fbDeleteClient(id) {
+  if (!firebaseReady) {
+    clients   = clients.filter(c => c.id !== id);
+    documents = documents.filter(d => d.clientId !== id);
+    messages  = messages.filter(m => m.clientId !== id);
+    meetings  = meetings.filter(m => m.clientId !== id);
+    saveData(); renderAdminTables(); return;
+  }
+  const batch = db.batch();
+  batch.delete(db.collection('clients').doc(String(id)));
+  (await db.collection('documents').where('clientId','==',id).get()).docs.forEach(d => batch.delete(d.ref));
+  (await db.collection('messages').where('clientId','==',id).get()).docs.forEach(d => batch.delete(d.ref));
+  (await db.collection('meetings').where('clientId','==',id).get()).docs.forEach(d => batch.delete(d.ref));
+  await batch.commit();
+  await loadFromFirebase();
+}
+
+async function fbSaveMessage(msg) {
+  if (!firebaseReady) { messages.push(msg); saveData(); loadMessages(); return; }
+  const { id, ...data } = msg;
+  await db.collection('messages').doc(String(id)).set(data);
+  await loadFromFirebase();
+}
+
+async function fbSaveMeeting(meeting) {
+  if (!firebaseReady) { meetings.push(meeting); saveData(); return; }
+  const { id, ...data } = meeting;
+  await db.collection('meetings').doc(String(id)).set(data);
+  await loadFromFirebase();
+}
+
+async function fbUpdateMeeting(id, updates) {
+  if (!firebaseReady) {
+    const m = meetings.find(m => m.id === id);
+    if (m) Object.assign(m, updates);
+    saveData(); renderAdminTables(); return;
+  }
+  await db.collection('meetings').doc(String(id)).update(updates);
+  await loadFromFirebase();
+}
+
+async function fbSaveDocument(doc) {
+  if (!firebaseReady) { documents.push(doc); saveData(); return; }
+  const { id, ...data } = doc;
+  await db.collection('documents').doc(String(id)).set(data);
+  await loadFromFirebase();
+}
+
+async function fbDeleteDocument(id) {
+  if (!firebaseReady) {
+    documents = documents.filter(d => d.id !== id);
+    saveData(); renderAdminTables(); return;
+  }
+  await db.collection('documents').doc(String(id)).delete();
+  await loadFromFirebase();
 }
 
 function showView(viewName) {
@@ -1056,16 +1217,24 @@ function register() {
   };
   
   clients.push(newClient);
-  saveData();
 
-  // Notify admin by email
-  sendAdminNotification(
-    "New Client Registration — " + name,
-    "A new client has registered on the Croft Finance portal.\n\nName: " + name + "\nEmail: " + email + "\nProject: " + project + "\nTime: " + new Date().toLocaleString() + "\n\nLog in to your admin panel to review and update their details."
-  );
+  showToast('Submitting registration...');
+  fbSaveClient(newClient).then(() => {
+    sendAdminNotification(
+      "New Client Registration — " + name,
+      "A new client has registered on the Croft Finance portal.\n\nName: " + name + "\nEmail: " + email + "\nProject: " + project + "\nTime: " + new Date().toLocaleString() + "\n\nLog in to your admin panel to review and activate their account."
+    );
+    showToast('Registration submitted. Suzana will activate your portal within 24 hours.');
+  }).catch(() => {
+    showToast('Registration submitted. Suzana will be in touch shortly.');
+  });
 
-  showToast('Thank you. Your registration has been submitted. Suzana will be in touch within 24 hours to activate your portal.');
   showLoginForm();
+  document.getElementById('regName').value = '';
+  document.getElementById('regEmail').value = '';
+  document.getElementById('regPassword').value = '';
+  document.getElementById('regConfirmPassword').value = '';
+  document.getElementById('regProject').value = '';
   document.getElementById('regName').value = '';
   document.getElementById('regEmail').value = '';
   document.getElementById('regPassword').value = '';
@@ -1076,7 +1245,7 @@ function register() {
 function login() {
   const email = document.getElementById('loginEmail').value.toLowerCase().trim();
   const password = document.getElementById('loginPassword').value;
-  const client = clients.find(c => c.email === email && c.password === password);
+  const client = clients.find(c => c.email.toLowerCase() === email && c.password === password);
   
   if (!client) {
     showToast('Invalid email or password', true);
@@ -1090,9 +1259,17 @@ function login() {
 
   currentClient = client;
   closeModal('loginModal');
-  loadClientPortal();
   showView('portal');
-  showToast(`Welcome back, ${client.name}`);
+  showToast('Welcome back, ' + client.name);
+  // Refresh from Firebase to get latest data
+  if (firebaseReady) {
+    loadFromFirebase().then(() => {
+      currentClient = clients.find(c => c.id === client.id) || client;
+      loadClientPortal();
+    });
+  } else {
+    loadClientPortal();
+  }
 }
 
 function openAdminLogin() {
@@ -1281,16 +1458,14 @@ function sendMessage() {
     content: content,
     timestamp: new Date().toISOString()
   };
-  messages.push(newMsg);
-  
-  saveData();
-  loadMessages();
 
-  // Notify admin by email
-  sendAdminNotification(
-    "New Message from " + currentClient.name,
-    "You have a new message in the Croft Finance portal.\n\nFrom: " + currentClient.name + " (" + currentClient.email + ")\nProject: " + currentClient.project + "\n\nMessage:\n" + content + "\n\nTime: " + new Date().toLocaleString()
-  );
+  fbSaveMessage(newMsg).then(() => {
+    loadMessages();
+    sendAdminNotification(
+      "New Message from " + currentClient.name,
+      "You have a new message in the Croft Finance portal.\n\nFrom: " + currentClient.name + " (" + currentClient.email + ")\nProject: " + currentClient.project + "\n\nMessage:\n" + content + "\n\nTime: " + new Date().toLocaleString()
+    );
+  });
 
   input.value = '';
   showToast('Message sent');
@@ -1309,16 +1484,13 @@ function scheduleMeeting() {
     timestamp: new Date().toISOString()
   };
   
-  meetings.push(meeting);
-  saveData();
-
-  // Notify admin by email
-  sendAdminNotification(
-    "Meeting Request from " + currentClient.name,
-    "A client has requested a meeting.\n\nClient: " + currentClient.name + "\nProject: " + currentClient.project + "\nMeeting Type: " + meeting.type + "\nRequested Date: " + (meeting.date || "TBD") + "\nRequested Time: " + (meeting.time || "TBD") + "\nNotes: " + (meeting.notes || "None") + "\n\nLog in to your admin panel to confirm."
-  );
-
-  showToast('Meeting request sent');
+  fbSaveMeeting(meeting).then(() => {
+    sendAdminNotification(
+      "Meeting Request from " + currentClient.name,
+      "A client has requested a meeting.\n\nClient: " + currentClient.name + "\nProject: " + currentClient.project + "\nMeeting Type: " + meeting.type + "\nRequested Date: " + (meeting.date || "TBD") + "\nRequested Time: " + (meeting.time || "TBD") + "\nNotes: " + (meeting.notes || "None") + "\n\nLog in to your admin panel to confirm."
+    );
+    showToast('Meeting request sent');
+  });
   document.getElementById('meetingDate').value = '';
   document.getElementById('meetingTime').value = '';
   document.getElementById('meetingNotes').value = '';
@@ -1438,34 +1610,31 @@ function renderAdminTables() {
 function replyToClient(messageId) {
   const originalMessage = messages.find(m => m.id === messageId);
   if (!originalMessage) return;
-  const reply = prompt('Reply to message:', '');
-  if (reply) {
-    messages.push({
+  const reply = prompt('Reply to ' + originalMessage.clientName + ':', '');
+  if (reply && reply.trim()) {
+    const replyMsg = {
       id: Date.now(),
       clientId: originalMessage.clientId,
       clientName: originalMessage.clientName,
       sender: 'admin',
-      content: reply,
+      content: reply.trim(),
       timestamp: new Date().toISOString()
+    };
+    fbSaveMessage(replyMsg).then(() => {
+      renderAdminTables();
+      showToast('Reply sent to ' + originalMessage.clientName);
     });
-    saveData();
-    renderAdminTables();
-    if (currentClient && currentClient.id === originalMessage.clientId) {
-      loadMessages();
-    }
-    showToast('Reply sent');
   }
 }
 
 function editClientStep(id) {
   const client = clients.find(c => c.id === id);
-  const step = prompt(`Update step for ${client.name} (1-8):`, client.step);
-  if (step && step >= 1 && step <= 8) {
-    client.step = parseInt(step);
-    saveData();
-    renderAdminTables();
-    if (currentClient && currentClient.id === id) loadClientPortal();
-    showToast('Step updated');
+  const step = prompt('Update step for ' + client.name + ' (1-8):', client.step);
+  if (step && parseInt(step) >= 1 && parseInt(step) <= 8) {
+    const milestones = ['','Awaiting Commitment Fee','Deed of Undertaking Execution','Credit Support Issuance','Hard-Copy Submission','ECF Escrow','Transfer to Closing Agent','Funding & Disbursement','Complete'];
+    fbUpdateClient(id, { step: parseInt(step), nextMilestone: milestones[parseInt(step)] || '' }).then(() => {
+      showToast('Step updated to ' + step + '/8');
+    });
   }
 }
 
@@ -1485,53 +1654,47 @@ function editProjectInfo(id) {
 }
 
 function saveProjectInfo() {
-  const client = clients.find(c => c.id === window.editClientId);
-  if (client) {
-    client.term = document.getElementById('editTerm').value;
-    client.interestRate = document.getElementById('editRate').value;
-    client.gracePeriod = document.getElementById('editGrace').value;
-    client.ecf = document.getElementById('editECF').value;
-    client.amount = document.getElementById('editAmount').value;
-    client.type = document.getElementById('editType').value;
-    client.nextMilestone = document.getElementById('editNext').value;
-    saveData();
-    renderAdminTables();
-    if (currentClient && currentClient.id === window.editClientId) loadClientPortal();
+  const id = window.editClientId;
+  const updates = {
+    term:          document.getElementById('editTerm').value,
+    interestRate:  document.getElementById('editRate').value,
+    gracePeriod:   document.getElementById('editGrace').value,
+    ecf:           document.getElementById('editECF').value,
+    amount:        document.getElementById('editAmount').value,
+    type:          document.getElementById('editType').value,
+    nextMilestone: document.getElementById('editNext').value
+  };
+  fbUpdateClient(id, updates).then(() => {
     closeModal('editProjectModal');
+    if (currentClient && currentClient.id === id) {
+      currentClient = clients.find(c => c.id === id) || currentClient;
+      loadClientPortal();
+    }
     showToast('Project info updated');
-  }
+  });
 }
 
 function activateClient(id) {
   const client = clients.find(c => c.id === id);
   if (!client) return;
-  // Open the edit modal pre-filled so Suzana can set project details before activating
-  client.status = 'active';
-  saveData();
-  editProjectInfo(id);
-  renderAdminTables();
-  showToast(client.name + ' activated. Set their project details below.');
+  fbUpdateClient(id, { status: 'active' }).then(() => {
+    editProjectInfo(id);
+    showToast(client.name + ' activated. Update their project details and save.');
+  });
 }
 
 function deleteClient(id) {
-  if (confirm('Delete this client? This will remove all their data.')) {
-    clients = clients.filter(c => c.id !== id);
-    documents = documents.filter(d => d.clientId !== id);
-    messages = messages.filter(m => m.clientId !== id);
-    meetings = meetings.filter(m => m.clientId !== id);
-    saveData();
-    renderAdminTables();
-    showToast('Client deleted');
+  if (confirm('Delete this client? This cannot be undone.')) {
+    fbDeleteClient(id).then(() => showToast('Client deleted'));
   }
 }
 
 function deleteDocument(id) {
   if (confirm('Delete this document?')) {
-    documents = documents.filter(d => d.id !== id);
-    saveData();
-    renderAdminTables();
-    if (currentClient) renderDocuments();
-    showToast('Document deleted');
+    fbDeleteDocument(id).then(() => {
+      if (currentClient) renderDocuments();
+      showToast('Document deleted');
+    });
   }
 }
 
@@ -1575,11 +1738,11 @@ function createClient() {
     status: 'active',
     createdAt: new Date().toISOString()
   };
-  clients.push(newClient);
-  saveData();
-  closeModal('addClientModal');
-  renderAdminTables();
-  showToast('Client portal created. Login: ' + email + ' / ' + password);
+  showToast('Creating client portal...');
+  fbSaveClient(newClient).then(() => {
+    closeModal('addClientModal');
+    showToast('Portal created. Login: ' + email + ' / ' + password);
+  });
 }
 
 function showUploadDocumentModal() {
@@ -1618,7 +1781,7 @@ function uploadDocument() {
 }
 
 function saveDocument(clientId, docType, url) {
-  documents.push({ 
+  const newDoc = { 
     id: Date.now(), 
     clientId, 
     type: docType,
@@ -1626,24 +1789,22 @@ function saveDocument(clientId, docType, url) {
     url: url, 
     date: new Date().toISOString().split('T')[0],
     isPDF: true 
+  };
+  fbSaveDocument(newDoc).then(() => {
+    closeModal('uploadDocumentModal');
+    if (currentClient && currentClient.id === clientId) renderDocuments();
+    showToast(docType + ' uploaded successfully');
   });
-  saveData();
-  closeModal('uploadDocumentModal');
-  renderAdminTables();
-  if (currentClient && currentClient.id === clientId) renderDocuments();
-  showToast(`${docType} uploaded successfully`);
   document.getElementById('pdfFile').value = '';
   document.getElementById('documentUrl').value = '';
 }
 
 function updateMeetingStatus(id, status) {
-  const meeting = meetings.find(m => m.id === id);
-  if (meeting) { meeting.status = status; saveData(); renderAdminTables(); showToast(`Meeting ${status}`); }
+  fbUpdateMeeting(id, { status }).then(() => showToast('Meeting ' + status));
 }
 
 initEmailJS();
-loadData();
-renderAdminTables();
+initFirebase();
 </script>
 </body>
 </html>
