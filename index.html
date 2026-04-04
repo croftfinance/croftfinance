@@ -8,667 +8,111 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <style>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-
+  * { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
-    --navy-dark: #0a1628;
-    --navy: #0f1c3f;
-    --navy-light: #1a2a4f;
-    --white: #ffffff;
-    --white-off: #f8f9fc;
-    --gray-100: #f3f4f6;
-    --gray-200: #e5e7eb;
-    --gray-300: #d1d5db;
-    --gray-400: #9ca3af;
-    --gray-500: #6b7280;
-    --gray-600: #4b5563;
-    --gray-700: #374151;
-    --success: #10b981;
-    --warning: #f59e0b;
-    --error: #ef4444;
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  }
-
-  body {
-    font-family: 'Inter', sans-serif;
-    background: var(--white);
-    color: var(--gray-900);
-  }
-
-  .navbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    background: var(--white);
-    border-bottom: 1px solid var(--gray-200);
-    z-index: 1000;
-    padding: 0 5%;
-    height: 80px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .logo {
-    font-family: 'Playfair Display', serif;
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--navy);
-    letter-spacing: -0.5px;
-  }
-
-  .logo span {
-    color: var(--gray-400);
-    font-weight: 400;
-  }
-
-  .nav-buttons {
-    display: flex;
-    gap: 12px;
-  }
-
-  .btn {
-    padding: 10px 24px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    border: none;
-    font-family: 'Inter', sans-serif;
-  }
-
-  .btn-primary {
-    background: var(--navy);
-    color: var(--white);
-  }
-
-  .btn-primary:hover {
-    background: var(--navy-light);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
-  }
-
-  .btn-outline {
-    background: transparent;
-    border: 1px solid var(--gray-300);
-    color: var(--gray-700);
-  }
-
-  .btn-outline:hover {
-    border-color: var(--navy);
-    color: var(--navy);
-  }
-
-  .btn-danger {
-    background: var(--error);
-    color: white;
-  }
-
-  .btn-danger:hover {
-    background: #dc2626;
-  }
-
-  .view {
-    display: none;
-    min-height: 100vh;
-  }
-
-  .view.active {
-    display: block;
-  }
-
-  .hero {
-    min-height: 100vh;
-    background: var(--navy);
-    display: flex;
-    align-items: center;
-    padding: 0 10%;
-    position: relative;
-  }
-
-  .hero-content {
-    max-width: 700px;
-    color: var(--white);
-  }
-
-  .hero h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: 64px;
-    font-weight: 600;
-    line-height: 1.1;
-    margin-bottom: 24px;
-  }
-
-  .hero h1 .highlight {
-    color: var(--gray-300);
-  }
-
-  .hero-subtitle {
-    font-size: 18px;
-    margin-bottom: 32px;
-    line-height: 1.5;
-    color: var(--gray-300);
-  }
-
-  .hero-description {
-    font-size: 15px;
-    line-height: 1.6;
-    color: var(--gray-400);
-    margin-bottom: 40px;
-  }
-
-  .hero-description p {
-    margin-bottom: 20px;
-  }
-
-  .portal-container {
-    display: flex;
-    min-height: 100vh;
-    padding-top: 80px;
-  }
-
-  .sidebar {
-    width: 280px;
-    background: var(--white);
-    border-right: 1px solid var(--gray-200);
-    position: fixed;
-    height: calc(100vh - 80px);
-    overflow-y: auto;
-  }
-
-  .sidebar-header {
-    padding: 24px;
-    border-bottom: 1px solid var(--gray-200);
-  }
-
-  .user-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .user-avatar {
-    width: 48px;
-    height: 48px;
-    background: var(--navy);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .user-avatar i {
-    font-size: 20px;
-    color: var(--white);
-  }
-
-  .user-details h4 {
-    font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 4px;
-  }
-
-  .user-details p {
-    font-size: 12px;
-    color: var(--gray-500);
-  }
-
-  .nav-items {
-    padding: 16px 0;
-  }
-
-  .nav-item {
-    padding: 12px 24px;
-    margin: 4px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--gray-700);
-  }
-
-  .nav-item i {
-    width: 20px;
-    color: var(--gray-400);
-  }
-
-  .nav-item:hover {
-    background: var(--gray-100);
-  }
-
-  .nav-item.active {
-    background: var(--navy);
-    color: var(--white);
-  }
-
-  .nav-item.active i {
-    color: var(--white);
-  }
-
-  .main-content {
-    flex: 1;
-    margin-left: 280px;
-    padding: 32px 40px;
-  }
-
-  .card {
-    background: var(--white);
-    border-radius: 12px;
-    border: 1px solid var(--gray-200);
-    margin-bottom: 24px;
-    overflow: hidden;
-  }
-
-  .card-header {
-    padding: 20px 24px;
-    border-bottom: 1px solid var(--gray-200);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .card-title {
-    font-size: 18px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .card-title i {
-    color: var(--navy);
-  }
-
-  .card-body {
-    padding: 24px;
-  }
-
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 24px;
-    margin-bottom: 32px;
-  }
-
-  .stat-card {
-    background: var(--white);
-    border-radius: 12px;
-    padding: 20px;
-    border: 1px solid var(--gray-200);
-  }
-
-  .stat-label {
-    font-size: 12px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--gray-500);
-    margin-bottom: 8px;
-  }
-
-  .stat-value {
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--navy);
-  }
-
-  .portal-tab {
-    display: none;
-  }
-
-  .portal-tab.active {
-    display: block;
-  }
-
-  .admin-tab {
-    display: none;
-  }
-
-  .admin-tab.active {
-    display: block;
-  }
-
-  .timeline {
-    position: relative;
-    padding-left: 40px;
-  }
-
-  .timeline::before {
-    content: '';
-    position: absolute;
-    left: 12px;
-    top: 8px;
-    bottom: 8px;
-    width: 2px;
-    background: var(--gray-200);
-  }
-
-  .timeline-item {
-    position: relative;
-    margin-bottom: 32px;
-  }
-
-  .timeline-dot {
-    position: absolute;
-    left: -40px;
-    top: 4px;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: var(--white);
-    border: 2px solid var(--gray-300);
-  }
-
-  .timeline-dot.completed {
-    background: var(--success);
-    border-color: var(--success);
-  }
-
-  .timeline-dot.current {
-    background: var(--navy);
-    border-color: var(--navy);
-    box-shadow: 0 0 0 4px rgba(15, 28, 63, 0.1);
-  }
-
-  .timeline-title {
-    font-weight: 600;
-    margin-bottom: 4px;
-  }
-
-  .timeline-desc {
-    font-size: 13px;
-    color: var(--gray-600);
-  }
-
-  .timeline-date {
-    font-size: 11px;
-    color: var(--gray-400);
-    margin-top: 4px;
-  }
-
-  .documents-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-  }
-
-  .document-card {
-    background: var(--gray-100);
-    border-radius: 12px;
-    padding: 16px;
-    cursor: pointer;
-    transition: all 0.2s;
-    border: 1px solid var(--gray-200);
-  }
-
-  .document-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-    border-color: var(--navy);
-  }
-
-  .document-icon {
-    width: 40px;
-    height: 40px;
-    background: var(--white);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 12px;
-  }
-
-  .document-icon i {
-    font-size: 20px;
-    color: var(--navy);
-  }
-
-  .document-name {
-    font-weight: 600;
-    margin-bottom: 4px;
-  }
-
-  .document-meta {
-    font-size: 11px;
-    color: var(--gray-500);
-  }
-
-  .document-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 12px;
-  }
-
-  .doc-action-btn {
-    padding: 4px 8px;
-    font-size: 11px;
-    border-radius: 4px;
-    cursor: pointer;
-    background: var(--white);
-    border: 1px solid var(--gray-300);
-  }
-
-  .doc-action-btn:hover {
-    border-color: var(--navy);
-    background: var(--navy);
-    color: white;
-  }
-
-  .status-badge {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 10px;
-    font-weight: 500;
-    margin-top: 8px;
-  }
-
-  .status-signed {
-    background: rgba(16, 185, 129, 0.1);
-    color: var(--success);
-  }
-
-  .messages-container {
-    height: 450px;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .messages-list {
-    flex: 1;
-    overflow-y: auto;
-    padding: 16px;
-    background: var(--gray-100);
-    border-radius: 12px;
-    margin-bottom: 16px;
-  }
-
-  .message {
-    margin-bottom: 16px;
-    display: flex;
-  }
-
-  .message.client {
-    justify-content: flex-end;
-  }
-
-  .message-bubble {
-    max-width: 70%;
-    padding: 10px 16px;
-    border-radius: 16px;
-    background: var(--white);
-    border: 1px solid var(--gray-200);
-  }
-
-  .message.client .message-bubble {
-    background: var(--navy);
-    color: var(--white);
-    border: none;
-  }
-
-  .message-meta {
-    font-size: 10px;
-    color: var(--gray-400);
-    margin-top: 4px;
-    padding: 0 8px;
-  }
-
-  .message-input {
-    display: flex;
-    gap: 12px;
-  }
-
-  .message-input input {
-    flex: 1;
-    padding: 12px;
-    border: 1px solid var(--gray-300);
-    border-radius: 8px;
-    font-family: 'Inter', sans-serif;
-  }
-
-  .form-group {
-    margin-bottom: 20px;
-  }
-
-  .form-label {
-    display: block;
-    margin-bottom: 6px;
-    font-weight: 500;
-    font-size: 13px;
-    color: var(--gray-700);
-  }
-
-  .form-input, .form-select, .form-textarea {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid var(--gray-300);
-    border-radius: 8px;
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-  }
-
-  .form-input:focus, .form-select:focus, .form-textarea:focus {
-    outline: none;
-    border-color: var(--navy);
-  }
-
-  .admin-table {
-    width: 100%;
-    background: var(--white);
-    border-radius: 12px;
-    overflow: hidden;
-    border: 1px solid var(--gray-200);
-  }
-
-  .admin-table th {
-    text-align: left;
-    padding: 14px 16px;
-    background: var(--gray-100);
-    font-weight: 600;
-    font-size: 12px;
-    color: var(--gray-600);
-    border-bottom: 1px solid var(--gray-200);
-  }
-
-  .admin-table td {
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--gray-100);
-  }
-
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 2000;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .modal-overlay.active {
-    display: flex;
-  }
-
-  .modal {
-    background: var(--white);
-    border-radius: 16px;
-    max-width: 500px;
-    width: 90%;
-    max-height: 90vh;
-    overflow-y: auto;
-  }
-
-  .modal-header {
-    padding: 20px 24px;
-    border-bottom: 1px solid var(--gray-200);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .modal-body {
-    padding: 24px;
-  }
-
-  .modal-close {
-    cursor: pointer;
-    font-size: 24px;
-    color: var(--gray-400);
-  }
-
-  .modal-close:hover {
-    color: var(--gray-600);
-  }
-
-  .toast {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    padding: 12px 20px;
-    background: var(--gray-800);
-    color: var(--white);
-    border-radius: 8px;
-    z-index: 3000;
-    animation: slideIn 0.3s ease;
-  }
-
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateX(100px); }
-    to { opacity: 1; transform: translateX(0); }
-  }
-
+    --navy-dark: #0a1628; --navy: #0f1c3f; --navy-light: #1a2a4f;
+    --white: #ffffff; --gray-100: #f3f4f6; --gray-200: #e5e7eb;
+    --gray-300: #d1d5db; --gray-400: #9ca3af; --gray-500: #6b7280;
+    --gray-600: #4b5563; --gray-700: #374151; --success: #10b981;
+    --warning: #f59e0b; --error: #ef4444;
+  }
+  body { font-family: 'Inter', sans-serif; background: var(--white); }
+  .navbar { position: fixed; top: 0; left: 0; right: 0; background: var(--white); border-bottom: 1px solid var(--gray-200); z-index: 1000; padding: 0 5%; height: 80px; display: flex; align-items: center; justify-content: space-between; }
+  .logo { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: var(--navy); }
+  .logo span { color: var(--gray-400); font-weight: 400; }
+  .nav-buttons { display: flex; gap: 12px; }
+  .btn { padding: 10px 24px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; font-family: 'Inter', sans-serif; }
+  .btn-primary { background: var(--navy); color: var(--white); }
+  .btn-primary:hover { background: var(--navy-light); }
+  .btn-outline { background: transparent; border: 1px solid var(--gray-300); color: var(--gray-700); }
+  .btn-outline:hover { border-color: var(--navy); color: var(--navy); }
+  .view { display: none; min-height: 100vh; }
+  .view.active { display: block; }
+  .hero { min-height: 100vh; background: var(--navy); display: flex; align-items: center; padding: 0 10%; }
+  .hero-content { max-width: 700px; color: var(--white); }
+  .hero h1 { font-family: 'Playfair Display', serif; font-size: 64px; font-weight: 600; line-height: 1.1; margin-bottom: 24px; }
+  .hero h1 .highlight { color: var(--gray-300); }
+  .hero-subtitle { font-size: 18px; margin-bottom: 32px; color: var(--gray-300); }
+  .hero-description { font-size: 15px; line-height: 1.6; color: var(--gray-400); margin-bottom: 40px; }
+  .hero-description p { margin-bottom: 20px; }
+  .portal-container { display: flex; min-height: 100vh; padding-top: 80px; }
+  .sidebar { width: 280px; background: var(--white); border-right: 1px solid var(--gray-200); position: fixed; height: calc(100vh - 80px); overflow-y: auto; }
+  .sidebar-header { padding: 24px; border-bottom: 1px solid var(--gray-200); }
+  .user-info { display: flex; align-items: center; gap: 12px; }
+  .user-avatar { width: 48px; height: 48px; background: var(--navy); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+  .user-avatar i { font-size: 20px; color: var(--white); }
+  .user-details h4 { font-size: 14px; font-weight: 600; }
+  .user-details p { font-size: 12px; color: var(--gray-500); }
+  .nav-items { padding: 16px 0; }
+  .nav-item { padding: 12px 24px; margin: 4px 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; color: var(--gray-700); }
+  .nav-item i { width: 20px; color: var(--gray-400); }
+  .nav-item:hover { background: var(--gray-100); }
+  .nav-item.active { background: var(--navy); color: var(--white); }
+  .nav-item.active i { color: var(--white); }
+  .main-content { flex: 1; margin-left: 280px; padding: 32px 40px; }
+  .card { background: var(--white); border-radius: 12px; border: 1px solid var(--gray-200); margin-bottom: 24px; overflow: hidden; }
+  .card-header { padding: 20px 24px; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center; }
+  .card-title { font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .card-title i { color: var(--navy); }
+  .card-body { padding: 24px; }
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 32px; }
+  .stat-card { background: var(--white); border-radius: 12px; padding: 20px; border: 1px solid var(--gray-200); }
+  .stat-label { font-size: 12px; font-weight: 500; text-transform: uppercase; color: var(--gray-500); margin-bottom: 8px; }
+  .stat-value { font-size: 28px; font-weight: 700; color: var(--navy); }
+  .portal-tab, .admin-tab { display: none; }
+  .portal-tab.active, .admin-tab.active { display: block; }
+  .timeline { position: relative; padding-left: 40px; }
+  .timeline::before { content: ''; position: absolute; left: 12px; top: 8px; bottom: 8px; width: 2px; background: var(--gray-200); }
+  .timeline-item { position: relative; margin-bottom: 32px; }
+  .timeline-dot { position: absolute; left: -40px; top: 4px; width: 16px; height: 16px; border-radius: 50%; background: var(--white); border: 2px solid var(--gray-300); }
+  .timeline-dot.completed { background: var(--success); border-color: var(--success); }
+  .timeline-dot.current { background: var(--navy); border-color: var(--navy); box-shadow: 0 0 0 4px rgba(15,28,63,0.1); }
+  .timeline-title { font-weight: 600; }
+  .timeline-desc { font-size: 13px; color: var(--gray-600); }
+  .timeline-date { font-size: 11px; color: var(--gray-400); margin-top: 4px; }
+  .documents-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+  .document-card { background: var(--gray-100); border-radius: 12px; padding: 16px; border: 1px solid var(--gray-200); }
+  .document-icon { width: 40px; height: 40px; background: var(--white); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+  .document-icon i { font-size: 20px; color: var(--navy); }
+  .document-name { font-weight: 600; }
+  .document-meta { font-size: 11px; color: var(--gray-500); }
+  .document-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .doc-action-btn { padding: 4px 8px; font-size: 11px; border-radius: 4px; cursor: pointer; background: var(--white); border: 1px solid var(--gray-300); }
+  .messages-container { height: 450px; display: flex; flex-direction: column; }
+  .messages-list { flex: 1; overflow-y: auto; padding: 16px; background: var(--gray-100); border-radius: 12px; margin-bottom: 16px; }
+  .message { margin-bottom: 16px; display: flex; }
+  .message.client { justify-content: flex-end; }
+  .message-bubble { max-width: 70%; padding: 10px 16px; border-radius: 16px; background: var(--white); border: 1px solid var(--gray-200); }
+  .message.client .message-bubble { background: var(--navy); color: var(--white); border: none; }
+  .message-meta { font-size: 10px; color: var(--gray-400); margin-top: 4px; }
+  .message-input { display: flex; gap: 12px; }
+  .message-input input { flex: 1; padding: 12px; border: 1px solid var(--gray-300); border-radius: 8px; }
+  .form-group { margin-bottom: 20px; }
+  .form-label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 13px; color: var(--gray-700); }
+  .form-input, .form-select, .form-textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--gray-300); border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 14px; }
+  .admin-table { width: 100%; background: var(--white); border-radius: 12px; border: 1px solid var(--gray-200); }
+  .admin-table th { text-align: left; padding: 14px 16px; background: var(--gray-100); font-weight: 600; font-size: 12px; border-bottom: 1px solid var(--gray-200); }
+  .admin-table td { padding: 14px 16px; border-bottom: 1px solid var(--gray-100); }
+  .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; }
+  .modal-overlay.active { display: flex; }
+  .modal { background: var(--white); border-radius: 16px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; }
+  .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center; }
+  .modal-body { padding: 24px; }
+  .modal-close { cursor: pointer; font-size: 24px; color: var(--gray-400); }
+  .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; background: var(--gray-800); color: var(--white); border-radius: 8px; z-index: 3000; animation: slideIn 0.3s ease; }
+  @keyframes slideIn { from { opacity: 0; transform: translateX(100px); } to { opacity: 1; transform: translateX(0); } }
   .text-center { text-align: center; }
   .mt-4 { margin-top: 16px; }
-  .mb-2 { margin-bottom: 8px; }
-  .hidden { display: none; }
 </style>
 </head>
 <body>
 
-<!-- Loading overlay -->
 <div id="loadingOverlay" style="position:fixed;inset:0;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;">
-  <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:600;color:#fff;letter-spacing:-0.5px;margin-bottom:24px;">CROFT <span style="color:#9ca3af;font-weight:400;">FINANCE</span></div>
-  <div style="width:40px;height:40px;border:3px solid rgba(255,255,255,0.15);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+  <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:600;color:#fff;">CROFT <span style="color:#9ca3af;">FINANCE</span></div>
+  <div style="width:40px;height:40px;border:3px solid rgba(255,255,255,0.15);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;margin-top:20px;"></div>
   <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
 </div>
 
@@ -681,7 +125,6 @@
   </div>
 </nav>
 
-<!-- Home View -->
 <div id="view-home" class="view active">
   <section class="hero">
     <div class="hero-content">
@@ -696,19 +139,10 @@
   </section>
 </div>
 
-<!-- Client Portal -->
 <div id="view-portal" class="view">
   <div class="portal-container">
     <div class="sidebar">
-      <div class="sidebar-header">
-        <div class="user-info">
-          <div class="user-avatar"><i class="fas fa-user"></i></div>
-          <div class="user-details">
-            <h4 id="portalUserName">Loading...</h4>
-            <p id="portalUserEmail">Loading...</p>
-          </div>
-        </div>
-      </div>
+      <div class="sidebar-header"><div class="user-info"><div class="user-avatar"><i class="fas fa-user"></i></div><div class="user-details"><h4 id="portalUserName">Loading...</h4><p id="portalUserEmail">Loading...</p></div></div></div>
       <div class="nav-items">
         <div class="nav-item active" onclick="switchPortalTab('dashboard')"><i class="fas fa-chart-pie"></i> Dashboard</div>
         <div class="nav-item" onclick="switchPortalTab('progress')"><i class="fas fa-tasks"></i> Closing Process</div>
@@ -719,67 +153,38 @@
         <div class="nav-item" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</div>
       </div>
     </div>
-
     <div class="main-content">
       <div id="tab-dashboard" class="portal-tab active">
         <div class="stats-grid">
           <div class="stat-card"><div class="stat-label">Current Step</div><div class="stat-value" id="dashboardStep">-</div></div>
           <div class="stat-card"><div class="stat-label">Facility Amount</div><div class="stat-value" id="dashboardAmount">-</div></div>
-          <div class="stat-card"><div class="stat-label">Next Milestone</div><div class="stat-value" id="dashboardNext" style="font-size: 18px;">-</div></div>
+          <div class="stat-card"><div class="stat-label">Next Milestone</div><div class="stat-value" id="dashboardNext" style="font-size:18px;">-</div></div>
         </div>
-        <div class="card">
-          <div class="card-header"><div class="card-title"><i class="fas fa-bell"></i> Recent Activity</div></div>
-          <div class="card-body"><div id="recentActivity"></div></div>
-        </div>
+        <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-bell"></i> Recent Activity</div></div><div class="card-body"><div id="recentActivity"></div></div></div>
       </div>
-
       <div id="tab-progress" class="portal-tab">
-        <div class="card">
-          <div class="card-header"><div class="card-title"><i class="fas fa-tasks"></i> Closing Process</div><span>Step <span id="currentStepNum">1</span> of 8</span></div>
-          <div class="card-body"><div class="timeline" id="timeline"></div></div>
-        </div>
+        <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-tasks"></i> Closing Process</div><span>Step <span id="currentStepNum">1</span> of 8</span></div><div class="card-body"><div class="timeline" id="timeline"></div></div></div>
       </div>
-
-      <div id="tab-documents" class="portal-tab">
-        <div class="documents-grid" id="documentsList"></div>
-      </div>
-
+      <div id="tab-documents" class="portal-tab"><div class="documents-grid" id="documentsList"></div></div>
       <div id="tab-schedule" class="portal-tab">
-        <div class="card">
-          <div class="card-header"><div class="card-title"><i class="fas fa-calendar"></i> Schedule a Meeting</div></div>
-          <div class="card-body">
-            <div class="form-group"><label class="form-label">Meeting Type</label><select id="meetingType" class="form-select"><option>Progress Review</option><option>Document Signing</option><option>Due Diligence</option><option>Closing</option></select></div>
-            <div class="form-group"><label class="form-label">Preferred Date</label><input type="date" id="meetingDate" class="form-input"></div>
-            <div class="form-group"><label class="form-label">Preferred Time</label><input type="time" id="meetingTime" class="form-input"></div>
-            <div class="form-group"><label class="form-label">Notes</label><textarea id="meetingNotes" rows="3" class="form-textarea"></textarea></div>
-            <button class="btn btn-primary" onclick="scheduleMeeting()">Request Meeting</button>
-          </div>
-        </div>
+        <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-calendar"></i> Schedule a Meeting</div></div><div class="card-body">
+          <div class="form-group"><label class="form-label">Meeting Type</label><select id="meetingType" class="form-select"><option>Progress Review</option><option>Document Signing</option><option>Due Diligence</option><option>Closing</option></select></div>
+          <div class="form-group"><label class="form-label">Preferred Date</label><input type="date" id="meetingDate" class="form-input"></div>
+          <div class="form-group"><label class="form-label">Preferred Time</label><input type="time" id="meetingTime" class="form-input"></div>
+          <div class="form-group"><label class="form-label">Notes</label><textarea id="meetingNotes" rows="3" class="form-textarea"></textarea></div>
+          <button class="btn btn-primary" onclick="scheduleMeeting()">Request Meeting</button>
+        </div></div>
       </div>
-
       <div id="tab-messages" class="portal-tab">
-        <div class="card">
-          <div class="card-header"><div class="card-title"><i class="fas fa-comments"></i> Messages</div></div>
-          <div class="card-body">
-            <div class="messages-container">
-              <div class="messages-list" id="messagesList"></div>
-              <div class="message-input"><input type="text" id="messageInput" placeholder="Type your message..."><button class="btn btn-primary" onclick="sendMessage()">Send</button></div>
-            </div>
-          </div>
-        </div>
+        <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-comments"></i> Messages</div></div><div class="card-body">
+          <div class="messages-container"><div class="messages-list" id="messagesList"></div><div class="message-input"><input type="text" id="messageInput" placeholder="Type your message..."><button class="btn btn-primary" onclick="sendMessage()">Send</button></div></div>
+        </div></div>
       </div>
-
-      <div id="tab-project" class="portal-tab">
-        <div class="card">
-          <div class="card-header"><div class="card-title"><i class="fas fa-building"></i> Project Information</div></div>
-          <div class="card-body"><div class="stats-grid" id="projectInfo"></div></div>
-        </div>
-      </div>
+      <div id="tab-project" class="portal-tab"><div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-building"></i> Project Information</div></div><div class="card-body"><div class="stats-grid" id="projectInfo"></div></div></div></div>
     </div>
   </div>
 </div>
 
-<!-- Admin Panel -->
 <div id="view-admin" class="view">
   <div class="portal-container">
     <div class="sidebar">
@@ -793,13 +198,9 @@
         <div class="nav-item" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</div>
       </div>
     </div>
-
     <div class="main-content">
       <div id="admin-overview" class="admin-tab active">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-          <h2>Overview</h2>
-          <button class="btn btn-outline" onclick="refreshData()" style="font-size:13px;">↻ Refresh</button>
-        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;"><h2>Overview</h2><button class="btn btn-outline" onclick="refreshData()" style="font-size:13px;">↻ Refresh</button></div>
         <div class="stats-grid">
           <div class="stat-card"><div class="stat-label">Total Clients</div><div class="stat-value" id="totalClients">0</div></div>
           <div class="stat-card"><div class="stat-label">New Registrations</div><div class="stat-value" id="pendingClients" style="color:#f59e0b">0</div></div>
@@ -808,161 +209,124 @@
           <div class="stat-card"><div class="stat-label">Documents</div><div class="stat-value" id="totalDocuments">0</div></div>
         </div>
         <div id="pendingRegistrationsBlock" style="display:none;margin-top:24px;">
-          <h3 style="margin-bottom:16px;color:#f59e0b;display:flex;align-items:center;gap:8px;"><i class="fas fa-user-clock"></i> New Registrations — Awaiting Setup</h3>
-          <table class="admin-table"><thead><tr><th>Name</th><th>Email</th><th>Project</th><th>Registered</th><th>Action</th></tr></thead>
-          <tbody id="pendingRegistrationsTable"></tbody></table>
+          <h3 style="margin-bottom:16px;color:#f59e0b;"><i class="fas fa-user-clock"></i> New Registrations — Awaiting Setup</h3>
+          <table class="admin-table"><thead><tr><th>Name</th><th>Email</th><th>Project</th><th>Registered</th><th>Action</th></tr></thead><tbody id="pendingRegistrationsTable"></tbody></table>
         </div>
       </div>
-
       <div id="admin-clients" class="admin-tab">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;"><h2>Clients</h2><button class="btn btn-primary" onclick="showAddClientModal()">+ Add Client</button></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:20px;"><h2>Clients</h2><button class="btn btn-primary" onclick="showAddClientModal()">+ Add Client</button></div>
         <table class="admin-table"><thead><tr><th>Client</th><th>Project</th><th>Amount</th><th>Step</th><th>ECF</th><th>Status</th><th>Actions</th></tr></thead><tbody id="adminClientsTable"></tbody></table>
       </div>
-
       <div id="admin-documents-admin" class="admin-tab">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;"><h2>Documents</h2><button class="btn btn-primary" onclick="showUploadDocumentModal()">+ Upload PDF</button></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:20px;"><h2>Documents</h2><button class="btn btn-primary" onclick="showUploadDocumentModal()">+ Upload PDF</button></div>
         <div class="documents-grid" id="adminDocumentsList"></div>
       </div>
-
-      <div id="admin-messages-admin" class="admin-tab"><h2 style="margin-bottom: 20px;">All Messages</h2><div id="allMessagesList"></div></div>
-      <div id="admin-meetings" class="admin-tab"><h2 style="margin-bottom: 20px;">Meeting Requests</h2><div id="meetingsList"></div></div>
+      <div id="admin-messages-admin" class="admin-tab"><h2 style="margin-bottom:20px;">All Messages</h2><div id="allMessagesList"></div></div>
+      <div id="admin-meetings" class="admin-tab"><h2 style="margin-bottom:20px;">Meeting Requests</h2><div id="meetingsList"></div></div>
     </div>
   </div>
 </div>
 
-<!-- Login Modal -->
 <div id="loginModal" class="modal-overlay">
-  <div class="modal">
-    <div class="modal-header"><h3 id="loginModalTitle">Client Portal Login</h3><span class="modal-close" onclick="closeModal('loginModal')">&times;</span></div>
-    <div class="modal-body">
-      <div id="loginForm">
-        <div class="form-group"><label class="form-label">Email</label><input type="email" id="loginEmail" class="form-input" placeholder="client@croft.com"></div>
-        <div class="form-group"><label class="form-label">Password</label><input type="password" id="loginPassword" class="form-input" placeholder="••••••••"></div>
-        <button class="btn btn-primary" onclick="login()" style="width:100%">Sign In</button>
-        <div class="text-center mt-4"><a href="#" onclick="showRegisterForm()" style="color:var(--navy); text-decoration:none;">New client? Request portal access</a></div>
-      </div>
-      <div id="registerForm" style="display:none;">
-        <div class="form-group"><label class="form-label">Full Name</label><input type="text" id="regName" class="form-input" placeholder="John Smith"></div>
-        <div class="form-group"><label class="form-label">Email</label><input type="email" id="regEmail" class="form-input" placeholder="john@company.com"></div>
-        <div class="form-group"><label class="form-label">Password</label><input type="password" id="regPassword" class="form-input" placeholder="Create password"></div>
-        <div class="form-group"><label class="form-label">Confirm Password</label><input type="password" id="regConfirmPassword" class="form-input" placeholder="Confirm password"></div>
-        <div class="form-group"><label class="form-label">Company/Project Name</label><input type="text" id="regProject" class="form-input" placeholder="Your project name"></div>
-        <button class="btn btn-primary" onclick="register()" style="width:100%">Create Account</button>
-        <div class="text-center mt-4"><a href="#" onclick="showLoginForm()" style="color:var(--navy); text-decoration:none;">← Back to Login</a></div>
-      </div>
+  <div class="modal"><div class="modal-header"><h3>Client Portal Login</h3><span class="modal-close" onclick="closeModal('loginModal')">&times;</span></div><div class="modal-body">
+    <div id="loginForm">
+      <div class="form-group"><label class="form-label">Email</label><input type="email" id="loginEmail" class="form-input"></div>
+      <div class="form-group"><label class="form-label">Password</label><input type="password" id="loginPassword" class="form-input"></div>
+      <button class="btn btn-primary" onclick="login()" style="width:100%">Sign In</button>
+      <div class="text-center mt-4"><a href="#" onclick="showRegisterForm()" style="color:var(--navy);">New client? Request portal access</a></div>
     </div>
-  </div>
+    <div id="registerForm" style="display:none;">
+      <div class="form-group"><label class="form-label">Full Name</label><input type="text" id="regName" class="form-input"></div>
+      <div class="form-group"><label class="form-label">Email</label><input type="email" id="regEmail" class="form-input"></div>
+      <div class="form-group"><label class="form-label">Password</label><input type="password" id="regPassword" class="form-input"></div>
+      <div class="form-group"><label class="form-label">Confirm Password</label><input type="password" id="regConfirmPassword" class="form-input"></div>
+      <div class="form-group"><label class="form-label">Company/Project Name</label><input type="text" id="regProject" class="form-input"></div>
+      <button class="btn btn-primary" onclick="register()" style="width:100%">Create Account</button>
+      <div class="text-center mt-4"><a href="#" onclick="showLoginForm()" style="color:var(--navy);">← Back to Login</a></div>
+    </div>
+  </div></div>
 </div>
 
-<!-- Upload PDF Modal -->
 <div id="uploadDocumentModal" class="modal-overlay">
-  <div class="modal">
-    <div class="modal-header"><h3>Upload PDF Document</h3><span class="modal-close" onclick="closeModal('uploadDocumentModal')">&times;</span></div>
-    <div class="modal-body">
-      <div class="form-group"><label class="form-label">Select Client</label><select id="uploadClientId" class="form-select"></select></div>
-      <div class="form-group"><label class="form-label">Document Type</label><select id="documentType" class="form-select">
-        <option value="Funding Proposal">Funding Proposal</option>
-        <option value="Term Sheet">Term Sheet</option>
-        <option value="Deed of Undertaking">Deed of Undertaking</option>
-      </select></div>
-      <div class="form-group"><label class="form-label">PDF File</label><input type="file" id="pdfFile" class="form-input" accept=".pdf"></div>
-      <div class="form-group"><label class="form-label">Or PDF URL</label><input type="url" id="documentUrl" class="form-input" placeholder="https://..."></div>
-      <button class="btn btn-primary" onclick="uploadDocument()" style="width:100%">Upload PDF</button>
-    </div>
-  </div>
+  <div class="modal"><div class="modal-header"><h3>Upload PDF Document</h3><span class="modal-close" onclick="closeModal('uploadDocumentModal')">&times;</span></div><div class="modal-body">
+    <div class="form-group"><label class="form-label">Select Client</label><select id="uploadClientId" class="form-select"></select></div>
+    <div class="form-group"><label class="form-label">Document Type</label><select id="documentType" class="form-select"><option>Funding Proposal</option><option>Term Sheet</option><option>Deed of Undertaking</option></select></div>
+    <div class="form-group"><label class="form-label">PDF File</label><input type="file" id="pdfFile" class="form-input" accept=".pdf"></div>
+    <div class="form-group"><label class="form-label">Or PDF URL</label><input type="url" id="documentUrl" class="form-input"></div>
+    <button class="btn btn-primary" onclick="uploadDocument()" style="width:100%">Upload PDF</button>
+  </div></div>
 </div>
 
-<!-- Edit Project Info Modal -->
 <div id="editProjectModal" class="modal-overlay">
-  <div class="modal">
-    <div class="modal-header"><h3>Edit Project Information</h3><span class="modal-close" onclick="closeModal('editProjectModal')">&times;</span></div>
-    <div class="modal-body">
-      <div class="form-group"><label class="form-label">Term (months/years)</label><input type="text" id="editTerm" class="form-input" placeholder="e.g., 24 months"></div>
-      <div class="form-group"><label class="form-label">Interest Rate (%)</label><input type="text" id="editRate" class="form-input" placeholder="e.g., 8.5%"></div>
-      <div class="form-group"><label class="form-label">Grace Period</label><input type="text" id="editGrace" class="form-input" placeholder="e.g., 6 months"></div>
-      <div class="form-group"><label class="form-label">ECF (Equity Contribution Fee - $)</label><input type="text" id="editECF" class="form-input" placeholder="e.g., $2,500,000"></div>
-      <div class="form-group"><label class="form-label">Facility Amount ($)</label><input type="text" id="editAmount" class="form-input" placeholder="e.g., $85,000,000"></div>
-      <div class="form-group"><label class="form-label">Project Type</label><input type="text" id="editType" class="form-input" placeholder="e.g., Mixed-Use Real Estate"></div>
-      <div class="form-group"><label class="form-label">Next Milestone</label><input type="text" id="editNext" class="form-input" placeholder="e.g., Commitment Fee Payment"></div>
-      <button class="btn btn-primary" onclick="saveProjectInfo()" style="width:100%">Save Changes</button>
-    </div>
-  </div>
+  <div class="modal"><div class="modal-header"><h3>Edit Project Information</h3><span class="modal-close" onclick="closeModal('editProjectModal')">&times;</span></div><div class="modal-body">
+    <div class="form-group"><label class="form-label">Term</label><input type="text" id="editTerm" class="form-input"></div>
+    <div class="form-group"><label class="form-label">Interest Rate</label><input type="text" id="editRate" class="form-input"></div>
+    <div class="form-group"><label class="form-label">Grace Period</label><input type="text" id="editGrace" class="form-input"></div>
+    <div class="form-group"><label class="form-label">ECF</label><input type="text" id="editECF" class="form-input"></div>
+    <div class="form-group"><label class="form-label">Facility Amount</label><input type="text" id="editAmount" class="form-input"></div>
+    <div class="form-group"><label class="form-label">Project Type</label><input type="text" id="editType" class="form-input"></div>
+    <div class="form-group"><label class="form-label">Next Milestone</label><input type="text" id="editNext" class="form-input"></div>
+    <button class="btn btn-primary" onclick="saveProjectInfo()" style="width:100%">Save Changes</button>
+  </div></div>
 </div>
 
-<!-- Admin Login Modal -->
 <div id="adminLoginModal" class="modal-overlay">
-  <div class="modal">
-    <div class="modal-header"><h3>Admin Access</h3><span class="modal-close" onclick="closeModal('adminLoginModal')">&times;</span></div>
-    <div class="modal-body">
-      <div class="form-group"><label class="form-label">Username</label><input type="text" id="adminUsername" class="form-input" placeholder="Username" onkeydown="if(event.key==='Enter')doAdminLogin()"></div>
-      <div class="form-group"><label class="form-label">Password</label><input type="password" id="adminPassword" class="form-input" placeholder="Password" onkeydown="if(event.key==='Enter')doAdminLogin()"></div>
-      <p id="adminLoginError" style="color:#dc2626;font-size:13px;margin-bottom:12px;display:none;">Incorrect credentials. Please try again.</p>
-      <button class="btn btn-primary" onclick="doAdminLogin()" style="width:100%">Sign In</button>
-    </div>
-  </div>
+  <div class="modal"><div class="modal-header"><h3>Admin Access</h3><span class="modal-close" onclick="closeModal('adminLoginModal')">&times;</span></div><div class="modal-body">
+    <div class="form-group"><label class="form-label">Username</label><input type="text" id="adminUsername" class="form-input"></div>
+    <div class="form-group"><label class="form-label">Password</label><input type="password" id="adminPassword" class="form-input"></div>
+    <p id="adminLoginError" style="color:#dc2626;font-size:13px;display:none;">Incorrect credentials</p>
+    <button class="btn btn-primary" onclick="doAdminLogin()" style="width:100%">Sign In</button>
+  </div></div>
 </div>
 
-<!-- Add Client Modal -->
 <div id="addClientModal" class="modal-overlay">
-  <div class="modal" style="max-width:600px">
-    <div class="modal-header"><h3>Add New Client</h3><span class="modal-close" onclick="closeModal('addClientModal')">&times;</span></div>
-    <div class="modal-body">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-        <div class="form-group"><label class="form-label">Full Name *</label><input type="text" id="ncName" class="form-input" placeholder="Client full name"></div>
-        <div class="form-group"><label class="form-label">Email *</label><input type="email" id="ncEmail" class="form-input" placeholder="client@email.com"></div>
-        <div class="form-group"><label class="form-label">Password *</label><input type="text" id="ncPassword" class="form-input" placeholder="Set login password"></div>
-        <div class="form-group"><label class="form-label">Project Name *</label><input type="text" id="ncProject" class="form-input" placeholder="e.g. Hartley Tower"></div>
-        <div class="form-group"><label class="form-label">Facility Amount</label><input type="text" id="ncAmount" class="form-input" placeholder="e.g. $50,000,000"></div>
-        <div class="form-group"><label class="form-label">Project Type</label><input type="text" id="ncType" class="form-input" placeholder="e.g. Real Estate"></div>
-        <div class="form-group"><label class="form-label">Interest Rate</label><input type="text" id="ncRate" class="form-input" placeholder="e.g. SOFR + 4.50%"></div>
-        <div class="form-group"><label class="form-label">Term</label><input type="text" id="ncTerm" class="form-input" placeholder="e.g. Up to 5 years"></div>
-        <div class="form-group"><label class="form-label">Grace Period</label><input type="text" id="ncGrace" class="form-input" placeholder="e.g. 12 months"></div>
-        <div class="form-group"><label class="form-label">ECF</label><input type="text" id="ncECF" class="form-input" placeholder="e.g. 5%"></div>
-      </div>
-      <div class="form-group"><label class="form-label">Next Milestone</label><input type="text" id="ncMilestone" class="form-input" placeholder="e.g. Awaiting Term Sheet Execution"></div>
-      <button class="btn btn-primary" onclick="createClient()" style="width:100%">Create Client Portal</button>
+  <div class="modal" style="max-width:600px"><div class="modal-header"><h3>Add New Client</h3><span class="modal-close" onclick="closeModal('addClientModal')">&times;</span></div><div class="modal-body">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="form-group"><label class="form-label">Full Name *</label><input type="text" id="ncName" class="form-input"></div>
+      <div class="form-group"><label class="form-label">Email *</label><input type="email" id="ncEmail" class="form-input"></div>
+      <div class="form-group"><label class="form-label">Password *</label><input type="text" id="ncPassword" class="form-input"></div>
+      <div class="form-group"><label class="form-label">Project Name *</label><input type="text" id="ncProject" class="form-input"></div>
+      <div class="form-group"><label class="form-label">Facility Amount</label><input type="text" id="ncAmount" class="form-input"></div>
+      <div class="form-group"><label class="form-label">Project Type</label><input type="text" id="ncType" class="form-input"></div>
+      <div class="form-group"><label class="form-label">Interest Rate</label><input type="text" id="ncRate" class="form-input"></div>
+      <div class="form-group"><label class="form-label">Term</label><input type="text" id="ncTerm" class="form-input"></div>
+      <div class="form-group"><label class="form-label">Grace Period</label><input type="text" id="ncGrace" class="form-input"></div>
+      <div class="form-group"><label class="form-label">ECF</label><input type="text" id="ncECF" class="form-input"></div>
     </div>
-  </div>
+    <div class="form-group"><label class="form-label">Next Milestone</label><input type="text" id="ncMilestone" class="form-input"></div>
+    <button class="btn btn-primary" onclick="createClient()" style="width:100%">Create Client Portal</button>
+  </div></div>
 </div>
 
 <script>
-// ============================================================
-// FIREBASE CONFIG
-// ============================================================
+// Firebase Config
 const FIREBASE_CONFIG = {
-  apiKey:            "AIzaSyCt76DoCS-ysPspUkUnIokAWLf255GzurY",
-  authDomain:        "croft-finance-52a4d.firebaseapp.com",
-  databaseURL:       "https://croft-finance-52a4d-default-rtdb.firebaseio.com",
-  projectId:         "croft-finance-52a4d",
-  storageBucket:     "croft-finance-52a4d.firebasestorage.app",
+  apiKey: "AIzaSyCt76DoCS-ysPspUkUnIokAWLf255GzurY",
+  authDomain: "croft-finance-52a4d.firebaseapp.com",
+  projectId: "croft-finance-52a4d",
+  storageBucket: "croft-finance-52a4d.firebasestorage.app",
   messagingSenderId: "718693826553",
-  appId:             "1:718693826553:web:c764558447a34cccd74728"
+  appId: "1:718693826553:web:c764558447a34cccd74728"
 };
 
-// ============================================================
-// EMAILJS CONFIGURATION
-// ============================================================
+// EmailJS Config
 const EMAILJS_CONFIG = {
-  publicKey:   "sgayReNOC1AIqBIZb",
-  serviceId:   "service_ri050ye",
-  templateId:  "template_s85eg0h",
-  adminEmail:  "suzana.aleksic@croftfinance.com"
+  publicKey: "sgayReNOC1AIqBIZb",
+  serviceId: "service_ri050ye",
+  templateId: "template_s85eg0h",
+  adminEmail: "suzana.aleksic@croftfinance.com"
 };
 
 let db = null;
 let firebaseReady = false;
-
-// Data stores
 let clients = [];
 let documents = [];
 let messages = [];
 let meetings = [];
 let currentClient = null;
-let adminCredentials = { username: "suzana", password: "croft2025" };
+const adminCredentials = { username: "suzana", password: "croft2025" };
 
-// ============================================================
-// FIREBASE INITIALIZATION
-// ============================================================
+// Initialize Firebase
 function initFirebase() {
   try {
     firebase.initializeApp(FIREBASE_CONFIG);
@@ -971,12 +335,19 @@ function initFirebase() {
     console.log("Firebase connected");
     loadFromFirebase();
   } catch(e) {
-    console.error("Firebase init error:", e);
+    console.error("Firebase error:", e);
     firebaseReady = false;
     loadFromLocalStorage();
   }
 }
 
+// Initialize EmailJS
+function initEmailJS() {
+  emailjs.init({ publicKey: EMAILJS_CONFIG.publicKey });
+  console.log("EmailJS initialized");
+}
+
+// Load from Firebase
 async function loadFromFirebase() {
   try {
     const [cSnap, dSnap, mSnap, mtSnap] = await Promise.all([
@@ -985,10 +356,10 @@ async function loadFromFirebase() {
       db.collection('messages').get(),
       db.collection('meetings').get()
     ]);
-    clients   = cSnap.docs.map(d => ({ id: Number(d.id), ...d.data() }));
+    clients = cSnap.docs.map(d => ({ id: Number(d.id), ...d.data() }));
     documents = dSnap.docs.map(d => ({ id: Number(d.id), ...d.data() }));
-    messages  = mSnap.docs.map(d => ({ id: Number(d.id), ...d.data() }));
-    meetings  = mtSnap.docs.map(d => ({ id: Number(d.id), ...d.data() }));
+    messages = mSnap.docs.map(d => ({ id: Number(d.id), ...d.data() }));
+    meetings = mtSnap.docs.map(d => ({ id: Number(d.id), ...d.data() }));
     document.getElementById('loadingOverlay').style.display = 'none';
     renderAdminTables();
     if (currentClient) {
@@ -996,25 +367,25 @@ async function loadFromFirebase() {
       loadClientPortal();
     }
   } catch(e) {
-    console.error("Firebase load error:", e);
+    console.error("Load error:", e);
     setTimeout(loadFromFirebase, 3000);
   }
 }
 
 function loadFromLocalStorage() {
-  clients   = JSON.parse(localStorage.getItem('croft_clients')   || '[]');
+  clients = JSON.parse(localStorage.getItem('croft_clients') || '[]');
   documents = JSON.parse(localStorage.getItem('croft_documents') || '[]');
-  messages  = JSON.parse(localStorage.getItem('croft_messages')  || '[]');
-  meetings  = JSON.parse(localStorage.getItem('croft_meetings')  || '[]');
+  messages = JSON.parse(localStorage.getItem('croft_messages') || '[]');
+  meetings = JSON.parse(localStorage.getItem('croft_meetings') || '[]');
   document.getElementById('loadingOverlay').style.display = 'none';
   renderAdminTables();
 }
 
 function saveData() {
-  localStorage.setItem('croft_clients',   JSON.stringify(clients));
+  localStorage.setItem('croft_clients', JSON.stringify(clients));
   localStorage.setItem('croft_documents', JSON.stringify(documents));
-  localStorage.setItem('croft_messages',  JSON.stringify(messages));
-  localStorage.setItem('croft_meetings',  JSON.stringify(meetings));
+  localStorage.setItem('croft_messages', JSON.stringify(messages));
+  localStorage.setItem('croft_meetings', JSON.stringify(meetings));
 }
 
 async function fbSaveClient(client) {
@@ -1028,7 +399,7 @@ async function fbUpdateClient(id, updates) {
   if (!firebaseReady) {
     const c = clients.find(c => c.id === id);
     if (c) Object.assign(c, updates);
-    saveData(); renderAdminTables(); 
+    saveData(); renderAdminTables();
     if (currentClient && currentClient.id === id) {
       currentClient = clients.find(c => c.id === id);
       loadClientPortal();
@@ -1041,17 +412,17 @@ async function fbUpdateClient(id, updates) {
 
 async function fbDeleteClient(id) {
   if (!firebaseReady) {
-    clients   = clients.filter(c => c.id !== id);
+    clients = clients.filter(c => c.id !== id);
     documents = documents.filter(d => d.clientId !== id);
-    messages  = messages.filter(m => m.clientId !== id);
-    meetings  = meetings.filter(m => m.clientId !== id);
+    messages = messages.filter(m => m.clientId !== id);
+    meetings = meetings.filter(m => m.clientId !== id);
     saveData(); renderAdminTables(); return;
   }
   const batch = db.batch();
   batch.delete(db.collection('clients').doc(String(id)));
-  (await db.collection('documents').where('clientId','==',id).get()).docs.forEach(d => batch.delete(d.ref));
-  (await db.collection('messages').where('clientId','==',id).get()).docs.forEach(d => batch.delete(d.ref));
-  (await db.collection('meetings').where('clientId','==',id).get()).docs.forEach(d => batch.delete(d.ref));
+  (await db.collection('documents').where('clientId', '==', id).get()).docs.forEach(d => batch.delete(d.ref));
+  (await db.collection('messages').where('clientId', '==', id).get()).docs.forEach(d => batch.delete(d.ref));
+  (await db.collection('meetings').where('clientId', '==', id).get()).docs.forEach(d => batch.delete(d.ref));
   await batch.commit();
   await loadFromFirebase();
 }
@@ -1097,186 +468,66 @@ async function fbDeleteDocument(id) {
 }
 
 function refreshData() {
-  if (firebaseReady) {
-    loadFromFirebase().then(() => showToast('Data refreshed'));
-  } else {
-    loadFromLocalStorage();
-    showToast('Data refreshed (local storage)');
-  }
+  if (firebaseReady) loadFromFirebase().then(() => showToast('Data refreshed'));
+  else { loadFromLocalStorage(); showToast('Data refreshed'); }
 }
 
-// ============================================================
-// EMAILJS FUNCTIONS
-// ============================================================
-function initEmailJS() {
-  emailjs.init({ publicKey: EMAILJS_CONFIG.publicKey });
-  console.log("EmailJS initialized");
-}
-
+// Email Functions
 function sendEmail(to, subject, htmlContent) {
-  const templateParams = {
-    to_email: to,
-    subject: subject,
-    message: htmlContent
-  };
-  return emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, templateParams);
+  return emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
+    to_email: to, subject: subject, message: htmlContent
+  });
 }
 
-function sendCustomerConfirmation(customerEmail, customerName) {
-  const htmlContent = `
-    <html>
-    <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-      <div style="background: #0a1628; padding: 30px 20px; text-align: center; border-radius: 12px 12px 0 0;">
-        <h1 style="color: #ffffff; margin: 0;">CROFT <span style="color: #9ca3af;">FINANCE</span></h1>
-      </div>
-      <div style="background: #ffffff; border: 1px solid #e5e7eb; border-top: none; padding: 30px; border-radius: 0 0 12px 12px;">
-        <h2 style="color: #0a1628;">Welcome ${customerName}</h2>
-        <p>Thank you for requesting access to the Croft Finance Institutional Client Portal.</p>
-        <div style="background: #fef3c7; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #f59e0b;">
-          <p style="margin: 0; font-weight: 600; color: #92400e;">⏱️ Access within 1 hour</p>
-          <p style="margin: 8px 0 0 0; color: #78350f;">We will grant you full portal access within 1 hour. You will receive a confirmation email once your account is activated.</p>
-        </div>
-        <p style="margin: 25px 0 10px 0; font-size: 14px; color: #6b7280;">What happens next:</p>
-        <ul style="color: #4b5563; font-size: 14px; line-height: 1.6; padding-left: 20px;">
-          <li>Our team reviews your request</li>
-          <li>We set up your project details in the portal</li>
-          <li>You receive activation confirmation (within 1 hour)</li>
-          <li>Log in using your email and chosen password</li>
-        </ul>
-        <hr style="border-top: 1px solid #e5e7eb;">
-        <p style="font-size: 12px; color: #9ca3af; text-align: center;">Croft Finance — Structured Financing Solutions</p>
-      </div>
-    </body>
-    </html>
-  `;
-  return sendEmail(customerEmail, "Croft Finance Portal Access Request Received", htmlContent);
+function sendCustomerConfirmation(email, name) {
+  const html = `<html><body style="font-family:Arial;max-width:600px;margin:0 auto;padding:20px;"><div style="background:#0a1628;padding:30px;text-align:center;"><h1 style="color:#fff;">CROFT FINANCE</h1></div><div style="border:1px solid #e5e7eb;padding:30px;"><h2>Welcome ${name}</h2><p>Thank you for requesting portal access.</p><div style="background:#fef3c7;padding:20px;border-left:4px solid #f59e0b;"><p style="font-weight:600;">⏱️ Access within 1 hour</p><p>We will grant you full portal access within 1 hour.</p></div><hr><p style="color:#9ca3af;">Croft Finance</p></div></body></html>`;
+  return sendEmail(email, "Croft Finance Portal Access Request Received", html);
 }
 
 function sendAdminNotification(subject, body, customerName = "", customerEmail = "") {
-  const htmlContent = `
-    <html>
-    <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-      <div style="background: #0a1628; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
-        <h2 style="color: #ffffff; margin: 0;">Croft Finance Portal Alert</h2>
-      </div>
-      <div style="background: #ffffff; border: 1px solid #e5e7eb; border-top: none; padding: 25px; border-radius: 0 0 8px 8px;">
-        ${customerName ? `<p><strong>Customer:</strong> ${customerName}</p>` : ''}
-        ${customerEmail ? `<p><strong>Email:</strong> ${customerEmail}</p>` : ''}
-        <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin: 15px 0;">
-          <p style="margin: 0; white-space: pre-wrap;">${body}</p>
-        </div>
-        <p style="font-size: 12px; color: #9ca3af;">Log in to your admin panel to take action.</p>
-      </div>
-    </body>
-    </html>
-  `;
-  return sendEmail(EMAILJS_CONFIG.adminEmail, subject, htmlContent);
+  const html = `<html><body><div style="background:#0a1628;padding:20px;"><h2 style="color:#fff;">Croft Finance Alert</h2></div><div style="padding:20px;">${customerName ? `<p><strong>Customer:</strong> ${customerName}</p>` : ''}${customerEmail ? `<p><strong>Email:</strong> ${customerEmail}</p>` : ''}<div style="background:#f3f4f6;padding:15px;">${body}</div></div></body></html>`;
+  return sendEmail(EMAILJS_CONFIG.adminEmail, subject, html);
 }
 
-// ============================================================
-// UI FUNCTIONS
-// ============================================================
+// UI Functions
 function showView(viewName) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById(`view-${viewName}`).classList.add('active');
 }
 
-function openLoginModal() { 
-  document.getElementById('loginModal').classList.add('active');
-  showLoginForm();
-}
-
-function closeModal(id) { 
-  document.getElementById(id).classList.remove('active'); 
-}
-
+function openLoginModal() { document.getElementById('loginModal').classList.add('active'); showLoginForm(); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 function showToast(msg, isError = false) {
   const toast = document.createElement('div');
   toast.className = 'toast';
-  toast.style.background = isError ? '#dc2626' : 'var(--gray-800)';
+    toast.style.background = isError ? '#dc2626' : 'var(--gray-800)';
   toast.innerHTML = msg;
   document.body.appendChild(toast);
   setTimeout(() => toast.remove(), 3000);
 }
+function showRegisterForm() { document.getElementById('loginForm').style.display = 'none'; document.getElementById('registerForm').style.display = 'block'; }
+function showLoginForm() { document.getElementById('registerForm').style.display = 'none'; document.getElementById('loginForm').style.display = 'block'; }
 
-function showRegisterForm() {
-  document.getElementById('loginForm').style.display = 'none';
-  document.getElementById('registerForm').style.display = 'block';
-}
-
-function showLoginForm() {
-  document.getElementById('registerForm').style.display = 'none';
-  document.getElementById('loginForm').style.display = 'block';
-}
-
-// ============================================================
-// REGISTRATION & LOGIN
-// ============================================================
+// Registration & Login
 function register() {
   const name = document.getElementById('regName').value.trim();
   const email = document.getElementById('regEmail').value.trim().toLowerCase();
   const password = document.getElementById('regPassword').value;
-  const confirmPassword = document.getElementById('regConfirmPassword').value;
+  const confirm = document.getElementById('regConfirmPassword').value;
   const project = document.getElementById('regProject').value.trim();
+  if (!name || !email || !password || !project) { showToast('Please fill all fields', true); return; }
+  if (password !== confirm) { showToast('Passwords do not match', true); return; }
+  if (password.length < 6) { showToast('Password must be at least 6 characters', true); return; }
+  if (clients.find(c => c.email === email)) { showToast('Email already registered', true); return; }
   
-  if (!name || !email || !password || !project) {
-    showToast('Please fill all fields', true);
-    return;
-  }
+  const newClient = { id: Date.now(), name, email, password, project, amount: "TBD", type: "New Project", step: 1, nextMilestone: "Awaiting Term Sheet", contact: "Suzana Aleksić", term: "TBD", interestRate: "TBD", gracePeriod: "TBD", ecf: "TBD", status: "pending", createdAt: new Date().toISOString() };
   
-  if (password !== confirmPassword) {
-    showToast('Passwords do not match', true);
-    return;
-  }
-  
-  if (password.length < 6) {
-    showToast('Password must be at least 6 characters', true);
-    return;
-  }
-  
-  const existingClient = clients.find(c => c.email === email);
-  if (existingClient) {
-    showToast('Email already registered', true);
-    return;
-  }
-  
-  const newClient = {
-    id: Date.now(),
-    name: name,
-    email: email,
-    password: password,
-    project: project,
-    amount: "TBD",
-    type: "New Project",
-    step: 1,
-    nextMilestone: "Awaiting Term Sheet",
-    contact: "Suzana Aleksić",
-    term: "TBD",
-    interestRate: "TBD",
-    gracePeriod: "TBD",
-    ecf: "TBD",
-    status: "pending",
-    createdAt: new Date().toISOString()
-  };
-  
-  showToast('Submitting registration...');
   fbSaveClient(newClient).then(() => {
-    sendCustomerConfirmation(email, name).catch(err => console.warn("Email error:", err));
-    sendAdminNotification(
-      "New Client Registration — " + name,
-      "A new client has registered.\n\nName: " + name + "\nEmail: " + email + "\nProject: " + project,
-      name, email
-    ).catch(err => console.warn("Admin email error:", err));
+    sendCustomerConfirmation(email, name).catch(e => console.warn(e));
+    sendAdminNotification("New Client Registration — " + name, "Name: " + name + "\nEmail: " + email + "\nProject: " + project, name, email).catch(e => console.warn(e));
     showToast('Registration submitted! Check your email for confirmation.');
-  }).catch(() => {
-    showToast('Registration submitted! You will receive access confirmation shortly.');
   });
-
-  document.getElementById('regName').value = '';
-  document.getElementById('regEmail').value = '';
-  document.getElementById('regPassword').value = '';
-  document.getElementById('regConfirmPassword').value = '';
-  document.getElementById('regProject').value = '';
+  document.getElementById('regName').value = ''; document.getElementById('regEmail').value = ''; document.getElementById('regPassword').value = ''; document.getElementById('regConfirmPassword').value = ''; document.getElementById('regProject').value = '';
   showLoginForm();
 }
 
@@ -1284,17 +535,8 @@ function login() {
   const email = document.getElementById('loginEmail').value.toLowerCase().trim();
   const password = document.getElementById('loginPassword').value;
   const client = clients.find(c => c.email === email && c.password === password);
-  
-  if (!client) {
-    showToast('Invalid email or password', true);
-    return;
-  }
-
-  if (client.status === 'pending') {
-    showToast('Your account is being reviewed. You will receive access within 1 hour.', true);
-    return;
-  }
-
+  if (!client) { showToast('Invalid email or password', true); return; }
+  if (client.status === 'pending') { showToast('Your account is being reviewed. Access within 1 hour.', true); return; }
   currentClient = client;
   closeModal('loginModal');
   showView('portal');
@@ -1302,45 +544,31 @@ function login() {
   loadClientPortal();
 }
 
-function openAdminLogin() {
-  document.getElementById('adminLoginModal').classList.add('active');
-}
-
+function openAdminLogin() { document.getElementById('adminLoginModal').classList.add('active'); }
 function doAdminLogin() {
   const username = document.getElementById('adminUsername').value.trim();
   const password = document.getElementById('adminPassword').value;
   if (username === adminCredentials.username && password === adminCredentials.password) {
     closeModal('adminLoginModal');
-    document.getElementById('adminUsername').value = '';
-    document.getElementById('adminPassword').value = '';
-    document.getElementById('adminLoginError').style.display = 'none';
     showView('admin');
     renderAdminTables();
-  } else {
-    document.getElementById('adminLoginError').style.display = 'block';
-  }
+  } else { document.getElementById('adminLoginError').style.display = 'block'; }
 }
-
-function logout() {
-  currentClient = null;
-  showView('home');
-}
+function logout() { currentClient = null; showView('home'); }
 
 function switchPortalTab(tabName) {
   const navItem = event.target.closest('.nav-item');
-  document.querySelectorAll('#view-portal .nav-item').forEach(item => item.classList.remove('active'));
+  document.querySelectorAll('#view-portal .nav-item').forEach(i => i.classList.remove('active'));
   if (navItem) navItem.classList.add('active');
-  
-  document.querySelectorAll('#view-portal .portal-tab').forEach(tab => tab.classList.remove('active'));
+  document.querySelectorAll('#view-portal .portal-tab').forEach(t => t.classList.remove('active'));
   document.getElementById(`tab-${tabName}`).classList.add('active');
 }
 
 function switchAdminTab(tabName) {
   const navItem = event.target.closest('.nav-item');
-  document.querySelectorAll('#view-admin .nav-item').forEach(item => item.classList.remove('active'));
+  document.querySelectorAll('#view-admin .nav-item').forEach(i => i.classList.remove('active'));
   if (navItem) navItem.classList.add('active');
-  
-  document.querySelectorAll('#view-admin .admin-tab').forEach(tab => tab.classList.remove('active'));
+  document.querySelectorAll('#view-admin .admin-tab').forEach(t => t.classList.remove('active'));
   document.getElementById(`admin-${tabName}`).classList.add('active');
 }
 
@@ -1358,35 +586,15 @@ function loadClientPortal() {
 }
 
 function renderTimeline() {
-  const steps = [
-    { title: "Term Sheet", desc: "Commercial terms agreed", duration: "Day 1-2" },
-    { title: "Commitment Fee", desc: "Initial fee payment", duration: "Day 3" },
-    { title: "Deed of Undertaking", desc: "Legal execution", duration: "Day 4-5" },
-    { title: "Credit Support", desc: "Policy issuance", duration: "Day 6-7" },
-    { title: "Hard-Copy Submission", desc: "Document delivery", duration: "Day 8" },
-    { title: "ECF Escrow", desc: "Funds deposited", duration: "Day 9-10" },
-    { title: "Transfer to Agent", desc: "Funds released", duration: "Day 11-14" },
-    { title: "Funding", desc: "Capital deployed", duration: "Day 15-21" }
-  ];
-  
+  const steps = [{ title: "Term Sheet", desc: "Commercial terms agreed", duration: "Day 1-2" }, { title: "Commitment Fee", desc: "Initial fee payment", duration: "Day 3" }, { title: "Deed of Undertaking", desc: "Legal execution", duration: "Day 4-5" }, { title: "Credit Support", desc: "Policy issuance", duration: "Day 6-7" }, { title: "Hard-Copy Submission", desc: "Document delivery", duration: "Day 8" }, { title: "ECF Escrow", desc: "Funds deposited", duration: "Day 9-10" }, { title: "Transfer to Agent", desc: "Funds released", duration: "Day 11-14" }, { title: "Funding", desc: "Capital deployed", duration: "Day 15-21" }];
   const container = document.getElementById('timeline');
   container.innerHTML = '';
-  
   steps.forEach((step, i) => {
     const stepNum = i + 1;
     const isCompleted = stepNum < currentClient.step;
     const isCurrent = stepNum === currentClient.step;
-    const item = document.createElement('div');
-    item.className = 'timeline-item';
-    item.innerHTML = `
-      <div class="timeline-dot ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''}"></div>
-      <div class="timeline-title">${step.title}</div>
-      <div class="timeline-desc">${step.desc}</div>
-      <div class="timeline-date">${step.duration}</div>
-    `;
-    container.appendChild(item);
+    container.innerHTML += `<div class="timeline-item"><div class="timeline-dot ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''}"></div><div class="timeline-title">${step.title}</div><div class="timeline-desc">${step.desc}</div><div class="timeline-date">${step.duration}</div></div>`;
   });
-  
   document.getElementById('currentStepNum').textContent = currentClient.step;
 }
 
@@ -1394,78 +602,22 @@ function renderDocuments() {
   const clientDocs = documents.filter(d => d.clientId === currentClient.id);
   const container = document.getElementById('documentsList');
   container.innerHTML = '';
-  
-  if (clientDocs.length === 0) {
-    container.innerHTML = '<div class="card"><div class="card-body text-center" style="color:var(--gray-500);">No documents uploaded yet</div></div>';
-    return;
-  }
-  
-  clientDocs.forEach(doc => {
-    const card = document.createElement('div');
-    card.className = 'document-card';
-    card.innerHTML = `
-      <div class="document-icon"><i class="fas fa-file-pdf"></i></div>
-      <div class="document-name">${doc.name || doc.type}</div>
-      <div class="document-meta">Uploaded: ${doc.date}</div>
-      <div class="document-actions">
-        <button class="doc-action-btn" onclick="viewPDF(${doc.id})"><i class="fas fa-eye"></i> View</button>
-        <button class="doc-action-btn" onclick="downloadPDF(${doc.id})"><i class="fas fa-download"></i> Download</button>
-      </div>
-      <span class="status-badge status-signed"><i class="fas fa-lock"></i> Secure PDF</span>
-    `;
-    container.appendChild(card);
-  });
+  if (clientDocs.length === 0) { container.innerHTML = '<div class="card"><div class="card-body text-center">No documents uploaded yet</div></div>'; return; }
+  clientDocs.forEach(doc => { container.innerHTML += `<div class="document-card"><div class="document-icon"><i class="fas fa-file-pdf"></i></div><div class="document-name">${doc.name || doc.type}</div><div class="document-meta">Uploaded: ${doc.date}</div><div class="document-actions"><button class="doc-action-btn" onclick="viewPDF(${doc.id})">View</button><button class="doc-action-btn" onclick="downloadPDF(${doc.id})">Download</button></div><span class="status-badge status-signed">Secure PDF</span></div>`; });
 }
 
-function viewPDF(docId) {
-  const doc = documents.find(d => d.id === docId);
-  if (doc && doc.url && doc.url !== '#') {
-    window.open(doc.url, '_blank');
-  } else {
-    showToast('PDF URL not available', true);
-  }
-}
-
-function downloadPDF(docId) {
-  const doc = documents.find(d => d.id === docId);
-  if (doc && doc.url && doc.url !== '#') {
-    const link = document.createElement('a');
-    link.href = doc.url;
-    link.download = (doc.name || doc.type) + '.pdf';
-    link.target = '_blank';
-    link.click();
-    showToast(`Downloading ${doc.name || doc.type}`);
-  } else {
-    showToast('PDF URL not available', true);
-  }
-}
+function viewPDF(docId) { const doc = documents.find(d => d.id === docId); if (doc && doc.url) window.open(doc.url, '_blank'); else showToast('PDF not available', true); }
+function downloadPDF(docId) { const doc = documents.find(d => d.id === docId); if (doc && doc.url) { const a = document.createElement('a'); a.href = doc.url; a.download = (doc.name || doc.type) + '.pdf'; a.click(); showToast('Downloading...'); } else showToast('PDF not available', true); }
 
 function renderProjectInfo() {
-  const container = document.getElementById('projectInfo');
-  container.innerHTML = `
-    <div class="stat-card"><div class="stat-label">Project Name</div><div class="stat-value" style="font-size:18px;">${currentClient.project}</div></div>
-    <div class="stat-card"><div class="stat-label">Facility Amount</div><div class="stat-value">${currentClient.amount}</div></div>
-    <div class="stat-card"><div class="stat-label">Project Type</div><div class="stat-value" style="font-size:18px;">${currentClient.type}</div></div>
-    <div class="stat-card"><div class="stat-label">Term</div><div class="stat-value" style="font-size:18px;">${currentClient.term}</div></div>
-    <div class="stat-card"><div class="stat-label">Interest Rate</div><div class="stat-value" style="font-size:18px;">${currentClient.interestRate}</div></div>
-    <div class="stat-card"><div class="stat-label">Grace Period</div><div class="stat-value" style="font-size:18px;">${currentClient.gracePeriod}</div></div>
-    <div class="stat-card"><div class="stat-label">ECF</div><div class="stat-value" style="font-size:18px;">${currentClient.ecf}</div></div>
-    <div class="stat-card"><div class="stat-label">Key Contact</div><div class="stat-value" style="font-size:18px;">${currentClient.contact}</div></div>
-    <div class="stat-card"><div class="stat-label">Current Step</div><div class="stat-value">${currentClient.step}/8</div></div>
-  `;
+  document.getElementById('projectInfo').innerHTML = `<div class="stat-card"><div class="stat-label">Project Name</div><div class="stat-value" style="font-size:18px;">${currentClient.project}</div></div><div class="stat-card"><div class="stat-label">Facility Amount</div><div class="stat-value">${currentClient.amount}</div></div><div class="stat-card"><div class="stat-label">Project Type</div><div class="stat-value" style="font-size:18px;">${currentClient.type}</div></div><div class="stat-card"><div class="stat-label">Term</div><div class="stat-value" style="font-size:18px;">${currentClient.term}</div></div><div class="stat-card"><div class="stat-label">Interest Rate</div><div class="stat-value" style="font-size:18px;">${currentClient.interestRate}</div></div><div class="stat-card"><div class="stat-label">Grace Period</div><div class="stat-value" style="font-size:18px;">${currentClient.gracePeriod}</div></div><div class="stat-card"><div class="stat-label">ECF</div><div class="stat-value" style="font-size:18px;">${currentClient.ecf}</div></div><div class="stat-card"><div class="stat-label">Key Contact</div><div class="stat-value" style="font-size:18px;">${currentClient.contact}</div></div><div class="stat-card"><div class="stat-label">Current Step</div><div class="stat-value">${currentClient.step}/8</div></div>`;
 }
 
 function loadMessages() {
   const clientMessages = messages.filter(m => m.clientId === currentClient.id);
   const container = document.getElementById('messagesList');
   container.innerHTML = '';
-  
-  clientMessages.forEach(msg => {
-    const div = document.createElement('div');
-    div.className = `message ${msg.sender === 'client' ? 'client' : ''}`;
-    div.innerHTML = `<div class="message-bubble">${msg.content}</div><div class="message-meta">${new Date(msg.timestamp).toLocaleString()}</div>`;
-    container.appendChild(div);
-  });
+  clientMessages.forEach(msg => { container.innerHTML += `<div class="message ${msg.sender === 'client' ? 'client' : ''}"><div class="message-bubble">${msg.content}</div><div class="message-meta">${new Date(msg.timestamp).toLocaleString()}</div></div>`; });
   container.scrollTop = container.scrollHeight;
 }
 
@@ -1473,153 +625,171 @@ function sendMessage() {
   const input = document.getElementById('messageInput');
   const content = input.value.trim();
   if (!content) return;
-  
-  const newMsg = {
-    id: Date.now(),
-    clientId: currentClient.id,
-    clientName: currentClient.name,
-    sender: 'client',
-    content: content,
-    timestamp: new Date().toISOString()
-  };
-
-  fbSaveMessage(newMsg).then(() => {
-    loadMessages();
-    sendAdminNotification(
-      "New Message from " + currentClient.name,
-      "Message: " + content,
-      currentClient.name,
-      currentClient.email
-    ).catch(err => console.warn("Message notification error:", err));
-  });
-
+  const newMsg = { id: Date.now(), clientId: currentClient.id, clientName: currentClient.name, sender: 'client', content: content, timestamp: new Date().toISOString() };
+  fbSaveMessage(newMsg).then(() => { loadMessages(); sendAdminNotification("New Message from " + currentClient.name, content, currentClient.name, currentClient.email).catch(e => console.warn(e)); });
   input.value = '';
   showToast('Message sent');
 }
 
 function scheduleMeeting() {
-  const meeting = {
-    id: Date.now(),
-    clientId: currentClient.id,
-    clientName: currentClient.name,
-    type: document.getElementById('meetingType').value,
-    date: document.getElementById('meetingDate').value,
-    time: document.getElementById('meetingTime').value,
-    notes: document.getElementById('meetingNotes').value,
-    status: 'pending',
-    timestamp: new Date().toISOString()
-  };
-  
-  fbSaveMeeting(meeting).then(() => {
-    sendAdminNotification(
-      "Meeting Request from " + currentClient.name,
-      "Type: " + meeting.type + "\nDate: " + (meeting.date || "TBD") + "\nNotes: " + (meeting.notes || "None"),
-      currentClient.name,
-      currentClient.email
-    ).catch(err => console.warn("Meeting notification error:", err));
-    showToast('Meeting request sent');
-  });
-  document.getElementById('meetingDate').value = '';
-  document.getElementById('meetingTime').value = '';
-  document.getElementById('meetingNotes').value = '';
+  const meeting = { id: Date.now(), clientId: currentClient.id, clientName: currentClient.name, type: document.getElementById('meetingType').value, date: document.getElementById('meetingDate').value, time: document.getElementById('meetingTime').value, notes: document.getElementById('meetingNotes').value, status: 'pending', timestamp: new Date().toISOString() };
+  fbSaveMeeting(meeting).then(() => { sendAdminNotification("Meeting Request from " + currentClient.name, "Type: " + meeting.type + "\nDate: " + (meeting.date || "TBD"), currentClient.name, currentClient.email).catch(e => console.warn(e)); showToast('Meeting request sent'); });
+  document.getElementById('meetingDate').value = ''; document.getElementById('meetingTime').value = ''; document.getElementById('meetingNotes').value = '';
 }
 
 function loadRecentActivity() {
-  const all = [...messages.filter(m => m.clientId === currentClient.id), ...meetings.filter(m => m.clientId === currentClient.id)]
-    .sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0,5);
-  
+  const all = [...messages.filter(m => m.clientId === currentClient.id), ...meetings.filter(m => m.clientId === currentClient.id)].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0,5);
   const container = document.getElementById('recentActivity');
-  if (all.length === 0) {
-    container.innerHTML = '<div style="color:var(--gray-500);">No recent activity</div>';
-    return;
-  }
-  
-  container.innerHTML = all.map(a => `
-    <div style="padding:12px 0; border-bottom:1px solid var(--gray-200);">
-      <div style="font-size:13px;">${a.content || a.type || 'Meeting request'}</div>
-      <div style="font-size:11px; color:var(--gray-500);">${new Date(a.timestamp).toLocaleString()}</div>
-    </div>
-  `).join('');
+  if (all.length === 0) { container.innerHTML = '<div>No recent activity</div>'; return; }
+  container.innerHTML = all.map(a => `<div style="padding:12px 0; border-bottom:1px solid var(--gray-200);"><div>${a.content || a.type || 'Meeting request'}</div><div style="font-size:11px; color:var(--gray-500);">${new Date(a.timestamp).toLocaleString()}</div></div>`).join('');
 }
 
-// ============================================================
-// ADMIN FUNCTIONS
-// ============================================================
+// Admin Functions
 function renderAdminTables() {
   const tbody = document.getElementById('adminClientsTable');
   if (tbody) {
     tbody.innerHTML = '';
     clients.forEach(c => {
-      const statusColor = c.status === 'pending' ? '#f59e0b' : '#10b981';
-      const statusLabel = c.status === 'pending' ? 'Pending' : 'Active';
-      tbody.innerHTML += `<tr>
-        <td><strong>${c.name}</strong><br><span style="font-size:12px;color:var(--gray-500);">${c.email}</span></td>
-        <td>${c.project}</td>
-        <td>${c.amount}</td>
-        <td>Step ${c.step}/8</td>
-        <td>${c.ecf}</td>
-        <td><span style="font-size:11px;font-weight:600;color:${statusColor};">${statusLabel}</span></td>
-        <td>
-          ${c.status === 'pending' ? `<button class="btn btn-primary" style="padding:4px 12px;margin-right:4px;" onclick="activateClient(${c.id})">Activate & Setup</button>` : `<button class="btn btn-outline" style="padding:4px 12px;margin-right:4px;" onclick="editClientStep(${c.id})">Update Step</button>`}
-          <button class="btn btn-outline" style="padding:4px 12px; margin-right:4px;" onclick="editProjectInfo(${c.id})">Edit Info</button>
-          <button class="btn btn-outline" style="padding:4px 12px; color:#dc2626;" onclick="deleteClient(${c.id})">Delete</button>
-        </td>
-      `;
+      tbody.innerHTML += `<tr><td><strong>${c.name}</strong><br><span style="font-size:12px;">${c.email}</span></td><td>${c.project}</td><td>${c.amount}</td><td>Step ${c.step}/8</td><td>${c.ecf}</td><td><span style="color:${c.status === 'pending' ? '#f59e0b' : '#10b981'}">${c.status === 'pending' ? 'Pending' : 'Active'}</span></td><td>${c.status === 'pending' ? `<button class="btn btn-primary" style="padding:4px 12px;" onclick="activateClient(${c.id})">Activate & Setup</button>` : `<button class="btn btn-outline" style="padding:4px 12px;" onclick="editClientStep(${c.id})">Update Step</button>`} <button class="btn btn-outline" style="padding:4px 12px;" onclick="editProjectInfo(${c.id})">Edit Info</button> <button class="btn btn-outline" style="padding:4px 12px;color:#dc2626;" onclick="deleteClient(${c.id})">Delete</button></td></tr>`;
     });
   }
-  
   const docsContainer = document.getElementById('adminDocumentsList');
   if (docsContainer) {
     docsContainer.innerHTML = '';
-    documents.forEach(d => {
-      const client = clients.find(c => c.id === d.clientId);
-      docsContainer.innerHTML += `
-        <div class="document-card">
-          <div class="document-icon"><i class="fas fa-file-pdf"></i></div>
-          <div class="document-name">${d.type}</div>
-          <div class="document-meta">${client?.name || 'Unknown'}<br>${d.date}</div>
-          <div class="document-actions">
-            <button class="doc-action-btn" onclick="viewPDF(${d.id})"><i class="fas fa-eye"></i> View</button>
-            <button class="doc-action-btn" onclick="deleteDocument(${d.id})" style="color:#dc2626;"><i class="fas fa-trash"></i> Delete</button>
-          </div>
-        </div>
-      `;
-    });
+    documents.forEach(d => { const client = clients.find(c => c.id === d.clientId); docsContainer.innerHTML += `<div class="document-card"><div class="document-icon"><i class="fas fa-file-pdf"></i></div><div class="document-name">${d.type}</div><div class="document-meta">${client?.name || 'Unknown'}<br>${d.date}</div><div class="document-actions"><button class="doc-action-btn" onclick="viewPDF(${d.id})">View</button><button class="doc-action-btn" onclick="deleteDocument(${d.id})" style="color:#dc2626;">Delete</button></div></div>`; });
   }
-  
   const messagesContainer = document.getElementById('allMessagesList');
   if (messagesContainer) {
     messagesContainer.innerHTML = '';
-    [...messages].reverse().forEach(m => {
-      messagesContainer.innerHTML += `<div style="padding:12px; background:var(--gray-100); border-radius:8px; margin-bottom:12px;"><strong>${m.clientName}</strong> <span style="font-size:11px; color:var(--gray-500);">${new Date(m.timestamp).toLocaleString()}</span><div style="margin-top:8px;">${m.content}</div><div style="margin-top:8px;"><button class="btn btn-primary" style="padding:4px 12px;" onclick="replyToClient(${m.id})">Reply</button></div></div>`;
-    });
+    [...messages].reverse().forEach(m => { messagesContainer.innerHTML += `<div style="padding:12px;background:var(--gray-100);border-radius:8px;margin-bottom:12px;"><strong>${m.clientName}</strong> <span style="font-size:11px;">${new Date(m.timestamp).toLocaleString()}</span><div>${m.content}</div><div><button class="btn btn-primary" style="padding:4px 12px;margin-top:8px;" onclick="replyToClient(${m.id})">Reply</button></div></div>`; });
   }
-  
   const meetingsContainer = document.getElementById('meetingsList');
   if (meetingsContainer) {
     meetingsContainer.innerHTML = '';
-    [...meetings].reverse().forEach(m => {
-      meetingsContainer.innerHTML += `<div style="padding:12px; background:var(--gray-100); border-radius:8px; margin-bottom:12px;"><strong>${m.clientName}</strong> <span class="status-badge status-signed">${m.status}</span><div><strong>${m.type}</strong> - ${m.date || 'TBD'} ${m.time || ''}</div><div>${m.notes || ''}</div><div style="margin-top:8px;"><button class="btn btn-primary" style="padding:4px 12px;" onclick="updateMeetingStatus(${m.id},'confirmed')">Confirm</button> <button class="btn btn-outline" style="padding:4px 12px;" onclick="updateMeetingStatus(${m.id},'cancelled')">Decline</button></div></div>`;
-    });
+    [...meetings].reverse().forEach(m => { meetingsContainer.innerHTML += `<div style="padding:12px;background:var(--gray-100);border-radius:8px;margin-bottom:12px;"><strong>${m.clientName}</strong> <span class="status-badge status-signed">${m.status}</span><div><strong>${m.type}</strong> - ${m.date || 'TBD'}</div><div>${m.notes || ''}</div><div><button class="btn btn-primary" style="padding:4px 12px;margin-top:8px;" onclick="updateMeetingStatus(${m.id},'confirmed')">Confirm</button> <button class="btn btn-outline" style="padding:4px 12px;" onclick="updateMeetingStatus(${m.id},'cancelled')">Decline</button></div></div>`; });
   }
-  
-  const pendingClients = clients.filter(c => c.status === 'pending');
-  const activeClients = clients.filter(c => c.status !== 'pending');
-  document.getElementById('totalClients').textContent = activeClients.length;
+  const pending = clients.filter(c => c.status === 'pending');
+  const active = clients.filter(c => c.status !== 'pending');
+  document.getElementById('totalClients').textContent = active.length;
   document.getElementById('pendingMessages').textContent = messages.filter(m => m.sender === 'client').length;
   document.getElementById('scheduledMeetings').textContent = meetings.filter(m => m.status === 'pending').length;
   document.getElementById('totalDocuments').textContent = documents.length;
-
-  const pcCount = document.getElementById('pendingClients');
-  if (pcCount) pcCount.textContent = pendingClients.length;
-
+  document.getElementById('pendingClients').textContent = pending.length;
   const pendingBlock = document.getElementById('pendingRegistrationsBlock');
   const pendingTbody = document.getElementById('pendingRegistrationsTable');
   if (pendingBlock && pendingTbody) {
-    if (pendingClients.length > 0) {
+    if (pending.length > 0) {
       pendingBlock.style.display = 'block';
       pendingTbody.innerHTML = '';
-      pendingClients.forEach(c => {
-        pendingTbody.innerHTML += `<tr>
-          <td><strong>${c.name}</strong></td>
-          <td>${c.email}</td>
+      pending.forEach(c => { pendingTbody.innerHTML += `<tr><td><strong>${c.name}</strong></td><td>${c.email}</td><td>${c.project}</td><td>${new Date(c.createdAt).toLocaleString()}</td><td><button class="btn btn-primary" style="padding:4px 12px;" onclick="activateClient(${c.id})">Activate & Setup</button> <button class="btn btn-outline" style="padding:4px 12px;color:#dc2626;" onclick="deleteClient(${c.id})">Decline</button></td></tr>`; });
+    } else { pendingBlock.style.display = 'none'; }
+  }
+}
+
+function activateClient(id) {
+  const client = clients.find(c => c.id === id);
+  if (!client) { showToast('Client not found', true); return; }
+  fbUpdateClient(id, { status: 'active' }).then(() => {
+    showToast(client.name + ' activated! Now edit their project details.');
+    setTimeout(() => { editProjectInfo(id); }, 500);
+  }).catch(err => { console.error(err); showToast('Error activating client', true); });
+}
+
+function editProjectInfo(id) {
+  const client = clients.find(c => c.id === id);
+  if (client) {
+    document.getElementById('editTerm').value = client.term || 'TBD';
+    document.getElementById('editRate').value = client.interestRate || 'TBD';
+    document.getElementById('editGrace').value = client.gracePeriod || 'TBD';
+    document.getElementById('editECF').value = client.ecf || 'TBD';
+    document.getElementById('editAmount').value = client.amount || 'TBD';
+    document.getElementById('editType').value = client.type || 'New Project';
+    document.getElementById('editNext').value = client.nextMilestone || 'Awaiting Term Sheet';
+    window.editClientId = id;
+    document.getElementById('editProjectModal').classList.add('active');
+  } else { showToast('Client not found', true); }
+}
+
+function saveProjectInfo() {
+  const id = window.editClientId;
+  const updates = {
+    term: document.getElementById('editTerm').value,
+    interestRate: document.getElementById('editRate').value,
+    gracePeriod: document.getElementById('editGrace').value,
+    ecf: document.getElementById('editECF').value,
+    amount: document.getElementById('editAmount').value,
+    type: document.getElementById('editType').value,
+    nextMilestone: document.getElementById('editNext').value
+  };
+  fbUpdateClient(id, updates).then(() => {
+    closeModal('editProjectModal');
+    if (currentClient && currentClient.id === id) { currentClient = clients.find(c => c.id === id); loadClientPortal(); }
+    showToast('Project info updated');
+  });
+}
+
+function editClientStep(id) {
+  const client = clients.find(c => c.id === id);
+  const step = prompt('Update step for ' + client.name + ' (1-8):', client.step);
+  if (step && parseInt(step) >= 1 && parseInt(step) <= 8) {
+    const milestones = ['', 'Awaiting Commitment Fee', 'Deed of Undertaking Execution', 'Credit Support Issuance', 'Hard-Copy Submission', 'ECF Escrow', 'Transfer to Closing Agent', 'Funding & Disbursement', 'Complete'];
+    fbUpdateClient(id, { step: parseInt(step), nextMilestone: milestones[parseInt(step)] || '' }).then(() => showToast('Step updated'));
+  }
+}
+
+function deleteClient(id) { if (confirm('Delete this client?')) fbDeleteClient(id).then(() => showToast('Client deleted')); }
+function deleteDocument(id) { if (confirm('Delete this document?')) fbDeleteDocument(id).then(() => showToast('Document deleted')); }
+function replyToClient(messageId) { const msg = messages.find(m => m.id === messageId); if (!msg) return; const reply = prompt('Reply to ' + msg.clientName + ':'); if (reply && reply.trim()) { const replyMsg = { id: Date.now(), clientId: msg.clientId, clientName: msg.clientName, sender: 'admin', content: reply.trim(), timestamp: new Date().toISOString() }; fbSaveMessage(replyMsg).then(() => { renderAdminTables(); showToast('Reply sent'); }); } }
+function updateMeetingStatus(id, status) { fbUpdateMeeting(id, { status }).then(() => showToast('Meeting ' + status)); }
+
+function showAddClientModal() {
+  ['ncName','ncEmail','ncPassword','ncProject','ncAmount','ncType','ncRate','ncTerm','ncGrace','ncECF','ncMilestone'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  document.getElementById('addClientModal').classList.add('active');
+}
+
+function createClient() {
+  const name = document.getElementById('ncName').value.trim();
+  const email = document.getElementById('ncEmail').value.trim().toLowerCase();
+  const password = document.getElementById('ncPassword').value.trim();
+  const project = document.getElementById('ncProject').value.trim();
+  if (!name || !email || !password || !project) { showToast('Name, email, password and project required', true); return; }
+  if (clients.find(c => c.email === email)) { showToast('Email already exists', true); return; }
+  const newClient = { id: Date.now(), name, email, password, project, amount: document.getElementById('ncAmount').value || 'TBD', type: document.getElementById('ncType').value || 'New Project', step: 1, nextMilestone: document.getElementById('ncMilestone').value || 'Awaiting Term Sheet', contact: 'Suzana Aleksić', term: document.getElementById('ncTerm').value || 'TBD', interestRate: document.getElementById('ncRate').value || 'TBD', gracePeriod: document.getElementById('ncGrace').value || 'TBD', ecf: document.getElementById('ncECF').value || 'TBD', status: 'active', createdAt: new Date().toISOString() };
+  fbSaveClient(newClient).then(() => { closeModal('addClientModal'); showToast('Portal created. Login: ' + email + ' / ' + password); });
+}
+
+function showUploadDocumentModal() {
+  const select = document.getElementById('uploadClientId');
+  select.innerHTML = '<option value="">Select Client</option>' + clients.map(c => `<option value="${c.id}">${c.name} - ${c.project}</option>`).join('');
+  document.getElementById('uploadDocumentModal').classList.add('active');
+}
+
+function uploadDocument() {
+  const clientId = parseInt(document.getElementById('uploadClientId').value);
+  const docType = document.getElementById('documentType').value;
+  const fileInput = document.getElementById('pdfFile');
+  const urlInput = document.getElementById('documentUrl').value;
+  if (!clientId) { showToast('Select a client', true); return; }
+  let finalUrl = urlInput;
+  if (fileInput.files && fileInput.files[0]) {
+    const file = fileInput.files[0];
+    if (file.type !== 'application/pdf') { showToast('Upload a PDF file', true); return; }
+    const reader = new FileReader();
+    reader.onload = function(e) { saveDocument(clientId, docType, e.target.result); };
+    reader.readAsDataURL(file);
+  } else if (finalUrl) { saveDocument(clientId, docType, finalUrl); }
+  else { showToast('Select a PDF file or provide a URL', true); }
+}
+
+function saveDocument(clientId, docType, url) {
+  const newDoc = { id: Date.now(), clientId, type: docType, name: docType, url: url, date: new Date().toISOString().split('T')[0], isPDF: true };
+  fbSaveDocument(newDoc).then(() => { closeModal('uploadDocumentModal'); if (currentClient && currentClient.id === clientId) renderDocuments(); showToast(docType + ' uploaded'); });
+  document.getElementById('pdfFile').value = ''; document.getElementById('documentUrl').value = '';
+}
+
+// Initialize
+initEmailJS();
+initFirebase();
+</script>
+</body>
+</html>
