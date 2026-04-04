@@ -107,24 +107,24 @@ body {
   transition: background 0.4s, border-color 0.4s;
 }
 .home-nav.scrolled {
-  background: rgba(10,22,40,0.97);
-  border-bottom: 1px solid rgba(201,168,76,0.2);
+  background: rgba(255,255,255,0.97);
+  border-bottom: 1px solid var(--gray-200);
   backdrop-filter: blur(12px);
 }
 .nav-logo {
   font-family: 'Cormorant Garamond', serif;
   font-size: 22px; font-weight: 600;
-  color: var(--white); letter-spacing: 3px;
+  color: var(--navy); letter-spacing: 3px;
 }
 .nav-logo span { color: var(--gold); font-weight: 300; }
 .nav-links { display: flex; align-items: center; gap: 36px; }
 .nav-link {
   font-size: 11px; letter-spacing: 2px;
-  text-transform: uppercase; color: rgba(255,255,255,0.6);
+  text-transform: uppercase; color: var(--gray-600);
   cursor: pointer; transition: color 0.2s;
   background: none; border: none; font-family: 'Jost', sans-serif;
 }
-.nav-link:hover { color: var(--gold-light); }
+.nav-link:hover { color: var(--navy); }
 .nav-cta {
   font-family: 'Jost', sans-serif;
   font-size: 11px; letter-spacing: 2px;
@@ -138,10 +138,10 @@ body {
 /* HERO */
 .hero {
   min-height: 100vh;
-  background: var(--navy);
+  background: var(--white);
   display: flex; align-items: center;
   padding: 0 60px;
-  position: relative; overflow: hidden;
+  position: relative; overflow: hidden; border-bottom: 1px solid var(--gray-200);
 }
 .hero-bg-lines {
   position: absolute; inset: 0; pointer-events: none;
@@ -151,14 +151,9 @@ body {
   position: absolute;
   top: 0; bottom: 0; left: 58%;
   width: 0.5px;
-  background: linear-gradient(to bottom, transparent, rgba(201,168,76,0.25), rgba(201,168,76,0.25), transparent);
+  background: linear-gradient(to bottom, transparent, rgba(10,22,40,0.08), rgba(10,22,40,0.08), transparent);
 }
-.hero-bg-lines::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse 50% 70% at 75% 50%, rgba(201,168,76,0.05) 0%, transparent 70%);
-}
+.hero-bg-lines::after { content: ''; }
 .hero-content { position: relative; max-width: 640px; }
 .hero-eyebrow {
   font-size: 10px; letter-spacing: 4px;
@@ -168,13 +163,13 @@ body {
 .hero-h1 {
   font-family: 'Cormorant Garamond', serif;
   font-size: 76px; font-weight: 300;
-  line-height: 1.05; color: var(--white);
+  line-height: 1.05; color: var(--navy);
   margin-bottom: 28px;
 }
 .hero-h1 em { font-style: italic; color: var(--gold-light); }
 .hero-p {
   font-size: 15px; line-height: 1.9;
-  color: rgba(255,255,255,0.5);
+  color: var(--gray-600);
   max-width: 460px; margin-bottom: 48px;
 }
 .hero-actions { display: flex; align-items: center; gap: 32px; }
@@ -190,11 +185,11 @@ body {
 .btn-hero-ghost {
   font-family: 'Jost', sans-serif;
   font-size: 11px; letter-spacing: 2px;
-  text-transform: uppercase; color: rgba(255,255,255,0.5);
+  text-transform: uppercase; color: var(--gray-500);
   background: none; border: none; cursor: pointer;
   transition: color 0.2s; display: flex; align-items: center; gap: 8px;
 }
-.btn-hero-ghost:hover { color: var(--gold-light); }
+.btn-hero-ghost:hover { color: var(--navy); }
 .hero-stats {
   position: absolute; right: 80px; top: 50%;
   transform: translateY(-50%);
@@ -204,7 +199,7 @@ body {
 .hero-stat-num {
   font-family: 'Cormorant Garamond', serif;
   font-size: 52px; font-weight: 300;
-  color: var(--white); line-height: 1;
+  color: var(--navy); line-height: 1;
 }
 .hero-stat-label {
   font-size: 9px; letter-spacing: 3px;
@@ -213,7 +208,7 @@ body {
 }
 .hero-stat-div {
   width: 36px; height: 0.5px;
-  background: rgba(201,168,76,0.3);
+  background: rgba(10,22,40,0.15);
   margin: 16px 0 0 auto;
 }
 
@@ -899,7 +894,6 @@ body {
     <div class="nav-logo">CROFT <span>FINANCE</span></div>
     <div class="nav-links">
       <button class="nav-link" onclick="scrollToSection('about')">About</button>
-      <button class="nav-link" onclick="scrollToSection('process')">Process</button>
       <button class="nav-link" onclick="scrollToSection('terms')">Terms</button>
       <button class="nav-link" onclick="scrollToSection('contact')">Contact</button>
       <button class="nav-cta" onclick="openLoginModal()">Client Portal</button>
@@ -912,10 +906,10 @@ body {
     <div class="hero-content">
       <p class="hero-eyebrow">Private Structured Finance &nbsp;·&nbsp; Est. 2024</p>
       <h1 class="hero-h1">Capital that moves<br><em>with</em> your vision.</h1>
-      <p class="hero-p">Croft Finance deploys private capital into exceptional projects — real estate, infrastructure, oil & gas — with institutional discipline and the execution speed that conventional lenders cannot match.</p>
+      <p class="hero-p">Croft Finance deploys private capital into exceptional projects — real estate, infrastructure, energy and renewables, mining, and oil &amp; gas — with institutional discipline and the execution speed that conventional lenders cannot match.</p>
       <div class="hero-actions">
         <button class="btn-hero" onclick="openLoginModal()">Access Client Portal</button>
-        <button class="btn-hero-ghost" onclick="scrollToSection('process')">How it works &nbsp;→</button>
+
       </div>
     </div>
     <div class="hero-stats">
@@ -940,8 +934,8 @@ body {
   <section class="section section-about" id="about">
     <div>
       <p class="section-tag">Who We Are</p>
-      <h2 class="section-h2 about-h2">Capital that moves<br><em>with</em> your vision.</h2>
-      <p class="about-body" style="margin-top:20px;">Croft Finance operates at the intersection of private capital and structured finance. We work with developers and project sponsors that require speed and structural flexibility that institutional lenders cannot offer.<br><br>Every mandate is handled personally by Suzana Aleksić, Principal. We do not delegate. We do not hand off. From first conversation to funding disbursement, you work with one person who understands your project completely.</p>
+      <h2 class="section-h2 about-h2">Quiet capital.<br><em>Decisive</em> execution.</h2>
+      <p class="about-body" style="margin-top:20px;">Croft Finance operates at the intersection of private capital and structured finance. We work with developers, project sponsors, and project owners that require speed, discretion, and structural flexibility that institutional lenders cannot offer.<br><br>Every mandate is handled personally by Suzana Aleksić, Principal. We do not delegate. We do not hand off. From first conversation to funding disbursement, you work with one person who understands your project completely.</p>
     </div>
     <div class="about-right">
       <div class="about-pillar">
@@ -958,10 +952,11 @@ body {
       </div>
       <div class="about-pillar">
         <div class="pillar-label">Sectors</div>
-        <div class="pillar-text">Real estate development, infrastructure, energy and renewables, mining, oil & gas.</div>
+        <div class="pillar-text">Real estate development, infrastructure, energy &amp; renewables, mining, and oil &amp; gas.</div>
       </div>
     </div>
   </section>
+
 
   <!-- TERMS -->
   <section class="section section-terms" id="terms">
@@ -973,10 +968,11 @@ body {
     <div class="terms-table">
       <div class="terms-row"><span class="terms-key">Facility Size</span><span class="terms-val">USD 30M – USD 500M</span></div>
       <div class="terms-row"><span class="terms-key">Facility Type</span><span class="terms-val">Structured Equity / Debt</span></div>
-      <div class="terms-row"><span class="terms-key">Interest Rate</span><span class="terms-val">6.5% - 8% </span></div>
-      <div class="terms-row"><span class="terms-key">Term</span><span class="terms-val">5 years</span></div>
-      <div class="terms-row"><span class="terms-key">Grace Period</span><span class="terms-val">6 months +</span></div>
+      <div class="terms-row"><span class="terms-key">Interest Rate</span><span class="terms-val">6% – 8% per annum</span></div>
+      <div class="terms-row"><span class="terms-key">Term</span><span class="terms-val">5 years and above</span></div>
+      <div class="terms-row"><span class="terms-key">Grace Period</span><span class="terms-val">6 months and above</span></div>
       <div class="terms-row"><span class="terms-key">Prepayment Penalty</span><span class="terms-val">None</span></div>
+      <div class="terms-row"><span class="terms-key">Sectors</span><span class="terms-val">Real Estate, Infrastructure, Energy, Mining, Oil &amp; Gas</span></div>
       <div class="terms-row"><span class="terms-key">Closing Timeline</span><span class="terms-val">14–21 business days</span></div>
     </div>
   </section>
@@ -986,7 +982,7 @@ body {
     <div>
       <p class="section-tag">Principal</p>
       <h2 class="section-h2 suzana-h2">Every mandate.<br><em>Personally</em> handled.</h2>
-      <p class="suzana-body">Suzana Aleksić is the principal and sole point of contact at Croft Finance. Every client relationship, every deal negotiation, and every closing is managed directly and personally <br><br>If you are considering a project that may require structured private capital, the first step is a direct conversation. There is no obligation, no fee for an initial discussion, and no intermediary.</p>
+      <p class="suzana-body">Suzana Aleksić is the principal and sole point of contact at Croft Finance. Every client relationship, every deal negotiation, and every closing is managed directly and personally — not delegated to a team of analysts.<br><br>If you are considering a project that may require structured private capital, the first step is a direct conversation. There is no obligation, no fee for an initial discussion, and no intermediary.</p>
       <button class="btn-hero" style="margin-top:32px;" onclick="openLoginModal()">Request Portal Access</button>
     </div>
     <div class="suzana-card">
@@ -1087,21 +1083,18 @@ body {
             <div class="stat-value" id="dashAmount">—</div>
           </div>
           <div class="stat-card">
+            <div class="stat-label">Interest Rate</div>
+            <div class="stat-value" id="dashRate" style="font-size:20px;margin-top:4px;">—</div>
+            <div class="stat-sub" id="dashTerm">—</div>
+          </div>
+          <div class="stat-card">
             <div class="stat-label">Target Closing</div>
             <div class="stat-value" id="dashCountdown" style="font-size:20px;margin-top:4px;">—</div>
             <div class="stat-sub" id="dashClosingDate">—</div>
           </div>
-          <div class="stat-card" id="commitFeeCard">
-            <div class="stat-label">Commitment Fee</div>
-            <div class="stat-value" style="font-size:18px;margin-top:4px;">$150,000</div>
-            <div class="stat-sub" id="commitFeeStatus">—</div>
-          </div>
-          <div class="stat-card" id="ecfCard">
-            <div class="stat-label">ECF (5%)</div>
-            <div class="stat-value" id="ecfAmount" style="font-size:18px;margin-top:4px;">—</div>
-            <div class="stat-sub" id="ecfStatus">—</div>
-          </div>
         </div>
+        <div id="commitFeeCard" style="display:none;"><div id="commitFeeStatus"></div></div>
+        <div id="ecfCard" style="display:none;"><div id="ecfAmount"></div><div id="ecfStatus"></div></div>
         <div id="termSheetExpiryCard"></div>
         <div id="fundedScreen"></div>
         <div id="gracePeriodCard"></div>
@@ -1192,6 +1185,7 @@ body {
           <div class="page-subtitle">All mandates associated with your account.</div>
         </div>
         <div id="projectsList"></div>
+        <div id="projectDetailView" style="display:none;margin-top:20px;"></div>
       </div>
 
     </main>
@@ -1245,6 +1239,7 @@ body {
         <div class="stats-grid">
           <div class="stat-card"><div class="stat-label">Active Clients</div><div class="stat-value" id="totalClients">0</div></div>
           <div class="stat-card"><div class="stat-label">Active Projects</div><div class="stat-value" id="totalProjects">0</div></div>
+          <div class="stat-card"><div class="stat-label">Total Documents</div><div class="stat-value" id="totalDocuments">0</div></div>
           <div class="stat-card"><div class="stat-label" style="color:var(--warning);">New Registrations</div><div class="stat-value" id="pendingClientsCount" style="color:var(--warning);">0</div></div>
           <div class="stat-card"><div class="stat-label">Unread Messages</div><div class="stat-value" id="pendingMessages">0</div></div>
           <div class="stat-card"><div class="stat-label">Pending Meetings</div><div class="stat-value" id="scheduledMeetings">0</div></div>
@@ -1267,9 +1262,12 @@ body {
 
       <!-- CLIENTS -->
       <div id="admin-clients" class="admin-tab">
-        <div class="page-header"><div class="page-title">Clients</div></div>
-        <div style="display:flex;justify-content:flex-end;margin-bottom:16px;"><button class="btn btn-primary" onclick="showAddClientModal()">+ Add Client</button></div>
-        <div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Projects</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="adminClientsTable"></tbody></table></div>
+        <div class="page-header"><div class="page-title">Clients</div><div class="page-subtitle" id="clientCount"></div></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap;">
+          <input type="text" id="clientSearch" class="form-input" placeholder="Search by name or email..." style="max-width:320px;" oninput="renderClientsTable()">
+          <button class="btn btn-primary" onclick="showAddClientModal()">+ Add Client</button>
+        </div>
+        <div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Email</th><th>Projects</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="adminClientsTable"></tbody></table></div>
       </div>
 
       <!-- PROJECTS -->
@@ -1281,14 +1279,20 @@ body {
 
       <!-- DOCUMENTS -->
       <div id="admin-documents-admin" class="admin-tab">
-        <div class="page-header"><div class="page-title">Documents</div></div>
-        <div style="display:flex;justify-content:flex-end;margin-bottom:16px;"><button class="btn btn-primary" onclick="showUploadDocumentModal()">+ Upload Document</button></div>
+        <div class="page-header"><div class="page-title">Documents</div><div class="page-subtitle" id="docCount"></div></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap;">
+          <input type="text" id="docSearch" class="form-input" placeholder="Search by client or document type..." style="max-width:320px;" oninput="renderDocumentsAdmin()">
+          <button class="btn btn-primary" onclick="showUploadDocumentModal()">+ Upload Document</button>
+        </div>
         <div class="documents-grid" id="adminDocumentsList"></div>
       </div>
 
       <!-- MESSAGES -->
       <div id="admin-messages-admin" class="admin-tab">
         <div class="page-header"><div class="page-title">Messages</div></div>
+        <div style="margin-bottom:16px;">
+          <input type="text" id="messageSearch" class="form-input" placeholder="Search by client name..." style="max-width:320px;" oninput="renderAdminMessages()">
+        </div>
         <div id="allMessagesList"></div>
       </div>
 
@@ -1376,7 +1380,7 @@ body {
     <div class="form-grid-2">
       <div class="form-group"><label class="form-label">Project Name</label><input type="text" id="editProjectName" class="form-input"></div>
       <div class="form-group"><label class="form-label">Facility Amount</label><input type="text" id="editAmount" class="form-input"></div>
-      <div class="form-group"><label class="form-label">Project Type</label><input type="text" id="editType" class="form-input"></div>
+      <div class="form-group"><label class="form-label">Project Type</label><select id="editType" class="form-select"><option>Real Estate</option><option>Infrastructure</option><option>Energy &amp; Renewables</option><option>Mining</option><option>Oil &amp; Gas</option><option>Other</option></select></div>
       <div class="form-group"><label class="form-label">Term</label><input type="text" id="editTerm" class="form-input"></div>
       <div class="form-group"><label class="form-label">Interest Rate</label><input type="text" id="editRate" class="form-input"></div>
       <div class="form-group"><label class="form-label">Grace Period (months)</label><input type="text" id="editGrace" class="form-input"></div>
@@ -1405,8 +1409,8 @@ body {
       <div class="form-group"><label class="form-label">Password *</label><input type="text" id="ncPassword" class="form-input" placeholder="Set login password"></div>
       <div class="form-group"><label class="form-label">Project Name *</label><input type="text" id="ncProject" class="form-input"></div>
       <div class="form-group"><label class="form-label">Facility Amount</label><input type="text" id="ncAmount" class="form-input" placeholder="e.g. $50,000,000"></div>
-      <div class="form-group"><label class="form-label">Project Type</label><input type="text" id="ncType" class="form-input" placeholder="e.g. Real Estate"></div>
-      <div class="form-group"><label class="form-label">Interest Rate</label><input type="text" id="ncRate" class="form-input" placeholder="SOFR + 4.50%"></div>
+      <div class="form-group"><label class="form-label">Project Type</label><select id="ncType" class="form-select"><option>Real Estate</option><option>Infrastructure</option><option>Energy &amp; Renewables</option><option>Mining</option><option>Oil &amp; Gas</option><option>Other</option></select></div>
+      <div class="form-group"><label class="form-label">Interest Rate</label><input type="text" id="ncRate" class="form-input" placeholder="6% – 8%"></div>
       <div class="form-group"><label class="form-label">Term</label><input type="text" id="ncTerm" class="form-input" placeholder="Up to 5 years"></div>
       <div class="form-group"><label class="form-label">Grace Period</label><input type="text" id="ncGrace" class="form-input" placeholder="12 months"></div>
       <div class="form-group"><label class="form-label">ECF</label><input type="text" id="ncECF" class="form-input" placeholder="5%"></div>
@@ -1835,19 +1839,11 @@ function loadCurrentProjectData() {
     document.getElementById('dashClosingDate').textContent = 'Awaiting term sheet execution';
   }
 
-  // Commit fee
-  const cfStatus = proj.commitFeeStatus || 'pending';
-  document.getElementById('commitFeeStatus').innerHTML = cfStatus === 'paid'
-    ? '<span style="color:var(--success);">✓ Paid' + (proj.commitFeeDate ? ' — ' + proj.commitFeeDate : '') + '</span>'
-    : '<span style="color:var(--warning);">Pending — due upon term sheet execution</span>';
-
-  // ECF
-  const ecfStatus = proj.ecfStatus || 'pending';
-  let ecfAmt = proj.ecf || '5%';
-  document.getElementById('ecfAmount').textContent = ecfAmt;
-  document.getElementById('ecfStatus').innerHTML = ecfStatus === 'escrowed'
-    ? '<span style="color:var(--success);">✓ Escrowed' + (proj.ecfDate ? ' — ' + proj.ecfDate : '') + '</span>'
-    : '<span style="color:var(--warning);">Pending</span>';
+  // Rate and term on dashboard
+  const rateEl = document.getElementById('dashRate');
+  const termEl = document.getElementById('dashTerm');
+  if (rateEl) rateEl.textContent = proj.interestRate || 'TBD';
+  if (termEl) termEl.textContent = 'Term: ' + (proj.term || 'TBD') + ' · Grace: ' + (proj.gracePeriod || 'TBD') + ' months';
 
   // Admin note
   const noteEl = document.getElementById('adminNoteDisplay');
@@ -1957,7 +1953,7 @@ function renderDocuments() {
   const proj = projects.find(p=>p.id===currentProjectId);
   if (!proj) return;
   const step = proj.step || 1;
-  const projDocs = documents.filter(d=>d.projectId===currentProjectId || d.projectId===String(currentProjectId));
+  const projDocs = documents.filter(d=>String(d.projectId)===String(currentProjectId));
 
   // Required docs list
   const reqEl = document.getElementById('requiredDocsList');
@@ -2024,7 +2020,7 @@ function renderProjectsList() {
   container.innerHTML = clientProjs.map(proj => {
     const step = proj.step||1; const stageName = STEP_NAMES[step]||'In Progress';
     const isActive = proj.status==='active';
-    return `<div class="card" style="cursor:pointer;border-left:3px solid var(--gold);" onclick="selectProject('${proj.id}')">
+    return `<div class="card" style="border-left:3px solid var(--gold);margin-bottom:16px;">
       <div class="card-body" style="display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center;">
         <div>
           <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--navy);margin-bottom:4px;">${proj.name}</div>
@@ -2037,7 +2033,12 @@ function renderProjectsList() {
         <div style="text-align:right;">
           <div style="font-size:11px;color:var(--gray-400);margin-bottom:6px;">Interest Rate</div>
           <div style="font-size:16px;font-weight:600;color:var(--navy);">${proj.interestRate||'TBD'}</div>
-          <div style="font-size:11px;color:var(--gray-400);margin-top:8px;">Grace: ${proj.gracePeriod||'TBD'} months</div>
+          <div style="font-size:11px;color:var(--gray-400);margin-top:6px;">Term: ${proj.term||'TBD'}</div>
+          <div style="font-size:11px;color:var(--gray-400);margin-top:4px;">Grace: ${proj.gracePeriod||'TBD'} months</div>
+          <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end;">
+            <button class="btn btn-outline" style="padding:5px 12px;font-size:11px;" onclick="showProjectDetail('${proj.id}')">Full Deal Sheet</button>
+            <button class="btn btn-primary" style="padding:5px 12px;font-size:11px;" onclick="selectProject('${proj.id}')">Dashboard</button>
+          </div>
         </div>
       </div>
     </div>`;
@@ -2047,8 +2048,54 @@ function renderProjectsList() {
 function selectProject(pid) {
   currentProjectId = pid;
   loadCurrentProjectData();
+  showToast('Project switched — viewing dashboard');
   switchPortalTab('dashboard', null);
-  showToast('Project switched');
+}
+
+function showProjectDetail(pid) {
+  const proj = projects.find(p=>p.id===pid||p.id===String(pid));
+  if (!proj) return;
+  const detailEl = document.getElementById('projectDetailView');
+  if (!detailEl) return;
+  const rows = [
+    ['Project Name', proj.name],
+    ['Facility Amount', proj.amount],
+    ['Project Type', proj.type],
+    ['Interest Rate', proj.interestRate],
+    ['Term', proj.term],
+    ['Grace Period', (proj.gracePeriod||'TBD') + ' months'],
+    ['Governing Law', proj.govLaw||'TBD'],
+    ['Next Milestone', proj.nextMilestone],
+    ['Current Step', 'Step ' + (proj.step||1) + ' of 8 — ' + (STEP_NAMES[proj.step||1]||'')],
+    ['Term Sheet Expiry', proj.termSheetExpiry ? new Date(proj.termSheetExpiry).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}) : 'Not set'],
+  ];
+  detailEl.style.display = 'block';
+  detailEl.innerHTML = `<div class="card">
+    <div class="card-header" style="justify-content:space-between;">
+      <div class="card-title"><i class="fas fa-file-contract"></i> Deal Sheet — ${proj.name}</div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-outline" style="padding:5px 12px;font-size:11px;" onclick="currentProjectId='${pid}';loadCurrentProjectData();switchPortalTab('dashboard',null);">View Dashboard</button>
+        <button class="btn btn-gold" style="padding:5px 12px;font-size:11px;" onclick="exportDealSummary()"><i class="fas fa-download"></i> Export PDF</button>
+      </div>
+    </div>
+    <div class="card-body">
+      <table style="width:100%;border-collapse:collapse;">
+        ${rows.map(([k,v])=>`<tr><td style="padding:12px 0;border-bottom:1px solid var(--gray-100);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gray-400);width:35%;">${k}</td><td style="padding:12px 0;border-bottom:1px solid var(--gray-100);font-size:14px;font-weight:500;color:var(--navy);">${v||'TBD'}</td></tr>`).join('')}
+      </table>
+      ${proj.adminNote ? `<div class="note-card" style="margin-top:20px;"><div class="note-card-label">Note from Suzana</div><div class="note-card-text">${proj.adminNote}</div><div class="note-card-date">${proj.adminNoteDate||''}</div></div>` : ''}
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--gray-100);">
+        <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gray-400);margin-bottom:12px;">Key Contact</div>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="width:44px;height:44px;background:rgba(10,22,40,0.08);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--navy);">SA</div>
+          <div>
+            <div style="font-weight:600;color:var(--navy);">Suzana Aleksić</div>
+            <div style="font-size:12px;color:var(--gray-400);">Principal, Croft Finance</div>
+            <div style="font-size:12px;color:var(--gray-500);margin-top:4px;">suzana.aleksic@croftfinance.com · +381 69 288 0 191</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
 }
 
 // MESSAGES
@@ -2159,6 +2206,8 @@ function renderAdminTables() {
   const pending = clients.filter(c=>c.status==='pending').length;
   document.getElementById('totalClients').textContent = active;
   document.getElementById('totalProjects').textContent = projects.length;
+  const tdEl = document.getElementById('totalDocuments');
+  if (tdEl) tdEl.textContent = documents.length;
   document.getElementById('pendingClientsCount').textContent = pending;
   document.getElementById('pendingMessages').textContent = messages.filter(m=>m.sender==='client').length;
   document.getElementById('scheduledMeetings').textContent = meetings.filter(m=>m.status==='pending').length;
@@ -2231,8 +2280,16 @@ function renderProjectsTable() {
 function renderDocumentsAdmin() {
   const container = document.getElementById('adminDocumentsList');
   if (!container) return;
-  if (!documents.length) { container.innerHTML='<p style="color:var(--gray-400);font-size:13px;">No documents uploaded yet.</p>'; return; }
-  container.innerHTML = documents.map(d=>{
+  const docSearchVal = (document.getElementById('docSearch')?.value||'').toLowerCase();
+  const countEl2 = document.getElementById('docCount');
+  const filteredDocs = documents.filter(d=>{
+    if (!docSearchVal) return true;
+    const client = clients.find(c=>c.id===d.clientId||c.id===String(d.clientId));
+    return (client?.name||'').toLowerCase().includes(docSearchVal) || (d.type||'').toLowerCase().includes(docSearchVal);
+  });
+  if (countEl2) countEl2.textContent = filteredDocs.length + ' of ' + documents.length + ' documents';
+  if (!filteredDocs.length) { container.innerHTML='<p style="color:var(--gray-400);font-size:13px;">No documents found.</p>'; return; }
+  container.innerHTML = filteredDocs.map(d=>{
     const client = clients.find(c=>c.id===d.clientId||c.id===String(d.clientId));
     const proj = projects.find(p=>p.id===d.projectId||p.id===String(d.projectId));
     return `<div class="document-card"><div class="doc-icon"><i class="fas fa-file-pdf"></i></div>
@@ -2254,8 +2311,12 @@ function renderAdminMessages() {
     if (!byClient[key]) byClient[key] = [];
     byClient[key].push(m);
   });
+  const msgSearchVal = (document.getElementById('messageSearch')?.value||'').toLowerCase();
   if (!Object.keys(byClient).length) { container.innerHTML='<p style="color:var(--gray-400);font-size:13px;">No messages yet.</p>'; return; }
-  container.innerHTML = Object.entries(byClient).map(([cid, msgs])=>{
+  container.innerHTML = Object.entries(byClient).filter(([cid])=>{
+    const client = clients.find(c=>c.id===cid||c.id===String(cid));
+    return !msgSearchVal || (client?.name||'').toLowerCase().includes(msgSearchVal);
+  }).map(([cid, msgs])=>{
     const client = clients.find(c=>c.id===cid||c.id===String(cid));
     const sorted = msgs.sort((a,b)=>new Date(a.timestamp)-new Date(b.timestamp));
     return `<div class="admin-thread">
@@ -2410,6 +2471,17 @@ function saveProjectInfo() {
   });
 }
 
+function viewClientProjects(clientId) {
+  // Switch to projects tab and pre-fill search with client name
+  const client = clients.find(c=>c.id===clientId);
+  if (!client) return;
+  switchAdminTab('projects-admin', document.querySelector('[onclick*="projects-admin"]'));
+  setTimeout(()=>{
+    const search = document.getElementById('projectSearch');
+    if (search) { search.value = client.name; renderProjectsTable(); }
+  }, 100);
+}
+
 function deleteClient(id) {
   if (!confirm('Delete this client and all their data? This cannot be undone.')) return;
   const client = clients.find(c=>c.id===id||c.id===String(id));
@@ -2459,7 +2531,7 @@ function createClient() {
   if (clients.find(c=>c.email===email)) { showToast('Email already exists',true); return; }
   const cid=String(Date.now()); const pid=String(Date.now()+1);
   const newClient={ id:cid, name, email, password:pass, status:'active', createdAt:new Date().toISOString() };
-  const newProject={ id:pid, clientId:cid, name:projName, amount:document.getElementById('ncAmount').value||'TBD', type:document.getElementById('ncType').value||'New Project', step:1, nextMilestone:document.getElementById('ncMilestone').value||'Awaiting Term Sheet', term:document.getElementById('ncTerm').value||'TBD', interestRate:document.getElementById('ncRate').value||'TBD', gracePeriod:document.getElementById('ncGrace').value||'12', ecf:document.getElementById('ncECF').value||'5%', govLaw:document.getElementById('ncGovLaw').value||'TBD', termSheetExpiry:document.getElementById('ncExpiry').value||'', status:'active', stepDates:{}, checklistItems:{}, commitFeeStatus:'pending', ecfStatus:'pending', createdAt:new Date().toISOString() };
+  const newProject={ id:pid, clientId:cid, name:projName, amount:document.getElementById('ncAmount').value||'TBD', type:document.getElementById('ncType').value||'Real Estate', step:1, nextMilestone:document.getElementById('ncMilestone').value||'Awaiting Term Sheet Execution', term:document.getElementById('ncTerm').value||'5 years', interestRate:document.getElementById('ncRate').value||'6% – 8% p.a.', gracePeriod:document.getElementById('ncGrace').value||'6', ecf:document.getElementById('ncECF').value||'', govLaw:document.getElementById('ncGovLaw').value||'TBD', termSheetExpiry:document.getElementById('ncExpiry').value||'', status:'active', stepDates:{}, checklistItems:{}, commitFeeStatus:'pending', ecfStatus:'pending', createdAt:new Date().toISOString() };
   clients.push(newClient); projects.push(newProject);
   fbSet('clients',cid,newClient).then(async()=>{
     await fbSet('projects',pid,newProject);
