@@ -883,4 +883,970 @@
       <div class="form-group"><label class="form-label">ECF (Equity Contribution Fee - $)</label><input type="text" id="editECF" class="form-input" placeholder="e.g., $2,500,000"></div>
       <div class="form-group"><label class="form-label">Facility Amount ($)</label><input type="text" id="editAmount" class="form-input" placeholder="e.g., $85,000,000"></div>
       <div class="form-group"><label class="form-label">Project Type</label><input type="text" id="editType" class="form-input" placeholder="e.g., Mixed-Use Real Estate"></div>
-      <div class="form-group"><label class="form-label">Next Milestone
+      <div class="form-group"><label class="form-label">Next Milestone</label><input type="text" id="editNext" class="form-input" placeholder="e.g., Commitment Fee Payment"></div>
+      <button class="btn btn-primary" onclick="saveProjectInfo()" style="width:100%">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Admin Login Modal -->
+<div id="adminLoginModal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header"><h3>Admin Access</h3><span class="modal-close" onclick="closeModal('adminLoginModal')">&times;</span></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Username</label><input type="text" id="adminUsername" class="form-input" placeholder="Username" onkeydown="if(event.key==='Enter')doAdminLogin()"></div>
+      <div class="form-group"><label class="form-label">Password</label><input type="password" id="adminPassword" class="form-input" placeholder="Password" onkeydown="if(event.key==='Enter')doAdminLogin()"></div>
+      <p id="adminLoginError" style="color:#dc2626;font-size:13px;margin-bottom:12px;display:none;">Incorrect credentials. Please try again.</p>
+      <button class="btn btn-primary" onclick="doAdminLogin()" style="width:100%">Sign In</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Client Modal -->
+<div id="addClientModal" class="modal-overlay">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-header"><h3>Add New Client</h3><span class="modal-close" onclick="closeModal('addClientModal')">&times;</span></div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="form-group"><label class="form-label">Full Name *</label><input type="text" id="ncName" class="form-input" placeholder="Client full name"></div>
+        <div class="form-group"><label class="form-label">Email *</label><input type="email" id="ncEmail" class="form-input" placeholder="client@email.com"></div>
+        <div class="form-group"><label class="form-label">Password *</label><input type="text" id="ncPassword" class="form-input" placeholder="Set login password"></div>
+        <div class="form-group"><label class="form-label">Project Name *</label><input type="text" id="ncProject" class="form-input" placeholder="e.g. Hartley Tower"></div>
+        <div class="form-group"><label class="form-label">Facility Amount</label><input type="text" id="ncAmount" class="form-input" placeholder="e.g. $50,000,000"></div>
+        <div class="form-group"><label class="form-label">Project Type</label><input type="text" id="ncType" class="form-input" placeholder="e.g. Real Estate"></div>
+        <div class="form-group"><label class="form-label">Interest Rate</label><input type="text" id="ncRate" class="form-input" placeholder="e.g. SOFR + 4.50%"></div>
+        <div class="form-group"><label class="form-label">Term</label><input type="text" id="ncTerm" class="form-input" placeholder="e.g. Up to 5 years"></div>
+        <div class="form-group"><label class="form-label">Grace Period</label><input type="text" id="ncGrace" class="form-input" placeholder="e.g. 12 months"></div>
+        <div class="form-group"><label class="form-label">ECF</label><input type="text" id="ncECF" class="form-input" placeholder="e.g. 5%"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Next Milestone</label><input type="text" id="ncMilestone" class="form-input" placeholder="e.g. Awaiting Term Sheet Execution"></div>
+      <button class="btn btn-primary" onclick="createClient()" style="width:100%">Create Client Portal</button>
+    </div>
+  </div>
+</div>
+<script>
+// ============================================================
+// FIREBASE CONFIG
+// ============================================================
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyCt76DoCS-ysPspUkUnIokAWLf255GzurY",
+  authDomain:        "croft-finance-52a4d.firebaseapp.com",
+  databaseURL:       "https://croft-finance-52a4d-default-rtdb.firebaseio.com",
+  projectId:         "croft-finance-52a4d",
+  storageBucket:     "croft-finance-52a4d.firebasestorage.app",
+  messagingSenderId: "718693826553",
+  appId:             "1:718693826553:web:c764558447a34cccd74728"
+};
+
+// ============================================================
+// EMAILJS CONFIGURATION — FULLY INTEGRATED
+// ============================================================
+const EMAILJS_CONFIG = {
+  publicKey:   "sgayReNOC1AIqBIZb",
+  serviceId:   "service_ri050ye",
+  templateId:  "template_s85eg0h",
+  adminEmail:  "suzana.aleksic@croftfinance.com"
+};
+
+let db = null;
+let firebaseReady = false;
+
+function initFirebase() {
+  try {
+    if (!FIREBASE_CONFIG.apiKey || FIREBASE_CONFIG.apiKey === "PASTE_YOUR_API_KEY") {
+      console.warn("Firebase not configured — using localStorage fallback");
+      firebaseReady = false;
+      loadFromLocalStorage();
+      return;
+    }
+    firebase.initializeApp(FIREBASE_CONFIG);
+    db = firebase.firestore();
+    firebaseReady = true;
+    console.log("Firebase connected");
+    loadFromFirebase();
+  } catch(e) {
+    console.error("Firebase init error:", e);
+    firebaseReady = false;
+    loadFromLocalStorage();
+  }
+}
+
+// ============================================================
+// Data Store (in-memory, synced to Firebase or localStorage)
+// ============================================================
+let clients = [];
+let documents = [];
+let messages = [];
+let meetings = [];
+let currentClient = null;
+let adminCredentials = { username: "suzana", password: "croft2025" };
+
+function initEmailJS() {
+  if (EMAILJS_CONFIG.publicKey && EMAILJS_CONFIG.publicKey !== "sgayReNOC1AIqBIZb") {
+    emailjs.init({ publicKey: EMAILJS_CONFIG.publicKey });
+  } else {
+    emailjs.init({ publicKey: EMAILJS_CONFIG.publicKey });
+    console.log("EmailJS initialized with public key");
+  }
+}
+
+// Send ANY email using the same template
+function sendEmail(to, subject, htmlContent) {
+  const templateParams = {
+    to_email: to,
+    subject: subject,
+    message: htmlContent
+  };
+  
+  return emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, templateParams);
+}
+
+// Customer confirmation email
+function sendCustomerConfirmation(customerEmail, customerName) {
+  const htmlContent = `
+    <html>
+    <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background: #0a1628; padding: 30px 20px; text-align: center; border-radius: 12px 12px 0 0;">
+        <h1 style="color: #ffffff; margin: 0;">CROFT <span style="color: #9ca3af;">FINANCE</span></h1>
+      </div>
+      <div style="background: #ffffff; border: 1px solid #e5e7eb; border-top: none; padding: 30px; border-radius: 0 0 12px 12px;">
+        <h2 style="color: #0a1628;">Welcome ${customerName}</h2>
+        <p>Thank you for requesting access to the Croft Finance Institutional Client Portal.</p>
+        <div style="background: #fef3c7; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #f59e0b;">
+          <p style="margin: 0; font-weight: 600; color: #92400e;">⏱️ Access within 1 hour</p>
+          <p style="margin: 8px 0 0 0; color: #78350f;">We will grant you full portal access within 1 hour. You will receive a confirmation email once your account is activated.</p>
+        </div>
+        <p style="margin: 25px 0 10px 0; font-size: 14px; color: #6b7280;">What happens next:</p>
+        <ul style="color: #4b5563; font-size: 14px; line-height: 1.6; padding-left: 20px;">
+          <li>Our team reviews your request</li>
+          <li>We set up your project details in the portal</li>
+          <li>You receive activation confirmation (within 1 hour)</li>
+          <li>Log in using your email and chosen password</li>
+        </ul>
+        <hr style="border-top: 1px solid #e5e7eb;">
+        <p style="font-size: 12px; color: #9ca3af; text-align: center;">Croft Finance — Structured Financing Solutions</p>
+      </div>
+    </body>
+    </html>
+  `;
+  
+  return sendEmail(customerEmail, "Croft Finance Portal Access Request Received", htmlContent);
+}
+
+// Admin notification email
+function sendAdminNotification(subject, body, customerName = "", customerEmail = "") {
+  const htmlContent = `
+    <html>
+    <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background: #0a1628; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+        <h2 style="color: #ffffff; margin: 0;">Croft Finance Portal Alert</h2>
+      </div>
+      <div style="background: #ffffff; border: 1px solid #e5e7eb; border-top: none; padding: 25px; border-radius: 0 0 8px 8px;">
+        ${customerName ? `<p><strong>Customer:</strong> ${customerName}</p>` : ''}
+        ${customerEmail ? `<p><strong>Email:</strong> ${customerEmail}</p>` : ''}
+        <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin: 15px 0;">
+          <p style="margin: 0; white-space: pre-wrap;">${body}</p>
+        </div>
+        <p style="font-size: 12px; color: #9ca3af;">Log in to your admin panel to take action.</p>
+      </div>
+    </body>
+    </html>
+  `;
+  
+  return sendEmail(EMAILJS_CONFIG.adminEmail, subject, htmlContent);
+}
+
+// ============================================================
+// FIREBASE DATA LAYER
+// ============================================================
+async function loadFromFirebase() {
+  try {
+    const [cSnap, dSnap, mSnap, mtSnap] = await Promise.all([
+      db.collection('clients').get(),
+      db.collection('documents').get(),
+      db.collection('messages').get(),
+      db.collection('meetings').get()
+    ]);
+    clients   = cSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    documents = dSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    messages  = mSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    meetings  = mtSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    document.getElementById('loadingOverlay').style.display = 'none';
+    renderAdminTables();
+    if (currentClient) {
+      currentClient = clients.find(c => c.id === currentClient.id) || currentClient;
+      loadClientPortal();
+    }
+  } catch(e) {
+    console.error("Firebase load error:", e);
+    showToast("Connection error — retrying...", true);
+    setTimeout(loadFromFirebase, 3000);
+  }
+}
+
+function loadFromLocalStorage() {
+  clients   = JSON.parse(localStorage.getItem('croft_clients')   || '[]');
+  documents = JSON.parse(localStorage.getItem('croft_documents') || '[]');
+  messages  = JSON.parse(localStorage.getItem('croft_messages')  || '[]');
+  meetings  = JSON.parse(localStorage.getItem('croft_meetings')  || '[]');
+  document.getElementById('loadingOverlay').style.display = 'none';
+  renderAdminTables();
+}
+
+async function fbSaveClient(client) {
+  if (!firebaseReady) { saveData(); return; }
+  const { id, ...data } = client;
+  await db.collection('clients').doc(String(id)).set(data);
+  await loadFromFirebase();
+}
+
+async function fbUpdateClient(id, updates) {
+  if (!firebaseReady) {
+    const c = clients.find(c => c.id === id);
+    if (c) Object.assign(c, updates);
+    saveData(); renderAdminTables(); return;
+  }
+  await db.collection('clients').doc(String(id)).update(updates);
+  await loadFromFirebase();
+}
+
+async function fbDeleteClient(id) {
+  if (!firebaseReady) {
+    clients   = clients.filter(c => c.id !== id);
+    documents = documents.filter(d => d.clientId !== id);
+    messages  = messages.filter(m => m.clientId !== id);
+    meetings  = meetings.filter(m => m.clientId !== id);
+    saveData(); renderAdminTables(); return;
+  }
+  const batch = db.batch();
+  batch.delete(db.collection('clients').doc(String(id)));
+  (await db.collection('documents').where('clientId','==',id).get()).docs.forEach(d => batch.delete(d.ref));
+  (await db.collection('messages').where('clientId','==',id).get()).docs.forEach(d => batch.delete(d.ref));
+  (await db.collection('meetings').where('clientId','==',id).get()).docs.forEach(d => batch.delete(d.ref));
+  await batch.commit();
+  await loadFromFirebase();
+}
+
+async function fbSaveMessage(msg) {
+  if (!firebaseReady) { messages.push(msg); saveData(); loadMessages(); return; }
+  const { id, ...data } = msg;
+  await db.collection('messages').doc(String(id)).set(data);
+  await loadFromFirebase();
+}
+
+async function fbSaveMeeting(meeting) {
+  if (!firebaseReady) { meetings.push(meeting); saveData(); return; }
+  const { id, ...data } = meeting;
+  await db.collection('meetings').doc(String(id)).set(data);
+  await loadFromFirebase();
+}
+
+async function fbUpdateMeeting(id, updates) {
+  if (!firebaseReady) {
+    const m = meetings.find(m => m.id === id);
+    if (m) Object.assign(m, updates);
+    saveData(); renderAdminTables(); return;
+  }
+  await db.collection('meetings').doc(String(id)).update(updates);
+  await loadFromFirebase();
+}
+
+async function fbSaveDocument(doc) {
+  if (!firebaseReady) { documents.push(doc); saveData(); return; }
+  const { id, ...data } = doc;
+  await db.collection('documents').doc(String(id)).set(data);
+  await loadFromFirebase();
+}
+
+async function fbDeleteDocument(id) {
+  if (!firebaseReady) {
+    documents = documents.filter(d => d.id !== id);
+    saveData(); renderAdminTables(); return;
+  }
+  await db.collection('documents').doc(String(id)).delete();
+  await loadFromFirebase();
+}
+
+function saveData() {
+  localStorage.setItem('croft_clients',   JSON.stringify(clients));
+  localStorage.setItem('croft_documents', JSON.stringify(documents));
+  localStorage.setItem('croft_messages',  JSON.stringify(messages));
+  localStorage.setItem('croft_meetings',  JSON.stringify(meetings));
+}
+
+function showView(viewName) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(`view-${viewName}`).classList.add('active');
+}
+
+function openLoginModal() { 
+  document.getElementById('loginModal').classList.add('active');
+  showLoginForm();
+}
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+function showToast(msg, isError = false) {
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.style.background = isError ? '#dc2626' : 'var(--gray-800)';
+  toast.innerHTML = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+function showRegisterForm() {
+  document.getElementById('loginForm').style.display = 'none';
+  document.getElementById('registerForm').style.display = 'block';
+}
+
+function showLoginForm() {
+  document.getElementById('registerForm').style.display = 'none';
+  document.getElementById('loginForm').style.display = 'block';
+}
+
+function register() {
+  const name = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim().toLowerCase();
+  const password = document.getElementById('regPassword').value;
+  const confirmPassword = document.getElementById('regConfirmPassword').value;
+  const project = document.getElementById('regProject').value.trim();
+  
+  if (!name || !email || !password || !project) {
+    showToast('Please fill all fields', true);
+    return;
+  }
+  
+  if (password !== confirmPassword) {
+    showToast('Passwords do not match', true);
+    return;
+  }
+  
+  if (password.length < 6) {
+    showToast('Password must be at least 6 characters', true);
+    return;
+  }
+  
+  const existingClient = clients.find(c => c.email === email);
+  if (existingClient) {
+    showToast('Email already registered', true);
+    return;
+  }
+  
+  const newClient = {
+    id: Date.now(),
+    name: name,
+    email: email,
+    password: password,
+    project: project,
+    amount: "TBD",
+    type: "New Project",
+    step: 1,
+    nextMilestone: "Awaiting Term Sheet",
+    contact: "Suzana Aleksić",
+    term: "TBD",
+    interestRate: "TBD",
+    gracePeriod: "TBD",
+    ecf: "TBD",
+    status: "pending",
+    createdAt: new Date().toISOString()
+  };
+  
+  clients.push(newClient);
+
+  showToast('Submitting registration...');
+  fbSaveClient(newClient).then(() => {
+    // Send confirmation email to customer
+    sendCustomerConfirmation(email, name).catch(err => console.warn("Customer email error:", err));
+    
+    // Send notification to admin
+    sendAdminNotification(
+      "New Client Registration — " + name,
+      "A new client has registered on the Croft Finance portal.\n\nName: " + name + "\nEmail: " + email + "\nProject: " + project + "\nTime: " + new Date().toLocaleString() + "\n\nLog in to your admin panel to review and activate their account.",
+      name,
+      email
+    ).catch(err => console.warn("Admin email error:", err));
+    
+    showToast('Registration submitted. Check your email for confirmation. You will receive portal access within 1 hour.');
+  }).catch(() => {
+    showToast('Registration submitted. You will receive access confirmation shortly.');
+  });
+
+  // Clear form
+  document.getElementById('regName').value = '';
+  document.getElementById('regEmail').value = '';
+  document.getElementById('regPassword').value = '';
+  document.getElementById('regConfirmPassword').value = '';
+  document.getElementById('regProject').value = '';
+  
+  showLoginForm();
+}
+
+function login() {
+  const email = document.getElementById('loginEmail').value.toLowerCase().trim();
+  const password = document.getElementById('loginPassword').value;
+  const client = clients.find(c => c.email.toLowerCase() === email && c.password === password);
+  
+  if (!client) {
+    showToast('Invalid email or password', true);
+    return;
+  }
+
+  if (client.status === 'pending') {
+    showToast('Your account is being reviewed. Suzana will be in touch shortly.', true);
+    return;
+  }
+
+  currentClient = client;
+  closeModal('loginModal');
+  showView('portal');
+  showToast('Welcome back, ' + client.name);
+  if (firebaseReady) {
+    loadFromFirebase().then(() => {
+      currentClient = clients.find(c => c.id === client.id) || client;
+      loadClientPortal();
+    });
+  } else {
+    loadClientPortal();
+  }
+}
+
+function openAdminLogin() {
+  document.getElementById('adminLoginModal').classList.add('active');
+  setTimeout(() => document.getElementById('adminUsername').focus(), 100);
+}
+
+function doAdminLogin() {
+  const username = document.getElementById('adminUsername').value.trim();
+  const password = document.getElementById('adminPassword').value;
+  if (username === adminCredentials.username && password === adminCredentials.password) {
+    closeModal('adminLoginModal');
+    document.getElementById('adminUsername').value = '';
+    document.getElementById('adminPassword').value = '';
+    document.getElementById('adminLoginError').style.display = 'none';
+    showView('admin');
+    renderAdminTables();
+  } else {
+    document.getElementById('adminLoginError').style.display = 'block';
+  }
+}
+
+function logout() {
+  currentClient = null;
+  showView('home');
+}
+
+function switchPortalTab(tabName) {
+  const navItem = event.target.closest('.nav-item');
+  document.querySelectorAll('#view-portal .nav-item').forEach(item => item.classList.remove('active'));
+  if (navItem) navItem.classList.add('active');
+  
+  document.querySelectorAll('#view-portal .portal-tab').forEach(tab => tab.classList.remove('active'));
+  document.getElementById(`tab-${tabName}`).classList.add('active');
+}
+
+function switchAdminTab(tabName) {
+  const navItem = event.target.closest('.nav-item');
+  document.querySelectorAll('#view-admin .nav-item').forEach(item => item.classList.remove('active'));
+  if (navItem) navItem.classList.add('active');
+  
+  document.querySelectorAll('#view-admin .admin-tab').forEach(tab => tab.classList.remove('active'));
+  document.getElementById(`admin-${tabName}`).classList.add('active');
+}
+
+function loadClientPortal() {
+  document.getElementById('portalUserName').textContent = currentClient.name;
+  document.getElementById('portalUserEmail').textContent = currentClient.email;
+  document.getElementById('dashboardStep').textContent = `Step ${currentClient.step} of 8`;
+  document.getElementById('dashboardAmount').textContent = currentClient.amount;
+  document.getElementById('dashboardNext').textContent = currentClient.nextMilestone;
+  renderTimeline();
+  renderDocuments();
+  renderProjectInfo();
+  loadMessages();
+  loadRecentActivity();
+}
+
+function renderTimeline() {
+  const steps = [
+    { title: "Term Sheet", desc: "Commercial terms agreed", duration: "Day 1-2" },
+    { title: "Commitment Fee", desc: "Initial fee payment", duration: "Day 3" },
+    { title: "Deed of Undertaking", desc: "Legal execution", duration: "Day 4-5" },
+    { title: "Credit Support", desc: "Policy issuance", duration: "Day 6-7" },
+    { title: "Hard-Copy Submission", desc: "Document delivery", duration: "Day 8" },
+    { title: "ECF Escrow", desc: "Funds deposited", duration: "Day 9-10" },
+    { title: "Transfer to Agent", desc: "Funds released", duration: "Day 11-14" },
+    { title: "Funding", desc: "Capital deployed", duration: "Day 15-21" }
+  ];
+  
+  const container = document.getElementById('timeline');
+  container.innerHTML = '';
+  
+  steps.forEach((step, i) => {
+    const stepNum = i + 1;
+    const isCompleted = stepNum < currentClient.step;
+    const isCurrent = stepNum === currentClient.step;
+    const item = document.createElement('div');
+    item.className = 'timeline-item';
+    item.innerHTML = `
+      <div class="timeline-dot ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''}"></div>
+      <div class="timeline-title">${step.title}</div>
+      <div class="timeline-desc">${step.desc}</div>
+      <div class="timeline-date">${step.duration}</div>
+    `;
+    container.appendChild(item);
+  });
+  
+  document.getElementById('currentStepNum').textContent = currentClient.step;
+}
+
+function renderDocuments() {
+  const clientDocs = documents.filter(d => d.clientId === currentClient.id);
+  const orderedDocs = ['Funding Proposal', 'Term Sheet', 'Deed of Undertaking'];
+  const sortedDocs = orderedDocs.map(docType => clientDocs.find(d => d.type === docType)).filter(d => d);
+  const otherDocs = clientDocs.filter(d => !orderedDocs.includes(d.type));
+  const allDocs = [...sortedDocs, ...otherDocs];
+  
+  const container = document.getElementById('documentsList');
+  container.innerHTML = '';
+  
+  if (allDocs.length === 0) {
+    container.innerHTML = '<div class="card"><div class="card-body text-center" style="color:var(--gray-500);">No documents uploaded yet</div></div>';
+    return;
+  }
+  
+  allDocs.forEach(doc => {
+    const card = document.createElement('div');
+    card.className = 'document-card';
+    card.innerHTML = `
+      <div class="document-icon"><i class="fas fa-file-pdf"></i></div>
+      <div class="document-name">${doc.name || doc.type}</div>
+      <div class="document-meta">Uploaded: ${doc.date}</div>
+      <div class="document-actions">
+        <button class="doc-action-btn" onclick="viewPDF(${doc.id})"><i class="fas fa-eye"></i> View</button>
+        <button class="doc-action-btn" onclick="downloadPDF(${doc.id})"><i class="fas fa-download"></i> Download</button>
+      </div>
+      <span class="status-badge status-signed"><i class="fas fa-lock"></i> Secure PDF</span>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function viewPDF(docId) {
+  const doc = documents.find(d => d.id === docId);
+  if (doc && doc.url && doc.url !== '#') {
+    window.open(doc.url, '_blank');
+  } else {
+    showToast('PDF URL not available', true);
+  }
+}
+
+function downloadPDF(docId) {
+  const doc = documents.find(d => d.id === docId);
+  if (doc && doc.url && doc.url !== '#') {
+    const link = document.createElement('a');
+    link.href = doc.url;
+    link.download = (doc.name || doc.type) + '.pdf';
+    link.target = '_blank';
+    link.click();
+    showToast(`Downloading ${doc.name || doc.type}`);
+  } else {
+    showToast('PDF URL not available', true);
+  }
+}
+
+function renderProjectInfo() {
+  const container = document.getElementById('projectInfo');
+  container.innerHTML = `
+    <div class="stat-card"><div class="stat-label">Project Name</div><div class="stat-value" style="font-size:18px;">${currentClient.project}</div></div>
+    <div class="stat-card"><div class="stat-label">Facility Amount</div><div class="stat-value">${currentClient.amount}</div></div>
+    <div class="stat-card"><div class="stat-label">Project Type</div><div class="stat-value" style="font-size:18px;">${currentClient.type}</div></div>
+    <div class="stat-card"><div class="stat-label">Term</div><div class="stat-value" style="font-size:18px;">${currentClient.term}</div></div>
+    <div class="stat-card"><div class="stat-label">Interest Rate</div><div class="stat-value" style="font-size:18px;">${currentClient.interestRate}</div></div>
+    <div class="stat-card"><div class="stat-label">Grace Period</div><div class="stat-value" style="font-size:18px;">${currentClient.gracePeriod}</div></div>
+    <div class="stat-card"><div class="stat-label">ECF</div><div class="stat-value" style="font-size:18px;">${currentClient.ecf}</div></div>
+    <div class="stat-card"><div class="stat-label">Key Contact</div><div class="stat-value" style="font-size:18px;">${currentClient.contact}</div></div>
+    <div class="stat-card"><div class="stat-label">Current Step</div><div class="stat-value">${currentClient.step}/8</div></div>
+  `;
+}
+
+function loadMessages() {
+  const clientMessages = messages.filter(m => m.clientId === currentClient.id);
+  const container = document.getElementById('messagesList');
+  container.innerHTML = '';
+  
+  clientMessages.forEach(msg => {
+    const div = document.createElement('div');
+    div.className = `message ${msg.sender === 'client' ? 'client' : ''}`;
+    div.innerHTML = `<div class="message-bubble">${msg.content}</div><div class="message-meta">${new Date(msg.timestamp).toLocaleString()}</div>`;
+    container.appendChild(div);
+  });
+  container.scrollTop = container.scrollHeight;
+}
+
+function sendMessage() {
+  const input = document.getElementById('messageInput');
+  const content = input.value.trim();
+  if (!content) return;
+  
+  const newMsg = {
+    id: Date.now(),
+    clientId: currentClient.id,
+    clientName: currentClient.name,
+    sender: 'client',
+    content: content,
+    timestamp: new Date().toISOString()
+  };
+
+  fbSaveMessage(newMsg).then(() => {
+    loadMessages();
+    sendAdminNotification(
+      "New Message from " + currentClient.name,
+      "You have a new message in the Croft Finance portal.\n\nFrom: " + currentClient.name + " (" + currentClient.email + ")\nProject: " + currentClient.project + "\n\nMessage:\n" + content + "\n\nTime: " + new Date().toLocaleString(),
+      currentClient.name,
+      currentClient.email
+    ).catch(err => console.warn("Message notification error:", err));
+  });
+
+  input.value = '';
+  showToast('Message sent');
+}
+
+function scheduleMeeting() {
+  const meeting = {
+    id: Date.now(),
+    clientId: currentClient.id,
+    clientName: currentClient.name,
+    type: document.getElementById('meetingType').value,
+    date: document.getElementById('meetingDate').value,
+    time: document.getElementById('meetingTime').value,
+    notes: document.getElementById('meetingNotes').value,
+    status: 'pending',
+    timestamp: new Date().toISOString()
+  };
+  
+  fbSaveMeeting(meeting).then(() => {
+    sendAdminNotification(
+      "Meeting Request from " + currentClient.name,
+      "A client has requested a meeting.\n\nClient: " + currentClient.name + "\nProject: " + currentClient.project + "\nMeeting Type: " + meeting.type + "\nRequested Date: " + (meeting.date || "TBD") + "\nRequested Time: " + (meeting.time || "TBD") + "\nNotes: " + (meeting.notes || "None") + "\n\nLog in to your admin panel to confirm.",
+      currentClient.name,
+      currentClient.email
+    ).catch(err => console.warn("Meeting notification error:", err));
+    showToast('Meeting request sent');
+  });
+  document.getElementById('meetingDate').value = '';
+  document.getElementById('meetingTime').value = '';
+  document.getElementById('meetingNotes').value = '';
+}
+
+function loadRecentActivity() {
+  const all = [...messages.filter(m => m.clientId === currentClient.id), ...meetings.filter(m => m.clientId === currentClient.id)]
+    .sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0,5);
+  
+  const container = document.getElementById('recentActivity');
+  if (all.length === 0) {
+    container.innerHTML = '<div style="color:var(--gray-500);">No recent activity</div>';
+    return;
+  }
+  
+  container.innerHTML = all.map(a => `
+    <div style="padding:12px 0; border-bottom:1px solid var(--gray-200);">
+      <div style="font-size:13px;">${a.content || a.type || 'Meeting request'}</div>
+      <div style="font-size:11px; color:var(--gray-500);">${new Date(a.timestamp).toLocaleString()}</div>
+    </div>
+  `).join('');
+}
+
+function renderAdminTables() {
+  const tbody = document.getElementById('adminClientsTable');
+  if (tbody) {
+    tbody.innerHTML = '';
+    clients.forEach(c => {
+      const statusColor = c.status === 'pending' ? '#f59e0b' : '#10b981';
+      const statusLabel = c.status === 'pending' ? 'Pending' : 'Active';
+      tbody.innerHTML += `<tr>
+        <td><strong>${c.name}</strong><br><span style="font-size:12px;color:var(--gray-500);">${c.email}</span></td>
+        <td>${c.project}</td>
+        <td>${c.amount}</td>
+        <td>Step ${c.step}/8</td>
+        <td>${c.ecf}</td>
+        <td><span style="font-size:11px;font-weight:600;color:${statusColor};">${statusLabel}</span></td>
+        <td>
+          ${c.status === 'pending' ? `<button class="btn btn-primary" style="padding:4px 12px;margin-right:4px;" onclick="activateClient(${c.id})">Activate</button>` : `<button class="btn btn-outline" style="padding:4px 12px;margin-right:4px;" onclick="editClientStep(${c.id})">Update Step</button>`}
+          <button class="btn btn-outline" style="padding:4px 12px; margin-right:4px;" onclick="editProjectInfo(${c.id})">Edit Info</button>
+          <button class="btn btn-outline" style="padding:4px 12px; color:#dc2626;" onclick="deleteClient(${c.id})">Delete</button>
+        </td>
+      `;
+    });
+  }
+  
+  const docsContainer = document.getElementById('adminDocumentsList');
+  if (docsContainer) {
+    docsContainer.innerHTML = '';
+    documents.forEach(d => {
+      const client = clients.find(c => c.id === d.clientId);
+      docsContainer.innerHTML += `
+        <div class="document-card">
+          <div class="document-icon"><i class="fas fa-file-pdf"></i></div>
+          <div class="document-name">${d.type}</div>
+          <div class="document-meta">${client?.name || 'Unknown'}<br>${d.date}</div>
+          <div class="document-actions">
+            <button class="doc-action-btn" onclick="viewPDF(${d.id})"><i class="fas fa-eye"></i> View</button>
+            <button class="doc-action-btn" onclick="deleteDocument(${d.id})" style="color:#dc2626;"><i class="fas fa-trash"></i> Delete</button>
+          </div>
+        </div>
+      `;
+    });
+  }
+  
+  const messagesContainer = document.getElementById('allMessagesList');
+  if (messagesContainer) {
+    messagesContainer.innerHTML = '';
+    [...messages].reverse().forEach(m => {
+      messagesContainer.innerHTML += `<div style="padding:12px; background:var(--gray-100); border-radius:8px; margin-bottom:12px;"><strong>${m.clientName}</strong> <span style="font-size:11px; color:var(--gray-500);">${new Date(m.timestamp).toLocaleString()}</span><div style="margin-top:8px;">${m.content}</div><div style="margin-top:8px;"><button class="btn btn-primary" style="padding:4px 12px;" onclick="replyToClient(${m.id})">Reply</button></div></div>`;
+    });
+  }
+  
+  const meetingsContainer = document.getElementById('meetingsList');
+  if (meetingsContainer) {
+    meetingsContainer.innerHTML = '';
+    [...meetings].reverse().forEach(m => {
+      meetingsContainer.innerHTML += `<div style="padding:12px; background:var(--gray-100); border-radius:8px; margin-bottom:12px;"><strong>${m.clientName}</strong> <span class="status-badge status-signed">${m.status}</span><div><strong>${m.type}</strong> - ${m.date || 'TBD'} ${m.time || ''}</div><div>${m.notes || ''}</div><div style="margin-top:8px;"><button class="btn btn-primary" style="padding:4px 12px;" onclick="updateMeetingStatus(${m.id},'confirmed')">Confirm</button> <button class="btn btn-outline" style="padding:4px 12px;" onclick="updateMeetingStatus(${m.id},'cancelled')">Decline</button></div></div>`;
+    });
+  }
+  
+  const pendingClients = clients.filter(c => c.status === 'pending');
+  const activeClients = clients.filter(c => c.status !== 'pending');
+  document.getElementById('totalClients').textContent = activeClients.length;
+  document.getElementById('pendingMessages').textContent = messages.filter(m => m.sender === 'client').length;
+  document.getElementById('scheduledMeetings').textContent = meetings.filter(m => m.status === 'pending').length;
+  document.getElementById('totalDocuments').textContent = documents.length;
+
+  const pcCount = document.getElementById('pendingClients');
+  if (pcCount) pcCount.textContent = pendingClients.length;
+
+  const pendingBlock = document.getElementById('pendingRegistrationsBlock');
+  const pendingTbody = document.getElementById('pendingRegistrationsTable');
+  if (pendingBlock && pendingTbody) {
+    if (pendingClients.length > 0) {
+      pendingBlock.style.display = 'block';
+      pendingTbody.innerHTML = '';
+      pendingClients.forEach(c => {
+        pendingTbody.innerHTML += `<tr>
+          <td><strong>${c.name}</strong></td>
+          <td>${c.email}</td>
+          <td>${c.project}</td>
+          <td style="font-size:12px;color:var(--gray-500)">${new Date(c.createdAt).toLocaleString()}</td>
+          <td>
+            <button class="btn btn-primary" style="padding:4px 12px;margin-right:4px;" onclick="activateClient(${c.id})">Activate &amp; Setup</button>
+            <button class="btn btn-outline" style="padding:4px 12px;color:#dc2626;" onclick="deleteClient(${c.id})">Decline</button>
+          </td>
+        </tr>`;
+      });
+    } else {
+      pendingBlock.style.display = 'none';
+    }
+  }
+}
+
+function replyToClient(messageId) {
+  const originalMessage = messages.find(m => m.id === messageId);
+  if (!originalMessage) return;
+  const reply = prompt('Reply to ' + originalMessage.clientName + ':', '');
+  if (reply && reply.trim()) {
+    const replyMsg = {
+      id: Date.now(),
+      clientId: originalMessage.clientId,
+      clientName: originalMessage.clientName,
+      sender: 'admin',
+      content: reply.trim(),
+      timestamp: new Date().toISOString()
+    };
+    fbSaveMessage(replyMsg).then(() => {
+      renderAdminTables();
+      showToast('Reply sent to ' + originalMessage.clientName);
+    });
+  }
+}
+
+function editClientStep(id) {
+  const client = clients.find(c => c.id === id);
+  const step = prompt('Update step for ' + client.name + ' (1-8):', client.step);
+  if (step && parseInt(step) >= 1 && parseInt(step) <= 8) {
+    const milestones = ['','Awaiting Commitment Fee','Deed of Undertaking Execution','Credit Support Issuance','Hard-Copy Submission','ECF Escrow','Transfer to Closing Agent','Funding & Disbursement','Complete'];
+    fbUpdateClient(id, { step: parseInt(step), nextMilestone: milestones[parseInt(step)] || '' }).then(() => {
+      showToast('Step updated to ' + step + '/8');
+    });
+  }
+}
+
+function editProjectInfo(id) {
+  const client = clients.find(c => c.id === id);
+  if (client) {
+    document.getElementById('editTerm').value = client.term || '';
+    document.getElementById('editRate').value = client.interestRate || '';
+    document.getElementById('editGrace').value = client.gracePeriod || '';
+    document.getElementById('editECF').value = client.ecf || '';
+    document.getElementById('editAmount').value = client.amount || '';
+    document.getElementById('editType').value = client.type || '';
+    document.getElementById('editNext').value = client.nextMilestone || '';
+    window.editClientId = id;
+    document.getElementById('editProjectModal').classList.add('active');
+  }
+}
+
+function saveProjectInfo() {
+  const id = window.editClientId;
+  const updates = {
+    term:          document.getElementById('editTerm').value,
+    interestRate:  document.getElementById('editRate').value,
+    gracePeriod:   document.getElementById('editGrace').value,
+    ecf:           document.getElementById('editECF').value,
+    amount:        document.getElementById('editAmount').value,
+    type:          document.getElementById('editType').value,
+    nextMilestone: document.getElementById('editNext').value
+  };
+  fbUpdateClient(id, updates).then(() => {
+    closeModal('editProjectModal');
+    if (currentClient && currentClient.id === id) {
+      currentClient = clients.find(c => c.id === id) || currentClient;
+      loadClientPortal();
+    }
+    showToast('Project info updated');
+  });
+}
+
+function activateClient(id) {
+  const client = clients.find(c => c.id === id);
+  if (!client) return;
+  fbUpdateClient(id, { status: 'active' }).then(() => {
+    editProjectInfo(id);
+    showToast(client.name + ' activated. Update their project details and save.');
+  });
+}
+
+function deleteClient(id) {
+  if (confirm('Delete this client? This cannot be undone.')) {
+    fbDeleteClient(id).then(() => showToast('Client deleted'));
+  }
+}
+
+function deleteDocument(id) {
+  if (confirm('Delete this document?')) {
+    fbDeleteDocument(id).then(() => {
+      if (currentClient) renderDocuments();
+      showToast('Document deleted');
+    });
+  }
+}
+
+function showAddClientModal() {
+  ['ncName','ncEmail','ncPassword','ncProject','ncAmount','ncType','ncRate','ncTerm','ncGrace','ncECF','ncMilestone'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('addClientModal').classList.add('active');
+}
+
+function createClient() {
+  const name = document.getElementById('ncName').value.trim();
+  const email = document.getElementById('ncEmail').value.trim().toLowerCase();
+  const password = document.getElementById('ncPassword').value.trim();
+  const project = document.getElementById('ncProject').value.trim();
+  if (!name || !email || !password || !project) {
+    showToast('Name, email, password and project are required', true);
+    return;
+  }
+  if (clients.find(c => c.email === email)) {
+    showToast('Email already exists', true);
+    return;
+  }
+  const newClient = {
+    id: Date.now(),
+    name,
+    email,
+    password,
+    project,
+    amount: document.getElementById('ncAmount').value || 'TBD',
+    type: document.getElementById('ncType').value || 'New Project',
+    step: 1,
+    nextMilestone: document.getElementById('ncMilestone').value || 'Awaiting Term Sheet',
+    contact: 'Suzana Aleksić',
+    term: document.getElementById('ncTerm').value || 'TBD',
+    interestRate: document.getElementById('ncRate').value || 'TBD',
+    gracePeriod: document.getElementById('ncGrace').value || 'TBD',
+    ecf: document.getElementById('ncECF').value || 'TBD',
+    status: 'active',
+    createdAt: new Date().toISOString()
+  };
+  showToast('Creating client portal...');
+  fbSaveClient(newClient).then(() => {
+    closeModal('addClientModal');
+    showToast('Portal created. Login: ' + email + ' / ' + password);
+  });
+}
+
+function showUploadDocumentModal() {
+  const select = document.getElementById('uploadClientId');
+  select.innerHTML = '<option value="">Select Client</option>' + clients.map(c => `<option value="${c.id}">${c.name} - ${c.project}</option>`).join('');
+  document.getElementById('uploadDocumentModal').classList.add('active');
+}
+
+function uploadDocument() {
+  const clientId = parseInt(document.getElementById('uploadClientId').value);
+  const docType = document.getElementById('documentType').value;
+  const fileInput = document.getElementById('pdfFile');
+  const urlInput = document.getElementById('documentUrl').value;
+  
+  if (!clientId) { showToast('Please select a client', true); return; }
+  
+  let finalUrl = urlInput;
+  
+  if (fileInput.files && fileInput.files[0]) {
+    const file = fileInput.files[0];
+    if (file.type !== 'application/pdf') {
+      showToast('Please upload a PDF file', true);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      finalUrl = e.target.result;
+      saveDocument(clientId, docType, finalUrl);
+    };
+    reader.readAsDataURL(file);
+  } else if (finalUrl) {
+    saveDocument(clientId, docType, finalUrl);
+  } else {
+    showToast('Please select a PDF file or provide a URL', true);
+  }
+}
+
+function saveDocument(clientId, docType, url) {
+  const newDoc = { 
+    id: Date.now(), 
+    clientId, 
+    type: docType,
+    name: docType,
+    url: url, 
+    date: new Date().toISOString().split('T')[0],
+    isPDF: true 
+  };
+  fbSaveDocument(newDoc).then(() => {
+    closeModal('uploadDocumentModal');
+    if (currentClient && currentClient.id === clientId) renderDocuments();
+    showToast(docType + ' uploaded successfully');
+  });
+  document.getElementById('pdfFile').value = '';
+  document.getElementById('documentUrl').value = '';
+}
+
+function updateMeetingStatus(id, status) {
+  fbUpdateMeeting(id, { status }).then(() => showToast('Meeting ' + status));
+}
+
+// Initialize everything
+initEmailJS();
+initFirebase();
+</script>
+</body>
+</html>
