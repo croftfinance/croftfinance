@@ -1061,4 +1061,843 @@ function register() {
     interestRate:'TBD',
     gracePeriod:'6+ months',
     status:'pending',
-    
+    commitmentFeePaid:false,
+    adminNotes:[],
+    lastActivity:new Date().toISOString()
+  };
+  fbSaveClient(newClient).then(()=>{
+    fbSaveProject(newProject);
+    addAuditLog('client_registered',email,newClient.id,newProject.id,`${name} registered`);
+    showToast('Registration submitted! Check your email.');
+  });
+  document.getElementById('regName').value='';
+  document.getElementById('regEmail').value='';
+  document.getElementById('regPassword').value='';
+  document.getElementById('regConfirmPassword').value='';
+  document.getElementById('regProject').value='';
+  document.getElementById('regTermsCheckbox').checked=false;
+  showLoginForm();
+}
+function login() {
+  const email=document.getElementById('loginEmail').value.toLowerCase().trim(),
+        pwd=document.getElementById('loginPassword').value;
+  const client=clients.find(c=>c.email===email && c.password===pwd);
+  if(!client){ showToast('Invalid credentials',true); return; }
+  if(client.status==='pending'){ showToast('Account under review — access within 1 hour',true); return; }
+  currentClient=client; currentAdmin=false;
+  const clientProjects=projects.filter(p=>p.clientId===client.id);
+  if(clientProjects.length) currentProjectId=clientProjects[0].id;
+  localStorage.setItem('croftSession',JSON.stringify({ clientId:client.id, timestamp:Date.now() }));
+  addAuditLog('client_logged_in',client.name,client.id,currentProjectId,`${client.name} logged in`);
+  closeModal('loginModal'); showView('portal'); showToast(`Welcome back, ${client.name}`);
+  renderDashboard(); renderProjectsList(); loadMessages(); updateDealRoomSelector();
+}
+function openAdminLogin() { document.getElementById('adminLoginModal').classList.add('active'); }
+function doAdminLogin() {
+  const user=document.getElementById('adminUsername').value.trim(),
+        pwd=document.getElementById('adminPassword').value;
+  if(user===adminCredentials.username && pwd===adminCredentials.password){
+    currentAdmin=true; currentClient=null;
+    localStorage.setItem('croftAdminSession',JSON.stringify({ admin:true, timestamp:Date.now() }));
+    addAuditLog('admin_logged_in','suzana',null,null,'Admin logged in');
+    closeModal('adminLoginModal'); showView('admin'); renderAdminViews();
+  } else {
+    document.getElementById('adminLoginError').style.display='block';
+  }
+}
+function logout() {
+  currentClient=null; currentAdmin=false;
+  localStorage.removeItem('croftSession');
+  localStorage.removeItem('croftAdminSession');
+  showView('home'); closeMobileSidebar();
+}
+function checkSession() {
+  const clientSess=localStorage.getItem('croftSession'),
+        adminSess=localStorage.getItem('croftAdminSession');
+  if(clientSess){
+    try{
+      const s=JSON.parse(clientSess);
+      if(Date.now()-s.timestamp<7*24*60*60*1000){
+        const c=clients.find(c=>c.id===s.clientId);
+        if(c && c.status!=='pending'){
+          currentClient=c;
+          const cp=projects.filter(p=>p.clientId===c.id);
+          if(cp.length) currentProjectId=cp[0].id;
+          showView('portal');
+          renderDashboard(); renderProjectsList(); loadMessages(); updateDealRoomSelector();
+          return;
+        }
+      }
+    } catch(e){}
+  }
+  if(adminSess){
+    try{
+      const s=JSON.parse(adminSess);
+      if(Date.now()-s.timestamp<7*24*60*60*1000){
+        currentAdmin=true; showView('admin'); renderAdminViews(); return;
+      }
+    } catch(e){}
+  }
+}
+
+// Tab switching
+function switchPortalTab(tab) {
+  const navItem=event?.target?.closest('.nav-item');
+  if(navItem){
+    document.querySelectorAll('#view-portal .nav-item').forEach(i=>i.classList.remove('active'));
+    navItem.classList.add('active');
+  }
+  document.querySelectorAll('#view-portal .portal-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  if(tab==='messages'){
+    localStorage.setItem('lastSeenMessages',Date.now().toString());
+    document.getElementById('messagesNotificationBadge')?.classList.remove('visible');
+    loadMessages(); updateMessagesNotificationBadge();
+  }
+  if(tab==='dealroom') loadDealRoom();
+  if(tab==='projects') renderProjectsList();
+  closeMobileSidebar();
+}
+function switchAdminTab(tab) {
+  const navItem=event?.target?.closest('.nav-item');
+  if(navItem){
+    document.querySelectorAll('#view-admin .nav-item').forEach(i=>i.classList.remove('active'));
+    navItem.classList.add('active');
+  }
+  document.querySelectorAll('#view-admin .admin-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(`admin-${tab}`).classList.add('active');
+  if(tab==='messages-admin') renderAdminMessages();
+  if(tab==='audit') renderAuditLog();
+  closeMobileSidebar();
+}
+
+// Client dashboard & 8-step track
+function renderDashboard() {
+  const project=projects.find(p=>p.id===currentProjectId);
+  if(!project){
+    document.getElementById('dashboardContent').innerHTML='<div class="card"><div class="card-body">Select a project to view details.</div></div>';
+    return;
+  }
+  const isFunded=project.step>=8 && project.fundedDate;
+  if(isFunded){
+    document.getElementById('dashboardContent').innerHTML=
+      `<div class="funded-banner" style="background:linear-gradient(135deg,var(--accepted-green),#047857);color:white;padding:24px;border-radius:16px;margin-bottom:24px;">
+         <i class="fas fa-check-circle"></i> Your project has been funded!<br>
+         <small>Disbursement completed on ${new Date(project.fundedDate).toLocaleDateString()}</small>
+         <div style="margin-top:16px;">
+           <button class="btn btn-gold" onclick="requestReferralLetter()">Request referral letter</button>
+         </div>
+       </div>`;
+    return;
+  }
+  const humanMessage =
+    project.step===1 ? "Your term sheet is being prepared. Your next action is to review and execute when received." :
+    project.step===2 ? "Your term sheet has been issued. Your next action is to execute and return it by the expiry date." :
+    project.step===3 ? "The Deed of Undertaking is ready for execution. Please review and sign." :
+    project.step===4 ? "Credit support documentation is being prepared by Croft Finance." :
+    project.step===5 ? "Please prepare and submit hard-copy closing materials." :
+    project.step===6 ? "ECF escrow instructions have been sent. Please deposit funds." :
+    project.step===7 ? "Funds are being transferred to the closing agent." :
+                       "Funding is being disbursed.";
+  const responsible=whoActsNextMap[project.step];
+  const actionText=responsible==='client' ? "Your Action Required" : "Awaiting Croft Finance";
+  document.getElementById('dashboardContent').innerHTML=
+    `<div class="deal-status-banner">
+       <h3>${stepStageMap[project.step]} Stage</h3>
+       <p>${humanMessage}</p>
+       <div class="next-action"><i class="fas ${responsible==='client'?'fa-user-check':'fa-building'}"></i> ${actionText}</div>
+     </div>
+     <div class="stats-grid">
+       <div class="stat-card">
+         <div class="stat-label">Current Step</div>
+         <div class="stat-value">${project.step}/8</div>
+       </div>
+       <div class="stat-card">
+         <div class="stat-label">Facility Amount</div>
+         <div class="stat-value">${project.amount}</div>
+       </div>
+       <div class="stat-card">
+         <div class="stat-label">Next Milestone</div>
+         <div class="stat-value" style="font-size:18px;">${project.nextMilestone}</div>
+       </div>
+     </div>
+     <div class="stats-grid">
+       <div class="stat-card">
+         <div class="stat-label">Interest Rate</div>
+         <div class="stat-value" style="font-size:18px;">${project.interestRate || 'TBD'}</div>
+       </div>
+       <div class="stat-card">
+         <div class="stat-label">Term</div>
+         <div class="stat-value" style="font-size:18px;">${project.term || 'TBD'}</div>
+       </div>
+       <div class="stat-card">
+         <div class="stat-label">Grace Period</div>
+         <div class="stat-value" style="font-size:18px;">${project.gracePeriod || '6+ months'}</div>
+       </div>
+     </div>
+     <div class="stats-grid">
+       <div class="stat-card">
+         <div class="stat-label">Commitment Fee ($150,000)</div>
+         <div id="cfStatus" class="stat-value" style="font-size:16px;">
+           ${project.commitmentFeePaid
+              ? `✅ Paid ${project.commitmentFeeDate ? new Date(project.commitmentFeeDate).toLocaleDateString() : ''}`
+              : '⏳ Pending'}
+         </div>
+       </div>
+       <div class="stat-card">
+         <div class="stat-label">Facility Type</div>
+         <div class="stat-value" style="font-size:18px;">${project.type || 'Structured Debt'}</div>
+       </div>
+     </div>
+     <div class="card">
+       <div class="card-header">
+         <div class="card-title"><i class="fas fa-tasks"></i> Closing Timeline</div>
+       </div>
+       <div class="card-body">
+         <div class="timeline" id="timeline"></div>
+       </div>
+     </div>
+     <div class="card">
+       <div class="card-header">
+         <div class="card-title"><i class="fas fa-bell"></i> Recent Activity</div>
+       </div>
+       <div class="card-body">
+         <div id="recentActivity"></div>
+       </div>
+     </div>`;
+  renderTimeline(project);
+  loadRecentActivity();
+}
+function renderTimeline(project) {
+  const steps=[
+    {title:"Term Sheet",desc:"Commercial terms agreed"},
+    {title:"Commitment Fee",desc:"Initial fee payment"},
+    {title:"Deed of Undertaking",desc:"Legal execution"},
+    {title:"Credit Support",desc:"Policy issuance"},
+    {title:"Hard-Copy Submission",desc:"Document delivery"},
+    {title:"ECF Escrow",desc:"Funds deposited"},
+    {title:"Transfer to Agent",desc:"Funds released"},
+    {title:"Funding",desc:"Capital deployed"}
+  ];
+  const container=document.getElementById('timeline'); if(!container) return;
+  container.innerHTML='';
+  steps.forEach((step,i)=>{
+    const stepNum=i+1;
+    const isCompleted=stepNum<project.step;
+    const isCurrent=stepNum===project.step;
+    const responsible=whoActsNextMap[stepNum];
+    container.innerHTML+=
+      `<div class="timeline-item">
+         <div class="timeline-dot ${isCompleted?'completed':''} ${isCurrent?'current':''}"></div>
+         <div class="timeline-title">
+           Step ${stepNum}: ${step.title}
+           <span class="timeline-pill ${responsible}" style="font-size:10px;padding:2px 8px;border-radius:12px;background:${responsible==='client'?'rgba(59,130,246,0.1)':'rgba(15,28,63,0.1)'};color:${responsible==='client'?'#3b82f6':'var(--navy)'};">
+             ${responsible==='client'?'Your Action':'Croft'}
+           </span>
+         </div>
+         <div class="timeline-desc">${step.desc}</div>
+         <div class="timeline-date">
+           ${isCompleted
+              ? `Completed: ${project.stepDates?.[stepNum] ? new Date(project.stepDates[stepNum]).toLocaleDateString() : ''}`
+              : isCurrent ? 'In Progress' : ''}
+         </div>
+       </div>`;
+  });
+}
+function loadRecentActivity() {
+  const all=[
+    ...messages.filter(m=>m.clientId===currentClient.id),
+    ...meetings.filter(m=>m.clientId===currentClient.id)
+  ].sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp)).slice(0,5);
+  const container=document.getElementById('recentActivity'); if(!container) return;
+  if(all.length===0){
+    container.innerHTML='<div>No recent activity</div>'; return;
+  }
+  container.innerHTML=all.map(a=>
+    `<div style="padding:12px 0;border-bottom:1px solid var(--gray-200);">
+       <div>${a.content||a.type||'Meeting request'}</div>
+       <div style="font-size:11px;color:var(--gray-500);">${new Date(a.timestamp).toLocaleString()}</div>
+     </div>`
+  ).join('');
+}
+
+// Projects list, deal room, messages, meetings
+function renderProjectsList() {
+  const clientProjects=projects.filter(p=>p.clientId===currentClient.id);
+  const container=document.getElementById('projectsList'); if(!container) return;
+  if(clientProjects.length===0){
+    container.innerHTML='<div class="card"><div class="card-body text-center">No projects yet. Contact your advisor to add one.</div></div>'; return;
+  }
+  container.innerHTML='<div class="stats-grid" id="projectsGrid"></div>';
+  const grid=document.getElementById('projectsGrid');
+  clientProjects.forEach(proj=>{
+    grid.innerHTML+=
+      `<div class="stat-card" style="cursor:pointer;" onclick="selectProject(${proj.id})">
+         <div class="stat-label">${proj.name}</div>
+         <div class="stat-value" style="font-size:20px;">${proj.amount}</div>
+         <div>
+           <span class="status-badge-accepted">
+             <span class="red-dot"></span> ${stepStageMap[proj.step]}
+           </span>
+         </div>
+         <div style="margin-top:8px;font-size:12px;">Step ${proj.step}/8</div>
+       </div>`;
+  });
+}
+function selectProject(id){
+  currentProjectId=id;
+  renderDashboard();
+  showToast('Project selected');
+  switchPortalTab('dashboard');
+}
+function updateDealRoomSelector(){
+  const select=document.getElementById('dealRoomProjectSelect'); if(!select) return;
+  const clientProjects=projects.filter(p=>p.clientId===currentClient.id);
+  select.innerHTML='';
+  clientProjects.forEach(proj=>{
+    const opt=document.createElement('option');
+    opt.value=proj.id;
+    opt.textContent=proj.name;
+    if(proj.id===currentProjectId) opt.selected=true;
+    select.appendChild(opt);
+  });
+}
+function loadDealRoom(){
+  const projectId=document.getElementById('dealRoomProjectSelect')?.value||currentProjectId;
+  const project=projects.find(p=>p.id==projectId); if(!project) return;
+  const projectDocs=documents.filter(d=>d.projectId==projectId);
+  const requiredDocs={
+    1:["Indicative Term Sheet","Executed Term Sheet"],
+    2:["Commitment Fee Confirmation"],
+    3:["Deed of Undertaking"],
+    4:["Credit Support Documentation"],
+    5:["Hard-Copy Closing Materials"],
+    6:["ECF Escrow Confirmation"],
+    7:["Transfer Confirmation"],
+    8:["Funding Disbursement Confirmation"]
+  };
+  const required=requiredDocs[project.step]||[];
+  let requiredHtml=
+    '<div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-list-check"></i> Required Documents for Current Step</div></div><div class="card-body">';
+  required.forEach(doc=>{
+    const uploaded=projectDocs.some(d=>d.type===doc);
+    requiredHtml+=
+      `<div style="display:flex;justify-content:space-between;padding:12px;border-bottom:1px solid var(--gray-200);">
+         <span>${doc}</span>
+         <span class="required-doc-status" style="padding:2px 8px;border-radius:12px;${uploaded?'background:#d1fae5;color:#065f46':'background:#fef3c7;color:#92400e'}">
+           ${uploaded?'Uploaded':'Required'}
+         </span>
+       </div>`;
+  });
+  requiredHtml+='</div></div>';
+  let docsHtml=
+    '<div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-file-alt"></i> Uploaded Documents</div></div><div class="card-body"><div class="documents-grid">';
+  if(projectDocs.length===0) docsHtml+='<div>No documents uploaded yet.</div>';
+  else projectDocs.forEach(doc=>{
+    docsHtml+=
+      `<div class="document-card" onclick="viewPDF(${doc.id})">
+         <div class="document-icon"><i class="fas fa-file-pdf"></i></div>
+         <div class="document-name">${doc.type}</div>
+         <div class="document-meta">Uploaded: ${doc.date}</div>
+       </div>`;
+  });
+  docsHtml+='</div></div></div>';
+  document.getElementById('dealRoomContent').innerHTML=requiredHtml+docsHtml;
+}
+function viewPDF(id){
+  const doc=documents.find(d=>d.id===id);
+  if(doc && doc.url) window.open(doc.url,'_blank');
+  else showToast('PDF not available',true);
+}
+function loadMessages(){
+  const filter=document.getElementById('messagesProjectFilter')?.value||'all';
+  let msgs=messages.filter(m=>m.clientId===currentClient.id);
+  if(filter!=='all') msgs=msgs.filter(m=>m.projectId==filter);
+  const container=document.getElementById('messagesList'); if(!container) return;
+  container.innerHTML='';
+  msgs.sort((a,b)=>new Date(a.timestamp)-new Date(b.timestamp)).forEach(msg=>{
+    container.innerHTML+=
+      `<div class="message ${msg.sender}">
+         <div class="message-bubble">${msg.content}</div>
+         <div class="message-meta">${new Date(msg.timestamp).toLocaleString()}</div>
+       </div>`;
+  });
+  container.scrollTop=container.scrollHeight;
+}
+function updateMessagesNotificationBadge(){
+  const lastSeen=localStorage.getItem('lastSeenMessages')||0;
+  const hasNew=messages.some(m=>m.clientId===currentClient?.id && m.sender==='admin' && new Date(m.timestamp).getTime()>lastSeen);
+  document.getElementById('messagesNotificationBadge')?.classList.toggle('visible',hasNew);
+}
+function sendMessage(){
+  const input=document.getElementById('messageInput'),
+        content=input.value.trim();
+  if(!content) return;
+  const msg={
+    id:Date.now(),
+    clientId:currentClient.id,
+    clientName:currentClient.name,
+    projectId:currentProjectId,
+    sender:'client',
+    content,
+    timestamp:new Date().toISOString()
+  };
+  fbSaveMessage(msg).then(()=>{
+    loadMessages();
+    addAuditLog('message_sent',currentClient.name,currentClient.id,currentProjectId,'Client sent message');
+  });
+  input.value='';
+  showToast('Message sent');
+}
+function scheduleMeeting(){
+  const meeting={
+    id:Date.now(),
+    clientId:currentClient.id,
+    clientName:currentClient.name,
+    projectId:currentProjectId,
+    type:document.getElementById('meetingType').value,
+    date:document.getElementById('meetingDate').value,
+    time:document.getElementById('meetingTime').value,
+    notes:document.getElementById('meetingNotes').value,
+    status:'pending',
+    timestamp:new Date().toISOString()
+  };
+  fbSaveMeeting(meeting).then(()=>{
+    addAuditLog('meeting_requested',currentClient.name,currentClient.id,currentProjectId,`${meeting.type} meeting requested`);
+    showToast('Meeting request sent');
+  });
+}
+function requestReferralLetter(){
+  sendAdminEmail('Referral letter requested',`${currentClient.name} requested a referral letter`);
+  showToast('Request sent to Suzana');
+}
+function sendAdminEmail(subject,body){
+  const html=
+    `<html><body>
+       <div style="background:#0a1628;padding:20px;">
+         <h2 style="color:#fff;">Croft Finance Alert</h2>
+       </div>
+       <div style="padding:20px;">${body}</div>
+     </body></html>`;
+  emailjs.send(EMAILJS_CONFIG.serviceId,EMAILJS_CONFIG.templateId,{
+    to_email:EMAILJS_CONFIG.adminEmail,
+    subject,
+    message:html
+  });
+}
+
+// Admin views & actions
+function renderAdminViews(){
+  renderPipelineBoard();
+  const tbody=document.getElementById('adminClientsTable');
+  if(tbody){
+    tbody.innerHTML='';
+    clients.forEach(c=>{
+      const clientProjects=projects.filter(p=>p.clientId===c.id);
+      tbody.innerHTML+=
+        `<tr>
+           <td><strong>${c.name}</strong><br><span style="font-size:12px;">${c.email}</span></td>
+           <td>${clientProjects.map(p=>`<span class="project-badge" style="background:var(--gray-100);padding:4px 8px;border-radius:6px;font-size:12px;margin-right:4px;">${p.name}</span>`).join('')||'None'}</td>
+           <td><span style="color:${c.status==='pending'?'#f59e0b':'#10b981'}">${c.status==='pending'?'Pending':'Active'}</span></td>
+           <td>
+             ${c.status==='pending'?`<button class="btn btn-primary btn-sm" onclick="activateClient(${c.id})">Activate</button>`:''}
+             <button class="btn btn-outline btn-sm" onclick="deleteClient(${c.id})">Delete</button>
+           </td>
+         </tr>`;
+    });
+  }
+  const pTbody=document.getElementById('adminProjectsTable');
+  if(pTbody){
+    pTbody.innerHTML='';
+    projects.forEach(p=>{
+      const client=clients.find(c=>c.id===p.clientId);
+      const lastActivity=p.lastActivity?new Date(p.lastActivity).toLocaleDateString():'-';
+      pTbody.innerHTML+=
+        `<tr>
+           <td>${client?.name||'Unknown'}</td>
+           <td><strong>${p.name}</strong></td>
+           <td>${p.amount}</td>
+           <td>Step ${p.step}/8</td>
+           <td>${lastActivity}</td>
+           <td>
+             <button class="btn btn-outline btn-sm" onclick="editProject(${p.id})">Edit</button>
+             <button class="btn btn-outline btn-sm" onclick="markStepComplete(${p.id})">Complete Step</button>
+           </td>
+         </tr>`;
+    });
+  }
+  const docsContainer=document.getElementById('adminDocumentsList');
+  if(docsContainer){
+    docsContainer.innerHTML='';
+    documents.forEach(d=>{
+      const client=clients.find(c=>c.id===d.clientId),
+            project=projects.find(p=>p.id===d.projectId);
+      docsContainer.innerHTML+=
+        `<div class="document-card">
+           <div class="document-icon"><i class="fas fa-file-pdf"></i></div>
+           <div class="document-name">${d.type}</div>
+           <div class="document-meta">${client?.name||'Unknown'} - ${project?.name||'Unknown'}<br>${d.date}</div>
+           <div>
+             <button class="btn btn-sm btn-outline" onclick="viewPDF(${d.id})">View</button>
+             <button class="btn btn-sm btn-outline" onclick="deleteDocument(${d.id})">Delete</button>
+           </div>
+         </div>`;
+    });
+  }
+  const meetingsContainer=document.getElementById('meetingsList');
+  if(meetingsContainer){
+    meetingsContainer.innerHTML='';
+    [...meetings].reverse().forEach(m=>{
+      meetingsContainer.innerHTML+=
+        `<div style="padding:12px;background:var(--gray-50);border-radius:8px;margin-bottom:12px;">
+           <strong>${m.clientName}</strong>
+           <span class="status-badge status-signed" style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;background:rgba(16,185,129,0.1);color:var(--success);">
+             ${m.status}
+           </span>
+           <div><strong>${m.type}</strong> - ${m.date||'TBD'}</div>
+           <div>${m.notes||''}</div>
+           <div>
+             <button class="btn btn-primary btn-sm" onclick="updateMeetingStatus(${m.id},'confirmed')">Confirm</button>
+             <button class="btn btn-outline btn-sm" onclick="updateMeetingStatus(${m.id},'cancelled')">Decline</button>
+           </div>
+         </div>`;
+    });
+  }
+  const pending=clients.filter(c=>c.status==='pending');
+  const pendingBlock=document.getElementById('pendingRegistrationsBlock');
+  const pendingTbody=document.getElementById('pendingRegistrationsTable');
+  if(pendingBlock&&pendingTbody){
+    if(pending.length){
+      pendingBlock.style.display='block';
+      pendingTbody.innerHTML='';
+      pending.forEach(c=>{
+        pendingTbody.innerHTML+=
+          `<tr>
+             <td><strong>${c.name}</strong></td>
+             <td>${c.email}</td>
+             <td>${projects.find(p=>p.clientId===c.id)?.name||'N/A'}</td>
+             <td>${new Date(c.createdAt).toLocaleString()}</td>
+             <td><button class="btn btn-primary btn-sm" onclick="activateClient(${c.id})">Activate</button></td>
+           </tr>`;
+      });
+    } else pendingBlock.style.display='none';
+  }
+}
+function renderPipelineBoard(){
+  const activeProjects=projects.filter(p=>p.status!=='pending');
+  const container=document.getElementById('pipelineBoard'); if(!container) return;
+  if(activeProjects.length===0){
+    container.innerHTML='<div class="card"><div class="card-body text-center">No active projects in pipeline.</div></div>'; return;
+  }
+  container.innerHTML='';
+  activeProjects.forEach(proj=>{
+    const client=clients.find(c=>c.id===proj.clientId);
+    const lastActivity=proj.lastActivity?new Date(proj.lastActivity).toLocaleDateString():'-';
+    const daysSince=proj.lastActivity?Math.floor((Date.now()-new Date(proj.lastActivity))/(1000*60*60*24)):'-';
+    container.innerHTML+=
+      `<div class="pipeline-card">
+         <div class="pipeline-card-info">
+           <h4>${client?.name||'Unknown'} — ${proj.name}</h4>
+           <p>Step ${proj.step}/8 · ${stepStageMap[proj.step]} · ${proj.amount} · ${proj.interestRate||'Rate TBD'} · ${proj.term||'Term TBD'} · Last activity: ${lastActivity} (${daysSince} days ago)</p>
+         </div>
+         <div>
+           <span class="pipeline-step ${proj.step>0?'active':''}" style="padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;">
+             ${stepStageMap[proj.step]}
+           </span>
+         </div>
+         <div><button class="btn btn-outline btn-sm" onclick="editProject(${proj.id})">Manage</button></div>
+       </div>`;
+  });
+}
+function renderAdminMessages(){
+  const container=document.getElementById('adminMessagesContainer'); if(!container) return;
+  const clientMap=new Map();
+  messages.forEach(m=>{
+    if(!clientMap.has(m.clientId)) clientMap.set(m.clientId,[]);
+    clientMap.get(m.clientId).push(m);
+  });
+  container.innerHTML='';
+  for(const [cid,msgs] of clientMap){
+    const client=clients.find(c=>c.id===cid);
+    if(!client) continue;
+    container.innerHTML+=
+      `<div class="card">
+         <div class="card-header">
+           <div class="card-title"><i class="fas fa-user"></i> ${client.name}</div>
+         </div>
+         <div class="card-body">
+           <div class="messages-list" id="conv-${cid}" style="height:200px;margin-bottom:12px;overflow-y:auto;padding:16px;background:var(--gray-50);border-radius:12px;"></div>
+           <textarea id="reply-${cid}" class="form-input" rows="2" placeholder="Type reply..."></textarea>
+           <button class="btn btn-primary btn-sm" onclick="sendAdminReply(${cid})" style="margin-top:8px;">Send Reply</button>
+         </div>
+       </div>`;
+    const convDiv=document.getElementById(`conv-${cid}`);
+    msgs.sort((a,b)=>new Date(a.timestamp)-new Date(b.timestamp)).forEach(msg=>{
+      convDiv.innerHTML+=
+        `<div class="message ${msg.sender}" style="margin-bottom:16px;display:flex;${msg.sender==='client'?'justify-content:flex-end':'justify-content:flex-start'}">
+           <div class="message-bubble" style="max-width:70%;padding:10px 16px;border-radius:16px;background:${msg.sender==='client'?'var(--navy)':'var(--white)'};color:${msg.sender==='client'?'white':'var(--gray-800)'};">
+             ${msg.content}
+           </div>
+           <div class="message-meta" style="font-size:10px;color:var(--gray-400);margin-top:4px;">${new Date(msg.timestamp).toLocaleString()}</div>
+         </div>`;
+    });
+    convDiv.scrollTop=convDiv.scrollHeight;
+  }
+}
+function sendAdminReply(cid){
+  const reply=document.getElementById(`reply-${cid}`).value.trim();
+  if(!reply) return;
+  const client=clients.find(c=>c.id===cid);
+  const msg={
+    id:Date.now(),
+    clientId:cid,
+    clientName:client?.name,
+    projectId:projects.find(p=>p.clientId===cid)?.id,
+    sender:'admin',
+    content:reply,
+    timestamp:new Date().toISOString()
+  };
+  fbSaveMessage(msg).then(()=>{
+    document.getElementById(`reply-${cid}`).value='';
+    renderAdminMessages();
+    addAuditLog('admin_replied','suzana',cid,null,'Admin replied');
+  });
+}
+function renderAuditLog(){
+  const tbody=document.getElementById('auditLogTable'); if(!tbody) return;
+  tbody.innerHTML='';
+  auditLogs.slice(0,100).forEach(log=>{
+    tbody.innerHTML+=
+      `<tr>
+         <td>${new Date(log.timestamp).toLocaleString()}</td>
+         <td>${log.action}</td>
+         <td>${log.performedBy}</td>
+         <td>${log.details||''}</td>
+       </tr>`;
+  });
+}
+
+// Admin actions: clients, projects, docs, meetings
+function activateClient(id){
+  const c=clients.find(c=>c.id===id); if(!c) return;
+  fbUpdateClient(id,{status:'active'}).then(()=>{
+    const cp=projects.filter(p=>p.clientId===id);
+    cp.forEach(p=>fbUpdateProject(p.id,{status:'active'}));
+    addAuditLog('client_activated','suzana',id,null,`${c.name} activated`);
+    showToast(`${c.name} activated!`);
+    if(cp.length) editProject(cp[0].id);
+  });
+}
+function editProject(id){
+  const p=projects.find(p=>p.id===id); if(!p) return;
+  document.getElementById('editProjectName').value=p.name||'';
+  document.getElementById('editAmount').value=p.amount||'TBD';
+  document.getElementById('editType').value=p.type||'';
+  document.getElementById('editTerm').value=p.term||'';
+  document.getElementById('editRate').value=p.interestRate||'';
+  document.getElementById('editGrace').value=p.gracePeriod||'';
+  document.getElementById('editStep').value=p.step||1;
+  document.getElementById('editCommitmentFeePaid').value=p.commitmentFeePaid?'true':'false';
+  document.getElementById('editCommitmentFeeDate').value=p.commitmentFeeDate||'';
+  window.editProjectId=id;
+  const notesDiv=document.getElementById('adminNotesList');
+  if(notesDiv&&p.adminNotes) notesDiv.innerHTML=p.adminNotes.map(n=>
+    `<div style="padding:8px;border-bottom:1px solid var(--gray-200);">
+       <small>${new Date(n.date).toLocaleString()}</small><br>${n.text}
+     </div>`
+  ).join('');
+  document.getElementById('editProjectModal').classList.add('active');
+}
+function addAdminNote(){
+  const note=document.getElementById('newAdminNote').value.trim();
+  if(!note) return;
+  const p=projects.find(p=>p.id===window.editProjectId); if(!p) return;
+  const notes=p.adminNotes||[];
+  notes.push({ text:note, date:new Date().toISOString() });
+  fbUpdateProject(p.id,{ adminNotes:notes, lastActivity:new Date().toISOString() }).then(()=>{
+    document.getElementById('newAdminNote').value='';
+    addAuditLog('admin_note_added','suzana',p.clientId,p.id,note.substring(0,50));
+    editProject(p.id);
+    showToast('Note added');
+  });
+}
+function saveProjectInfo(){
+  const id=window.editProjectId,
+        p=projects.find(p=>p.id===id);
+  if(!p) return;
+  const newStep=parseInt(document.getElementById('editStep').value);
+  if(newStep>p.step+1){
+    showToast('Step can only increase by 1 at a time',true);
+    return;
+  }
+  const updates={
+    name:document.getElementById('editProjectName').value,
+    amount:document.getElementById('editAmount').value,
+    type:document.getElementById('editType').value,
+    term:document.getElementById('editTerm').value,
+    interestRate:document.getElementById('editRate').value,
+    gracePeriod:document.getElementById('editGrace').value,
+    commitmentFeePaid:document.getElementById('editCommitmentFeePaid').value==='true',
+    commitmentFeeDate:document.getElementById('editCommitmentFeeDate').value,
+    lastActivity:new Date().toISOString()
+  };
+  if(newStep!==p.step){
+    const stepDates=p.stepDates||{};
+    for(let s=p.step+1;s<=newStep;s++) stepDates[s]=new Date().toISOString().split('T')[0];
+    updates.step=newStep;
+    updates.stepDates=stepDates;
+    addAuditLog('project_step_updated','suzana',p.clientId,id,`Step ${p.step}→${newStep}`);
+  }
+  if(updates.commitmentFeePaid && !p.commitmentFeePaid)
+    addAuditLog('commitment_fee_paid','suzana',p.clientId,id,'Commitment fee paid');
+  fbUpdateProject(id,updates).then(()=>{
+    closeModal('editProjectModal');
+    if(currentClient && currentProjectId===id) renderDashboard();
+    showToast('Project updated');
+  });
+}
+function markStepComplete(id){
+  const p=projects.find(p=>p.id===id); if(!p||p.step>=8) return;
+  const newStep=p.step+1;
+  const stepDates=p.stepDates||{};
+  stepDates[newStep]=new Date().toISOString().split('T')[0];
+  fbUpdateProject(id,{ step:newStep, stepDates, lastActivity:new Date().toISOString() }).then(()=>{
+    addAuditLog('step_completed','suzana',p.clientId,id,`Step ${p.step} completed`);
+    showToast(`Step ${newStep} reached`);
+  });
+}
+function deleteClient(id){
+  if(confirm('Delete client?')) fbDeleteClient(id).then(()=>showToast('Deleted'));
+}
+function deleteDocument(id){
+  if(confirm('Delete document?')) fbDeleteDocument(id).then(()=>showToast('Deleted'));
+}
+function updateMeetingStatus(id,status){
+  fbUpdateMeeting(id,{status}).then(()=>showToast(`Meeting ${status}`));
+}
+function showAddClientModal(){
+  ['ncName','ncEmail','ncPassword','ncProject','ncAmount','ncType','ncRate','ncTerm','ncGrace'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('addClientModal').classList.add('active');
+}
+function createClient(){
+  const name=document.getElementById('ncName').value.trim(),
+        email=document.getElementById('ncEmail').value.trim().toLowerCase(),
+        pwd=document.getElementById('ncPassword').value.trim(),
+        pName=document.getElementById('ncProject').value.trim();
+  if(!name||!email||!pwd||!pName){ showToast('Required fields missing',true); return; }
+  if(clients.find(c=>c.email===email)){ showToast('Email exists',true); return; }
+  const newClient={ id:Date.now(), name, email, password:pwd, status:'active', createdAt:new Date().toISOString() };
+  const newProject={
+    id:Date.now(),
+    clientId:newClient.id,
+    name:pName,
+    amount:document.getElementById('ncAmount').value||'TBD',
+    type:document.getElementById('ncType').value||'New Project',
+    facilityType:'Structured Debt',
+    step:1,
+    stepDates:{ "1":new Date().toISOString().split('T')[0] },
+    nextMilestone:'Awaiting Term Sheet',
+    term:document.getElementById('ncTerm').value||'TBD',
+    interestRate:document.getElementById('ncRate').value||'TBD',
+    gracePeriod:document.getElementById('ncGrace').value||'6+ months',
+    status:'active',
+    commitmentFeePaid:false,
+    adminNotes:[],
+    lastActivity:new Date().toISOString()
+  };
+  fbSaveClient(newClient).then(()=>{
+    fbSaveProject(newProject);
+    addAuditLog('client_created','suzana',newClient.id,newProject.id,`${name} created`);
+    closeModal('addClientModal');
+    showToast(`Portal created: ${email}/${pwd}`);
+  });
+}
+function showAddProjectAdminModal(){
+  const select=document.getElementById('addProjectClientId');
+  select.innerHTML='<option value="">Select Client</option>'+clients.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  document.getElementById('addProjectModal').classList.add('active');
+}
+function addNewProject(){
+  const cid=parseInt(document.getElementById('addProjectClientId').value),
+        name=document.getElementById('newProjectName').value.trim();
+  if(!cid||!name){ showToast('Select client and project name',true); return; }
+  const newProject={
+    id:Date.now(),
+    clientId:cid,
+    name,
+    amount:document.getElementById('newProjectAmount').value||'TBD',
+    type:document.getElementById('newProjectType').value||'New Project',
+    facilityType:'Structured Debt',
+    step:1,
+    stepDates:{ "1":new Date().toISOString().split('T')[0] },
+    nextMilestone:'Awaiting Term Sheet',
+    term:'TBD',
+    interestRate:'TBD',
+    gracePeriod:'6+ months',
+    status:'active',
+    commitmentFeePaid:false,
+    adminNotes:[],
+    lastActivity:new Date().toISOString()
+  };
+  fbSaveProject(newProject).then(()=>{
+    addAuditLog('project_created','suzana',cid,newProject.id,`${name} created`);
+    closeModal('addProjectModal');
+    showToast('Project added');
+  });
+}
+function showUploadDocumentModal(){
+  const cs=document.getElementById('uploadClientId');
+  cs.innerHTML='<option value="">Select Client</option>'+clients.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  cs.onchange=function(){
+    const ps=document.getElementById('uploadProjectId');
+    const clientProjects=projects.filter(p=>p.clientId==this.value);
+    ps.innerHTML='<option value="">Select Project</option>'+clientProjects.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  };
+  document.getElementById('uploadDocumentModal').classList.add('active');
+}
+function uploadDocument(){
+  const cid=parseInt(document.getElementById('uploadClientId').value),
+        pid=parseInt(document.getElementById('uploadProjectId').value),
+        type=document.getElementById('documentType').value,
+        file=document.getElementById('pdfFile').files[0],
+        url=document.getElementById('documentUrl').value;
+  if(!cid||!pid){ showToast('Select client and project',true); return; }
+  if(file){
+    if(file.type!=='application/pdf'){ showToast('Upload a PDF',true); return; }
+    const reader=new FileReader();
+    reader.onload=function(e){ saveDocument(cid,pid,type,e.target.result); };
+    reader.readAsDataURL(file);
+  } else if(url){
+    saveDocument(cid,pid,type,url);
+  } else {
+    showToast('Select PDF or provide URL',true);
+  }
+}
+function saveDocument(cid,pid,type,url){
+  const doc={
+    id:Date.now(),
+    clientId:cid,
+    projectId:pid,
+    type,
+    name:type,
+    url,
+    date:new Date().toISOString().split('T')[0]
+  };
+  fbSaveDocument(doc).then(()=>{
+    addAuditLog('document_uploaded','suzana',cid,pid,type);
+    closeModal('uploadDocumentModal');
+    showToast(`${type} uploaded`);
+  });
+  document.getElementById('pdfFile').value='';
+  document.getElementById('documentUrl').value='';
+}
+
+// Init
+initEmailJS();
+initFirebase();
+checkCookies();
+</script>
+</body>
+</html>
