@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Croft Finance — Structured Finance Solutions</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%232c5f8a'/><text y='72' x='8' font-size='58' font-family='Georgia,serif' fill='%23ffffff' font-weight='700'>CF</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -3348,6 +3349,12 @@ function saveLocal() {
   localStorage.setItem('croft_client_activity', JSON.stringify(clientActivityLog));
 }
 
+  function saveBrokersLocal() {
+  localStorage.setItem('croft_brokers', JSON.stringify(brokers));
+  localStorage.setItem('croft_brokerSubmissions', JSON.stringify(brokerSubmissions));
+  localStorage.setItem('croft_brokerMessages', JSON.stringify(brokerMessages));
+}
+
 async function fbSet(col, id, data) { if (!firebaseReady) { saveLocal(); return; } await db.collection(col).doc(String(id)).set(data); }
 async function fbUpdate(col, id, data) { if (!firebaseReady) { saveLocal(); return; } await db.collection(col).doc(String(id)).update(data); }
 async function fbDelete(col, id) { if (!firebaseReady) { saveLocal(); return; } await db.collection(col).doc(String(id)).delete(); }
@@ -4014,6 +4021,7 @@ async function clientUploadDocument() {
   if (file.type !== 'application/pdf') { showToast('Please upload a PDF file', true); return; }
   if (file.size > 10 * 1024 * 1024) { showToast('File size must be less than 10MB', true); return; }
   const docType = selectedValue.split('|')[0];
+  const proj = projects.find(p => p.id === currentProjectId);
   statusDiv.style.display = 'block';
   statusDiv.innerHTML = '<span style="color: var(--blue);"><i class="fas fa-spinner fa-spin"></i> Uploading...</span>';
   const reader = new FileReader();
@@ -4302,13 +4310,6 @@ function renderClientsTable() {
   tbody.innerHTML = filtered.map(c => { const cp = projects.filter(p => p.clientId === c.id); return `<tr><td><strong>${escapeHtml(c.name)}</strong><br><span style="font-size:11px;color:var(--gray-400);">${c.email}</span></td><td>${cp.map(p => `<span class="badge badge-gray">${escapeHtml(p.name)}</span>`).join(' ') || '—'}</td><td><span style="color:${c.status === 'pending' ? 'var(--warning)' : 'var(--success)'};">${c.status === 'pending' ? 'Pending' : 'Active'}</span></td><td style="font-size:12px;color:var(--gray-400);">${c.createdAt ? new Date(c.createdAt).toLocaleDateString() : '—'}</td><td style="display:flex;gap:6px;flex-wrap:wrap;">${c.status === 'pending' ? `<button class="btn btn-success" style="padding:4px 10px;font-size:11px;" onclick="activateClient('${c.id}')">Activate</button>` : ''}<button class="btn btn-outline" style="padding:4px 10px;font-size:11px;color:var(--error);" onclick="deleteClient('${c.id}')">Delete</button></td></tr>`; }).join('');
 }
 
-function renderProjectsTable() {
-  const tbody = document.getElementById('adminProjectsTable');
-  if (!tbody) return;
-  tbody.innerHTML = projects.map(p => { const client = clients.find(c => c.id === p.clientId); return `<tr><td style="font-size:12px;">${client?.name || '?'}</td><td><strong>${escapeHtml(p.name)}</strong></td><td>${p.industry || '—'}</td><td>${p.location || '—'}
-  // ============================================================
-// ADMIN TABLES (CONTINUED)
-// ============================================================
 function renderProjectsTable() {
   const tbody = document.getElementById('adminProjectsTable');
   if (!tbody) return;
@@ -5464,7 +5465,7 @@ function saveDocument(clientId, projectId, docType, url) {
     logAudit('Document uploaded', docType, String(clientId), String(projectId));
     logClientActivity(clientId, projectId, 'document_uploaded', `Croft Finance uploaded: ${docType}`, 'croft');
     fbReload().then(() => {
-      renderDocumentsAdmin();
+      renderAdminDocumentsTable();
       if (currentClient && String(currentClient.id) === String(clientId)) renderDocuments();
     });
     if (client && client.email && client.status === 'active') {
