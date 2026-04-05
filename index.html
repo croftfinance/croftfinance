@@ -5178,7 +5178,7 @@ function clearSignatureCanvas() {
 function updateSignatureSubmitButton() {
   const btn = document.getElementById('signatureSubmitBtn');
   if (!btn) return;
-  const isValid = strokePixels >= 500;
+  const isValid = strokePixels >= 50;
   btn.disabled = !isValid;
   const errorEl = document.getElementById('signatureError');
   if (errorEl && !isValid && hasDrawn) { errorEl.style.display = 'block'; errorEl.textContent = 'Please provide a complete signature (draw more)'; }
