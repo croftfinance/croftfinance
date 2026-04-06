@@ -2839,6 +2839,12 @@ body {
         <div class="sidebar-section-label" style="margin-top:8px;">Communication</div><button class="nav-item" onclick="switchAdminTab('messages-admin',this)"><i class="fas fa-comments"></i> Messages</button><button class="nav-item" onclick="switchAdminTab('meetings',this)"><i class="fas fa-calendar"></i> Meetings</button>
         <div class="sidebar-section-label" style="margin-top:8px;">System</div><button class="nav-item" onclick="switchAdminTab('audit',this)"><i class="fas fa-history"></i> Audit Log</button>
       </div>
+      <div style="margin-top: 20px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1);">
+    <button class="nav-item" onclick="switchToAdminLogin()" style="color: var(--blue);">
+      <i class="fas fa-exchange-alt"></i> Switch to Admin Login
+    </button>
+  </div>
+</div>
     </aside>
     <main class="main-content">
       <div id="admin-overview" class="admin-tab active">
@@ -2863,7 +2869,7 @@ body {
 
       <div id="admin-documents-admin" class="admin-tab"><div class="page-header"><div class="page-title">Documents</div><div class="page-subtitle" id="docCount"></div></div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap;"><select id="adminDocFilterClient" class="form-select" style="max-width:250px;" onchange="renderAdminDocumentsTable()"><option value="">All Clients</option></select><button class="btn btn-primary" onclick="showUploadDocumentModal()">+ Upload Document</button></div><div class="table-wrap"><table class="documents-table" id="adminDocumentsTable"><thead><tr><th>Client</th><th>Project</th><th>Document Name</th><th>Step</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="adminDocumentsTableBody"></tbody></table></div></div>
 
-      <div id="admin-brokers" class="admin-tab"><div class="page-header"><div class="page-title">Brokers & Introducers</div><div class="page-subtitle">Manage broker registrations and view their submissions</div></div><div class="card"><div class="card-body"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Broker</th><th>Firm</th><th>Country</th><th>Status</th><th>Registered</th><th>Actions</th></tr></thead><tbody id="adminBrokersTable"></tbody></table></div></div></div></div>
+      <div id="admin-brokers" class="admin-tab"><div class="page-header"><div class="page-title">Brokers & Introducers</div><div class="page-subtitle">Manage broker registrations and view their submissions</div></div><div class="card"><div class="card-body"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Broker</th><th>Firm</th><th>Country</th><th>Commission</th><th>Status</th><th>Registered</th><th>Actions</th></tr></thead><tbody id="adminBrokersTable"></tbody></table></div></div></div></div>
 
       <div id="admin-broker-submissions" class="admin-tab"><div class="page-header"><div class="page-title">Broker Submissions</div><div class="page-subtitle">All deals submitted by brokers</div></div><div class="card"><div class="card-body"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Date</th><th>Broker</th><th>Client</th><th>Project</th><th>Funds Needed</th><th>Status</th><th>Action</th></tr></thead><tbody id="adminBrokerSubmissionsTable"></tbody></table></div></div></div></div>
 
@@ -3525,18 +3531,27 @@ function clearRegistrationForm() {
   document.getElementById('ndaCheckbox').checked = false;
 }
 
-function login() {
+async function login() {
   const email = document.getElementById('loginEmail').value.trim().toLowerCase();
   const pass = document.getElementById('loginPassword').value;
   const errEl = document.getElementById('loginError');
   errEl.style.display = 'none';
 
-  firebase.auth().signInWithEmailAndPassword(email, pass)
-    .then((userCredential) => {
+firebase.auth().signInWithEmailAndPassword(email, pass)
+    .then(async (userCredential) => {
       const uid = userCredential.user.uid;
       
-      const client = clients.find(c => c.id === uid) || 
-                     clients.find(c => c.email === email);
+let client = clients.find(c => c.id === uid) || 
+             clients.find(c => c.email === email);
+
+// If not found in local array, try to fetch from Firestore
+if (!client && firebaseReady) {
+  const doc = await db.collection('clients').doc(uid).get();
+  if (doc.exists) {
+    client = { id: doc.id, ...doc.data() };
+    clients.push(client);
+  }
+}
       
       if (!client) {
         firebase.auth().signOut();
@@ -3647,6 +3662,30 @@ function logout() {
   showView('home');
   document.title = 'Croft Finance — Structured Finance Solutions';
   if (sessionTimeout) clearTimeout(sessionTimeout);
+}
+  // ADD THIS NEW FUNCTION HERE
+function switchToAdminLogin() {
+  // Sign out from Firebase
+  firebase.auth().signOut().catch(() => {});
+  
+  // Clear all sessions
+  localStorage.removeItem('croftSession');
+  localStorage.removeItem('croftAdminSession');
+  localStorage.removeItem('croftBrokerSession');
+  
+  // Clear current user variables
+  currentClient = null;
+  currentProjectId = null;
+  currentBroker = null;
+  
+  // Show home view
+  showView('home');
+  
+  // Show admin login form
+  showAdminLogin();
+  openModal('loginModal');
+  
+  showToast('Please log in as administrator');
 }
 
 // ============================================================
@@ -4924,10 +4963,56 @@ async function acknowledgeECF() {
 function renderBrokerAdminTable() {
   const container = document.getElementById('adminBrokersTable');
   if (!container) return;
-  container.innerHTML = brokers.map(b => `<tr><td><strong>${escapeHtml(b.name)}</strong><br><span style="font-size:11px;color:var(--gray-400);">${b.email}</span></td><td>${escapeHtml(b.firm)}</div><td>${b.country}</td><td><span style="color:${b.status === 'pending' ? 'var(--warning)' : 'var(--success)'};">${b.status === 'pending' ? 'Pending' : 'Active'}</span></td><td style="font-size:12px;">${b.createdAt ? new Date(b.createdAt).toLocaleDateString() : '—'}</td><td>${b.status === 'pending' ? `<button class="btn btn-success" style="padding:4px 10px;font-size:11px;" onclick="activateBroker('${b.id}')">Activate</button>` : ''}<button class="btn btn-outline" style="padding:4px 10px;font-size:11px;color:var(--error);" onclick="deleteBroker('${b.id}')">Delete</button></td></tr>`).join('');
+  container.innerHTML = brokers.map(b => `
+    <tr>
+      <td><strong>${escapeHtml(b.name)}</strong><br><span style="font-size:11px;color:var(--gray-400);">${b.email}</span></td>
+      <td>${escapeHtml(b.firm)}</td>
+      <td>${b.country}</td>
+      <td>
+        <input type="number" id="commission_${b.id}" 
+               value="${b.commissionRate !== undefined && b.commissionRate !== null ? b.commissionRate : ''}" 
+               step="0.1" min="0" max="100" 
+               style="width:70px; padding:4px;" 
+               placeholder="0"
+               onchange="setBrokerCommissionRate('${b.id}', this.value)">
+        <span style="font-size:11px;">%</span>
+      </td>
+      <td><span style="color:${b.status === 'pending' ? 'var(--warning)' : 'var(--success)'};">${b.status === 'pending' ? 'Pending' : 'Active'}</span></td>
+      <td style="font-size:12px;">${b.createdAt ? new Date(b.createdAt).toLocaleDateString() : '—'}</td>
+      <td>
+        ${b.status === 'pending' ? `<button class="btn btn-success" style="padding:4px 10px;font-size:11px;" onclick="activateBroker('${b.id}')">Activate</button>` : ''}
+        <button class="btn btn-outline" style="padding:4px 10px;font-size:11px;color:var(--error);" onclick="deleteBroker('${b.id}')">Delete</button>
+      </td>
+    </tr>
+  `).join('');
+  
   const pendingCount = brokers.filter(b => b.status === 'pending').length;
   const pendingSpan = document.getElementById('pendingBrokersCount');
   if (pendingSpan) pendingSpan.textContent = pendingCount;
+}
+  function setBrokerCommissionRate(brokerId, rate) {
+  const broker = brokers.find(b => b.id === brokerId || b.id === String(brokerId));
+  if (broker) {
+    // Parse rate: empty string or NaN becomes undefined (meaning 0% / no commission)
+    const parsedRate = rate === '' || rate === null ? undefined : parseFloat(rate);
+    broker.commissionRate = (parsedRate === undefined || isNaN(parsedRate)) ? undefined : Math.max(0, Math.min(100, parsedRate));
+    
+    if (firebaseReady) {
+      fbUpdate('brokers', brokerId, { commissionRate: broker.commissionRate });
+    } else {
+      saveBrokersLocal();
+    }
+    
+    const displayRate = broker.commissionRate !== undefined ? broker.commissionRate + '%' : '0% (No commission)';
+    showToast(`Commission rate for ${broker.name} set to ${displayRate}`);
+    renderBrokerAdminTable(); // Refresh to show updated value
+  }
+}
+
+  function getBrokerCommissionRate(brokerId) {
+  const broker = brokers.find(b => b.id === brokerId || b.id === String(brokerId));
+  // Returns the commission rate (0 if undefined/empty)
+  return broker?.commissionRate || 0;
 }
 
 function renderAdminBrokerSubmissionsTable() {
@@ -5016,7 +5101,7 @@ function activateBroker(id) {
   broker.status = 'active';
   if (firebaseReady) fbUpdate('brokers', id, { status: 'active' });
   else saveBrokersLocal();
-  sendEmail(broker.email, '✅ Croft Finance — Broker Portal Activated', `Dear ${broker.name},\n\nYour broker portal has been activated.\n\nYou can now log in at ${window.location.origin} to submit deals and track your introductions.\n\nEmail: ${broker.email}\n\nStandard introducer fee: 1% of funded facility amount, payable at disbursement.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`).catch(() => {});
+  sendEmail(broker.email, '✅ Croft Finance — Broker Portal Activated', `Dear ${broker.name},\n\nYour broker portal has been activated.\n\nYou can now log in at ${window.location.origin} to submit deals and track your introductions.\n\nEmail: ${broker.email}\n\n\n\nBest regards,\nSuzana Aleksić\nCroft Finance`).catch(() => {});
   showToast(broker.name + ' activated.');
   renderBrokerAdminTable();
 }
@@ -5108,7 +5193,7 @@ function brokerLogin() {
   errEl.style.display = 'none';
 
   firebase.auth().signInWithEmailAndPassword(email, pass)
-    .then((userCredential) => {
+    .then(async (userCredential) => {
       const uid = userCredential.user.uid;
       const broker = brokers.find(b => b.id === uid) || 
                      brokers.find(b => b.email === email);
@@ -5149,14 +5234,50 @@ function loadBrokerPortal() {
   document.getElementById('brokerNavUser').textContent = currentBroker.name;
   document.getElementById('brokerAvatar').textContent = currentBroker.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
   document.getElementById('brokerDashGreeting').textContent = 'Welcome, ' + currentBroker.name.split(' ')[0] + '.';
+  
   const mySubmissions = brokerSubmissions.filter(s => s.brokerId === currentBroker.id);
   const activeSubmissions = mySubmissions.filter(s => s.status === 'active');
   const fundedSubmissions = mySubmissions.filter(s => s.status === 'funded');
-  const totalCommission = fundedSubmissions.reduce((sum, s) => { const amount = parseFloat(String(s.fundsNeeded || '0').replace(/[^0-9.-]/g, '')); return sum + (amount * 0.01); }, 0);
+  
+  // Get broker's commission rate (could be 0 or undefined)
+  const brokerRate = currentBroker.commissionRate || 0;
+  const ratePercent = brokerRate / 100;
+  
+  const totalCommission = fundedSubmissions.reduce((sum, s) => { 
+    const amount = parseFloat(String(s.fundsNeeded || '0').replace(/[^0-9.-]/g, '')); 
+    return sum + (amount * ratePercent); 
+  }, 0);
+  
   document.getElementById('brokerTotalSubmissions').textContent = mySubmissions.length;
   document.getElementById('brokerActiveDeals').textContent = activeSubmissions.length;
   document.getElementById('brokerFundedDeals').textContent = fundedSubmissions.length;
+  
+// Show commission
+if (brokerRate > 0) {
   document.getElementById('brokerEstCommission').textContent = '$' + totalCommission.toLocaleString();
+} else {
+  document.getElementById('brokerEstCommission').textContent = '$0';
+}
+
+// Add rate display to the Est. Commission Earned stat card
+const commissionStatCard = document.getElementById('brokerEstCommission')?.closest('.stat-card');
+if (commissionStatCard) {
+  let rateDisplay = commissionStatCard.querySelector('.commission-rate-display');
+  if (!rateDisplay) {
+    rateDisplay = document.createElement('div');
+    rateDisplay.className = 'commission-rate-display';
+    rateDisplay.style.fontSize = '10px';
+    rateDisplay.style.marginTop = '6px';
+    rateDisplay.style.color = 'var(--gray-500)';
+    commissionStatCard.appendChild(rateDisplay);
+  }
+  if (brokerRate > 0) {
+    rateDisplay.innerHTML = `Your rate: <strong>${brokerRate}%</strong>`;
+  } else {
+    rateDisplay.innerHTML = `⚠️ No commission rate set`;
+  }
+}
+  
   renderBrokerSubmissions();
   loadBrokerMessages();
 }
@@ -5187,7 +5308,7 @@ function submitDeal() {
   const newProject = { id: projectId, name: projectName, clientId: null, brokerId: currentBroker.id, industry, location, fundsNeeded, amount: fundsNeeded, status: 'pending', step: 1, nextMilestone: 'Awaiting Client Registration', createdAt: new Date().toISOString() };
   projects.push(newProject);
   if (firebaseReady) fbSet('projects', projectId, newProject);
-  sendEmail(EMAILJS_CONFIG.adminEmail, `📋 NEW DEAL SUBMISSION from ${currentBroker.name}`, `A new deal has been submitted by broker ${currentBroker.name} (${currentBroker.email}, ${currentBroker.firm}).\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nDEAL DETAILS:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n• Client: ${clientName}\n• Client Email: ${clientEmail}\n• Project: ${projectName}\n• Industry: ${industry}\n• Location: ${location}\n• Funds Needed: $${fundsNeeded}\n• Description: ${description || 'Not provided'}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nBroker: ${currentBroker.name} (${currentBroker.firm})\nCommission Rate: 1%\n\nLog in to admin to review.`).catch(() => {});
+  sendEmail(EMAILJS_CONFIG.adminEmail, `📋 NEW DEAL SUBMISSION from ${currentBroker.name}`, `A new deal has been submitted by broker ${currentBroker.name} (${currentBroker.email}, ${currentBroker.firm}).\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nDEAL DETAILS:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n• Client: ${clientName}\n• Client Email: ${clientEmail}\n• Project: ${projectName}\n• Industry: ${industry}\n• Location: ${location}\n• Funds Needed: $${fundsNeeded}\n• Description: ${description || 'Not provided'}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nBroker: ${currentBroker.name} (${currentBroker.firm})\n\n\nLog in to admin to review.`).catch(() => {});
   document.getElementById('dealClientName').value = '';
   document.getElementById('dealClientEmail').value = '';
   document.getElementById('dealProjectName').value = '';
@@ -5423,10 +5544,15 @@ function createClient() {
   const email = document.getElementById('ncEmail').value.trim().toLowerCase();
   const pass = document.getElementById('ncPassword').value.trim();
   const projName = document.getElementById('ncProject').value.trim();
+  
   if (!name || !email || !pass || !projName) { 
     showToast('Name, email, password and project required', true); 
     return; 
   }
+
+  // Save current admin info BEFORE creating new user
+  const wasAdmin = localStorage.getItem('croftAdminSession');
+  const adminEmail = wasAdmin ? 'suzana.aleksic@croftfinance.com' : null;
 
   firebase.auth().createUserWithEmailAndPassword(email, pass)
     .then(async (userCredential) => {
@@ -5482,9 +5608,32 @@ function createClient() {
       await fbSet('projects', pid, newProject);
       await logAudit('Admin created client', name + ' (' + email + ')', uid, pid);
       await generateAndStoreIVL(uid, pid);
+      
+      // CRITICAL: Sign out the new client
+      await firebase.auth().signOut();
+      
+      // Clear any existing session
+      localStorage.removeItem('croftSession');
+      
+      // Show success message
+      showToast(`Client ${name} created successfully!`);
       closeModal('addClientModal');
-      showToast('Portal created — Login: ' + email + ' / ' + pass);
-      fbReload();
+      
+      // Clear the form
+      document.getElementById('ncName').value = '';
+      document.getElementById('ncEmail').value = '';
+      document.getElementById('ncPassword').value = '';
+      document.getElementById('ncProject').value = '';
+      
+      // If we were admin, restore admin view
+      if (wasAdmin) {
+        // Show admin login form
+        showAdminLogin();
+        openModal('loginModal');
+        showToast('Please log back in as admin to continue.');
+      } else {
+        fbReload();
+      }
     })
     .catch((error) => {
       if (error.code === 'auth/email-already-in-use') {
