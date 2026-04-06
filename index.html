@@ -11,6 +11,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
 <style>
 :root {
@@ -3022,7 +3023,6 @@ const EMAILJS_CONFIG = {
   templateId: "template_s85eg0h",
   adminEmail: "suzana.aleksic@croftfinance.com"
 };
-const ADMIN_CREDS = { username: "suzana", password: "croft2025" };
 
 let db = null, firebaseReady = false;
 let clients = [], projects = [], documents = [], messages = [], meetings = [], auditLog = [], notifications = [];
@@ -3546,20 +3546,36 @@ function requestPasswordReset() {
 function doAdminLogin() {
   const u = document.getElementById('adminUsername').value.trim();
   const p = document.getElementById('adminPassword').value;
-  if (u === ADMIN_CREDS.username && p === ADMIN_CREDS.password) {
-    localStorage.setItem('croftAdminSession', JSON.stringify({ ts: Date.now() }));
-    closeModal('loginModal');
-    showView('admin');
-    document.title = 'Croft Finance — Admin';
-    loadAdminNotifications();
-    if (firebaseReady) initAdminListeners();
-    setTimeout(() => requestBrowserNotificationPermission(), 1000);
-    renderAdminTables();
-    logAudit('Admin logged in', 'Suzana');
-    resetSessionTimeout();
-  } else {
-    document.getElementById('adminLoginError').style.display = 'block';
-  }
+  const errEl = document.getElementById('adminLoginError');
+  errEl.style.display = 'none';
+
+  // Use the email they type, or map username to email
+  const email = u.includes('@') ? u : u + '@croftfinance.com';
+
+  firebase.auth().signInWithEmailAndPassword(email, p)
+    .then((userCredential) => {
+      // Check it's actually the admin account
+      const allowedAdminEmails = ['suzana@croftfinance.com', 'suzana.aleksic@croftfinance.com'];
+      if (!allowedAdminEmails.includes(userCredential.user.email)) {
+        firebase.auth().signOut();
+        errEl.style.display = 'block';
+        return;
+      }
+      localStorage.setItem('croftAdminSession', JSON.stringify({ ts: Date.now() }));
+      closeModal('loginModal');
+      showView('admin');
+      document.title = 'Croft Finance — Admin';
+      loadAdminNotifications();
+      if (firebaseReady) initAdminListeners();
+      setTimeout(() => requestBrowserNotificationPermission(), 1000);
+      renderAdminTables();
+      logAudit('Admin logged in', 'Suzana');
+      resetSessionTimeout();
+    })
+    .catch((error) => {
+      console.error('Admin login error:', error);
+      errEl.style.display = 'block';
+    });
 }
 
 function logout() {
@@ -3570,6 +3586,7 @@ function logout() {
   localStorage.removeItem('croftAdminSession');
   localStorage.removeItem('croftBrokerSession');
   stopAdminListeners();
+  firebase.auth().signOut().catch(() => {});
   showView('home');
   document.title = 'Croft Finance — Structured Finance Solutions';
   if (sessionTimeout) clearTimeout(sessionTimeout);
