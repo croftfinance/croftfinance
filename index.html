@@ -1406,23 +1406,6 @@ body {
   gap: 16px;
   margin-bottom: 24px;
 }
-.commission-card {
-  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
-  color: white;
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 24px;
-}
-.commission-card .commission-rate {
-  font-size: 36px;
-  font-weight: 700;
-  font-family: 'Cormorant Garamond', serif;
-  margin: 8px 0;
-}
-.commission-card .commission-note {
-  font-size: 12px;
-  opacity: 0.8;
-}
 .submission-table {
   width: 100%;
   border-collapse: collapse;
@@ -2574,203 +2557,6 @@ body {
   opacity: 0.6;
 }
 
-/* E-Signature System */
-.signature-modal {
-  max-width: 1400px;
-  width: 95%;
-  height: 90vh;
-}
-.signature-container {
-  display: flex;
-  gap: 24px;
-  height: calc(90vh - 140px);
-  overflow: hidden;
-}
-.signature-document-panel {
-  flex: 2;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-.signature-document-preview {
-  flex: 1;
-  border: 1px solid var(--gray-200);
-  border-radius: 8px;
-  overflow-y: auto;
-  background: var(--gray-50);
-  padding: 16px;
-}
-.signature-document-preview iframe {
-  width: 100%;
-  min-height: 500px;
-  border: none;
-  background: white;
-}
-.signature-panel {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-.signature-canvas-container {
-  background: white;
-  border: 1px solid var(--gray-300);
-  border-bottom: 2px solid var(--navy);
-  border-radius: 8px;
-  position: relative;
-}
-.signature-canvas {
-  width: 100%;
-  height: 180px;
-  cursor: crosshair;
-  background: white;
-  border-radius: 8px;
-}
-.signature-watermark {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: var(--gray-300);
-  font-size: 14px;
-  pointer-events: none;
-  font-family: 'Cormorant Garamond', serif;
-  letter-spacing: 2px;
-}
-.signature-declaration {
-  font-size: 11px;
-  color: var(--gray-500);
-  padding: 12px;
-  background: var(--gray-50);
-  border-radius: 8px;
-  text-align: center;
-}
-.signature-metadata {
-  font-size: 10px;
-  color: var(--gray-400);
-  padding: 8px;
-  background: var(--gray-50);
-  border-radius: 8px;
-}
-.signature-error {
-  color: var(--error);
-  font-size: 11px;
-  padding: 8px;
-  display: none;
-}
-.signature-submit-btn {
-  width: 100%;
-  padding: 14px;
-  background: var(--navy);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.signature-submit-btn:hover:not(:disabled) {
-  background: var(--navy-light);
-}
-.signature-submit-btn:disabled {
-  background: var(--gray-400);
-  cursor: not-allowed;
-}
-.signature-clear-btn {
-  background: none;
-  border: 1px solid var(--gray-300);
-  color: var(--gray-600);
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 11px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.signature-clear-btn:hover {
-  border-color: var(--error);
-  color: var(--error);
-}
-.signature-status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 9px;
-  font-weight: 600;
-}
-.signature-status-signed {
-  background: rgba(43,140,78,0.1);
-  color: var(--success);
-}
-.signature-status-pending {
-  background: rgba(217,119,6,0.1);
-  color: var(--warning);
-}
-.signature-viewer-modal {
-  max-width: 600px;
-}
-.signature-certificate {
-  background: white;
-  padding: 32px;
-  border-radius: 12px;
-}
-.signature-certificate-header {
-  background: var(--navy);
-  margin: -32px -32px 24px -32px;
-  padding: 20px 32px;
-  border-radius: 12px 12px 0 0;
-  color: white;
-}
-.signature-certificate-header h3 {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 22px;
-  margin-bottom: 4px;
-}
-.signature-image-container {
-  text-align: center;
-  padding: 20px;
-  background: var(--gray-50);
-  border-radius: 8px;
-  margin: 20px 0;
-  position: relative;
-}
-.signature-image-container img {
-  max-width: 300px;
-  border: 1px solid var(--gray-200);
-  padding: 10px;
-  background: white;
-  box-shadow: var(--shadow-sm);
-}
-.signature-watermark-bg {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 48px;
-  color: rgba(0,0,0,0.03);
-  font-family: 'Cormorant Garamond', serif;
-  letter-spacing: 4px;
-  white-space: nowrap;
-  pointer-events: none;
-}
-.signature-metadata-table {
-  width: 100%;
-  margin: 16px 0;
-}
-.signature-metadata-table td {
-  padding: 8px;
-  border-bottom: 1px solid var(--gray-100);
-  font-size: 12px;
-}
-.signature-metadata-table td:first-child {
-  font-weight: 600;
-  width: 35%;
-  color: var(--gray-600);
-}
-
 @media print {
   body * { visibility: hidden; }
   #printArea, #printArea * { visibility: visible; }
@@ -2811,8 +2597,6 @@ body {
   .dashboard-hero-right { text-align: left; }
   .quick-actions-bar { flex-direction: column; }
   .quick-action-btn { width: 100%; }
-  .signature-container { flex-direction: column; height: auto; }
-  .signature-document-preview iframe { min-height: 300px; }
   .ivl-letter-container { padding: 30px 20px; }
   .ivl-letterhead { margin: -30px -20px 0 -20px; padding: 20px; }
   .ivl-classification { position: static; margin-top: 10px; display: inline-block; }
@@ -3013,7 +2797,7 @@ body {
 
       <div id="tab-activity" class="portal-tab"><div class="page-header"><div class="page-title">Activity Log</div><div class="page-subtitle">Complete history of actions on your deal</div></div><div class="card"><div class="card-body"><div class="activity-timeline" id="activityTimeline"></div></div></div></div>
 
-      <div id="tab-messages" class="portal-tab"><div class="page-header"><div class="page-title">Messages</div><div class="page-subtitle">Secure communication with Suzana Aleksić.</div></div><div class="card"><div class="card-body"><div class="messages-container"><div class="messages-list" id="messagesList"></div><div class="message-input"><input type="text" id="messageInput" placeholder="Write a message..." onkeypress="if(event.key==='Enter')sendMessage()"><button class="btn btn-primary" onclick="sendMessage()">Send</button></div></div></div></div></div>
+      <div id="tab-messages" class="portal-tab"><div class="page-header"><div class="page-title">Messages</div><div class="page-subtitle">Secure communication with Suzana Aleksić.</div></div><div class="card"><div class="card-body"><div class="messages-container"><div class="messages-list" id="messagesList"></div><div class="message-input"><input type="text" id="messageInput" autocomplete="off" placeholder="Write a message..." onkeypress="if(event.key==='Enter')sendMessage()"><button class="btn btn-primary" onclick="sendMessage()">Send</button></div></div></div></div></div>
 
       <div id="tab-schedule" class="portal-tab"><div class="page-header"><div class="page-title">Schedule a Meeting</div><div class="page-subtitle">Request a call or meeting with Suzana.</div></div><div class="card"><div class="card-body" style="max-width:480px;"><div class="form-group"><label class="form-label">Meeting Type</label><select id="meetingType" class="form-select"><option>Progress Review</option><option>Document Signing</option><option>Due Diligence Call</option><option>Closing Coordination</option></select></div><div class="form-group"><label class="form-label">Preferred Date</label><input type="date" id="meetingDate" class="form-input"></div><div class="form-group"><label class="form-label">Preferred Time (CET)</label><input type="time" id="meetingTime" class="form-input"></div><div class="form-group"><label class="form-label">Notes</label><textarea id="meetingNotes" rows="3" class="form-textarea" placeholder="Topics you would like to discuss..."></textarea></div><button class="btn btn-primary" onclick="scheduleMeeting()">Request Meeting</button></div></div></div></div>
 
@@ -3087,10 +2871,10 @@ body {
       <div class="sidebar-advisor"><div class="advisor-label">Croft Finance</div><div class="advisor-name">Suzana Aleksić</div><div class="advisor-title">Principal</div><div class="advisor-contact"><i class="fas fa-envelope" style="width:14px;color:var(--blue);margin-right:4px;"></i> suzana.aleksic@croftfinance.com</div></div>
     </aside>
     <main class="main-content">
-      <div id="broker-tab-dashboard" class="portal-tab active"><div class="page-header"><div class="page-title" id="brokerDashGreeting">Welcome.</div><div class="page-subtitle">Broker Portal - Track your deal flow and commissions</div></div><div class="commission-card"><div><i class="fas fa-percent"></i> Standard Introducer Fee</div><div class="commission-rate">1%</div><div class="commission-note">of funded facility amount, payable at disbursement to registered broker of record</div></div><div class="broker-stats-grid"><div class="stat-card"><div class="stat-label">Total Submissions</div><div class="stat-value" id="brokerTotalSubmissions">0</div></div><div class="stat-card"><div class="stat-label">Active Deals</div><div class="stat-value" id="brokerActiveDeals">0</div></div><div class="stat-card"><div class="stat-label">Funded Deals</div><div class="stat-value" id="brokerFundedDeals">0</div></div><div class="stat-card"><div class="stat-label">Est. Commission Earned</div><div class="stat-value" id="brokerEstCommission">$0</div></div></div></div>
+      <div id="broker-tab-dashboard" class="portal-tab active"><div class="page-header"><div class="page-title" id="brokerDashGreeting">Welcome.</div><div class="page-subtitle">Broker Portal - Track your deal flow and commissions</div></div><div class="broker-stats-grid"><div class="stat-card"><div class="stat-label">Total Submissions</div><div class="stat-value" id="brokerTotalSubmissions">0</div></div><div class="stat-card"><div class="stat-label">Active Deals</div><div class="stat-value" id="brokerActiveDeals">0</div></div><div class="stat-card"><div class="stat-label">Funded Deals</div><div class="stat-value" id="brokerFundedDeals">0</div></div><div class="stat-card"><div class="stat-label">Est. Commission Earned</div><div class="stat-value" id="brokerEstCommission">$0</div></div></div></div>
       <div id="broker-tab-submit-deal" class="portal-tab"><div class="page-header"><div class="page-title">Submit a Deal</div><div class="page-subtitle">Introduce a client to Croft Finance</div></div><div class="card"><div class="card-body" style="max-width:600px;"><div class="form-group"><label class="form-label">Client Name *</label><input type="text" id="dealClientName" class="form-input"></div><div class="form-group"><label class="form-label">Client Email *</label><input type="email" id="dealClientEmail" class="form-input"></div><div class="form-group"><label class="form-label">Project Name *</label><input type="text" id="dealProjectName" class="form-input"></div><div class="form-grid-2"><div class="form-group"><label class="form-label">Industry</label><select id="dealIndustry" class="form-select"><option>Real Estate</option><option>Infrastructure</option><option>Energy & Renewables</option><option>Mining</option><option>Oil & Gas</option></select></div><div class="form-group"><label class="form-label">Location</label><input type="text" id="dealLocation" class="form-input" placeholder="City, Country"></div></div><div class="form-group"><label class="form-label">Funds Needed (USD) *</label><input type="text" id="dealFundsNeeded" class="form-input" placeholder="e.g., 50,000,000"></div><div class="form-group"><label class="form-label">Brief Description</label><textarea id="dealDescription" rows="4" class="form-textarea" placeholder="Project overview, use of funds, timeline..."></textarea></div><button class="btn btn-primary" onclick="submitDeal()" style="width:100%">Submit Deal to Croft Finance</button></div></div></div>
       <div id="broker-tab-submissions" class="portal-tab"><div class="page-header"><div class="page-title">My Submissions</div><div class="page-subtitle">Track all deals you've introduced</div></div><div class="card"><div class="card-body"><div class="table-wrap"><table class="submission-table"><thead><tr><th>Date</th><th>Client</th><th>Project</th><th>Funds Needed</th><th>Status</th></tr></thead><tbody id="brokerSubmissionsList"></tbody></table></div></div></div></div>
-      <div id="broker-tab-messages" class="portal-tab"><div class="page-header"><div class="page-title">Messages</div><div class="page-subtitle">Secure communication with Croft Finance</div></div><div class="card"><div class="card-body"><div class="messages-container"><div class="messages-list" id="brokerMessagesList"></div><div class="message-input"><input type="text" id="brokerMessageInput" placeholder="Write a message..." onkeypress="if(event.key==='Enter')sendBrokerMessage()"><button class="btn btn-primary" onclick="sendBrokerMessage()">Send</button></div></div></div></div></div>
+      <div id="broker-tab-messages" class="portal-tab"><div class="page-header"><div class="page-title">Messages</div><div class="page-subtitle">Secure communication with Croft Finance</div></div><div class="card"><div class="card-body"><div class="messages-container"><div class="messages-list" id="brokerMessagesList"></div><div class="message-input"><input type="text" id="brokerMessageInput" autocomplete="off" placeholder="Write a message..." onkeypress="if(event.key==='Enter')sendBrokerMessage()"><button class="btn btn-primary" onclick="sendBrokerMessage()">Send</button></div></div></div></div></div>
     </main>
   </div>
 </div>
@@ -3399,17 +3183,44 @@ function checkSession() {
   } else if (sess) {
     const s = JSON.parse(sess);
     if (Date.now() - s.ts < 7 * 24 * 60 * 60 * 1000) {
+      currentClient = { id: s.clientId, 
+        name: s.name || 'Client', 
+        email: s.email || '' };
+      const cp = projects.filter(
+        p => p.clientId === s.clientId);
+      if (cp.length) currentProjectId = cp[0].id;
+      showView('portal');
       setTimeout(() => {
-        const client = clients.find(c => c.id === s.clientId);
-        if (client && client.status === 'active') {
-          currentClient = client;
-          const cp = projects.filter(p => p.clientId === client.id);
-          if (cp.length) currentProjectId = cp[0].id;
-          showView('portal');
-          loadClientPortal();
+        if (firebaseReady) {
+          loadFromFirebase().then(() => {
+            const freshClient = clients.find(
+              c => c.id === s.clientId);
+            if (freshClient && 
+              freshClient.status === 'active') {
+              currentClient = freshClient;
+              const fcp = projects.filter(
+                p => p.clientId === freshClient.id);
+              if (fcp.length) 
+                currentProjectId = fcp[0].id;
+              loadClientPortal();
+            } else {
+              logout();
+            }
+          });
+        } else {
+          const client = clients.find(
+            c => c.id === s.clientId);
+          if (client && client.status === 'active') {
+            currentClient = client;
+            loadClientPortal();
+          } else {
+            logout();
+          }
         }
-      }, 800);
-    } else { localStorage.removeItem('croftSession'); }
+      }, 1000);
+    } else { 
+      localStorage.removeItem('croftSession'); 
+    }
   }
 }
 
@@ -3680,7 +3491,10 @@ function login() {
   currentClient = client;
   const cp = projects.filter(p => p.clientId === client.id);
   if (cp.length) currentProjectId = cp[0].id;
-  localStorage.setItem('croftSession', JSON.stringify({ clientId: client.id, ts: Date.now() }));
+  localStorage.setItem('croftSession', JSON.stringify({ clientId: client.id, 
+    name: client.name, 
+    email: client.email, 
+    ts: Date.now() }));
   closeModal('loginModal');
   showView('portal');
   document.title = 'Croft Finance — Client Portal — ' + client.name;
@@ -3760,7 +3574,6 @@ async function loadClientPortal() {
   loadRecentActivity();
   updateMsgBadge();
   checkForNotifications();
-  setTimeout(() => showFirstLoginIVLModal(), 500);
 }
 
 function loadCurrentProjectData() {
@@ -3945,18 +3758,15 @@ function renderClosingDocumentsTable() {
         statusClass = 'doc-status-approved';
         dateDisplay = uploadedDoc.date || '—';
         actions = `<button class="doc-action-btn doc-action-view" onclick="viewPDF('${uploadedDoc.id}')">View</button><button class="doc-action-btn doc-action-download" onclick="downloadPDF('${uploadedDoc.id}')">Download</button>`;
-      } else if (uploadedDoc && uploadedDoc.signed) {
-        status = 'approved';
-        statusText = 'Executed ✓';
-        statusClass = 'doc-status-approved';
-        dateDisplay = uploadedDoc.date || '—';
-        actions = `<button class="doc-action-btn doc-action-view" onclick="viewPDF('${uploadedDoc.id}')">View</button><button class="doc-action-btn doc-action-download" onclick="downloadPDF('${uploadedDoc.id}')">Download</button><div style="font-size: 10px; color: var(--gray-400); margin-top: 4px;">Signed: ${new Date(uploadedDoc.signedAt).toLocaleDateString()}</div>`;
       } else if (uploadedDoc && (docType === 'Executed Term Sheet (Binding)' || docType === 'Deed of Undertaking') && uploadedDoc.url) {
         status = 'uploaded';
-        statusText = 'Ready for Signature';
+        statusText = 'Uploaded — Pending Signing';
         statusClass = 'doc-status-uploaded';
         dateDisplay = uploadedDoc.date || '—';
-        actions = `<button class="doc-action-btn" style="background: var(--blue); color: white; border: none;" onclick="showSignatureModal('${uploadedDoc.id}')"><i class="fas fa-pen-fancy"></i> Sign Document</button><button class="doc-action-btn doc-action-download" onclick="downloadPDF('${uploadedDoc.id}')">Download</button>`;
+        actions = `
+          <button class="doc-action-btn doc-action-view" onclick="viewPDF('${uploadedDoc.id}')">View</button>
+          <button class="doc-action-btn doc-action-download" onclick="downloadPDF('${uploadedDoc.id}')">Download</button>
+          <button class="doc-action-btn" style="background: #6B46C1; color: white; border: none; padding: 5px 12px;" onclick="openLuminSign('${uploadedDoc.id}')"><i class="fas fa-pen-fancy"></i> Sign via Lumin</button>`;
       } else if (uploadedDoc) {
         status = 'uploaded';
         statusText = 'Uploaded (Pending Review)';
@@ -3965,7 +3775,7 @@ function renderClosingDocumentsTable() {
         actions = `<button class="doc-action-btn doc-action-view" onclick="viewPDF('${uploadedDoc.id}')">View</button><button class="doc-action-btn doc-action-download" onclick="downloadPDF('${uploadedDoc.id}')">Download</button>`;
       }
       
-      rows.push(`<tr><td><strong>${escapeHtml(docType)}</strong></td><td>Step ${s}</td><td><span class="doc-status-badge ${statusClass}">${statusText}</span></td><td>${dateDisplay}</td><td>${actions}</td></tr>`);
+      rows.push(`<tr><td><strong>${escapeHtml(docType)}</strong></td><td>Step ${s}</td><td><span class="doc-status-badge ${statusClass}">${statusText}</span></td><td>${dateDisplay}</td><td>${actions}</td>`);
     });
   }
   tbody.innerHTML = rows.join('');
@@ -4301,7 +4111,7 @@ function renderPipelineBoard() {
   const board = document.getElementById('pipelineBoard');
   if (!board) return;
   const cols = [{ label: 'Term Sheet (Steps 1–2)', steps: [1, 2] }, { label: 'Due Diligence (Steps 3–4)', steps: [3, 4] }, { label: 'Closing (Steps 5–7)', steps: [5, 6, 7] }, { label: 'Funded (Step 8)', steps: [8] }];
-  board.innerHTML = cols.map(col => { const colProjs = projects.filter(p => col.steps.includes(p.step || 1)); return `<div class="pipeline-col"><div class="pipeline-col-title">${col.label} <span style="background:var(--gray-200);border-radius:10px;padding:1px 8px;font-size:11px;">${colProjs.length}</span></div>${colProjs.map(p => { const client = clients.find(c => c.id === p.clientId); const daysSince = p.createdAt ? Math.floor((Date.now() - new Date(p.createdAt).getTime()) / 86400000) : '?'; const tsSigned = documents.some(d => d.projectId === p.id && d.type === 'Executed Term Sheet (Binding)' && d.signed); const duSigned = documents.some(d => d.projectId === p.id && d.type === 'Deed of Undertaking' && d.signed); const tsUploaded = documents.some(d => d.projectId === p.id && d.type === 'Executed Term Sheet (Binding)' && !d.signed); return `<div class="pipeline-card" onclick="editProject('${p.id}')"><div class="pipeline-card-name">${client?.name || 'Unknown'}</div><div class="pipeline-card-project">${escapeHtml(p.name)}</div><div class="pipeline-card-meta"><span class="pipeline-card-amount">${p.fundsNeeded ? '$' + p.fundsNeeded : (p.amount || 'TBD')}</span><span class="pipeline-card-days">Day ${daysSince}</span></div><div style="margin-top: 8px; display: flex; gap: 4px; flex-wrap: wrap;"><span class="badge badge-navy" style="font-size: 9px;">${p.industry || '—'} · Step ${p.step || 1}</span>${tsSigned ? '<span class="signature-status-badge signature-status-signed" style="font-size: 8px;">TS ✓</span>' : (tsUploaded ? '<span class="signature-status-badge signature-status-pending" style="font-size: 8px;">TS ?</span>' : '')}${duSigned ? '<span class="signature-status-badge signature-status-signed" style="font-size: 8px;">DU ✓</span>' : ''}${p.ivrLetterAcknowledged ? '<span class="ack-badge completed" style="margin-left: 4px;">IVL ✓</span>' : (p.investorVerificationLetter ? '<span class="ack-badge pending">IVL ⏳</span>' : '<span class="ack-badge" style="opacity:0.3;">IVL —</span>')}</div></div>`; }).join('')}</div>`; }).join('');
+  board.innerHTML = cols.map(col => { const colProjs = projects.filter(p => col.steps.includes(p.step || 1)); return `<div class="pipeline-col"><div class="pipeline-col-title">${col.label} <span style="background:var(--gray-200);border-radius:10px;padding:1px 8px;font-size:11px;">${colProjs.length}</span></div>${colProjs.map(p => { const client = clients.find(c => c.id === p.clientId); const daysSince = p.createdAt ? Math.floor((Date.now() - new Date(p.createdAt).getTime()) / 86400000) : '?'; return `<div class="pipeline-card" onclick="editProject('${p.id}')"><div class="pipeline-card-name">${client?.name || 'Unknown'}</div><div class="pipeline-card-project">${escapeHtml(p.name)}</div><div class="pipeline-card-meta"><span class="pipeline-card-amount">${p.fundsNeeded ? '$' + p.fundsNeeded : (p.amount || 'TBD')}</span><span class="pipeline-card-days">Day ${daysSince}</span></div><div style="margin-top: 8px; display: flex; gap: 4px; flex-wrap: wrap;"><span class="badge badge-navy" style="font-size: 9px;">${p.industry || '—'} · Step ${p.step || 1}</span>${p.ivrLetterAcknowledged ? '<span class="ack-badge completed" style="margin-left: 4px;">IVL ✓</span>' : (p.investorVerificationLetter ? '<span class="ack-badge pending">IVL ⏳</span>' : '<span class="ack-badge" style="opacity:0.3;">IVL —</span>')}</div></div>`; }).join('')}</div>`; }).join('');
 }
 
 function renderClientsTable() {
@@ -4361,8 +4171,8 @@ function renderAdminDocumentsTable() {
     const step = requiredTypesMap[doc.type] || '—';
     let statusHtml = '<span class="doc-status-badge doc-status-uploaded">Uploaded</span>';
     if (doc.approved) statusHtml = '<span class="doc-status-badge doc-status-approved">Approved ✓</span>';
-    if (doc.signed) statusHtml = `<span class="signature-status-badge signature-status-signed"><i class="fas fa-check-circle"></i> Executed</span><div style="font-size:10px;">Signed by ${doc.signedBy}<br>${new Date(doc.signedAt).toLocaleDateString()}</div><button class="btn btn-outline" style="padding:2px 8px;font-size:10px;margin-top:4px;" onclick="viewSignatureRecord('${doc.signatureId}')">View Signature</button>`;
-    else if (doc.type === 'Executed Term Sheet (Binding)' || doc.type === 'Deed of Undertaking') statusHtml = '<span class="signature-status-badge signature-status-pending">Awaiting Signature</span>';
+    else if (doc.type === 'Executed Term Sheet (Binding)' || doc.type === 'Deed of Undertaking') 
+      statusHtml = '<span class="doc-status-badge doc-status-uploaded">Uploaded — Pending Signing</span>';
     
     return `
       <tr>
@@ -4389,11 +4199,100 @@ function renderAdminDocumentsTable() {
 function renderAdminMessages() {
   const container = document.getElementById('allMessagesList');
   if (!container) return;
+  
+  // Add broker messages section
+  const brokerThreadsHtml = brokerMessages.length ? 
+    `<div style="margin-bottom:24px;">
+    <div style="font-size:10px;letter-spacing:3px;
+    text-transform:uppercase;color:var(--gray-400);
+    margin-bottom:12px;">BROKER MESSAGES</div>
+    ${Object.entries(brokerMessages.reduce((acc, m) => {
+      const key = String(m.brokerId);
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(m);
+      return acc;
+    }, {})).map(([bid, msgs]) => {
+      const broker = brokers.find(b => 
+        b.id === bid || b.id === String(bid));
+      const sorted = msgs.sort((a,b) => 
+        new Date(a.timestamp) - new Date(b.timestamp));
+      return `<div class="admin-thread">
+      <div class="admin-thread-header">
+      <div><div class="admin-thread-client">
+      ${broker?.name || 'Unknown Broker'}</div>
+      <div class="admin-thread-project">
+      ${broker?.firm || ''} · ${broker?.email || ''}
+      </div></div>
+      <span class="badge badge-blue">Broker</span>
+      </div>
+      <div class="admin-thread-body">
+      <div class="admin-thread-msgs">
+      ${sorted.map(m => 
+        `<div class="message ${m.sender === 'broker' ? 
+        'admin' : 'client'}" style="margin-bottom:10px;">
+        <div class="message-bubble" style="${
+        m.sender === 'admin' ? 
+        'background:var(--navy);color:white;' : 
+        'background:var(--gray-100);color:var(--navy);'}">
+        ${escapeHtml(m.content)}</div>
+        <div class="message-meta">
+        ${m.sender === 'admin' ? 'Suzana' : 
+        broker?.name || 'Broker'} · 
+        ${new Date(m.timestamp).toLocaleString()}
+        </div></div>`).join('')}
+      </div>
+      <div class="admin-reply-box">
+      <textarea id="brokerReplyBox_${bid}" 
+      placeholder="Reply to ${broker?.name || 'broker'}...">
+      </textarea>
+      <button class="btn btn-primary" 
+      onclick="sendAdminBrokerReply('${bid}')">
+      Send Reply</button>
+      </div></div></div>`;
+    }).join('')}</div>` : '';
+  
   const byClient = {};
   messages.forEach(m => { const key = String(m.clientId); if (!byClient[key]) byClient[key] = []; byClient[key].push(m); });
   const msgSearchVal = (document.getElementById('messageSearch')?.value || '').toLowerCase();
-  if (!Object.keys(byClient).length) { container.innerHTML = '<p style="color:var(--gray-400);font-size:13px;">No messages yet.</p>'; return; }
-  container.innerHTML = Object.entries(byClient).filter(([cid]) => { const client = clients.find(c => c.id === cid || c.id === String(cid)); return !msgSearchVal || (client?.name || '').toLowerCase().includes(msgSearchVal); }).map(([cid, msgs]) => { const client = clients.find(c => c.id === cid || c.id === String(cid)); const sorted = msgs.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp)); return `<div class="admin-thread" data-client-id="${cid}"><div class="admin-thread-header"><div><div class="admin-thread-client">${client?.name || 'Unknown'}</div><div class="admin-thread-project">${client?.email || ''}</div></div><span class="badge badge-navy">${sorted.length} messages</span></div><div class="admin-thread-body"><div class="admin-thread-msgs">${sorted.map(m => `<div class="message ${m.sender === 'client' ? 'admin' : 'client'}" style="margin-bottom:10px;"><div class="message-bubble" style="${m.sender === 'admin' ? 'background:var(--navy);color:white;' : 'background:var(--gray-100);color:var(--navy);'}">${escapeHtml(m.content)}</div><div class="message-meta">${m.sender === 'admin' ? 'Suzana' : client?.name || 'Client'} · ${new Date(m.timestamp).toLocaleString()}</div></div>`).join('')}</div><div class="admin-reply-box"><textarea id="replyBox_${cid}" placeholder="Reply to ${client?.name || 'client'}..."></textarea><button class="btn btn-primary" onclick="sendAdminReply('${cid}')">Send Reply</button></div></div></div>`; }).join('');
+  if (!Object.keys(byClient).length && !brokerMessages.length) { container.innerHTML = '<p style="color:var(--gray-400);font-size:13px;">No messages yet.</p>'; return; }
+  
+  const clientThreadsHtml = Object.entries(byClient).filter(([cid]) => { const client = clients.find(c => c.id === cid || c.id === String(cid)); return !msgSearchVal || (client?.name || '').toLowerCase().includes(msgSearchVal); }).map(([cid, msgs]) => { const client = clients.find(c => c.id === cid || c.id === String(cid)); const sorted = msgs.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp)); return `<div class="admin-thread" data-client-id="${cid}"><div class="admin-thread-header"><div><div class="admin-thread-client">${client?.name || 'Unknown'}</div><div class="admin-thread-project">${client?.email || ''}</div></div><span class="badge badge-navy">${sorted.length} messages</span></div><div class="admin-thread-body"><div class="admin-thread-msgs">${sorted.map(m => `<div class="message ${m.sender === 'client' ? 'admin' : 'client'}" style="margin-bottom:10px;"><div class="message-bubble" style="${m.sender === 'admin' ? 'background:var(--navy);color:white;' : 'background:var(--gray-100);color:var(--navy);'}">${escapeHtml(m.content)}</div><div class="message-meta">${m.sender === 'admin' ? 'Suzana' : client?.name || 'Client'} · ${new Date(m.timestamp).toLocaleString()}</div></div>`).join('')}</div><div class="admin-reply-box"><textarea id="replyBox_${cid}" placeholder="Reply to ${client?.name || 'client'}..."></textarea><button class="btn btn-primary" onclick="sendAdminReply('${cid}')">Send Reply</button></div></div></div>`; }).join('');
+  
+  container.innerHTML = brokerThreadsHtml + clientThreadsHtml;
+}
+
+function sendAdminBrokerReply(brokerId) {
+  const textarea = document.getElementById(
+    'brokerReplyBox_' + brokerId);
+  const content = textarea?.value.trim();
+  if (!content) return;
+  const id = String(Date.now());
+  const broker = brokers.find(b => 
+    b.id === brokerId || 
+    b.id === String(brokerId));
+  const msg = { id, 
+    brokerId: String(brokerId), 
+    brokerName: broker?.name || '', 
+    sender: 'admin', 
+    content, 
+    timestamp: new Date().toISOString() };
+  brokerMessages.push(msg);
+  if (firebaseReady) fbSet('brokerMessages', id, msg);
+  else saveBrokersLocal();
+  if (textarea) textarea.value = '';
+  showToast('Reply sent to ' + 
+    (broker?.name || 'broker'));
+  renderAdminMessages();
+  if (currentBroker && 
+    String(currentBroker.id) === String(brokerId)) {
+    loadBrokerMessages();
+  }
+  if (broker && broker.email) {
+    sendEmail(broker.email, 
+      'New Message from Croft Finance',
+      `Dear ${broker.name},\n\nYou have a new message from Suzana Aleksić.\n\n${content}\n\nLog in to your broker portal to reply.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`
+    ).catch(() => {});
+  }
 }
 
 function sendAdminReply(clientId) {
@@ -4445,12 +4344,11 @@ async function activateClient(id) {
   const client = clients.find(c => c.id === id || c.id === String(id));
   if (!client) return;
   fbUpdate('clients', id, { status: 'active' }).then(async () => {
-    const cp = projects.filter(p => p.clientId === id || p.clientId === String(id));
+    const cp = projects.filter(p => p.clientId === id || p.id === String(id));
     for (const p of cp) await fbUpdate('projects', p.id, { status: 'active' });
     await logAudit('Client activated', client.name, String(id));
     await logClientActivity(client.id, cp[0]?.id || '', 'portal_activated', 'Your portal was activated by Croft Finance', 'croft');
     
-    // Generate Investor Verification Letter
     if (cp[0]) await generateAndStoreIVL(client.id, cp[0].id);
     
     sendEmail(client.email, '✅ Croft Finance — Portal Access Activated',
@@ -4639,7 +4537,7 @@ function renderActivityLog() {
   container.innerHTML = projectActivities.map(activity => { const dotClass = activity.performedBy === 'client' ? 'client' : activity.action === 'step_completed' ? 'completion' : 'croft'; const icon = getActivityIcon(activity.action); const performerName = activity.performedBy === 'client' ? 'You' : 'Croft Finance'; const performerClass = activity.performedBy === 'client' ? 'performer-client' : 'performer-croft'; const relativeTime = getRelativeTime(new Date(activity.timestamp)); const formattedDate = new Date(activity.timestamp).toLocaleString(); return `<div class="activity-item"><div class="activity-dot ${dotClass}"><i class="fas ${icon}"></i></div><div class="activity-content"><div class="activity-description">${escapeHtml(activity.description)}<span class="activity-performer ${performerClass}">${performerName}</span></div><div class="activity-time"><span>${formattedDate}</span><span class="activity-relative-time">• ${relativeTime}</span></div></div></div>`; }).join('');
 }
 
-function getActivityIcon(action) { const icons = { 'portal_activated': 'fa-check-circle', 'step_advanced': 'fa-arrow-right', 'document_uploaded': 'fa-file-upload', 'document_approved': 'fa-check', 'message_sent': 'fa-envelope', 'message_received': 'fa-envelope-open', 'meeting_requested': 'fa-calendar-plus', 'meeting_confirmed': 'fa-calendar-check', 'acknowledgment_given': 'fa-handshake', 'admin_note_added': 'fa-sticky-note', 'term_sheet_expiry': 'fa-clock', 'deal_created': 'fa-briefcase', 'Document Signed': 'fa-pen-fancy' }; return icons[action] || 'fa-info-circle'; }
+function getActivityIcon(action) { const icons = { 'portal_activated': 'fa-check-circle', 'step_advanced': 'fa-arrow-right', 'document_uploaded': 'fa-file-upload', 'document_approved': 'fa-check', 'message_sent': 'fa-envelope', 'message_received': 'fa-envelope-open', 'meeting_requested': 'fa-calendar-plus', 'meeting_confirmed': 'fa-calendar-check', 'acknowledgment_given': 'fa-handshake', 'admin_note_added': 'fa-sticky-note', 'term_sheet_expiry': 'fa-clock', 'deal_created': 'fa-briefcase' }; return icons[action] || 'fa-info-circle'; }
 
 function getRelativeTime(date) { const seconds = Math.floor((new Date() - date) / 1000); if (seconds < 60) return 'just now'; const minutes = Math.floor(seconds / 60); if (minutes < 60) return `${minutes} minute${minutes === 1 ? '' : 's'} ago`; const hours = Math.floor(minutes / 60); if (hours < 24) return `${hours} hour${hours === 1 ? '' : 's'} ago`; const days = Math.floor(hours / 24); if (days < 7) return `${days} day${days === 1 ? '' : 's'} ago`; const weeks = Math.floor(days / 7); return `${weeks} week${weeks === 1 ? '' : 's'} ago`; }
 
@@ -4696,7 +4594,7 @@ function renderAdminExpiryTable() {
     }
   }
   if (expiringProjects.length === 0) { container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--gray-400);">No documents expiring this week.</div>'; return; }
-  container.innerHTML = `<div class="table-wrap"><table class="expiry-table"><thead><tr><th>Client</th><th>Project</th><th>Document</th><th>Expiry Date</th><th>Days Left</th><th>Action</th></tr></thead><tbody>${expiringProjects.map(item => `<tr><td>${escapeHtml(item.client.name)}</td><td>${escapeHtml(item.project.name)}</td><td>${item.document}</td><td>${new Date(item.expiryDate).toLocaleDateString()}</td><td class="${item.daysLeft <= 3 ? 'expiry-days-critical' : 'expiry-days-warning'}">${item.daysLeft} day${item.daysLeft === 1 ? '' : 's'}</td><td><button class="btn btn-outline" style="padding: 4px 10px; font-size: 11px;" onclick="sendExpiryReminder('${item.project.id}', '${item.document}', ${item.daysLeft})">Email Client</button></td></tr>`).join('')}</tbody></table></div>`;
+  container.innerHTML = `<div class="table-wrap"><table class="expiry-table"><thead><tr><th>Client</th><th>Project</th><th>Document</th><th>Expiry Date</th><th>Days Left</th><th>Action</th></tr></thead><tbody>${expiringProjects.map(item => `<tr><td>${escapeHtml(item.client.name)}</td><td>${escapeHtml(item.project.name)}</td><td>${item.document}</td><td>${new Date(item.expiryDate).toLocaleDateString()}</td><td class="${item.daysLeft <= 3 ? 'expiry-days-critical' : 'expiry-days-warning'}">${item.daysLeft} day${item.daysLeft === 1 ? '' : 's'}</td><td><button class="btn btn-outline" style="padding: 4px 10px; font-size: 11px;" onclick="sendExpiryReminder('${item.project.id}', '${item.document}', ${item.daysLeft})">Email Client</button></td>`).join('')}</tbody></table></div>`;
 }
 
 async function sendExpiryReminder(projectId, documentName, daysLeft) {
@@ -4934,7 +4832,7 @@ async function acknowledgeECF() {
 function renderBrokerAdminTable() {
   const container = document.getElementById('adminBrokersTable');
   if (!container) return;
-  container.innerHTML = brokers.map(b => `<tr><td><strong>${escapeHtml(b.name)}</strong><br><span style="font-size:11px;color:var(--gray-400);">${b.email}</span></td><td>${escapeHtml(b.firm)}</td><td>${b.country}</td><td><span style="color:${b.status === 'pending' ? 'var(--warning)' : 'var(--success)'};">${b.status === 'pending' ? 'Pending' : 'Active'}</span></td><td style="font-size:12px;">${b.createdAt ? new Date(b.createdAt).toLocaleDateString() : '—'}</td><td>${b.status === 'pending' ? `<button class="btn btn-success" style="padding:4px 10px;font-size:11px;" onclick="activateBroker('${b.id}')">Activate</button>` : ''}<button class="btn btn-outline" style="padding:4px 10px;font-size:11px;color:var(--error);" onclick="deleteBroker('${b.id}')">Delete</button></td></tr>`).join('');
+  container.innerHTML = brokers.map(b => `<tr><td><strong>${escapeHtml(b.name)}</strong><br><span style="font-size:11px;color:var(--gray-400);">${b.email}</span></td><td>${escapeHtml(b.firm)}</div><td>${b.country}</td><td><span style="color:${b.status === 'pending' ? 'var(--warning)' : 'var(--success)'};">${b.status === 'pending' ? 'Pending' : 'Active'}</span></td><td style="font-size:12px;">${b.createdAt ? new Date(b.createdAt).toLocaleDateString() : '—'}</td><td>${b.status === 'pending' ? `<button class="btn btn-success" style="padding:4px 10px;font-size:11px;" onclick="activateBroker('${b.id}')">Activate</button>` : ''}<button class="btn btn-outline" style="padding:4px 10px;font-size:11px;color:var(--error);" onclick="deleteBroker('${b.id}')">Delete</button></td></tr>`).join('');
   const pendingCount = brokers.filter(b => b.status === 'pending').length;
   const pendingSpan = document.getElementById('pendingBrokersCount');
   if (pendingSpan) pendingSpan.textContent = pendingCount;
@@ -4944,6 +4842,80 @@ function renderAdminBrokerSubmissionsTable() {
   const container = document.getElementById('adminBrokerSubmissionsTable');
   if (!container) return;
   container.innerHTML = brokerSubmissions.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).map(s => `<tr><td style="font-size:12px;">${new Date(s.createdAt).toLocaleDateString()}</td><td>${escapeHtml(s.brokerName)}</td><td>${escapeHtml(s.clientName)}</td><td>${escapeHtml(s.projectName)}</td><td>$${s.fundsNeeded || 'TBD'}</td><td><span class="status-badge-${s.status === 'pending' ? 'pending' : s.status === 'active' ? 'active' : 'funded'}">${s.status === 'pending' ? 'Pending Review' : s.status === 'active' ? 'Active' : 'Funded'}</span></td><td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="viewBrokerSubmission('${s.id}')">View</button></td></tr>`).join('');
+}
+
+function viewBrokerSubmission(submissionId) {
+  const s = brokerSubmissions.find(x => x.id === submissionId);
+  if (!s) return;
+  const broker = brokers.find(b => b.id === s.brokerId);
+  const modalHtml = `
+  <div id="brokerSubmissionModal" class="modal-overlay active">
+  <div class="modal">
+  <div class="modal-header">
+  <h3>Broker Submission</h3>
+  <button class="modal-close" onclick="document.getElementById('brokerSubmissionModal').remove()">✕</button>
+  </div>
+  <div class="modal-body">
+  <div class="project-details-grid">
+  <div class="project-detail-item">
+  <div class="project-detail-label">Broker</div>
+  <div class="project-detail-value">${escapeHtml(s.brokerName)}</div></div>
+  <div class="project-detail-item">
+  <div class="project-detail-label">Broker Firm</div>
+  <div class="project-detail-value">${escapeHtml(broker?.firm || '—')}</div></div>
+  <div class="project-detail-item">
+  <div class="project-detail-label">Client Name</div>
+  <div class="project-detail-value">${escapeHtml(s.clientName)}</div></div>
+  <div class="project-detail-item">
+  <div class="project-detail-label">Client Email</div>
+  <div class="project-detail-value">${escapeHtml(s.clientEmail)}</div></div>
+  <div class="project-detail-item">
+  <div class="project-detail-label">Project</div>
+  <div class="project-detail-value">${escapeHtml(s.projectName)}</div></div>
+  <div class="project-detail-item">
+  <div class="project-detail-label">Industry</div>
+  <div class="project-detail-value">${escapeHtml(s.industry || '—')}</div></div>
+  <div class="project-detail-item">
+  <div class="project-detail-label">Location</div>
+  <div class="project-detail-value">${escapeHtml(s.location || '—')}</div></div>
+  <div class="project-detail-item">
+  <div class="project-detail-label">Funds Needed</div>
+  <div class="project-detail-value">$${escapeHtml(s.fundsNeeded || '—')}</div></div>
+  <div class="project-detail-item">
+  <div class="project-detail-label">Status</div>
+  <div class="project-detail-value">${s.status}</div></div>
+  <div class="project-detail-item">
+  <div class="project-detail-label">Submitted</div>
+  <div class="project-detail-value">${new Date(s.createdAt).toLocaleString()}</div></div>
+  </div>
+  ${s.description ? `<div class="note-card" style="margin-top:16px;"><div class="note-card-label">Description</div><div class="note-card-text">${escapeHtml(s.description)}</div></div>` : ''}
+  <div style="display:flex;gap:12px;margin-top:20px;">
+  <button class="btn btn-primary" onclick="convertSubmissionToClient('${s.id}')">Convert to Client</button>
+  <button class="btn btn-outline" onclick="document.getElementById('brokerSubmissionModal').remove()">Close</button>
+  </div>
+  </div></div></div>`;
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+function convertSubmissionToClient(submissionId) {
+  const s = brokerSubmissions.find(x => x.id === submissionId);
+  if (!s) return;
+  document.getElementById('brokerSubmissionModal')?.remove();
+  showAddClientModal();
+  setTimeout(() => {
+    const ncName = document.getElementById('ncName');
+    const ncEmail = document.getElementById('ncEmail');
+    const ncProject = document.getElementById('ncProject');
+    const ncIndustry = document.getElementById('ncIndustry');
+    const ncLocation = document.getElementById('ncLocation');
+    const ncFundsNeeded = document.getElementById('ncFundsNeeded');
+    if (ncName) ncName.value = s.clientName;
+    if (ncEmail) ncEmail.value = s.clientEmail;
+    if (ncProject) ncProject.value = s.projectName;
+    if (ncIndustry) ncIndustry.value = s.industry || '';
+    if (ncLocation) ncLocation.value = s.location || '';
+    if (ncFundsNeeded) ncFundsNeeded.value = s.fundsNeeded || '';
+  }, 300);
 }
 
 function activateBroker(id) {
@@ -5130,131 +5102,105 @@ function resetContactForm() {
 }
 
 // ============================================================
-// E-SIGNATURE SYSTEM
+// LUMIN SIGN INTEGRATION (No API Required)
 // ============================================================
-let signatureCanvas = null;
-let signatureCtx = null;
-let isDrawing = false;
-let strokePixels = 0;
-let hasDrawn = false;
-let currentSignatureDocId = null;
 
-function initSignatureCanvas() {
-  const canvas = document.getElementById('signatureCanvas');
-  if (!canvas) return;
-  signatureCanvas = canvas;
-  signatureCtx = canvas.getContext('2d');
-  const rect = canvas.getBoundingClientRect();
-  canvas.width = rect.width;
-  canvas.height = rect.height;
-  signatureCtx.lineWidth = 2;
-  signatureCtx.lineCap = 'round';
-  signatureCtx.strokeStyle = '#0a1628';
+function openLuminSign(docId) {
+  const doc = documents.find(d => d.id === docId || d.id === String(docId));
+  if (!doc || !doc.url) { 
+    showToast('Document not available', true); 
+    return; 
+  }
   
-  function clearWatermark() { const watermark = document.getElementById('signatureWatermark'); if (watermark) watermark.style.display = 'none'; }
-  function getX(e) { const rect = canvas.getBoundingClientRect(); let clientX = e.clientX || (e.touches ? e.touches[0].clientX : 0); return clientX - rect.left; }
-  function getY(e) { const rect = canvas.getBoundingClientRect(); let clientY = e.clientY || (e.touches ? e.touches[0].clientY : 0); return clientY - rect.top; }
-  function startDraw(e) { e.preventDefault(); isDrawing = true; signatureCtx.beginPath(); signatureCtx.moveTo(getX(e), getY(e)); }
-  function draw(e) { if (!isDrawing) return; e.preventDefault(); signatureCtx.lineTo(getX(e), getY(e)); signatureCtx.stroke(); strokePixels++; hasDrawn = true; clearWatermark(); updateSignatureSubmitButton(); }
-  function stopDraw() { isDrawing = false; }
+  // Auto-download the document for the user
+  downloadPDF(docId);
   
-  canvas.addEventListener('mousedown', startDraw);
-  canvas.addEventListener('mousemove', draw);
-  canvas.addEventListener('mouseup', stopDraw);
-  canvas.addEventListener('mouseleave', stopDraw);
-  canvas.addEventListener('touchstart', startDraw);
-  canvas.addEventListener('touchmove', draw);
-  canvas.addEventListener('touchend', stopDraw);
-}
-
-function clearSignatureCanvas() {
-  if (!signatureCtx || !signatureCanvas) return;
-  signatureCtx.clearRect(0, 0, signatureCanvas.width, signatureCanvas.height);
-  strokePixels = 0;
-  hasDrawn = false;
-  updateSignatureSubmitButton();
-  const watermark = document.getElementById('signatureWatermark');
-  if (watermark) watermark.style.display = 'block';
-}
-
-function updateSignatureSubmitButton() {
-  const btn = document.getElementById('signatureSubmitBtn');
-  if (!btn) return;
-  const isValid = strokePixels >= 50;
-  btn.disabled = !isValid;
-  const errorEl = document.getElementById('signatureError');
-  if (errorEl && !isValid && hasDrawn) { errorEl.style.display = 'block'; errorEl.textContent = 'Please provide a complete signature (draw more)'; }
-  else if (errorEl) errorEl.style.display = 'none';
-}
-
-async function showSignatureModal(docId) {
-  const doc = documents.find(d => d.id === docId);
-  if (!doc) return;
-  currentSignatureDocId = docId;
-  strokePixels = 0;
-  hasDrawn = false;
-  const proj = projects.find(p => p.id === currentProjectId);
-  const dealRef = `CF-${new Date().getFullYear()}-${String(currentProjectId).slice(-4)}`;
-  const ip = await getUserIP();
-  const now = new Date();
-  const formattedDate = now.toLocaleString();
-  const modalHtml = `<div id="signatureModal" class="modal-overlay active"><div class="modal signature-modal"><div class="modal-header"><div><h3 style="font-family: 'Cormorant Garamond', serif; font-size: 24px;">Sign Document</h3><div style="font-size: 13px; color: var(--gray-500); margin-top: 4px;">${escapeHtml(doc.type)} — ${dealRef}</div></div><div><span class="ivl-classification" style="position: static;">STRICTLY CONFIDENTIAL</span><button class="modal-close" onclick="closeSignatureModal()">✕</button></div></div><div class="modal-body" style="padding: 20px;"><div class="signature-container"><div class="signature-document-panel"><div style="font-size: 11px; color: var(--blue); margin-bottom: 8px;"><i class="fas fa-info-circle"></i> Please review this document carefully before signing</div><div class="signature-document-preview"><iframe src="${doc.url}" title="Document Preview" style="width: 100%; min-height: 500px;"></iframe></div></div><div class="signature-panel"><div><div style="font-size: 13px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px;">Your Signature</div><div style="font-size: 11px; color: var(--gray-500); margin-bottom: 12px;">Draw your signature below using your mouse or touch screen</div><div class="signature-canvas-container"><canvas id="signatureCanvas" class="signature-canvas" width="400" height="180"></canvas><div id="signatureWatermark" class="signature-watermark">Sign here</div></div><div style="margin-top: 8px; text-align: right;"><button class="signature-clear-btn" onclick="clearSignatureCanvas()">Clear</button></div></div><div class="signature-declaration"><i class="fas fa-gavel"></i> By submitting my signature I confirm that I have read and understood this document in its entirety and that my electronic signature is legally binding.</div><div class="signature-metadata"><div><i class="fas fa-calendar-alt"></i> Signing date: ${formattedDate}</div><div><i class="fas fa-network-wired"></i> IP Address: ${ip}</div></div><div id="signatureError" class="signature-error"></div><button id="signatureSubmitBtn" class="signature-submit-btn" disabled onclick="submitSignature('${docId}')"><i class="fas fa-pen-fancy"></i> Submit Signature</button></div></div></div><div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid var(--gray-100); display: flex; justify-content: space-between; align-items: center;"><div style="font-size: 10px; color: var(--gray-400);"><i class="fas fa-lock"></i> This signature is encrypted and stored securely. Reference: ${dealRef}</div><button class="btn btn-outline" onclick="closeSignatureModal()">Cancel</button></div></div></div>`;
-  document.body.insertAdjacentHTML('beforeend', modalHtml);
-  initSignatureCanvas();
-}
-
-function closeSignatureModal() { const modal = document.getElementById('signatureModal'); if (modal) modal.remove(); currentSignatureDocId = null; }
-
-async function submitSignature(docId) {
-  const doc = documents.find(d => d.id === docId);
-  if (!doc) return;
-  const proj = projects.find(p => p.id === currentProjectId);
-  const dealRef = `CF-${new Date().getFullYear()}-${String(currentProjectId).slice(-4)}`;
-  if (strokePixels < 500) { document.getElementById('signatureError').style.display = 'block'; document.getElementById('signatureError').textContent = 'Please provide a complete signature (draw more)'; return; }
-  const submitBtn = document.getElementById('signatureSubmitBtn');
-  const originalText = submitBtn.innerHTML;
-  submitBtn.disabled = true;
-  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
-  const ip = await getUserIP();
-  const timestamp = new Date().toISOString();
-  const signatureData = signatureCanvas.toDataURL('image/png');
-  const signatureId = String(Date.now());
-  const signaturePayload = { id: signatureId, signatureImage: signatureData, signedBy: currentClient.name, signedByEmail: currentClient.email, signedAt: timestamp, signedIP: ip, documentId: docId, documentType: doc.type, projectId: currentProjectId, dealRef: dealRef, clientId: currentClient.id };
-  await fbSet('signatures', signatureId, signaturePayload);
-  await fbUpdate('documents', docId, { signed: true, signedAt: timestamp, signedBy: currentClient.name, signatureId: signatureId, status: 'executed' });
-  const docIndex = documents.findIndex(d => d.id === docId);
-  if (docIndex !== -1) { documents[docIndex].signed = true; documents[docIndex].signedAt = timestamp; documents[docIndex].signedBy = currentClient.name; documents[docIndex].signatureId = signatureId; }
-  let stepAdvanced = false;
-  let newStep = proj.step || 1;
-  if (doc.type === 'Executed Term Sheet (Binding)' && proj.step === 1) { newStep = 2; stepAdvanced = true; const today = new Date().toISOString().split('T')[0]; proj.stepDates = proj.stepDates || {}; proj.stepDates['1'] = today; proj.stepDates['2'] = today; await fbUpdate('projects', currentProjectId, { step: 2, stepDates: proj.stepDates }); proj.step = 2; }
-  else if (doc.type === 'Deed of Undertaking' && proj.step === 3) { newStep = 4; stepAdvanced = true; const today = new Date().toISOString().split('T')[0]; proj.stepDates = proj.stepDates || {}; proj.stepDates['3'] = today; proj.stepDates['4'] = today; await fbUpdate('projects', currentProjectId, { step: 4, stepDates: proj.stepDates }); proj.step = 4; }
-  await logClientActivity(currentClient.id, currentProjectId, 'Document Signed', `${currentClient.name} signed ${doc.type} — ${dealRef}`, 'client');
-  await sendEmail(EMAILJS_CONFIG.adminEmail, `✍ Document Signed — ${currentClient.name} — ${doc.type} — ${dealRef}`, `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nSIGNATURE DETAILS:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n- Client: ${currentClient.name}\n- Email: ${currentClient.email}\n- Document: ${doc.type}\n- Deal Reference: ${dealRef}\n- Project: ${proj.name}\n- Signed At: ${new Date(timestamp).toLocaleString()}\n- IP Address: ${ip}\n- Deal Advanced To: Step ${newStep} — ${STEP_NAMES[newStep]}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nACTION REQUIRED:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nPlease log in to the admin portal to review the executed document and confirm next steps with your client.\n\nThe deal has been automatically advanced to the next step in the closing process.`);
-  await sendEmail(currentClient.email, `✅ Signature Confirmed — ${doc.type} — Croft Finance — ${dealRef}`, `Dear ${currentClient.name},\n\nThis email confirms that your electronic signature has been successfully recorded for the following document:\n\n- Document: ${doc.type}\n- Deal Reference: ${dealRef}\n- Signed: ${new Date(timestamp).toLocaleString()}\n- Your deal has advanced to: Step ${newStep} — ${STEP_NAMES[newStep]}\n\nYour signature has been securely stored and this confirmation serves as your receipt of execution.\n\nPlease log in to your portal to review your updated deal status.\n\nYours sincerely,\nSuzana Aleksić\nPrincipal, Croft Finance`);
-  closeSignatureModal();
-  showToast(`Document signed successfully. Your deal has advanced to Step ${newStep}.`);
-  await loadCurrentProjectData();
-  renderDocuments();
-  submitBtn.disabled = false;
-  submitBtn.innerHTML = originalText;
-}
-
-async function viewSignatureRecord(signatureId) {
-  let signature = null;
-  if (firebaseReady) { const docSnap = await db.collection('signatures').doc(signatureId).get(); if (docSnap.exists) signature = { id: docSnap.id, ...docSnap.data() }; }
-  else signature = JSON.parse(localStorage.getItem('croft_signatures') || '[]').find(s => s.id === signatureId);
-  if (!signature) { showToast('Signature record not found', true); return; }
-  const proj = projects.find(p => p.id === signature.projectId);
-  const modalHtml = `<div id="signatureViewModal" class="modal-overlay active"><div class="modal signature-viewer-modal"><div class="signature-certificate-header"><h3><i class="fas fa-file-signature"></i> Signature Record — ${signature.dealRef}</h3><div style="font-size: 11px; opacity: 0.8;">Formal Execution Certificate</div></div><div class="modal-body" style="padding: 24px;"><div class="signature-certificate"><table class="signature-metadata-table"><tr><td>Document Type</td><td><strong>${escapeHtml(signature.documentType)}</strong></td></tr><tr><td>Project</td><td>${escapeHtml(proj?.name || 'N/A')}</td></tr><tr><td>Signed By</td><td>${escapeHtml(signature.signedBy)} (${signature.signedByEmail})</td></tr><tr><td>Signed At</td><td>${new Date(signature.signedAt).toLocaleString()}</td></tr><tr><td>IP Address</td><td>${signature.signedIP}</td></tr><tr><td>Deal Reference</td><td>${signature.dealRef}</td></tr></table><div class="signature-image-container"><div class="signature-watermark-bg">EXECUTED</div><img src="${signature.signatureImage}" alt="Client Signature"></div><div style="font-size: 10px; color: var(--gray-400); text-align: center; margin-top: 16px;">This signature was captured electronically via the Croft Finance secure client portal on ${new Date(signature.signedAt).toLocaleDateString()}.</div></div></div><div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid var(--gray-100); display: flex; justify-content: flex-end; gap: 12px;"><button class="btn btn-outline" onclick="downloadSignatureImage('${signatureId}')"><i class="fas fa-download"></i> Download Signature</button><button class="btn btn-primary" onclick="closeSignatureViewModal()">Close</button></div></div></div>`;
+  const modalHtml = `
+  <div id="luminModal" class="modal-overlay active">
+  <div class="modal" style="max-width: 1000px; width: 95%;">
+  <div class="modal-header" style="background: #6B46C1; color: white;">
+  <h3 style="color: white;"><i class="fas fa-pen-fancy" style="margin-right: 8px;"></i>Sign with Lumin Sign</h3>
+  <button class="modal-close" style="color: white;" onclick="document.getElementById('luminModal').remove()">✕</button>
+  </div>
+  <div class="modal-body" style="padding: 0;">
+  
+  <!-- Quick Steps -->
+  <div style="background: #F5F3FF; padding: 16px 20px; border-bottom: 1px solid #E9D5FF; display: flex; gap: 20px; flex-wrap: wrap;">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <div style="width: 28px; height: 28px; background: #6B46C1; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">1</div>
+      <span style="font-size: 13px;">Document downloaded <i class="fas fa-check-circle" style="color: #10B981;"></i></span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <div style="width: 28px; height: 28px; background: #6B46C1; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">2</div>
+      <span style="font-size: 13px;">Upload to Lumin below</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <div style="width: 28px; height: 28px; background: #6B46C1; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">3</div>
+      <span style="font-size: 13px;">Add signature & download</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <div style="width: 28px; height: 28px; background: #6B46C1; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">4</div>
+      <span style="font-size: 13px;">Upload signed document back</span>
+    </div>
+  </div>
+  
+  <!-- Lumin Iframe -->
+  <iframe src="https://luminpdf.com/sign" style="width: 100%; height: 500px; border: none;"></iframe>
+  
+  <!-- Footer with Upload Button -->
+  <div style="padding: 16px 20px; background: #F9FAFB; border-top: 1px solid #E5E7EB; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+    <div style="font-size: 12px; color: #6B7280;">
+      <i class="fas fa-info-circle"></i> After signing, save the PDF to your computer
+    </div>
+    <button class="btn btn-primary" onclick="document.getElementById('luminModal').remove(); switchPortalTab('documents', null); document.getElementById('clientUploadDocType').scrollIntoView({ behavior: 'smooth' });">
+      <i class="fas fa-upload"></i> I've Signed — Upload Document
+    </button>
+  </div>
+  
+  </div>
+  </div>
+  </div>`;
+  
   document.body.insertAdjacentHTML('beforeend', modalHtml);
 }
-
-function closeSignatureViewModal() { const modal = document.getElementById('signatureViewModal'); if (modal) modal.remove(); }
-function downloadSignatureImage(signatureId) { showToast('Signature download feature - would save PNG'); }
+  
+  const modalHtml = `
+  <div id="luminModal" class="modal-overlay active">
+  <div class="modal modal-lg">
+  <div class="modal-header">
+  <h3><i class="fas fa-pen-fancy" style="color:#6B46C1;margin-right:8px;"></i>Sign with Lumin Sign</h3>
+  <button class="modal-close" onclick="document.getElementById('luminModal').remove()">✕</button>
+  </div>
+  <div class="modal-body">
+  <div style="background: #F5F3FF; border: 1px solid #6B46C1; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+  <div style="font-size: 13px; color: #4C1D95; font-weight: 500; margin-bottom: 8px;"><i class="fas fa-info-circle"></i> How to sign with Lumin Sign:</div>
+  <ol style="font-size: 12px; color: #5B21B6; line-height: 2; margin-left: 20px;">
+  <li>Download the document using the button below</li>
+  <li>Go to Lumin Sign (luminpdf.com/sign)</li>
+  <li>Upload the document to Lumin Sign</li>
+  <li>Add your signature and complete signing</li>
+  <li>Download the signed version from Lumin</li>
+  <li>Upload the signed document back here via the Upload section below</li>
+  </ol>
+  </div>
+  <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+  <button class="btn btn-primary" onclick="downloadPDF('${docId}'); document.getElementById('luminModal').remove();"><i class="fas fa-download"></i> Download Document First</button>
+  <a href="https://luminpdf.com/sign" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: #6B46C1; color: white; padding: 10px 22px; border-radius: 6px; font-size: 12px; font-weight: 500; text-decoration: none; letter-spacing: 1px;"><i class="fas fa-external-link-alt"></i> Open Lumin Sign</a>
+  <button class="btn btn-outline" onclick="document.getElementById('luminModal').remove(); switchPortalTab('documents', null);">Upload Signed Document</button>
+  </div>
+  <div style="margin-top: 20px; font-size: 11px; color: var(--gray-400); border-top: 1px solid var(--gray-100); padding-top: 12px;">
+  After signing in Lumin, upload the completed signed document using the Upload section on this page. Name it clearly e.g. "Signed Term Sheet - [Your Name]".
+  </div>
+  </div></div></div>`;
+  
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
 
 // ============================================================
 // INVESTOR VERIFICATION LETTER
 // ============================================================
+function showFirstLoginIVLModal() { return; }
+
 function generateInvestorVerificationLetter(clientId, projectId) {
   const client = clients.find(c => c.id === clientId);
   const proj = projects.find(p => p.id === projectId);
@@ -5275,10 +5221,6 @@ async function generateAndStoreIVL(clientId, projectId) {
   const updates = { investorVerificationLetter: html, investorVerificationLetterDate: new Date().toISOString(), ivrLetterAcknowledged: proj.ivrLetterAcknowledged || false };
   Object.assign(proj, updates);
   await fbUpdate('projects', projectId, updates);
-  const client = clients.find(c => c.id === clientId);
-  const refNumber = `CF-${new Date().getFullYear()}-${String(projectId).slice(-4)}/IVL`;
-  await sendEmail(client.email, `${refNumber} — Capital Partner Verification Letter — Croft Finance`, `Dear ${client.name},\n\nPlease be advised that Croft Finance has issued a formal Capital Partner Verification Letter in connection with your financing mandate referenced ${refNumber}.\n\nThis letter provides formal confirmation of the identity, standing, and financial capacity of the capital partner engaged in connection with your project, as personally verified by Suzana Aleksić, Principal of Croft Finance.\n\nThis is an important document. Please log in to your client portal immediately to read and acknowledge receipt of this letter.\n\nPortal URL: ${window.location.origin}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nLETTER PREVIEW:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nI, Suzana Aleksić, Principal of Croft Finance, issue this letter to formally confirm the identity, standing, and financial capacity of the capital partner engaged in connection with your financing mandate.\n\nThe Capital Partner is a private capital entity with confirmed deployable capital in excess of USD 550,000,000 and has been in continuous operation for over twenty years.\n\nI have personally conducted verification procedures including review of proof of funds documentation, legal entity verification, transaction history review, and legal counsel verification.\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nYours sincerely,\nSuzana Aleksić\nPrincipal, Croft Finance\nsuzana.aleksic@croftfinance.com\n+381 69 288 0 191`);
-  await sendEmail(EMAILJS_CONFIG.adminEmail, `IVL Generated — ${client.name} — ${refNumber}`, `Investor Verification Letter generated.\n\nClient: ${client.name}\nProject: ${proj.name}\nReference: ${refNumber}\nTimestamp: ${new Date().toLocaleString()}\n\nReminder: Follow up if not acknowledged within 24 hours.`);
   return html;
 }
 
@@ -5293,16 +5235,7 @@ function printInvestorVerificationLetter(projectId) {
   printArea.style.display = 'none';
 }
 
-async function showFirstLoginIVLModal() {
-  const proj = projects.find(p => p.id === currentProjectId);
-  if (!proj || proj.ivrLetterAcknowledged) return;
-  const flagKey = `firstLoginIVL_${currentClient.id}`;
-  if (localStorage.getItem(flagKey) === 'seen') return;
-  if (!proj.investorVerificationLetter) { await generateAndStoreIVL(currentClient.id, currentProjectId); const updatedProj = projects.find(p => p.id === currentProjectId); if (updatedProj) proj.investorVerificationLetter = updatedProj.investorVerificationLetter; }
-  const modalHtml = `<div id="ivlFirstLoginModal" class="modal-overlay active"><div class="modal ivl-modal"><div class="modal-header"><h3><i class="fas fa-shield-alt"></i> Important Document — Please Read</h3><button class="modal-close" onclick="closeIVLModal()">✕</button></div><div class="modal-body ivl-modal-body"><div class="ivl-modal-banner"><i class="fas fa-info-circle"></i> Croft Finance has issued the following formal verification letter regarding your capital partner. Please read this carefully before proceeding.</div>${proj.investorVerificationLetter}</div><div class="modal-footer" style="padding: 20px 24px; border-top: 1px solid var(--gray-100); display: flex; gap: 12px; justify-content: flex-end;"><button class="btn btn-outline" onclick="printInvestorVerificationLetter('${currentProjectId}')"><i class="fas fa-download"></i> Download for Your Records</button><button id="ivlAcknowledgeBtn" class="btn btn-primary ivl-read-button disabled" disabled><i class="fas fa-check-circle"></i> I Have Read and Understood This Letter</button></div></div></div>`;
-  document.body.insertAdjacentHTML('beforeend', modalHtml);
-  setTimeout(() => { const btn = document.getElementById('ivlAcknowledgeBtn'); if (btn) { btn.classList.remove('disabled'); btn.classList.add('active'); btn.disabled = false; } }, 10000);
-}
+async function showFirstLoginIVLModal() { return; }
 
 async function acknowledgeIVL() {
   const proj = projects.find(p => p.id === currentProjectId);
