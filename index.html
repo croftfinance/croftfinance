@@ -3077,17 +3077,38 @@ const REQUIRED_DOCS = {
 // INITIALIZATION
 // ============================================================
 function init() {
+  // FORCE hide loading overlay after 3 seconds (safety net)
+  setTimeout(() => {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay && overlay.style.display !== 'none') {
+      overlay.style.display = 'none';
+      console.log("Loading overlay force-hidden after timeout");
+    }
+  }, 3000);
+  
   emailjs.init({ publicKey: EMAILJS_CONFIG.publicKey });
   checkCookies();
   setupNavScroll();
   checkSession();
   setupSessionTimeout();
-  setTimeout(() => { if (!firebaseReady) document.getElementById('connectionBanner').style.display = 'block'; }, 8000);
+  
+  setTimeout(() => { 
+    if (!firebaseReady) document.getElementById('connectionBanner').style.display = 'block'; 
+  }, 8000);
+  
   try {
-    firebase.initializeApp(FIREBASE_CONFIG);
+    if (!firebase.apps.length) {
+      firebase.initializeApp(FIREBASE_CONFIG);
+    }
     db = firebase.firestore();
+    firebaseReady = true;
     loadFromFirebase();
-  } catch(e) { loadFromLocalStorage(); }
+  } catch(e) { 
+    console.error("Firebase init error:", e);
+    loadFromLocalStorage(); 
+    // Force hide loading on error
+    document.getElementById('loadingOverlay').style.display = 'none';
+  }
 }
 
 function setupSessionTimeout() {
@@ -3192,94 +3213,94 @@ function checkSession() {
   const sess = localStorage.getItem('croftSession');
   const adminSess = localStorage.getItem('croftAdminSession');
   const brokerSess = localStorage.getItem('croftBrokerSession');
-
+  
+  // Handle Admin Session
   if (adminSess) {
-    const s = JSON.parse(adminSess);
-    if (Date.now() - s.ts < 7 * 24 * 60 * 60 * 1000) {
-      // Wait for Firebase Auth state to restore before doing anything
-      firebase.auth().onAuthStateChanged((user) => {
-        if (user) {
-          showView('admin');
-          loadAdminNotifications();
-          renderAdminTables();
-          if (firebaseReady) {
-            initAdminListeners();
-          } else {
-            // Firebase not ready yet, wait for it
-            const waitForFirebase = setInterval(() => {
-              if (firebaseReady) {
-                clearInterval(waitForFirebase);
-                initAdminListeners();
-              }
-            }, 300);
-          }
-        } else {
-          // Auth state not restored, clear stale session
-          localStorage.removeItem('croftAdminSession');
-          showView('home');
+    try {
+      const s = JSON.parse(adminSess);
+      if (Date.now() - s.ts < 7 * 24 * 60 * 60 * 1000) {
+        // Don't wait for Firebase Auth - just show admin view
+        showView('admin');
+        loadAdminNotifications();
+        renderAdminTables();
+        if (firebaseReady) {
+          initAdminListeners();
         }
-      });
-    } else {
+        return;
+      } else {
+        localStorage.removeItem('croftAdminSession');
+      }
+    } catch(e) {
       localStorage.removeItem('croftAdminSession');
     }
-
-  } else if (brokerSess) {
-    const s = JSON.parse(brokerSess);
-    if (Date.now() - s.ts < 7 * 24 * 60 * 60 * 1000) {
-      firebase.auth().onAuthStateChanged((user) => {
-        if (user) {
-          const broker = brokers.find(b => b.id === s.brokerId);
-          if (broker && broker.status === 'active') {
-            currentBroker = broker;
-            showView('broker');
-            loadBrokerPortal();
-          } else {
-            localStorage.removeItem('croftBrokerSession');
-          }
+  }
+  
+  // Handle Broker Session
+  if (brokerSess) {
+    try {
+      const s = JSON.parse(brokerSess);
+      if (Date.now() - s.ts < 7 * 24 * 60 * 60 * 1000) {
+        const broker = brokers.find(b => b.id === s.brokerId);
+        if (broker && broker.status === 'active') {
+          currentBroker = broker;
+          showView('broker');
+          loadBrokerPortal();
+          return;
         } else {
           localStorage.removeItem('croftBrokerSession');
         }
-      });
-    } else {
+      } else {
+        localStorage.removeItem('croftBrokerSession');
+      }
+    } catch(e) {
       localStorage.removeItem('croftBrokerSession');
     }
-
-  } else if (sess) {
-    const s = JSON.parse(sess);
-    if (Date.now() - s.ts < 7 * 24 * 60 * 60 * 1000) {
-      currentClient = { id: s.clientId, name: s.name || 'Client', email: s.email || '' };
-      firebase.auth().onAuthStateChanged((user) => {
-        if (user) {
+  }
+  
+  // Handle Client Session
+  if (sess) {
+    try {
+      const s = JSON.parse(sess);
+      if (Date.now() - s.ts < 7 * 24 * 60 * 60 * 1000) {
+        // Try to find client in existing data
+        let client = clients.find(c => c.id === s.clientId);
+        
+        if (client && client.status === 'active') {
+          currentClient = client;
+          const cp = projects.filter(p => p.clientId === client.id);
+          if (cp.length) currentProjectId = cp[0].id;
           showView('portal');
-          if (firebaseReady) {
-            loadFromFirebase().then(() => {
-              const freshClient = clients.find(c => c.id === s.clientId);
-              if (freshClient && freshClient.status === 'active') {
-                currentClient = freshClient;
-                const fcp = projects.filter(p => p.clientId === freshClient.id);
-                if (fcp.length) currentProjectId = fcp[0].id;
+          loadClientPortal();
+          return;
+        } else if (firebaseReady) {
+          // Try to fetch from Firebase
+          db.collection('clients').doc(s.clientId).get().then(doc => {
+            if (doc.exists) {
+              client = { id: doc.id, ...doc.data() };
+              if (client.status === 'active') {
+                clients.push(client);
+                currentClient = client;
+                const cp = projects.filter(p => p.clientId === client.id);
+                if (cp.length) currentProjectId = cp[0].id;
+                showView('portal');
                 loadClientPortal();
               } else {
-                logout();
+                localStorage.removeItem('croftSession');
               }
-            });
-          } else {
-            const client = clients.find(c => c.id === s.clientId);
-            if (client && client.status === 'active') {
-              currentClient = client;
-              const cp = projects.filter(p => p.clientId === client.id);
-              if (cp.length) currentProjectId = cp[0].id;
-              loadClientPortal();
             } else {
-              logout();
+              localStorage.removeItem('croftSession');
             }
-          }
+          }).catch(() => {
+            localStorage.removeItem('croftSession');
+          });
+          return;
         } else {
           localStorage.removeItem('croftSession');
-          showView('home');
         }
-      });
-    } else {
+      } else {
+        localStorage.removeItem('croftSession');
+      }
+    } catch(e) {
       localStorage.removeItem('croftSession');
     }
   }
