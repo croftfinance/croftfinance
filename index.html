@@ -2799,8 +2799,26 @@ body {
 
       <div id="tab-messages" class="portal-tab"><div class="page-header"><div class="page-title">Messages</div><div class="page-subtitle">Secure communication with Suzana Aleksić.</div></div><div class="card"><div class="card-body"><div class="messages-container"><div class="messages-list" id="messagesList"></div><div class="message-input"><input type="text" id="messageInput" autocomplete="off" placeholder="Write a message..." onkeypress="if(event.key==='Enter')sendMessage()"><button class="btn btn-primary" onclick="sendMessage()">Send</button></div></div></div></div></div>
 
-      <div id="tab-schedule" class="portal-tab"><div class="page-header"><div class="page-title">Schedule a Meeting</div><div class="page-subtitle">Request a call or meeting with Suzana.</div></div><div class="card"><div class="card-body" style="max-width:480px;"><div class="form-group"><label class="form-label">Meeting Type</label><select id="meetingType" class="form-select"><option>Progress Review</option><option>Document Signing</option><option>Due Diligence Call</option><option>Closing Coordination</option></select></div><div class="form-group"><label class="form-label">Preferred Date</label><input type="date" id="meetingDate" class="form-input"></div><div class="form-group"><label class="form-label">Preferred Time (CET)</label><input type="time" id="meetingTime" class="form-input"></div><div class="form-group"><label class="form-label">Notes</label><textarea id="meetingNotes" rows="3" class="form-textarea" placeholder="Topics you would like to discuss..."></textarea></div><button class="btn btn-primary" onclick="scheduleMeeting()">Request Meeting</button></div></div></div></div>
-
+<div id="tab-schedule" class="portal-tab">
+  <div class="page-header">
+    <div class="page-title">Schedule a Meeting</div>
+    <div class="page-subtitle">Book a time directly with Suzana Aleksić</div>
+  </div>
+  <div class="card">
+    <div class="card-body" style="padding: 0; overflow: hidden; border-radius: 8px;">
+      <div style="background: #0a1628; padding: 20px; text-align: center; color: white;">
+        <i class="fas fa-calendar-alt" style="font-size: 32px; margin-bottom: 8px; display: block;"></i>
+        <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 24px;">Schedule with Suzana Aleksić</h3>
+        <p style="font-size: 13px; opacity: 0.8; margin-top: 4px;">30-minute meeting · Video or Phone Call</p>
+      </div>
+      <div class="calendly-inline-widget" data-url="https://calendly.com/suzana-aleksic-croftfinance/30min" style="min-width:320px;height:700px;"></div>
+      <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
+      <div style="padding: 16px; background: var(--gray-50); text-align: center; font-size: 11px; color: var(--gray-500); border-top: 1px solid var(--gray-200);">
+        <i class="fas fa-lock"></i> All meetings are confidential. You will receive a calendar invitation with joining details.
+      </div>
+    </div>
+  </div>
+</div>
       <div id="tab-projects" class="portal-tab"><div class="page-header"><div class="page-title">My Projects</div><div class="page-subtitle">All mandates associated with your account.</div></div><div id="projectsList"></div><div id="projectDetailView" style="display:none;margin-top:20px;"></div></div>
     </main>
   </div>
@@ -3822,6 +3840,7 @@ function updateClientUploadDropdown() {
   }
 }
 
+  // Add at the VERY TOP of clientUploadDocument() function
 async function clientUploadDocument() {
   const docTypeSelect = document.getElementById('clientUploadDocType');
   const fileInput = document.getElementById('clientUploadFile');
