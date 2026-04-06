@@ -4222,14 +4222,101 @@ function handleAdminNotificationClick(type, data) { closeAdminNotifications(); i
 function initAdminListeners() {
   if (!firebaseReady) return;
   adminSessionStart = new Date();
+
+  const safeListener = (query, handler) => {
+    try {
+      return query.onSnapshot(handler, (error) => {
+        console.warn('Snapshot listener error (non-fatal):', error.message);
+      });
+    } catch(e) {
+      console.warn('Could not attach listener:', e.message);
+      return () => {};
+    }
+  };
+
   if (adminMessageUnsubscribe) adminMessageUnsubscribe();
-  adminMessageUnsubscribe = db.collection('messages').orderBy('timestamp', 'desc').onSnapshot(snapshot => { snapshot.docChanges().forEach(change => { if (change.type === 'added') { const msg = { id: change.doc.id, ...change.doc.data() }; const existing = messages.find(m => m.id === msg.id); if (!existing) { messages.unshift(msg); const client = clients.find(c => String(c.id) === String(msg.clientId)); if (client && msg.sender === 'client') addAdminNotification('message', `New message from ${client.name}`, msg.content.substring(0, 100), { clientId: client.id, messageId: msg.id }); } } }); renderAdminMessages(); updateAdminStats(); });
+  adminMessageUnsubscribe = safeListener(
+    db.collection('messages').orderBy('timestamp', 'desc'),
+    snapshot => {
+      snapshot.docChanges().forEach(change => {
+        if (change.type === 'added') {
+          const msg = { id: change.doc.id, ...change.doc.data() };
+          const existing = messages.find(m => m.id === msg.id);
+          if (!existing) {
+            messages.unshift(msg);
+            const client = clients.find(c => String(c.id) === String(msg.clientId));
+            if (client && msg.sender === 'client') addAdminNotification('message', `New message from ${client.name}`, msg.content.substring(0, 100), { clientId: client.id, messageId: msg.id });
+          }
+        }
+      });
+      renderAdminMessages();
+      updateAdminStats();
+    }
+  );
+
   if (adminMeetingUnsubscribe) adminMeetingUnsubscribe();
-  adminMeetingUnsubscribe = db.collection('meetings').orderBy('timestamp', 'desc').onSnapshot(snapshot => { snapshot.docChanges().forEach(change => { if (change.type === 'added') { const meeting = { id: change.doc.id, ...change.doc.data() }; const existing = meetings.find(m => m.id === meeting.id); if (!existing) { meetings.unshift(meeting); const client = clients.find(c => String(c.id) === String(meeting.clientId)); if (client && meeting.status === 'pending') addAdminNotification('meeting', `New meeting request from ${client.name}`, `${meeting.type} on ${meeting.date || 'TBD'}`, { clientId: client.id, meetingId: meeting.id }); } } }); renderMeetings(); updateAdminStats(); });
+  adminMeetingUnsubscribe = safeListener(
+    db.collection('meetings').orderBy('timestamp', 'desc'),
+    snapshot => {
+      snapshot.docChanges().forEach(change => {
+        if (change.type === 'added') {
+          const meeting = { id: change.doc.id, ...change.doc.data() };
+          const existing = meetings.find(m => m.id === meeting.id);
+          if (!existing) {
+            meetings.unshift(meeting);
+            const client = clients.find(c => String(c.id) === String(meeting.clientId));
+            if (client && meeting.status === 'pending') addAdminNotification('meeting', `New meeting request from ${client.name}`, `${meeting.type} on ${meeting.date || 'TBD'}`, { clientId: client.id, meetingId: meeting.id });
+          }
+        }
+      });
+      renderMeetings();
+      updateAdminStats();
+    }
+  );
+
   if (adminDocumentUnsubscribe) adminDocumentUnsubscribe();
-  adminDocumentUnsubscribe = db.collection('documents').orderBy('date', 'desc').onSnapshot(snapshot => { snapshot.docChanges().forEach(change => { if (change.type === 'added') { const doc = { id: change.doc.id, ...change.doc.data() }; const existing = documents.find(d => d.id === doc.id); if (!existing) { documents.unshift(doc); const client = clients.find(c => String(c.id) === String(doc.clientId)); if (client && !doc.approved) addAdminNotification('document', `New document uploaded by ${client.name}`, `${doc.type || doc.name}`, { clientId: client.id, documentId: doc.id }); } } else if (change.type === 'modified') { const updated = { id: change.doc.id, ...change.doc.data() }; const index = documents.findIndex(d => d.id === updated.id); if (index !== -1) documents[index] = updated; } }); renderAdminDocumentsTable(); updateAdminStats(); });
+  adminDocumentUnsubscribe = safeListener(
+    db.collection('documents').orderBy('date', 'desc'),
+    snapshot => {
+      snapshot.docChanges().forEach(change => {
+        if (change.type === 'added') {
+          const doc = { id: change.doc.id, ...change.doc.data() };
+          const existing = documents.find(d => d.id === doc.id);
+          if (!existing) {
+            documents.unshift(doc);
+            const client = clients.find(c => String(c.id) === String(doc.clientId));
+            if (client && !doc.approved) addAdminNotification('document', `New document uploaded by ${client.name}`, `${doc.type || doc.name}`, { clientId: client.id, documentId: doc.id });
+          }
+        } else if (change.type === 'modified') {
+          const updated = { id: change.doc.id, ...change.doc.data() };
+          const index = documents.findIndex(d => d.id === updated.id);
+          if (index !== -1) documents[index] = updated;
+        }
+      });
+      renderAdminDocumentsTable();
+      updateAdminStats();
+    }
+  );
+
   if (adminClientUnsubscribe) adminClientUnsubscribe();
-  adminClientUnsubscribe = db.collection('clients').orderBy('createdAt', 'desc').onSnapshot(snapshot => { snapshot.docChanges().forEach(change => { if (change.type === 'added') { const client = { id: change.doc.id, ...change.doc.data() }; const existing = clients.find(c => c.id === client.id); if (!existing) { clients.unshift(client); if (client.status === 'pending') addAdminNotification('registration', `New client registration`, `${client.name} (${client.email}) is awaiting activation`, { clientId: client.id }); } } }); renderClientsTable(); renderPendingRegistrations(); updateAdminStats(); });
+  adminClientUnsubscribe = safeListener(
+    db.collection('clients').orderBy('createdAt', 'desc'),
+    snapshot => {
+      snapshot.docChanges().forEach(change => {
+        if (change.type === 'added') {
+          const client = { id: change.doc.id, ...change.doc.data() };
+          const existing = clients.find(c => c.id === client.id);
+          if (!existing) {
+            clients.unshift(client);
+            if (client.status === 'pending') addAdminNotification('registration', `New client registration`, `${client.name} (${client.email}) is awaiting activation`, { clientId: client.id });
+          }
+        }
+      });
+      renderClientsTable();
+      renderPendingRegistrations();
+      updateAdminStats();
+    }
+  );
 }
 function updateAdminStats() { const activeClients = clients.filter(c => c.status !== 'pending').length; const pendingRegistrations = clients.filter(c => c.status === 'pending').length; const activeProjects = projects.length; const unreadMessages = messages.filter(m => m.sender === 'client').length; const pendingMeetings = meetings.filter(m => m.status === 'pending').length; document.getElementById('totalClients').textContent = activeClients; document.getElementById('totalProjects').textContent = activeProjects; document.getElementById('pendingClientsCount').textContent = pendingRegistrations; document.getElementById('pendingMessages').textContent = unreadMessages; document.getElementById('scheduledMeetings').textContent = pendingMeetings; const activeProjs = projects.filter(p => p.status === 'active'); const acknowledgedIVL = activeProjs.filter(p => p.ivrLetterAcknowledged === true).length; document.getElementById('ivlAcknowledgedCount').textContent = `${acknowledgedIVL} / ${activeProjs.length}`; }
 function stopAdminListeners() { if (adminMessageUnsubscribe) adminMessageUnsubscribe(); if (adminMeetingUnsubscribe) adminMeetingUnsubscribe(); if (adminDocumentUnsubscribe) adminDocumentUnsubscribe(); if (adminClientUnsubscribe) adminClientUnsubscribe(); adminMessageUnsubscribe = null; adminMeetingUnsubscribe = null; adminDocumentUnsubscribe = null; adminClientUnsubscribe = null; }
