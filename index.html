@@ -5102,7 +5102,7 @@ function resetContactForm() {
 }
 
 // ============================================================
-// LUMIN SIGN INTEGRATION (No API Required)
+// LUMIN SIGN INTEGRATION
 // ============================================================
 
 function openLuminSign(docId) {
@@ -5112,57 +5112,8 @@ function openLuminSign(docId) {
     return; 
   }
   
-  // Auto-download the document for the user
+  // Auto-download the document
   downloadPDF(docId);
-  
-  const modalHtml = `
-  <div id="luminModal" class="modal-overlay active">
-  <div class="modal" style="max-width: 1000px; width: 95%;">
-  <div class="modal-header" style="background: #6B46C1; color: white;">
-  <h3 style="color: white;"><i class="fas fa-pen-fancy" style="margin-right: 8px;"></i>Sign with Lumin Sign</h3>
-  <button class="modal-close" style="color: white;" onclick="document.getElementById('luminModal').remove()">✕</button>
-  </div>
-  <div class="modal-body" style="padding: 0;">
-  
-  <!-- Quick Steps -->
-  <div style="background: #F5F3FF; padding: 16px 20px; border-bottom: 1px solid #E9D5FF; display: flex; gap: 20px; flex-wrap: wrap;">
-    <div style="display: flex; align-items: center; gap: 8px;">
-      <div style="width: 28px; height: 28px; background: #6B46C1; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">1</div>
-      <span style="font-size: 13px;">Document downloaded <i class="fas fa-check-circle" style="color: #10B981;"></i></span>
-    </div>
-    <div style="display: flex; align-items: center; gap: 8px;">
-      <div style="width: 28px; height: 28px; background: #6B46C1; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">2</div>
-      <span style="font-size: 13px;">Upload to Lumin below</span>
-    </div>
-    <div style="display: flex; align-items: center; gap: 8px;">
-      <div style="width: 28px; height: 28px; background: #6B46C1; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">3</div>
-      <span style="font-size: 13px;">Add signature & download</span>
-    </div>
-    <div style="display: flex; align-items: center; gap: 8px;">
-      <div style="width: 28px; height: 28px; background: #6B46C1; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">4</div>
-      <span style="font-size: 13px;">Upload signed document back</span>
-    </div>
-  </div>
-  
-  <!-- Lumin Iframe -->
-  <iframe src="https://luminpdf.com/sign" style="width: 100%; height: 500px; border: none;"></iframe>
-  
-  <!-- Footer with Upload Button -->
-  <div style="padding: 16px 20px; background: #F9FAFB; border-top: 1px solid #E5E7EB; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-    <div style="font-size: 12px; color: #6B7280;">
-      <i class="fas fa-info-circle"></i> After signing, save the PDF to your computer
-    </div>
-    <button class="btn btn-primary" onclick="document.getElementById('luminModal').remove(); switchPortalTab('documents', null); document.getElementById('clientUploadDocType').scrollIntoView({ behavior: 'smooth' });">
-      <i class="fas fa-upload"></i> I've Signed — Upload Document
-    </button>
-  </div>
-  
-  </div>
-  </div>
-  </div>`;
-  
-  document.body.insertAdjacentHTML('beforeend', modalHtml);
-}
   
   const modalHtml = `
   <div id="luminModal" class="modal-overlay active">
@@ -5194,6 +5145,7 @@ function openLuminSign(docId) {
   </div></div></div>`;
   
   document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
 
 // ============================================================
 // INVESTOR VERIFICATION LETTER
