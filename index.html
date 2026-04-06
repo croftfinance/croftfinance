@@ -3065,7 +3065,7 @@ function init() {
   setupNavScroll();
   checkSession();
   setupSessionTimeout();
-  setTimeout(() => { if (!firebaseReady) document.getElementById('connectionBanner').style.display = 'block'; }, 6000);
+  setTimeout(() => { if (!firebaseReady) document.getElementById('connectionBanner').style.display = 'block'; }, 8000);
   try {
     firebase.initializeApp(FIREBASE_CONFIG);
     db = firebase.firestore();
@@ -3092,16 +3092,16 @@ function resetSessionTimeout() {
 async function loadFromFirebase() {
   try {
     const [cS, pS, dS, mS, mtS, aS, bS, sS, bmS, aL] = await Promise.all([
-      db.collection('clients').get(),
-      db.collection('projects').get(),
-      db.collection('documents').get(),
-      db.collection('messages').get(),
-      db.collection('meetings').get(),
+      db.collection('clients').get().catch(() => ({ docs: [] })),
+      db.collection('projects').get().catch(() => ({ docs: [] })),
+      db.collection('documents').get().catch(() => ({ docs: [] })),
+      db.collection('messages').get().catch(() => ({ docs: [] })),
+      db.collection('meetings').get().catch(() => ({ docs: [] })),
       db.collection('auditLog').orderBy('timestamp', 'desc').limit(100).get().catch(() => ({ docs: [] })),
       db.collection('brokers').get().catch(() => ({ docs: [] })),
       db.collection('brokerSubmissions').get().catch(() => ({ docs: [] })),
       db.collection('brokerMessages').get().catch(() => ({ docs: [] })),
-      db.collection('clientActivityLog').get().catch(() => ({ docs: [] }))
+      db.collection('clientActivityLog').get().catch(() => ({ docs: [] })),
     ]);
     clients = cS.docs.map(d => ({ id: d.id, ...d.data() }));
     projects = pS.docs.map(d => ({ id: d.id, ...d.data() }));
