@@ -12,7 +12,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
 <style>
 :root {
   --navy: #0a1628;
@@ -3394,7 +3393,6 @@ function sendEmail(to, subject, message) {
   return emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, { to_email: to, subject: subject, message: message });
 }
 
-function hashPassword(password) { return CryptoJS.SHA256(password).toString(); }
 
 function getUserIP() {
   return fetch('https://api.ipify.org?format=json').then(r => r.json()).then(d => d.ip).catch(() => 'unknown');
@@ -3413,58 +3411,111 @@ function register() {
   const errEl = document.getElementById('regError');
   errEl.style.display = 'none';
 
-  if (!name || !email || !pass || !project) { errEl.textContent = 'Please fill all required fields.'; errEl.style.display = 'block'; return; }
-  if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) { errEl.textContent = 'Please enter a valid email address.'; errEl.style.display = 'block'; return; }
-  if (pass !== confirm) { errEl.textContent = 'Passwords do not match.'; errEl.style.display = 'block'; return; }
-  if (pass.length < 6) { errEl.textContent = 'Password must be at least 6 characters.'; errEl.style.display = 'block'; return; }
-  if (!nda) { errEl.textContent = 'You must agree to the Confidentiality Terms.'; errEl.style.display = 'block'; return; }
-  if (clients.find(c => c.email === email)) { errEl.textContent = 'This email is already registered.'; errEl.style.display = 'block'; return; }
+  if (!name || !email || !pass || !project) { 
+    errEl.textContent = 'Please fill all required fields.'; 
+    errEl.style.display = 'block'; 
+    return; 
+  }
+  if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) { 
+    errEl.textContent = 'Please enter a valid email address.'; 
+    errEl.style.display = 'block'; 
+    return; 
+  }
+  if (pass !== confirm) { 
+    errEl.textContent = 'Passwords do not match.'; 
+    errEl.style.display = 'block'; 
+    return; 
+  }
+  if (pass.length < 6) { 
+    errEl.textContent = 'Password must be at least 6 characters.'; 
+    errEl.style.display = 'block'; 
+    return; 
+  }
+  if (!nda) { 
+    errEl.textContent = 'You must agree to the Confidentiality Terms.'; 
+    errEl.style.display = 'block'; 
+    return; 
+  }
 
-  const cid = String(Date.now());
-  const pid = String(Date.now() + 1);
-  const hashedPassword = hashPassword(pass);
-  const newClient = { id: cid, name, email, password: hashedPassword, status: 'pending', ndaAccepted: true, ndaAcceptedAt: new Date().toISOString(), createdAt: new Date().toISOString() };
-  const newProject = { 
-    id: pid, clientId: cid, name: project, status: 'pending', step: 1,
-    industry: document.getElementById('regIndustry')?.value || '',
-    location: document.getElementById('regLocation')?.value || '',
-    totalCost: document.getElementById('regTotalCost')?.value || '',
-    sponsorEquity: document.getElementById('regSponsorEquity')?.value || '',
-    fundsNeeded: document.getElementById('regFundsNeeded')?.value || '',
-    currentStage: document.getElementById('regCurrentStage')?.value || '',
-    useOfFunds: document.getElementById('regUseOfFunds')?.value || '',
-    targetIRR: document.getElementById('regTargetIRR')?.value || '',
-    targetCloseDate: document.getElementById('regCloseDate')?.value || '',
-    moic: document.getElementById('regMOIC')?.value || '',
-    capRate: document.getElementById('regCapRate')?.value || '',
-    exitStrategy: document.getElementById('regExitStrategy')?.value || '',
-    exitCapRate: document.getElementById('regExitCapRate')?.value || '',
-    permits: document.getElementById('regPermits')?.value || '',
-    revenue: document.getElementById('regRevenue')?.value || '',
-    assetClass: document.getElementById('regAssetClass')?.value || '',
-    infraType: document.getElementById('regInfraType')?.value || '',
-    commodity: document.getElementById('regCommodity')?.value || '',
-    miningStage: document.getElementById('regMiningStage')?.value || '',
-    reserveLife: document.getElementById('regReserveLife')?.value || '',
-    dataRoom: document.getElementById('regDataRoom')?.value || '',
-    amount: 'TBD', interestRate: 'TBD', term: 'TBD', gracePeriod: '12', ecf: 'TBD', govLaw: 'TBD',
-    nextMilestone: 'Awaiting Term Sheet', stepDates: {}, checklistItems: {}, commitFeeStatus: 'pending', ecfStatus: 'pending',
-    commitFeeAcknowledged: false, ecfAcknowledged: false, ivrLetterAcknowledged: false,
-    createdAt: new Date().toISOString()
-  };
+  firebase.auth().createUserWithEmailAndPassword(email, pass)
+    .then(async (userCredential) => {
+      const uid = userCredential.user.uid;
+      const pid = String(Date.now() + 1);
 
-  clients.push(newClient);
-  projects.push(newProject);
-  fbSet('clients', cid, newClient).then(async () => {
-    await fbSet('projects', pid, newProject);
-    await logAudit('Client registered', name + ' (' + email + ')', cid, pid);
-    await sendEmail(email, 'Croft Finance — Registration Received', `Dear ${name},\n\nThank you for submitting your registration for the Croft Finance Client Portal.\n\nWe have received your request and will review your information within 24 hours. Once approved, you will receive another email with your activation confirmation.\n\nRegistration Details:\n• Name: ${name}\n• Email: ${email}\n• Project: ${project}\n• Registration Date: ${new Date().toLocaleString()}\n\nIf you have any questions, please contact Suzana Aleksić directly at suzana.aleksic@croftfinance.com.\n\nKind regards,\nCroft Finance Team`).catch(() => {});
-    await sendEmail(EMAILJS_CONFIG.adminEmail, `🔔 NEW REGISTRATION: ${name} - Action Required`, `A new client has registered for portal access.\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nCLIENT DETAILS:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n• Name: ${name}\n• Email: ${email}\n• Project: ${project}\n• Industry: ${newProject.industry || 'Not specified'}\n• Funds Needed: ${newProject.fundsNeeded || 'Not specified'}\n• Registered: ${new Date().toLocaleString()}\n• NDA Accepted: Yes\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nACTION REQUIRED:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n1. Log in to admin portal\n2. Review client information\n3. Click "Activate" to approve access\n4. Client will receive activation email\n\nPlease process this registration within 24 hours.\n\nBest regards,\nCroft Finance System`).catch(() => {});
-    showToast('Registration submitted. Check your email for confirmation.');
-    renderAdminTables();
-  });
-  clearRegistrationForm();
-  showLoginForm();
+      const newClient = { 
+        id: uid, 
+        name, 
+        email, 
+        status: 'pending', 
+        ndaAccepted: true, 
+        ndaAcceptedAt: new Date().toISOString(), 
+        createdAt: new Date().toISOString() 
+      };
+
+      const newProject = { 
+        id: pid, clientId: uid, name: project, status: 'pending', step: 1,
+        industry: document.getElementById('regIndustry')?.value || '',
+        location: document.getElementById('regLocation')?.value || '',
+        totalCost: document.getElementById('regTotalCost')?.value || '',
+        sponsorEquity: document.getElementById('regSponsorEquity')?.value || '',
+        fundsNeeded: document.getElementById('regFundsNeeded')?.value || '',
+        currentStage: document.getElementById('regCurrentStage')?.value || '',
+        useOfFunds: document.getElementById('regUseOfFunds')?.value || '',
+        targetIRR: document.getElementById('regTargetIRR')?.value || '',
+        targetCloseDate: document.getElementById('regCloseDate')?.value || '',
+        moic: document.getElementById('regMOIC')?.value || '',
+        capRate: document.getElementById('regCapRate')?.value || '',
+        exitStrategy: document.getElementById('regExitStrategy')?.value || '',
+        exitCapRate: document.getElementById('regExitCapRate')?.value || '',
+        permits: document.getElementById('regPermits')?.value || '',
+        revenue: document.getElementById('regRevenue')?.value || '',
+        assetClass: document.getElementById('regAssetClass')?.value || '',
+        infraType: document.getElementById('regInfraType')?.value || '',
+        commodity: document.getElementById('regCommodity')?.value || '',
+        miningStage: document.getElementById('regMiningStage')?.value || '',
+        reserveLife: document.getElementById('regReserveLife')?.value || '',
+        dataRoom: document.getElementById('regDataRoom')?.value || '',
+        amount: 'TBD', interestRate: 'TBD', term: 'TBD', 
+        gracePeriod: '12', ecf: 'TBD', govLaw: 'TBD',
+        nextMilestone: 'Awaiting Term Sheet', 
+        stepDates: {}, checklistItems: {}, 
+        commitFeeStatus: 'pending', ecfStatus: 'pending',
+        commitFeeAcknowledged: false, ecfAcknowledged: false, 
+        ivrLetterAcknowledged: false,
+        createdAt: new Date().toISOString()
+      };
+
+      clients.push(newClient);
+      projects.push(newProject);
+
+      await fbSet('clients', uid, newClient);
+      await fbSet('projects', pid, newProject);
+      await logAudit('Client registered', name + ' (' + email + ')', uid, pid);
+      
+      await sendEmail(email, 'Croft Finance — Registration Received', 
+        `Dear ${name},\n\nThank you for submitting your registration for the Croft Finance Client Portal.\n\nWe have received your request and will review your information within 24 hours.\n\nKind regards,\nCroft Finance Team`
+      ).catch(() => {});
+      
+      await sendEmail(EMAILJS_CONFIG.adminEmail, 
+        `🔔 NEW REGISTRATION: ${name} - Action Required`, 
+        `A new client has registered.\n\n• Name: ${name}\n• Email: ${email}\n• Project: ${project}\n• Registered: ${new Date().toLocaleString()}`
+      ).catch(() => {});
+
+      showToast('Registration submitted. Check your email for confirmation.');
+      clearRegistrationForm();
+      showLoginForm();
+      renderAdminTables();
+    })
+    .catch((error) => {
+      if (error.code === 'auth/email-already-in-use') {
+        errEl.textContent = 'This email is already registered.';
+      } else if (error.code === 'auth/weak-password') {
+        errEl.textContent = 'Password must be at least 6 characters.';
+      } else {
+        errEl.textContent = 'Registration failed. Please try again.';
+      }
+      errEl.style.display = 'block';
+    });
 }
 
 function clearRegistrationForm() {
@@ -3480,46 +3531,57 @@ function login() {
   const errEl = document.getElementById('loginError');
   errEl.style.display = 'none';
 
-  const attempts = failedLoginAttempts.get(email) || { count: 0, lastAttempt: 0 };
-  if (attempts.count >= 5 && Date.now() - attempts.lastAttempt < 15 * 60 * 1000) {
-    errEl.textContent = 'Too many failed attempts. Please try again later.';
-    errEl.style.display = 'block';
-    return;
-  }
+  firebase.auth().signInWithEmailAndPassword(email, pass)
+    .then((userCredential) => {
+      const uid = userCredential.user.uid;
+      
+      const client = clients.find(c => c.id === uid) || 
+                     clients.find(c => c.email === email);
+      
+      if (!client) {
+        firebase.auth().signOut();
+        errEl.textContent = 'Account not found. Please contact Suzana.';
+        errEl.style.display = 'block';
+        return;
+      }
 
-  const hashedPass = hashPassword(pass);
-  const client = clients.find(c => c.email === email && c.password === hashedPass);
+      if (client.status === 'pending') {
+        firebase.auth().signOut();
+        errEl.textContent = 'Your account is under review. Suzana will activate it within 24 hours.';
+        errEl.style.display = 'block';
+        return;
+      }
 
-  if (!client) {
-    attempts.count++;
-    attempts.lastAttempt = Date.now();
-    failedLoginAttempts.set(email, attempts);
-    errEl.textContent = 'Incorrect email or password.';
-    errEl.style.display = 'block';
-    return;
-  }
-
-  if (client.status === 'pending') {
-    errEl.textContent = 'Your account is under review. Suzana will activate it within 24 hours.';
-    errEl.style.display = 'block';
-    return;
-  }
-
-  failedLoginAttempts.delete(email);
-  currentClient = client;
-  const cp = projects.filter(p => p.clientId === client.id);
-  if (cp.length) currentProjectId = cp[0].id;
-  localStorage.setItem('croftSession', JSON.stringify({ clientId: client.id, 
-    name: client.name, 
-    email: client.email, 
-    ts: Date.now() }));
-  closeModal('loginModal');
-  showView('portal');
-  document.title = 'Croft Finance — Client Portal — ' + client.name;
-  logAudit('Client logged in', client.name, client.id);
-  resetSessionTimeout();
-  if (firebaseReady) loadFromFirebase().then(() => { currentClient = clients.find(c => c.id === client.id) || client; loadClientPortal(); });
-  else loadClientPortal();
+      currentClient = client;
+      const cp = projects.filter(p => p.clientId === client.id);
+      if (cp.length) currentProjectId = cp[0].id;
+      
+      localStorage.setItem('croftSession', JSON.stringify({ 
+        clientId: client.id, 
+        name: client.name, 
+        email: client.email, 
+        ts: Date.now() 
+      }));
+      
+      closeModal('loginModal');
+      showView('portal');
+      document.title = 'Croft Finance — Client Portal — ' + client.name;
+      logAudit('Client logged in', client.name, client.id);
+      resetSessionTimeout();
+      
+      if (firebaseReady) {
+        loadFromFirebase().then(() => { 
+          currentClient = clients.find(c => c.id === client.id) || client; 
+          loadClientPortal(); 
+        });
+      } else {
+        loadClientPortal();
+      }
+    })
+    .catch((error) => {
+      errEl.textContent = 'Incorrect email or password.';
+      errEl.style.display = 'block';
+    });
 }
 
 function requestPasswordReset() {
@@ -3527,20 +3589,15 @@ function requestPasswordReset() {
   const errEl = document.getElementById('forgotError');
   errEl.style.display = 'none';
 
-  const client = clients.find(c => c.email === email);
-  if (!client) {
-    errEl.textContent = 'No account found with this email address.';
-    errEl.style.display = 'block';
-    return;
-  }
-
-  const resetToken = CryptoJS.MD5(Date.now() + email).toString();
-  const resetLink = window.location.origin + '/reset-password?token=' + resetToken;
-  localStorage.setItem('reset_' + resetToken, client.id);
-
-  sendEmail(email, 'Croft Finance — Password Reset Request', `Dear ${client.name},\n\nClick the link below to reset your password:\n\n${resetLink}\n\nThis link expires in 1 hour.\n\nIf you did not request this, please ignore this email.\n\nKind regards,\nSuzana Aleksić\nCroft Finance`).catch(() => {});
-  showToast('Password reset link sent to your email.');
-  showLoginForm();
+  firebase.auth().sendPasswordResetEmail(email)
+    .then(() => {
+      showToast('Password reset email sent. Check your inbox.');
+      showLoginForm();
+    })
+    .catch((error) => {
+      errEl.textContent = 'No account found with this email address.';
+      errEl.style.display = 'block';
+    });
 }
 
 function doAdminLogin() {
@@ -4986,22 +5043,62 @@ function brokerRegister() {
   const nda = document.getElementById('brokerNdaCheckbox').checked;
   const errEl = document.getElementById('brokerRegError');
   errEl.style.display = 'none';
-  if (!name || !email || !pass || !firm || !country) { errEl.textContent = 'Please fill all required fields.'; errEl.style.display = 'block'; return; }
-  if (pass !== confirm) { errEl.textContent = 'Passwords do not match.'; errEl.style.display = 'block'; return; }
-  if (pass.length < 6) { errEl.textContent = 'Password must be at least 6 characters.'; errEl.style.display = 'block'; return; }
-  if (!nda) { errEl.textContent = 'You must agree to the Broker Terms.'; errEl.style.display = 'block'; return; }
-  if (brokers.find(b => b.email === email)) { errEl.textContent = 'This email is already registered.'; errEl.style.display = 'block'; return; }
-  const bid = String(Date.now());
-  const hashedPassword = hashPassword(pass);
-  const newBroker = { id: bid, name, email, password: hashedPassword, firm, country, license, hear, status: 'pending', createdAt: new Date().toISOString() };
-  brokers.push(newBroker);
-  if (firebaseReady) fbSet('brokers', bid, newBroker);
-  else saveBrokersLocal();
-  sendEmail(email, 'Croft Finance — Broker Registration Received', `Dear ${name},\n\nThank you for registering as a broker with Croft Finance.\n\nYour registration is under review. You will receive an email once your account is activated.\n\nRegistration Details:\n• Name: ${name}\n• Email: ${email}\n• Firm: ${firm}\n• Country: ${country}\n\nKind regards,\nCroft Finance Team`).catch(() => {});
-  sendEmail(EMAILJS_CONFIG.adminEmail, `🔔 NEW BROKER REGISTRATION: ${name}`, `A new broker has registered.\n\n• Name: ${name}\n• Email: ${email}\n• Firm: ${firm}\n• Country: ${country}\n• License: ${license || 'Not provided'}\n• Heard from: ${hear}\n\nLog in to admin to activate.`).catch(() => {});
-  showToast('Broker registration submitted. You will receive an email once approved.');
-  showBrokerLoginForm();
-  renderBrokerAdminTable();
+
+  if (!name || !email || !pass || !firm || !country) { 
+    errEl.textContent = 'Please fill all required fields.'; 
+    errEl.style.display = 'block'; 
+    return; 
+  }
+  if (pass !== confirm) { 
+    errEl.textContent = 'Passwords do not match.'; 
+    errEl.style.display = 'block'; 
+    return; 
+  }
+  if (pass.length < 6) { 
+    errEl.textContent = 'Password must be at least 6 characters.'; 
+    errEl.style.display = 'block'; 
+    return; 
+  }
+  if (!nda) { 
+    errEl.textContent = 'You must agree to the Broker Terms.'; 
+    errEl.style.display = 'block'; 
+    return; 
+  }
+
+  firebase.auth().createUserWithEmailAndPassword(email, pass)
+    .then(async (userCredential) => {
+      const uid = userCredential.user.uid;
+      const newBroker = { 
+        id: uid, name, email, 
+        firm, country, license, hear, 
+        status: 'pending', 
+        createdAt: new Date().toISOString() 
+      };
+      brokers.push(newBroker);
+      if (firebaseReady) fbSet('brokers', uid, newBroker);
+      else saveBrokersLocal();
+
+      sendEmail(email, 'Croft Finance — Broker Registration Received', 
+        `Dear ${name},\n\nThank you for registering as a broker with Croft Finance.\n\nYour registration is under review. You will receive an email once your account is activated.\n\nKind regards,\nCroft Finance Team`
+      ).catch(() => {});
+      
+      sendEmail(EMAILJS_CONFIG.adminEmail, 
+        `🔔 NEW BROKER REGISTRATION: ${name}`, 
+        `A new broker has registered.\n\n• Name: ${name}\n• Email: ${email}\n• Firm: ${firm}\n• Country: ${country}\n• License: ${license || 'Not provided'}\n\nLog in to admin to activate.`
+      ).catch(() => {});
+
+      showToast('Broker registration submitted. You will receive an email once approved.');
+      showBrokerLoginForm();
+      renderBrokerAdminTable();
+    })
+    .catch((error) => {
+      if (error.code === 'auth/email-already-in-use') {
+        errEl.textContent = 'This email is already registered.';
+      } else {
+        errEl.textContent = 'Registration failed. Please try again.';
+      }
+      errEl.style.display = 'block';
+    });
 }
 
 function brokerLogin() {
@@ -5009,16 +5106,40 @@ function brokerLogin() {
   const pass = document.getElementById('brokerLoginPassword').value;
   const errEl = document.getElementById('brokerLoginError');
   errEl.style.display = 'none';
-  const hashedPass = hashPassword(pass);
-  const broker = brokers.find(b => b.email === email && b.password === hashedPass);
-  if (!broker) { errEl.textContent = 'Incorrect email or password.'; errEl.style.display = 'block'; return; }
-  if (broker.status === 'pending') { errEl.textContent = 'Your account is under review. You will receive an email once approved.'; errEl.style.display = 'block'; return; }
-  currentBroker = broker;
-  localStorage.setItem('croftBrokerSession', JSON.stringify({ brokerId: broker.id, ts: Date.now() }));
-  closeModal('loginModal');
-  showView('broker');
-  document.title = 'Croft Finance — Broker Portal — ' + broker.name;
-  loadBrokerPortal();
+
+  firebase.auth().signInWithEmailAndPassword(email, pass)
+    .then((userCredential) => {
+      const uid = userCredential.user.uid;
+      const broker = brokers.find(b => b.id === uid) || 
+                     brokers.find(b => b.email === email);
+      
+      if (!broker) {
+        firebase.auth().signOut();
+        errEl.textContent = 'Broker account not found.';
+        errEl.style.display = 'block';
+        return;
+      }
+      if (broker.status === 'pending') {
+        firebase.auth().signOut();
+        errEl.textContent = 'Your account is under review.';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      currentBroker = broker;
+      localStorage.setItem('croftBrokerSession', JSON.stringify({ 
+        brokerId: broker.id, 
+        ts: Date.now() 
+      }));
+      closeModal('loginModal');
+      showView('broker');
+      document.title = 'Croft Finance — Broker Portal — ' + broker.name;
+      loadBrokerPortal();
+    })
+    .catch((error) => {
+      errEl.textContent = 'Incorrect email or password.';
+      errEl.style.display = 'block';
+    });
 }
 
 function loadBrokerPortal() {
@@ -5302,43 +5423,76 @@ function createClient() {
   const email = document.getElementById('ncEmail').value.trim().toLowerCase();
   const pass = document.getElementById('ncPassword').value.trim();
   const projName = document.getElementById('ncProject').value.trim();
-  if (!name || !email || !pass || !projName) { showToast('Name, email, password and project required', true); return; }
-  if (clients.find(c => c.email === email)) { showToast('Email already exists', true); return; }
-  const cid = String(Date.now());
-  const pid = String(Date.now() + 1);
-  const hashedPassword = hashPassword(pass);
-  const newClient = { id: cid, name, email, password: hashedPassword, status: 'active', createdAt: new Date().toISOString() };
-  const newProject = {
-    id: pid, clientId: cid, name: projName, status: 'active', step: 1,
-    industry: document.getElementById('ncIndustry')?.value || '', location: document.getElementById('ncLocation')?.value || '',
-    totalCost: document.getElementById('ncTotalCost')?.value || '', sponsorEquity: document.getElementById('ncSponsorEquity')?.value || '',
-    fundsNeeded: document.getElementById('ncFundsNeeded')?.value || '', currentStage: document.getElementById('ncCurrentStage')?.value || '',
-    useOfFunds: document.getElementById('ncUseOfFunds')?.value || '', targetIRR: document.getElementById('ncTargetIRR')?.value || '',
-    targetCloseDate: document.getElementById('ncCloseDate')?.value || '', moic: document.getElementById('ncMOIC')?.value || '',
-    capRate: document.getElementById('ncCapRate')?.value || '', exitStrategy: document.getElementById('ncExitStrategy')?.value || '',
-    exitCapRate: document.getElementById('ncExitCapRate')?.value || '', permits: document.getElementById('ncPermits')?.value || '',
-    revenue: document.getElementById('ncRevenue')?.value || '', assetClass: document.getElementById('ncAssetClass')?.value || '',
-    infraType: document.getElementById('ncInfraType')?.value || '', commodity: document.getElementById('ncCommodity')?.value || '',
-    miningStage: document.getElementById('ncMiningStage')?.value || '', reserveLife: document.getElementById('ncReserveLife')?.value || '',
-    dataRoom: document.getElementById('ncDataRoom')?.value || '', amount: document.getElementById('ncAmount')?.value || 'TBD',
-    interestRate: document.getElementById('ncRate')?.value || 'TBD', term: document.getElementById('ncTerm')?.value || 'TBD',
-    gracePeriod: document.getElementById('ncGrace')?.value || '12', ecf: document.getElementById('ncECF')?.value || 'TBD',
-    govLaw: document.getElementById('ncGovLaw')?.value || 'TBD', termSheetExpiry: document.getElementById('ncExpiry')?.value || '',
-    nextMilestone: document.getElementById('ncMilestone')?.value || 'Awaiting Term Sheet',
-    stepDates: {}, checklistItems: {}, commitFeeStatus: 'pending', ecfStatus: 'pending',
-    commitFeeAcknowledged: false, ecfAcknowledged: false, ivrLetterAcknowledged: false,
-    createdAt: new Date().toISOString()
-  };
-  clients.push(newClient);
-  projects.push(newProject);
-  fbSet('clients', cid, newClient).then(async () => {
-    await fbSet('projects', pid, newProject);
-    await logAudit('Admin created client', name + ' (' + email + ')', cid, pid);
-    await generateAndStoreIVL(cid, pid);
-    closeModal('addClientModal');
-    showToast('Portal created — Login: ' + email + ' / ' + pass);
-    fbReload();
-  });
+  if (!name || !email || !pass || !projName) { 
+    showToast('Name, email, password and project required', true); 
+    return; 
+  }
+
+  firebase.auth().createUserWithEmailAndPassword(email, pass)
+    .then(async (userCredential) => {
+      const uid = userCredential.user.uid;
+      const pid = String(Date.now() + 1);
+
+      const newClient = { 
+        id: uid, name, email, 
+        status: 'active', 
+        createdAt: new Date().toISOString() 
+      };
+      const newProject = {
+        id: pid, clientId: uid, name: projName, status: 'active', step: 1,
+        industry: document.getElementById('ncIndustry')?.value || '',
+        location: document.getElementById('ncLocation')?.value || '',
+        totalCost: document.getElementById('ncTotalCost')?.value || '',
+        sponsorEquity: document.getElementById('ncSponsorEquity')?.value || '',
+        fundsNeeded: document.getElementById('ncFundsNeeded')?.value || '',
+        currentStage: document.getElementById('ncCurrentStage')?.value || '',
+        useOfFunds: document.getElementById('ncUseOfFunds')?.value || '',
+        targetIRR: document.getElementById('ncTargetIRR')?.value || '',
+        targetCloseDate: document.getElementById('ncCloseDate')?.value || '',
+        moic: document.getElementById('ncMOIC')?.value || '',
+        capRate: document.getElementById('ncCapRate')?.value || '',
+        exitStrategy: document.getElementById('ncExitStrategy')?.value || '',
+        exitCapRate: document.getElementById('ncExitCapRate')?.value || '',
+        permits: document.getElementById('ncPermits')?.value || '',
+        revenue: document.getElementById('ncRevenue')?.value || '',
+        assetClass: document.getElementById('ncAssetClass')?.value || '',
+        infraType: document.getElementById('ncInfraType')?.value || '',
+        commodity: document.getElementById('ncCommodity')?.value || '',
+        miningStage: document.getElementById('ncMiningStage')?.value || '',
+        reserveLife: document.getElementById('ncReserveLife')?.value || '',
+        dataRoom: document.getElementById('ncDataRoom')?.value || '',
+        amount: document.getElementById('ncAmount')?.value || 'TBD',
+        interestRate: document.getElementById('ncRate')?.value || 'TBD',
+        term: document.getElementById('ncTerm')?.value || 'TBD',
+        gracePeriod: document.getElementById('ncGrace')?.value || '12',
+        ecf: document.getElementById('ncECF')?.value || 'TBD',
+        govLaw: document.getElementById('ncGovLaw')?.value || 'TBD',
+        termSheetExpiry: document.getElementById('ncExpiry')?.value || '',
+        nextMilestone: document.getElementById('ncMilestone')?.value || 'Awaiting Term Sheet',
+        stepDates: {}, checklistItems: {}, 
+        commitFeeStatus: 'pending', ecfStatus: 'pending',
+        commitFeeAcknowledged: false, ecfAcknowledged: false, 
+        ivrLetterAcknowledged: false,
+        createdAt: new Date().toISOString()
+      };
+
+      clients.push(newClient);
+      projects.push(newProject);
+      await fbSet('clients', uid, newClient);
+      await fbSet('projects', pid, newProject);
+      await logAudit('Admin created client', name + ' (' + email + ')', uid, pid);
+      await generateAndStoreIVL(uid, pid);
+      closeModal('addClientModal');
+      showToast('Portal created — Login: ' + email + ' / ' + pass);
+      fbReload();
+    })
+    .catch((error) => {
+      if (error.code === 'auth/email-already-in-use') {
+        showToast('Email already exists', true);
+      } else {
+        showToast('Failed to create client: ' + error.message, true);
+      }
+    });
 }
 
 function showUploadDocumentModal() {
