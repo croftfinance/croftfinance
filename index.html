@@ -2789,7 +2789,7 @@ body {
       <div id="tab-documents" class="portal-tab">
         <div class="page-header"><div class="page-title">Documents</div><div class="page-subtitle">Manage all closing documents for your facility</div></div>
         <div id="ivlDocumentCard" class="ivl-document-card" style="display: none;"><div class="ivl-verified-badge"><i class="fas fa-check-circle"></i> VERIFIED</div><div style="display: flex; align-items: flex-start; gap: 16px;"><div class="doc-icon" style="width: 48px; height: 48px;"><i class="fas fa-shield-alt" style="font-size: 22px;"></i></div><div style="flex: 1;"><div style="font-size: 16px; font-weight: 600; color: var(--navy);">Capital Partner Verification Letter</div><div style="font-size: 12px; color: var(--gray-500); margin: 4px 0;">Issued by Suzana Aleksić, Principal · <span id="ivlIssueDate"></span></div><div style="font-size: 11px; color: var(--gray-400); margin-bottom: 12px;">Reference: <span id="ivlReference"></span></div><div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;"><button class="btn btn-outline" style="padding: 6px 16px;" onclick="showIVLModal()"><i class="fas fa-eye"></i> View Letter</button><button class="btn btn-outline" style="padding: 6px 16px;" onclick="printInvestorVerificationLetter(currentProjectId)"><i class="fas fa-print"></i> Download PDF</button><span id="ivlAcknowledgedStatus" style="display: none;" class="ivl-acknowledged-badge"><i class="fas fa-check-circle"></i> Acknowledged</span></div><div id="ivlAcknowledgedTimestamp" style="font-size: 10px; color: var(--gray-400); margin-top: 8px;"></div></div></div></div>
-        <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-file-signature"></i> Closing Documents</div><div class="card-subtitle" style="font-size: 11px; color: var(--gray-500);">Required documents for your closing process</div></div><div class="card-body" style="padding: 0;"><div class="table-wrap"><table class="documents-table" id="closingDocumentsTable"><thead><tr><th>Document Name</th><th>Step</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="closingDocumentsBody"></tbody></tr></div></div></div>
+        <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-file-signature"></i> Closing Documents</div><div class="card-subtitle" style="font-size: 11px; color: var(--gray-500);">Required documents for your closing process</div></div><div class="card-body" style="padding: 0;"><div class="table-wrap"><table class="documents-table" id="closingDocumentsTable"><thead><tr><th>Document Name</th><th>Step</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="closingDocumentsBody"></tbody></table></div></div></div>
         <div class="card" id="additionalDocsCard" style="display: none;"><div class="card-header"><div class="card-title"><i class="fas fa-folder-open"></i> Additional Documents</div></div><div class="card-body"><div class="additional-docs-grid" id="additionalDocsGrid"></div></div></div>
         <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-upload"></i> Upload a Document</div></div><div class="card-body"><div class="upload-form-inline"><div class="upload-form-title"><i class="fas fa-cloud-upload-alt"></i> Submit a document for review</div><div class="form-group"><label class="form-label">Document Type</label><select id="clientUploadDocType" class="form-select"><option value="">Select document type...</option></select></div><div class="form-group"><label class="form-label">PDF File (max 10MB)</label><input type="file" id="clientUploadFile" class="form-input" accept=".pdf"></div><button class="btn btn-primary" onclick="clientUploadDocument()" style="width: auto;"><i class="fas fa-upload"></i> Upload Document</button><div id="clientUploadStatus" style="margin-top: 12px; font-size: 12px; display: none;"></div></div></div></div>
       </div>
@@ -2866,7 +2866,7 @@ body {
 
       <div id="admin-projects-admin" class="admin-tab"><div class="page-header"><div class="page-title">Projects</div></div><div style="display:flex;justify-content:flex-end;margin-bottom:16px;"><button class="btn btn-primary" onclick="showAddClientModal()">+ Add Client & Project</button></div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Project</th><th>Industry</th><th>Location</th><th>Funds Needed</th><th>Current Step</th><th>CF</th><th>ECF</th><th>Actions</th></tr></thead><tbody id="adminProjectsTable"></tbody></table></div></div>
 
-      <div id="admin-documents-admin" class="admin-tab"><div class="page-header"><div class="page-title">Documents</div><div class="page-subtitle" id="docCount"></div></div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap;"><select id="adminDocFilterClient" class="form-select" style="max-width:250px;" onchange="renderAdminDocumentsTable()"><option value="">All Clients</option></select><button class="btn btn-primary" onclick="showUploadDocumentModal()">+ Upload Document</button></div><div class="table-wrap"><table class="documents-table" id="adminDocumentsTable"><thead><tr><th>Client</th><th>Project</th><th>Document Name</th><th>Step</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="adminDocumentsTableBody"></tbody></table></div></div>
+      <div id="admin-documents-admin" class="admin-tab"><div class="page-header"><div class="page-title">Documents</div><div class="page-subtitle" id="docCount"></div></div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap;"><select id="adminDocFilterClient" class="form-select" style="max-width:250px;" onchange="renderAdminDocumentsTable()"><option value="">All Clients</option></select><button class="btn btn-primary" onclick="showUploadDocumentModal()">+ Upload Document</button></div><div class="table-wrap"><table class="documents-table" id="adminDocumentsTable"><thead><tr><th>Client</th><th>Project</th><th>Document Name</th><th>Step</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="adminDocumentsTableBody"></tbody></table></div></div></div>
 
       <div id="admin-brokers" class="admin-tab"><div class="page-header"><div class="page-title">Brokers & Introducers</div><div class="page-subtitle">Manage broker registrations and view their submissions</div></div><div class="card"><div class="card-body"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Broker</th><th>Firm</th><th>Country</th><th>Commission</th><th>Status</th><th>Registered</th><th>Actions</th></tr></thead><tbody id="adminBrokersTable"></tbody></table></div></div></div></div>
 
@@ -3077,13 +3077,9 @@ const REQUIRED_DOCS = {
 // INITIALIZATION
 // ============================================================
 function init() {
-  // FORCE hide loading overlay after 3 seconds (safety net)
   setTimeout(() => {
     const overlay = document.getElementById('loadingOverlay');
-    if (overlay && overlay.style.display !== 'none') {
-      overlay.style.display = 'none';
-      console.log("Loading overlay force-hidden after timeout");
-    }
+    if (overlay) overlay.style.display = 'none';
   }, 3000);
   
   emailjs.init({ publicKey: EMAILJS_CONFIG.publicKey });
@@ -3106,7 +3102,6 @@ function init() {
   } catch(e) { 
     console.error("Firebase init error:", e);
     loadFromLocalStorage(); 
-    // Force hide loading on error
     document.getElementById('loadingOverlay').style.display = 'none';
   }
 }
@@ -3129,39 +3124,61 @@ function resetSessionTimeout() {
 
 async function loadFromFirebase() {
   try {
-    const [cS, pS, dS, mS, mtS, aS, bS, sS, bmS, aL] = await Promise.all([
-      db.collection('clients').get().catch(() => ({ docs: [] })),
-      db.collection('projects').get().catch(() => ({ docs: [] })),
-      db.collection('documents').get().catch(() => ({ docs: [] })),
-      db.collection('messages').get().catch(() => ({ docs: [] })),
-      db.collection('meetings').get().catch(() => ({ docs: [] })),
-      db.collection('auditLog').orderBy('timestamp', 'desc').limit(100).get().catch(() => ({ docs: [] })),
-      db.collection('brokers').get().catch(() => ({ docs: [] })),
-      db.collection('brokerSubmissions').get().catch(() => ({ docs: [] })),
-      db.collection('brokerMessages').get().catch(() => ({ docs: [] })),
-      db.collection('clientActivityLog').get().catch(() => ({ docs: [] })),
-    ]);
-    clients = cS.docs.map(d => ({ id: d.id, ...d.data() }));
-    projects = pS.docs.map(d => ({ id: d.id, ...d.data() }));
-    documents = dS.docs.map(d => ({ id: d.id, ...d.data() }));
-    messages = mS.docs.map(d => ({ id: d.id, ...d.data() }));
-    meetings = mtS.docs.map(d => ({ id: d.id, ...d.data() }));
-    auditLog = aS.docs.map(d => ({ id: d.id, ...d.data() }));
-    brokers = bS.docs.map(d => ({ id: d.id, ...d.data() }));
-    brokerSubmissions = sS.docs.map(d => ({ id: d.id, ...d.data() }));
-    brokerMessages = bmS.docs.map(d => ({ id: d.id, ...d.data() }));
-    clientActivityLog = aL.docs.map(d => ({ id: d.id, ...d.data() }));
+    const collections = {
+      clients: db.collection('clients'),
+      projects: db.collection('projects'),
+      documents: db.collection('documents'),
+      messages: db.collection('messages'),
+      meetings: db.collection('meetings'),
+      auditLog: db.collection('auditLog').orderBy('timestamp', 'desc').limit(100),
+      brokers: db.collection('brokers'),
+      brokerSubmissions: db.collection('brokerSubmissions'),
+      brokerMessages: db.collection('brokerMessages'),
+      clientActivityLog: db.collection('clientActivityLog')
+    };
+    
+    const results = {};
+    for (const [key, query] of Object.entries(collections)) {
+      try {
+        const snapshot = await query.get();
+        results[key] = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      } catch(e) {
+        console.warn(`Failed to load ${key}:`, e);
+        results[key] = [];
+      }
+    }
+    
+    clients = results.clients;
+    projects = results.projects;
+    documents = results.documents;
+    messages = results.messages;
+    meetings = results.meetings;
+    auditLog = results.auditLog;
+    brokers = results.brokers;
+    brokerSubmissions = results.brokerSubmissions;
+    brokerMessages = results.brokerMessages;
+    clientActivityLog = results.clientActivityLog;
+    
     firebaseReady = true;
     document.getElementById('connectionBanner').style.display = 'none';
     document.getElementById('loadingOverlay').style.display = 'none';
+    
     renderAdminTables();
     renderBrokerAdminTable();
+    
     if (currentClient) {
       currentClient = clients.find(c => c.id === currentClient.id) || currentClient;
       loadClientPortal();
     }
+    
     checkForNotifications();
-  } catch(e) { loadFromLocalStorage(); }
+    checkAllExpiries();
+    
+  } catch(e) { 
+    console.error('Firebase load error:', e);
+    loadFromLocalStorage(); 
+    document.getElementById('loadingOverlay').style.display = 'none';
+  }
 }
 
 function loadFromLocalStorage() {
@@ -3191,16 +3208,46 @@ function saveLocal() {
   localStorage.setItem('croft_client_activity', JSON.stringify(clientActivityLog));
 }
 
-  function saveBrokersLocal() {
+function saveBrokersLocal() {
   localStorage.setItem('croft_brokers', JSON.stringify(brokers));
   localStorage.setItem('croft_brokerSubmissions', JSON.stringify(brokerSubmissions));
   localStorage.setItem('croft_brokerMessages', JSON.stringify(brokerMessages));
 }
 
-async function fbSet(col, id, data) { if (!firebaseReady) { saveLocal(); return; } await db.collection(col).doc(String(id)).set(data); }
-async function fbUpdate(col, id, data) { if (!firebaseReady) { saveLocal(); return; } await db.collection(col).doc(String(id)).update(data); }
-async function fbDelete(col, id) { if (!firebaseReady) { saveLocal(); return; } await db.collection(col).doc(String(id)).delete(); }
-async function fbReload() { if (firebaseReady) await loadFromFirebase(); else { renderAdminTables(); if(currentClient) loadClientPortal(); } }
+async function fbSet(col, id, data) { 
+  if (!firebaseReady) { saveLocal(); return; } 
+  try {
+    await db.collection(col).doc(String(id)).set(data);
+  } catch(e) {
+    console.error(`fbSet error for ${col}/${id}:`, e);
+    saveLocal();
+  }
+}
+
+async function fbUpdate(col, id, data) { 
+  if (!firebaseReady) { saveLocal(); return; } 
+  try {
+    await db.collection(col).doc(String(id)).update(data);
+  } catch(e) {
+    console.error(`fbUpdate error for ${col}/${id}:`, e);
+    saveLocal();
+  }
+}
+
+async function fbDelete(col, id) { 
+  if (!firebaseReady) { saveLocal(); return; } 
+  try {
+    await db.collection(col).doc(String(id)).delete();
+  } catch(e) {
+    console.error(`fbDelete error for ${col}/${id}:`, e);
+    saveLocal();
+  }
+}
+
+async function fbReload() { 
+  if (firebaseReady) await loadFromFirebase(); 
+  else { renderAdminTables(); if(currentClient) loadClientPortal(); } 
+}
 
 async function logAudit(action, details = '', targetClientId = '', targetProjectId = '') {
   const entry = { action, details, targetClientId, targetProjectId, performedBy: currentClient ? currentClient.name : 'Admin', timestamp: new Date().toISOString() };
@@ -3214,17 +3261,15 @@ function checkSession() {
   const adminSess = localStorage.getItem('croftAdminSession');
   const brokerSess = localStorage.getItem('croftBrokerSession');
   
-  // Handle Admin Session
   if (adminSess) {
     try {
       const s = JSON.parse(adminSess);
       if (Date.now() - s.ts < 7 * 24 * 60 * 60 * 1000) {
-        // Don't wait for Firebase Auth - just show admin view
         showView('admin');
         loadAdminNotifications();
-        renderAdminTables();
         if (firebaseReady) {
           initAdminListeners();
+          renderAdminTables();
         }
         return;
       } else {
@@ -3235,7 +3280,6 @@ function checkSession() {
     }
   }
   
-  // Handle Broker Session
   if (brokerSess) {
     try {
       const s = JSON.parse(brokerSess);
@@ -3257,12 +3301,10 @@ function checkSession() {
     }
   }
   
-  // Handle Client Session
   if (sess) {
     try {
       const s = JSON.parse(sess);
       if (Date.now() - s.ts < 7 * 24 * 60 * 60 * 1000) {
-        // Try to find client in existing data
         let client = clients.find(c => c.id === s.clientId);
         
         if (client && client.status === 'active') {
@@ -3273,7 +3315,6 @@ function checkSession() {
           loadClientPortal();
           return;
         } else if (firebaseReady) {
-          // Try to fetch from Firebase
           db.collection('clients').doc(s.clientId).get().then(doc => {
             if (doc.exists) {
               client = { id: doc.id, ...doc.data() };
@@ -3458,7 +3499,6 @@ function sendEmail(to, subject, message) {
   return emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, { to_email: to, subject: subject, message: message });
 }
 
-
 function getUserIP() {
   return fetch('https://api.ipify.org?format=json').then(r => r.json()).then(d => d.ip).catch(() => 'unknown');
 }
@@ -3596,21 +3636,20 @@ async function login() {
   const errEl = document.getElementById('loginError');
   errEl.style.display = 'none';
 
-firebase.auth().signInWithEmailAndPassword(email, pass)
+  firebase.auth().signInWithEmailAndPassword(email, pass)
     .then(async (userCredential) => {
       const uid = userCredential.user.uid;
       
-let client = clients.find(c => c.id === uid) || 
-             clients.find(c => c.email === email);
+      let client = clients.find(c => c.id === uid) || 
+                   clients.find(c => c.email === email);
 
-// If not found in local array, try to fetch from Firestore
-if (!client && firebaseReady) {
-  const doc = await db.collection('clients').doc(uid).get();
-  if (doc.exists) {
-    client = { id: doc.id, ...doc.data() };
-    clients.push(client);
-  }
-}
+      if (!client && firebaseReady) {
+        const doc = await db.collection('clients').doc(uid).get();
+        if (doc.exists) {
+          client = { id: doc.id, ...doc.data() };
+          clients.push(client);
+        }
+      }
       
       if (!client) {
         firebase.auth().signOut();
@@ -3681,19 +3720,29 @@ function doAdminLogin() {
   errEl.style.display = 'none';
 
   firebase.auth().signInWithEmailAndPassword(email, pass)
-    .then((userCredential) => {
-      // Check if this is an admin email (you can add more emails to this list)
+    .then(async (userCredential) => {
       const adminEmails = ['suzana.aleksic@croftfinance.com', 'suzana@croftfinance.com'];
       if (!adminEmails.includes(userCredential.user.email)) {
-        firebase.auth().signOut();
+        await firebase.auth().signOut();
         errEl.textContent = 'Access denied. Admin privileges required.';
         errEl.style.display = 'block';
         return;
       }
-      localStorage.setItem('croftAdminSession', JSON.stringify({ ts: Date.now() }));
+      
+      localStorage.setItem('croftAdminSession', JSON.stringify({ 
+        ts: Date.now(),
+        email: userCredential.user.email
+      }));
+      
       closeModal('loginModal');
       showView('admin');
       document.title = 'Croft Finance — Admin';
+      
+      localStorage.removeItem('croftSession');
+      localStorage.removeItem('croftBrokerSession');
+      currentClient = null;
+      currentBroker = null;
+      
       loadAdminNotifications();
       if (firebaseReady) initAdminListeners();
       setTimeout(() => requestBrowserNotificationPermission(), 1000);
@@ -3721,25 +3770,19 @@ function logout() {
   document.title = 'Croft Finance — Structured Finance Solutions';
   if (sessionTimeout) clearTimeout(sessionTimeout);
 }
-  // ADD THIS NEW FUNCTION HERE
+
 function switchToAdminLogin() {
-  // Sign out from Firebase
   firebase.auth().signOut().catch(() => {});
   
-  // Clear all sessions
   localStorage.removeItem('croftSession');
   localStorage.removeItem('croftAdminSession');
   localStorage.removeItem('croftBrokerSession');
   
-  // Clear current user variables
   currentClient = null;
   currentProjectId = null;
   currentBroker = null;
   
-  // Show home view
   showView('home');
-  
-  // Show admin login form
   showAdminLogin();
   openModal('loginModal');
   
@@ -3855,7 +3898,7 @@ function goToStep(step) { switchPortalTab('process', null); document.getElementB
 function downloadTermSheet() {
   const proj = projects.find(p => p.id === currentProjectId);
   if (!proj) return;
-  const html = `<div style="font-family:Georgia,serif;max-width:800px;margin:0 auto;padding:40px;"><div style="border-bottom:2px solid #0a1628;padding-bottom:20px;margin-bottom:30px;"><div style="font-size:28px;font-weight:700;color:#0a1628;">CROFT FINANCE</div><div style="font-size:12px;letter-spacing:3px;color:#2c5f8a;">EXECUTED TERM SHEET</div></div><div style="margin-bottom:30px;"><div style="font-size:22px;font-weight:600;color:#0a1628;">${escapeHtml(proj.name)}</div><div style="font-size:14px;color:#6b7280;">Date: ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</div></div><table style="width:100%;border-collapse:collapse;margin-bottom:30px;">${[['Facility Amount', proj.amount], ['Interest Rate', proj.interestRate + ' per annum'], ['Term', proj.term], ['Grace Period', proj.gracePeriod + ' months'], ['Prepayment Penalty', 'None'], ['Governing Law', proj.govLaw || 'English Law']].map(([k, v]) => `<tr style="border-bottom:1px solid #e5e7eb;"><td style="padding:12px 0;font-size:12px;color:#6b7280;width:40%">${k}</td><td style="padding:12px 0;font-size:14px;color:#0a1628;font-weight:500;">${v}</td><tr>`).join('')}</table><div style="margin-top:40px;padding:20px;background:#f9fafb;border-radius:8px;"><div style="font-size:12px;color:#6b7280;margin-bottom:10px;">This term sheet is binding upon execution by both parties.</div><div style="display:flex;justify-content:space-between;margin-top:20px;"><div><div style="font-weight:600;">For Croft Finance</div><div style="margin-top:30px;">_________________</div><div>Suzana Aleksić, Principal</div></div><div><div style="font-weight:600;">For Sponsor</div><div style="margin-top:30px;">_________________</div><div>${currentClient.name}</div></div></div></div><div style="margin-top:30px;font-size:10px;color:#9ca3af;border-top:1px solid #f3f4f6;padding-top:16px;">Confidential — Not for distribution</div></div>`;
+  const html = `<div style="font-family:Georgia,serif;max-width:800px;margin:0 auto;padding:40px;"><div style="border-bottom:2px solid #0a1628;padding-bottom:20px;margin-bottom:30px;"><div style="font-size:28px;font-weight:700;color:#0a1628;">CROFT FINANCE</div><div style="font-size:12px;letter-spacing:3px;color:#2c5f8a;">EXECUTED TERM SHEET</div></div><div style="margin-bottom:30px;"><div style="font-size:22px;font-weight:600;color:#0a1628;">${escapeHtml(proj.name)}</div><div style="font-size:14px;color:#6b7280;">Date: ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</div></div><table style="width:100%;border-collapse:collapse;margin-bottom:30px;">${[['Facility Amount', proj.amount], ['Interest Rate', proj.interestRate + ' per annum'], ['Term', proj.term], ['Grace Period', proj.gracePeriod + ' months'], ['Prepayment Penalty', 'None'], ['Governing Law', proj.govLaw || 'English Law']].map(([k, v]) => `<tr style="border-bottom:1px solid #e5e7eb;"><td style="padding:12px 0;font-size:12px;color:#6b7280;width:40%">${k}</td><td style="padding:12px 0;font-size:14px;color:#0a1628;font-weight:500;">${v}</td></table>`).join('')}</table><div style="margin-top:40px;padding:20px;background:#f9fafb;border-radius:8px;"><div style="font-size:12px;color:#6b7280;margin-bottom:10px;">This term sheet is binding upon execution by both parties.</div><div style="display:flex;justify-content:space-between;margin-top:20px;"><div><div style="font-weight:600;">For Croft Finance</div><div style="margin-top:30px;">_________________</div><div>Suzana Aleksić, Principal</div></div><div><div style="font-weight:600;">For Sponsor</div><div style="margin-top:30px;">_________________</div><div>${currentClient.name}</div></div></div></div><div style="margin-top:30px;font-size:10px;color:#9ca3af;border-top:1px solid #f3f4f6;padding-top:16px;">Confidential — Not for distribution</div></div>`;
   const printArea = document.getElementById('printArea');
   printArea.innerHTML = html;
   printArea.style.display = 'block';
@@ -3964,7 +4007,7 @@ function renderClosingDocumentsTable() {
         actions = `<button class="doc-action-btn doc-action-view" onclick="viewPDF('${uploadedDoc.id}')">View</button><button class="doc-action-btn doc-action-download" onclick="downloadPDF('${uploadedDoc.id}')">Download</button>`;
       }
       
-      rows.push(`<tr><td><strong>${escapeHtml(docType)}</strong></td><td>Step ${s}</td><td><span class="doc-status-badge ${statusClass}">${statusText}</span></td><td>${dateDisplay}</td><td>${actions}</td>`);
+      rows.push(`<tr><td><strong>${escapeHtml(docType)}</strong></td><td style="text-align:center;">Step ${s}</td><td style="text-align:center;"><span class="doc-status-badge ${statusClass}">${statusText}</span></td><td style="text-align:center;">${dateDisplay}</td><td style="text-align:center;">${actions}</td>`);
     });
   }
   tbody.innerHTML = rows.join('');
@@ -4405,7 +4448,7 @@ function renderClientsTable() {
   if (!tbody) return;
   const searchVal = (document.getElementById('clientSearch')?.value || '').toLowerCase();
   const filtered = clients.filter(c => c.name.toLowerCase().includes(searchVal) || c.email.toLowerCase().includes(searchVal));
-  tbody.innerHTML = filtered.map(c => { const cp = projects.filter(p => p.clientId === c.id); return `<tr><td><strong>${escapeHtml(c.name)}</strong><br><span style="font-size:11px;color:var(--gray-400);">${c.email}</span></td><td>${cp.map(p => `<span class="badge badge-gray">${escapeHtml(p.name)}</span>`).join(' ') || '—'}</td><td><span style="color:${c.status === 'pending' ? 'var(--warning)' : 'var(--success)'};">${c.status === 'pending' ? 'Pending' : 'Active'}</span></td><td style="font-size:12px;color:var(--gray-400);">${c.createdAt ? new Date(c.createdAt).toLocaleDateString() : '—'}</td><td style="display:flex;gap:6px;flex-wrap:wrap;">${c.status === 'pending' ? `<button class="btn btn-success" style="padding:4px 10px;font-size:11px;" onclick="activateClient('${c.id}')">Activate</button>` : ''}<button class="btn btn-outline" style="padding:4px 10px;font-size:11px;color:var(--error);" onclick="deleteClient('${c.id}')">Delete</button></td></tr>`; }).join('');
+  tbody.innerHTML = filtered.map(c => { const cp = projects.filter(p => p.clientId === c.id); return `<tr><td style="vertical-align:middle;"><strong>${escapeHtml(c.name)}</strong><br><span style="font-size:11px;color:var(--gray-400);">${c.email}</span></td><td style="vertical-align:middle;">${cp.map(p => `<span class="badge badge-gray">${escapeHtml(p.name)}</span>`).join(' ') || '—'}</td><td style="vertical-align:middle;"><span style="color:${c.status === 'pending' ? 'var(--warning)' : 'var(--success)'};">${c.status === 'pending' ? 'Pending' : 'Active'}</span></td><td style="vertical-align:middle;font-size:12px;color:var(--gray-400);">${c.createdAt ? new Date(c.createdAt).toLocaleDateString() : '—'}</td><td style="vertical-align:middle;display:flex;gap:6px;flex-wrap:wrap;">${c.status === 'pending' ? `<button class="btn btn-success" style="padding:4px 10px;font-size:11px;" onclick="activateClient('${c.id}')">Activate</button>` : ''}<button class="btn btn-outline" style="padding:4px 10px;font-size:11px;color:var(--error);" onclick="deleteClient('${c.id}')">Delete</button></td></tr>`; }).join('');
 }
 
 function renderProjectsTable() {
@@ -4415,15 +4458,15 @@ function renderProjectsTable() {
     const client = clients.find(c => c.id === p.clientId); 
     return `
       <tr>
-        <td style="font-size:12px;">${client?.name || '?'}</td>
-        <td><strong>${escapeHtml(p.name)}</strong></td>
-        <td>${p.industry || '—'}</td>
-        <td>${p.location || '—'}</td>
-        <td>${p.fundsNeeded ? '$' + p.fundsNeeded : (p.amount || 'TBD')}</td>
-        <td><span class="badge badge-navy">${STEP_NAMES[p.step || 1] || 'Step ' + (p.step || 1)}</span></td>
-        <td>${p.step >= 2 ? `<span class="ack-badge ${p.commitFeeAcknowledged ? 'completed' : 'pending'}" title="${p.commitFeeAcknowledged ? 'Acknowledged: ' + new Date(p.commitFeeAcknowledgedAt).toLocaleDateString() : 'Not yet acknowledged'}">${p.commitFeeAcknowledged ? '✓ CF' : '⏳ CF'}</span>` : '<span class="ack-badge" style="opacity:0.3;">— CF</span>'}</td>
-        <td>${p.step >= 6 ? `<span class="ack-badge ${p.ecfAcknowledged ? 'completed' : 'pending'}" title="${p.ecfAcknowledged ? 'Acknowledged: ' + new Date(p.ecfAcknowledgedAt).toLocaleDateString() : 'Not yet acknowledged'}">${p.ecfAcknowledged ? '✓ ECF' : '⏳ ECF'}</span>` : '<span class="ack-badge" style="opacity:0.3;">— ECF</span>'}</td>
-        <td style="display:flex;gap:6px;">
+        <td style="vertical-align:middle;font-size:12px;">${client?.name || '?'}</td>
+        <td style="vertical-align:middle;"><strong>${escapeHtml(p.name)}</strong></td>
+        <td style="vertical-align:middle;">${p.industry || '—'}</td>
+        <td style="vertical-align:middle;">${p.location || '—'}</td>
+        <td style="vertical-align:middle;">${p.fundsNeeded ? '$' + p.fundsNeeded : (p.amount || 'TBD')}</td>
+        <td style="vertical-align:middle;"><span class="badge badge-navy">${STEP_NAMES[p.step || 1] || 'Step ' + (p.step || 1)}</span></td>
+        <td style="vertical-align:middle;">${p.step >= 2 ? `<span class="ack-badge ${p.commitFeeAcknowledged ? 'completed' : 'pending'}" title="${p.commitFeeAcknowledged ? 'Acknowledged: ' + new Date(p.commitFeeAcknowledgedAt).toLocaleDateString() : 'Not yet acknowledged'}">${p.commitFeeAcknowledged ? '✓ CF' : '⏳ CF'}</span>` : '<span class="ack-badge" style="opacity:0.3;">— CF</span>'}</td>
+        <td style="vertical-align:middle;">${p.step >= 6 ? `<span class="ack-badge ${p.ecfAcknowledged ? 'completed' : 'pending'}" title="${p.ecfAcknowledged ? 'Acknowledged: ' + new Date(p.ecfAcknowledgedAt).toLocaleDateString() : 'Not yet acknowledged'}">${p.ecfAcknowledged ? '✓ ECF' : '⏳ ECF'}</span>` : '<span class="ack-badge" style="opacity:0.3;">— ECF</span>'}</td>
+        <td style="vertical-align:middle;display:flex;gap:6px;">
           <button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="editProject('${p.id}')">Edit</button>
           <button class="btn btn-outline" style="padding:4px 10px;font-size:11px;color:var(--error);" onclick="deleteProject('${p.id}')">Delete</button>
         </td>
@@ -4462,13 +4505,13 @@ function renderAdminDocumentsTable() {
     
     return `
       <tr>
-        <td>${client?.name || 'Unknown'}</td>
-        <td>${proj?.name || '—'}</td>
-        <td><strong>${escapeHtml(doc.type || doc.name)}</strong></td>
-        <td>${step !== '—' ? 'Step ' + step : '—'}</td>
-        <td>${statusHtml}</td>
-        <td>${doc.date || '—'}</td>
-        <td>
+        <td style="vertical-align:middle;">${client?.name || 'Unknown'}</td>
+        <td style="vertical-align:middle;">${proj?.name || '—'}</td>
+        <td style="vertical-align:middle;"><strong>${escapeHtml(doc.type || doc.name)}</strong></td>
+        <td style="vertical-align:middle;text-align:center;">${step !== '—' ? 'Step ' + step : '—'}</td>
+        <td style="vertical-align:middle;">${statusHtml}</td>
+        <td style="vertical-align:middle;">${doc.date || '—'}</td>
+        <td style="vertical-align:middle;">
           <button class="doc-action-btn doc-action-view" onclick="viewPDF('${doc.id}')">View</button>
           ${!doc.approved && !doc.signed ? `<button class="doc-action-btn" style="background: var(--success); color: white; border: none;" onclick="approveDocument('${doc.id}')">Approve</button>` : ''}
           <button class="doc-action-btn doc-action-download" onclick="downloadPDF('${doc.id}')">Download</button>
@@ -4486,7 +4529,6 @@ function renderAdminMessages() {
   const container = document.getElementById('allMessagesList');
   if (!container) return;
   
-  // Add broker messages section
   const brokerThreadsHtml = brokerMessages.length ? 
     `<div style="margin-bottom:24px;">
     <div style="font-size:10px;letter-spacing:3px;
@@ -4499,7 +4541,8 @@ function renderAdminMessages() {
       return acc;
     }, {})).map(([bid, msgs]) => {
       const broker = brokers.find(b => 
-        b.id === bid || b.id === String(bid));
+        b.id === bid || 
+        b.id === String(bid));
       const sorted = msgs.sort((a,b) => 
         new Date(a.timestamp) - new Date(b.timestamp));
       return `<div class="admin-thread">
@@ -4613,7 +4656,7 @@ function renderPendingRegistrations() {
   const tbody = document.getElementById('pendingRegistrationsTable');
   if (!block || !tbody) return;
   block.style.display = pending.length ? 'block' : 'none';
-  tbody.innerHTML = pending.map(c => { const proj = projects.find(p => p.clientId === c.id); return `<tr><td><strong>${escapeHtml(c.name)}</strong></td><td>${c.email}</td><td>${proj?.name || '—'}<br><span style="font-size:10px;color:var(--gray-400);">${proj?.industry || ''} · ${proj?.fundsNeeded ? '$' + proj.fundsNeeded : ''}</span></td><td style="font-size:12px;color:var(--gray-400);">${c.createdAt ? new Date(c.createdAt).toLocaleString() : '—'}</td><td style="display:flex;gap:6px;"><button class="btn btn-success" style="padding:4px 10px;font-size:11px;" onclick="activateClient('${c.id}')">Activate</button><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;color:var(--error);" onclick="deleteClient('${c.id}')">Decline</button></td></tr>`; }).join('');
+  tbody.innerHTML = pending.map(c => { const proj = projects.find(p => p.clientId === c.id); return `<tr><td style="vertical-align:middle;"><strong>${escapeHtml(c.name)}</strong></td><td style="vertical-align:middle;">${c.email}</td><td style="vertical-align:middle;">${proj?.name || '—'}<br><span style="font-size:10px;color:var(--gray-400);">${proj?.industry || ''} · ${proj?.fundsNeeded ? '$' + proj.fundsNeeded : ''}</span></td><td style="vertical-align:middle;font-size:12px;color:var(--gray-400);">${c.createdAt ? new Date(c.createdAt).toLocaleString() : '—'}</td><td style="vertical-align:middle;display:flex;gap:6px;"><button class="btn btn-success" style="padding:4px 10px;font-size:11px;" onclick="activateClient('${c.id}')">Activate</button><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;color:var(--error);" onclick="deleteClient('${c.id}')">Decline</button></td></tr>`; }).join('');
 }
 
 function renderAuditLog() {
@@ -4880,7 +4923,7 @@ function renderAdminExpiryTable() {
     }
   }
   if (expiringProjects.length === 0) { container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--gray-400);">No documents expiring this week.</div>'; return; }
-  container.innerHTML = `<div class="table-wrap"><table class="expiry-table"><thead><tr><th>Client</th><th>Project</th><th>Document</th><th>Expiry Date</th><th>Days Left</th><th>Action</th></tr></thead><tbody>${expiringProjects.map(item => `<tr><td>${escapeHtml(item.client.name)}</td><td>${escapeHtml(item.project.name)}</td><td>${item.document}</td><td>${new Date(item.expiryDate).toLocaleDateString()}</td><td class="${item.daysLeft <= 3 ? 'expiry-days-critical' : 'expiry-days-warning'}">${item.daysLeft} day${item.daysLeft === 1 ? '' : 's'}</td><td><button class="btn btn-outline" style="padding: 4px 10px; font-size: 11px;" onclick="sendExpiryReminder('${item.project.id}', '${item.document}', ${item.daysLeft})">Email Client</button></td></tr>`).join('')}</tbody>}</div>`;
+  container.innerHTML = `<div class="table-wrap"><table class="expiry-table"><thead><tr><th>Client</th><th>Project</th><th>Document</th><th>Expiry Date</th><th>Days Left</th><th>Action</th></tr></thead><tbody>${expiringProjects.map(item => `<tr><td style="vertical-align:middle;">${escapeHtml(item.client.name)}</td><td style="vertical-align:middle;">${escapeHtml(item.project.name)}</td><td style="vertical-align:middle;">${item.document}</td><td style="vertical-align:middle;">${new Date(item.expiryDate).toLocaleDateString()}</td><td class="${item.daysLeft <= 3 ? 'expiry-days-critical' : 'expiry-days-warning'}" style="vertical-align:middle;">${item.daysLeft} day${item.daysLeft === 1 ? '' : 's'}</td><td style="vertical-align:middle;"><button class="btn btn-outline" style="padding: 4px 10px; font-size: 11px;" onclick="sendExpiryReminder('${item.project.id}', '${item.document}', ${item.daysLeft})">Email Client</button></td>`).join('')}</tbody>}</div>`;
 }
 
 async function sendExpiryReminder(projectId, documentName, daysLeft) {
@@ -5122,8 +5165,8 @@ function renderBrokerAdminTable() {
     <tr>
       <td><strong>${escapeHtml(b.name)}</strong><br><span style="font-size:11px;color:var(--gray-400);">${b.email}</span></td>
       <td>${escapeHtml(b.firm)}</td>
-      <td>${b.country}</td>
-      <td>
+      <td style="vertical-align:middle;">${b.country}</td>
+      <td style="vertical-align:middle;">
         <input type="number" id="commission_${b.id}" 
                value="${b.commissionRate !== undefined && b.commissionRate !== null ? b.commissionRate : ''}" 
                step="0.1" min="0" max="100" 
@@ -5132,9 +5175,9 @@ function renderBrokerAdminTable() {
                onchange="setBrokerCommissionRate('${b.id}', this.value)">
         <span style="font-size:11px;">%</span>
       </td>
-      <td><span style="color:${b.status === 'pending' ? 'var(--warning)' : 'var(--success)'};">${b.status === 'pending' ? 'Pending' : 'Active'}</span></td>
-      <td style="font-size:12px;">${b.createdAt ? new Date(b.createdAt).toLocaleDateString() : '—'}</td>
-      <td>
+      <td style="vertical-align:middle;"><span style="color:${b.status === 'pending' ? 'var(--warning)' : 'var(--success)'};">${b.status === 'pending' ? 'Pending' : 'Active'}</span></td>
+      <td style="vertical-align:middle;font-size:12px;">${b.createdAt ? new Date(b.createdAt).toLocaleDateString() : '—'}</td>
+      <td style="vertical-align:middle;">
         ${b.status === 'pending' ? `<button class="btn btn-success" style="padding:4px 10px;font-size:11px;" onclick="activateBroker('${b.id}')">Activate</button>` : ''}
         <button class="btn btn-outline" style="padding:4px 10px;font-size:11px;color:var(--error);" onclick="deleteBroker('${b.id}')">Delete</button>
       </td>
@@ -5145,10 +5188,10 @@ function renderBrokerAdminTable() {
   const pendingSpan = document.getElementById('pendingBrokersCount');
   if (pendingSpan) pendingSpan.textContent = pendingCount;
 }
-  function setBrokerCommissionRate(brokerId, rate) {
+
+function setBrokerCommissionRate(brokerId, rate) {
   const broker = brokers.find(b => b.id === brokerId || b.id === String(brokerId));
   if (broker) {
-    // Parse rate: empty string or NaN becomes undefined (meaning 0% / no commission)
     const parsedRate = rate === '' || rate === null ? undefined : parseFloat(rate);
     broker.commissionRate = (parsedRate === undefined || isNaN(parsedRate)) ? undefined : Math.max(0, Math.min(100, parsedRate));
     
@@ -5160,30 +5203,29 @@ function renderBrokerAdminTable() {
     
     const displayRate = broker.commissionRate !== undefined ? broker.commissionRate + '%' : '0% (No commission)';
     showToast(`Commission rate for ${broker.name} set to ${displayRate}`);
-    renderBrokerAdminTable(); // Refresh to show updated value
+    renderBrokerAdminTable();
   }
 }
 
-  function getBrokerCommissionRate(brokerId) {
+function getBrokerCommissionRate(brokerId) {
   const broker = brokers.find(b => b.id === brokerId || b.id === String(brokerId));
-  // Returns the commission rate (0 if undefined/empty)
   return broker?.commissionRate || 0;
 }
 
 function renderAdminBrokerSubmissionsTable() {
   const container = document.getElementById('adminBrokerSubmissionsTable');
   if (!container) return;
-    container.innerHTML = brokerSubmissions.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).map(s => `
-      <tr>
-        <td style="font-size:12px;">${new Date(s.createdAt).toLocaleDateString()}</td>
-        <td>${escapeHtml(s.brokerName)}</td>
-        <td>${escapeHtml(s.clientName)}</td>
-        <td>${escapeHtml(s.projectName)}</td>
-        <td>$${s.fundsNeeded || 'TBD'}</td>
-        <td><span class="status-badge-${s.status === 'pending' ? 'pending' : s.status === 'active' ? 'active' : 'funded'}">${s.status === 'pending' ? 'Pending Review' : s.status === 'active' ? 'Active' : 'Funded'}</span></td>
-        <td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="viewBrokerSubmission('${s.id}')">View</button></td>
-      </table>
-    `).join('');
+  container.innerHTML = brokerSubmissions.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).map(s => `
+    <tr>
+      <td style="vertical-align:middle;font-size:12px;">${new Date(s.createdAt).toLocaleDateString()}</td>
+      <td style="vertical-align:middle;">${escapeHtml(s.brokerName)}</td>
+      <td style="vertical-align:middle;">${escapeHtml(s.clientName)}</td>
+      <td style="vertical-align:middle;">${escapeHtml(s.projectName)}</td>
+      <td style="vertical-align:middle;">$${s.fundsNeeded || 'TBD'}</td>
+      <td style="vertical-align:middle;"><span class="status-badge-${s.status === 'pending' ? 'pending' : s.status === 'active' ? 'active' : 'funded'}">${s.status === 'pending' ? 'Pending Review' : s.status === 'active' ? 'Active' : 'Funded'}</span></td>
+      <td style="vertical-align:middle;"><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="viewBrokerSubmission('${s.id}')">View</button></td>
+    </tr>
+  `).join('');
 }
 
 function viewBrokerSubmission(submissionId) {
@@ -5404,7 +5446,6 @@ function loadBrokerPortal() {
   const activeSubmissions = mySubmissions.filter(s => s.status === 'active');
   const fundedSubmissions = mySubmissions.filter(s => s.status === 'funded');
   
-  // Get broker's commission rate (could be 0 or undefined)
   const brokerRate = currentBroker.commissionRate || 0;
   const ratePercent = brokerRate / 100;
   
@@ -5417,31 +5458,29 @@ function loadBrokerPortal() {
   document.getElementById('brokerActiveDeals').textContent = activeSubmissions.length;
   document.getElementById('brokerFundedDeals').textContent = fundedSubmissions.length;
   
-// Show commission
-if (brokerRate > 0) {
-  document.getElementById('brokerEstCommission').textContent = '$' + totalCommission.toLocaleString();
-} else {
-  document.getElementById('brokerEstCommission').textContent = '$0';
-}
-
-// Add rate display to the Est. Commission Earned stat card
-const commissionStatCard = document.getElementById('brokerEstCommission')?.closest('.stat-card');
-if (commissionStatCard) {
-  let rateDisplay = commissionStatCard.querySelector('.commission-rate-display');
-  if (!rateDisplay) {
-    rateDisplay = document.createElement('div');
-    rateDisplay.className = 'commission-rate-display';
-    rateDisplay.style.fontSize = '10px';
-    rateDisplay.style.marginTop = '6px';
-    rateDisplay.style.color = 'var(--gray-500)';
-    commissionStatCard.appendChild(rateDisplay);
-  }
   if (brokerRate > 0) {
-    rateDisplay.innerHTML = `Your rate: <strong>${brokerRate}%</strong>`;
+    document.getElementById('brokerEstCommission').textContent = '$' + totalCommission.toLocaleString();
   } else {
-    rateDisplay.innerHTML = `⚠️ No commission rate set`;
+    document.getElementById('brokerEstCommission').textContent = '$0';
   }
-}
+  
+  const commissionStatCard = document.getElementById('brokerEstCommission')?.closest('.stat-card');
+  if (commissionStatCard) {
+    let rateDisplay = commissionStatCard.querySelector('.commission-rate-display');
+    if (!rateDisplay) {
+      rateDisplay = document.createElement('div');
+      rateDisplay.className = 'commission-rate-display';
+      rateDisplay.style.fontSize = '10px';
+      rateDisplay.style.marginTop = '6px';
+      rateDisplay.style.color = 'var(--gray-500)';
+      commissionStatCard.appendChild(rateDisplay);
+    }
+    if (brokerRate > 0) {
+      rateDisplay.innerHTML = `Your rate: <strong>${brokerRate}%</strong>`;
+    } else {
+      rateDisplay.innerHTML = `⚠️ No commission rate set`;
+    }
+  }
   
   renderBrokerSubmissions();
   loadBrokerMessages();
@@ -5453,11 +5492,11 @@ function renderBrokerSubmissions() {
   if (!tbody) return;
   tbody.innerHTML = mySubmissions.map(s => `
     <tr>
-      <td style="font-size:12px;">${new Date(s.createdAt).toLocaleDateString()}</td>
-      <td>${escapeHtml(s.clientName)}</td>
-      <td>${escapeHtml(s.projectName)}</td>
-      <td>$${s.fundsNeeded || 'TBD'}</td>
-      <td><span class="status-badge-${s.status === 'pending' ? 'pending' : s.status === 'active' ? 'active' : 'funded'}">${s.status === 'pending' ? 'Pending Review' : s.status === 'active' ? 'Active' : 'Funded'}</span></td>
+      <td style="vertical-align:middle;font-size:12px;">${new Date(s.createdAt).toLocaleDateString()}</td>
+      <td style="vertical-align:middle;">${escapeHtml(s.clientName)}</td>
+      <td style="vertical-align:middle;">${escapeHtml(s.projectName)}</td>
+      <td style="vertical-align:middle;">$${s.fundsNeeded || 'TBD'}</td>
+      <td style="vertical-align:middle;"><span class="status-badge-${s.status === 'pending' ? 'pending' : s.status === 'active' ? 'active' : 'funded'}">${s.status === 'pending' ? 'Pending Review' : s.status === 'active' ? 'Active' : 'Funded'}</span></td>
     </tr>
   `).join('');
 }
@@ -5562,7 +5601,6 @@ function openLuminSign(docId) {
     return; 
   }
   
-  // Auto-download the document
   downloadPDF(docId);
   
   const modalHtml = `
@@ -5731,10 +5769,6 @@ function createClient() {
     return; 
   }
 
-  // Save current admin info BEFORE creating new user
-  const wasAdmin = localStorage.getItem('croftAdminSession');
-  const adminEmail = wasAdmin ? 'suzana.aleksic@croftfinance.com' : null;
-
   firebase.auth().createUserWithEmailAndPassword(email, pass)
     .then(async (userCredential) => {
       const uid = userCredential.user.uid;
@@ -5790,31 +5824,21 @@ function createClient() {
       await logAudit('Admin created client', name + ' (' + email + ')', uid, pid);
       await generateAndStoreIVL(uid, pid);
       
-      // CRITICAL: Sign out the new client
       await firebase.auth().signOut();
       
-      // Clear any existing session
       localStorage.removeItem('croftSession');
       
-      // Show success message
       showToast(`Client ${name} created successfully!`);
       closeModal('addClientModal');
       
-      // Clear the form
       document.getElementById('ncName').value = '';
       document.getElementById('ncEmail').value = '';
       document.getElementById('ncPassword').value = '';
       document.getElementById('ncProject').value = '';
       
-      // If we were admin, restore admin view
-      if (wasAdmin) {
-        // Show admin login form
-        showAdminLogin();
-        openModal('loginModal');
-        showToast('Please log back in as admin to continue.');
-      } else {
-        fbReload();
-      }
+      showAdminLogin();
+      openModal('loginModal');
+      showToast('Please log back in as admin to continue.');
     })
     .catch((error) => {
       if (error.code === 'auth/email-already-in-use') {
