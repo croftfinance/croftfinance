@@ -3192,69 +3192,95 @@ function checkSession() {
   const sess = localStorage.getItem('croftSession');
   const adminSess = localStorage.getItem('croftAdminSession');
   const brokerSess = localStorage.getItem('croftBrokerSession');
-  
+
   if (adminSess) {
     const s = JSON.parse(adminSess);
     if (Date.now() - s.ts < 7 * 24 * 60 * 60 * 1000) {
-      setTimeout(() => { 
-        showView('admin'); 
-        loadAdminNotifications();
-        if (firebaseReady) initAdminListeners();
-        renderAdminTables(); 
-      }, 800);
-    } else { localStorage.removeItem('croftAdminSession'); }
+      // Wait for Firebase Auth state to restore before doing anything
+      firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+          showView('admin');
+          loadAdminNotifications();
+          renderAdminTables();
+          if (firebaseReady) {
+            initAdminListeners();
+          } else {
+            // Firebase not ready yet, wait for it
+            const waitForFirebase = setInterval(() => {
+              if (firebaseReady) {
+                clearInterval(waitForFirebase);
+                initAdminListeners();
+              }
+            }, 300);
+          }
+        } else {
+          // Auth state not restored, clear stale session
+          localStorage.removeItem('croftAdminSession');
+          showView('home');
+        }
+      });
+    } else {
+      localStorage.removeItem('croftAdminSession');
+    }
+
   } else if (brokerSess) {
     const s = JSON.parse(brokerSess);
     if (Date.now() - s.ts < 7 * 24 * 60 * 60 * 1000) {
-      setTimeout(() => {
-        const broker = brokers.find(b => b.id === s.brokerId);
-        if (broker && broker.status === 'active') {
-          currentBroker = broker;
-          showView('broker');
-          loadBrokerPortal();
+      firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+          const broker = brokers.find(b => b.id === s.brokerId);
+          if (broker && broker.status === 'active') {
+            currentBroker = broker;
+            showView('broker');
+            loadBrokerPortal();
+          } else {
+            localStorage.removeItem('croftBrokerSession');
+          }
+        } else {
+          localStorage.removeItem('croftBrokerSession');
         }
-      }, 800);
-    } else { localStorage.removeItem('croftBrokerSession'); }
+      });
+    } else {
+      localStorage.removeItem('croftBrokerSession');
+    }
+
   } else if (sess) {
     const s = JSON.parse(sess);
     if (Date.now() - s.ts < 7 * 24 * 60 * 60 * 1000) {
-      currentClient = { id: s.clientId, 
-        name: s.name || 'Client', 
-        email: s.email || '' };
-      const cp = projects.filter(
-        p => p.clientId === s.clientId);
-      if (cp.length) currentProjectId = cp[0].id;
-      showView('portal');
-      setTimeout(() => {
-        if (firebaseReady) {
-          loadFromFirebase().then(() => {
-            const freshClient = clients.find(
-              c => c.id === s.clientId);
-            if (freshClient && 
-              freshClient.status === 'active') {
-              currentClient = freshClient;
-              const fcp = projects.filter(
-                p => p.clientId === freshClient.id);
-              if (fcp.length) 
-                currentProjectId = fcp[0].id;
+      currentClient = { id: s.clientId, name: s.name || 'Client', email: s.email || '' };
+      firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+          showView('portal');
+          if (firebaseReady) {
+            loadFromFirebase().then(() => {
+              const freshClient = clients.find(c => c.id === s.clientId);
+              if (freshClient && freshClient.status === 'active') {
+                currentClient = freshClient;
+                const fcp = projects.filter(p => p.clientId === freshClient.id);
+                if (fcp.length) currentProjectId = fcp[0].id;
+                loadClientPortal();
+              } else {
+                logout();
+              }
+            });
+          } else {
+            const client = clients.find(c => c.id === s.clientId);
+            if (client && client.status === 'active') {
+              currentClient = client;
+              const cp = projects.filter(p => p.clientId === client.id);
+              if (cp.length) currentProjectId = cp[0].id;
               loadClientPortal();
             } else {
               logout();
             }
-          });
-        } else {
-          const client = clients.find(
-            c => c.id === s.clientId);
-          if (client && client.status === 'active') {
-            currentClient = client;
-            loadClientPortal();
-          } else {
-            logout();
           }
+        } else {
+          localStorage.removeItem('croftSession');
+          showView('home');
         }
-      }, 1000);
-    } else { 
-      localStorage.removeItem('croftSession'); 
+      });
+    } else {
+      localStorage.removeItem('croftSession');
     }
   }
 }
@@ -4221,6 +4247,16 @@ function getTimeAgo(date) { const seconds = Math.floor((new Date() - date) / 100
 function handleAdminNotificationClick(type, data) { closeAdminNotifications(); if (type === 'message') switchAdminTab('messages-admin', document.querySelector('[onclick*="messages-admin"]')); else if (type === 'meeting') switchAdminTab('meetings', document.querySelector('[onclick*="meetings"]')); else if (type === 'document') switchAdminTab('documents-admin', document.querySelector('[onclick*="documents-admin"]')); else if (type === 'registration' || type === 'submission') switchAdminTab('clients', document.querySelector('[onclick*="clients"]')); }
 function initAdminListeners() {
   if (!firebaseReady) return;
+
+  const currentUser = firebase.auth().currentUser;
+  if (!currentUser) {
+    console.warn('initAdminListeners: no authenticated user, waiting...');
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) initAdminListeners();
+    });
+    return;
+  }
+
   adminSessionStart = new Date();
 
   const safeListener = (query, handler) => {
