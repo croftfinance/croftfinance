@@ -3079,20 +3079,11 @@ const REQUIRED_DOCS = {
 // INITIALIZATION
 // ============================================================
 function init() {
-  setTimeout(() => {
-    const overlay = document.getElementById('loadingOverlay');
-    if (overlay) overlay.style.display = 'none';
-  }, 3000);
-  
   emailjs.init({ publicKey: EMAILJS_CONFIG.publicKey });
   checkCookies();
   setupNavScroll();
   checkSession();
   setupSessionTimeout();
-  
-  setTimeout(() => { 
-    if (!firebaseReady) document.getElementById('connectionBanner').style.display = 'block'; 
-  }, 8000);
   
   try {
     if (!firebase.apps.length) {
@@ -3125,23 +3116,11 @@ function resetSessionTimeout() {
 }
 
 async function loadFromFirebase() {
-    // Set a timeout to prevent infinite waiting
-    const timeoutPromise = new Promise((resolve) => {
-        setTimeout(() => {
-            console.log("Firebase load timeout - using localStorage fallback");
-            document.getElementById('loadingOverlay').style.display = 'none';
-            loadFromLocalStorage();
-            resolve();
-        }, 5000);
-    });
-    
-    // Main loading promise
-    const loadPromise = (async () => {
-        // Wait for Firebase Auth to be ready (with timeout)
+    try {
+        // Wait for Firebase Auth to be ready
         let user = firebase.auth().currentUser;
         
         if (!user) {
-            // Wait for auth state to resolve
             await new Promise((resolve) => {
                 const unsubscribe = firebase.auth().onAuthStateChanged((authUser) => {
                     unsubscribe();
@@ -3151,98 +3130,91 @@ async function loadFromFirebase() {
             });
         }
         
-        if (!user) {
-            console.log("No user logged in - using localStorage");
-            document.getElementById('loadingOverlay').style.display = 'none';
-            loadFromLocalStorage();
-            return;
-        }
+        console.log("User authenticated:", user?.email);
         
-        console.log("User authenticated:", user.email);
-        
-        try {
-            const collections = {
-                clients: db.collection('clients'),
-                projects: db.collection('projects'),
-                documents: db.collection('documents'),
-                messages: db.collection('messages'),
-                meetings: db.collection('meetings'),
-                auditLog: db.collection('auditLog').orderBy('timestamp', 'desc').limit(100),
-                brokers: db.collection('brokers'),
-                brokerSubmissions: db.collection('brokerSubmissions'),
-                brokerMessages: db.collection('brokerMessages'),
-                clientActivityLog: db.collection('clientActivityLog')
-            };
+        // Load all collections
+        const collections = {
+            clients: db.collection('clients'),
+            projects: db.collection('projects'),
+            documents: db.collection('documents'),
+            messages: db.collection('messages'),
+            meetings: db.collection('meetings'),
+            auditLog: db.collection('auditLog').orderBy('timestamp', 'desc').limit(100),
+            brokers: db.collection('brokers'),
+            brokerSubmissions: db.collection('brokerSubmissions'),
+            brokerMessages: db.collection('brokerMessages'),
+            clientActivityLog: db.collection('clientActivityLog')
+        };
 
-            const results = {};
-            
-            for (const [key, query] of Object.entries(collections)) {
-                try {
-                    const snapshot = await query.get();
-                    results[key] = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                    console.log(`Loaded ${key}: ${results[key].length} items`);
-                } catch(e) {
-                    console.warn(`Could not load ${key}:`, e.message);
-                    results[key] = [];
-                }
+        const results = {};
+        
+        for (const [key, query] of Object.entries(collections)) {
+            try {
+                const snapshot = await query.get();
+                results[key] = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                console.log(`Loaded ${key}: ${results[key].length} items`);
+            } catch(e) {
+                console.warn(`Could not load ${key}:`, e.message);
+                results[key] = [];
             }
+        }
 
-            clients = results.clients;
-            projects = results.projects;
-            documents = results.documents;
-            messages = results.messages;
-            meetings = results.meetings;
-            auditLog = results.auditLog;
-            brokers = results.brokers;
-            brokerSubmissions = results.brokerSubmissions;
-            brokerMessages = results.brokerMessages;
-            clientActivityLog = results.clientActivityLog;
+        clients = results.clients;
+        projects = results.projects;
+        documents = results.documents;
+        messages = results.messages;
+        meetings = results.meetings;
+        auditLog = results.auditLog;
+        brokers = results.brokers;
+        brokerSubmissions = results.brokerSubmissions;
+        brokerMessages = results.brokerMessages;
+        clientActivityLog = results.clientActivityLog;
 
-            firebaseReady = true;
-            
-            const banner = document.getElementById('connectionBanner');
-            const overlay = document.getElementById('loadingOverlay');
-            if (banner) banner.style.display = 'none';
-            if (overlay) overlay.style.display = 'none';
+        firebaseReady = true;
+        
+        const banner = document.getElementById('connectionBanner');
+        const overlay = document.getElementById('loadingOverlay');
+        if (banner) banner.style.display = 'none';
+        if (overlay) overlay.style.display = 'none';
 
-            // Check if user is admin
-            const adminEmails = ['suzana.aleksic@croftfinance.com', 'suzana@croftfinance.com'];
-            const isAdmin = adminEmails.includes(user.email);
-            
-            if (isAdmin) {
-                console.log("Admin logged in - loading admin panel");
-                renderAdminTables();
-                renderBrokerAdminTable();
+        // Check if user is admin
+        const adminEmails = ['suzana.aleksic@croftfinance.com', 'suzana@croftfinance.com'];
+        const isAdmin = adminEmails.includes(user?.email);
+        
+        if (isAdmin) {
+            console.log("Admin logged in - loading admin panel");
+            showView('admin');
+            renderAdminTables();
+            renderBrokerAdminTable();
+        } else if (user) {
+            // Regular client
+            currentClient = clients.find(c => c.id === user.uid);
+            if (currentClient) {
+                console.log("Client logged in:", currentClient.name);
+                const cp = projects.filter(p => p.clientId === currentClient.id);
+                if (cp.length) currentProjectId = cp[0].id;
+                showView('portal');
+                loadClientPortal();
             } else {
-                // Regular client
-                currentClient = clients.find(c => c.id === user.uid);
-                if (currentClient) {
-                    console.log("Client logged in:", currentClient.name);
-                    const cp = projects.filter(p => p.clientId === currentClient.id);
-                    if (cp.length) currentProjectId = cp[0].id;
-                    loadClientPortal();
-                } else {
-                    console.log("Client record not found, but user is authenticated");
-                    // Still show portal but with limited data
-                    showView('portal');
-                }
+                console.log("Client record not found, but user is authenticated");
+                showView('portal');
             }
-
-            checkForNotifications();
-            checkAllExpiries();
-            console.log("Firebase Sync Complete.");
-
-        } catch(e) { 
-            console.error('Critical Firebase load error:', e);
-            document.getElementById('loadingOverlay').style.display = 'none';
-            loadFromLocalStorage();
+        } else {
+            showView('home');
         }
-    })();
-    
-    // Race between timeout and actual load
-    await Promise.race([loadPromise, timeoutPromise]);
-}
 
+        checkForNotifications();
+        checkAllExpiries();
+        console.log("Firebase Sync Complete.");
+
+    } catch(e) { 
+        console.error('Critical Firebase load error:', e);
+        document.getElementById('loadingOverlay').style.display = 'none';
+        // Only fallback to localStorage if Firebase completely fails
+        loadFromLocalStorage();
+    }
+}
+  
 function loadFromLocalStorage() {
   clients = JSON.parse(localStorage.getItem('croft_clients') || '[]');
   projects = JSON.parse(localStorage.getItem('croft_projects') || '[]');
