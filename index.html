@@ -12,6 +12,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 <style>
 /* ========== YOUR EXISTING STYLES (PRESERVED) ========== */
 :root {
@@ -2606,7 +2607,7 @@ body {
 </head>
 <body>
 
-<div id="connectionBanner">⚠ Connection issue — your data may not be saved. Please refresh or contact suzana.aleksic@croftfinance.com</div>
+<div id="connectionBanner"></div>
 <div id="loadingOverlay"><div class="loading-logo">CROFT <span>FINANCE</span></div><div class="spinner"></div></div>
 
 <div id="notificationCenter" class="notification-center">
@@ -2614,6 +2615,7 @@ body {
   <div class="notification-list" id="notificationList"></div>
 </div>
 
+<!-- ========== HOME VIEW ========== -->
 <div id="view-home" class="view active">
   <nav class="home-nav" id="homeNav">
     <div class="nav-logo">CROFT <span>FINANCE</span></div>
@@ -2690,7 +2692,6 @@ body {
     </div>
   </section>
 
-  <!-- REQUEST A CONVERSATION SECTION -->
   <section class="section-contact-form" id="contact-form">
     <div class="contact-form-container" id="contactFormContainer">
       <div id="contactFormContent">
@@ -2723,6 +2724,7 @@ body {
   </footer>
 </div>
 
+<!-- ========== CLIENT PORTAL VIEW ========== -->
 <div id="view-portal" class="view">
   <nav class="portal-nav">
     <div style="display:flex;align-items:center;height:100%;"><button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()"><span></span><span></span><span></span></button><div class="portal-nav-brand">CROFT <span>FINANCE</span></div></div>
@@ -2757,7 +2759,7 @@ body {
     <main class="main-content">
       <div id="tab-dashboard" class="portal-tab active">
         <div id="adminNoteDisplay"></div>
-<div id="actionBannerDisplay"></div>
+        <div id="actionBannerDisplay"></div>
         <div id="dashboardTimelineWidget"></div>
         <div id="expiryAlertsContainer"></div>
         <div class="dashboard-hero">
@@ -2800,31 +2802,33 @@ body {
 
       <div id="tab-messages" class="portal-tab"><div class="page-header"><div class="page-title">Messages</div><div class="page-subtitle">Secure communication with Suzana Aleksić.</div></div><div class="card"><div class="card-body"><div class="messages-container"><div class="messages-list" id="messagesList"></div><div class="message-input"><input type="text" id="messageInput" autocomplete="off" placeholder="Write a message..." onkeypress="if(event.key==='Enter')sendMessage()"><button class="btn btn-primary" onclick="sendMessage()">Send</button></div></div></div></div></div>
 
-<div id="tab-schedule" class="portal-tab">
-  <div class="page-header">
-    <div class="page-title">Schedule a Meeting</div>
-    <div class="page-subtitle">Book a time directly with Suzana Aleksić</div>
-  </div>
-  <div class="card">
-    <div class="card-body" style="padding: 0; overflow: hidden; border-radius: 8px;">
-      <div style="background: #0a1628; padding: 20px; text-align: center; color: white;">
-        <i class="fas fa-calendar-alt" style="font-size: 32px; margin-bottom: 8px; display: block;"></i>
-        <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 24px;">Schedule with Suzana Aleksić</h3>
-        <p style="font-size: 13px; opacity: 0.8; margin-top: 4px;">30-minute meeting · Video or Phone Call</p>
+      <div id="tab-schedule" class="portal-tab">
+        <div class="page-header">
+          <div class="page-title">Schedule a Meeting</div>
+          <div class="page-subtitle">Book a time directly with Suzana Aleksić</div>
+        </div>
+        <div class="card">
+          <div class="card-body" style="padding: 0; overflow: hidden; border-radius: 8px;">
+            <div style="background: #0a1628; padding: 20px; text-align: center; color: white;">
+              <i class="fas fa-calendar-alt" style="font-size: 32px; margin-bottom: 8px; display: block;"></i>
+              <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 24px;">Schedule with Suzana Aleksić</h3>
+              <p style="font-size: 13px; opacity: 0.8; margin-top: 4px;">30-minute meeting · Video or Phone Call</p>
+            </div>
+            <div class="calendly-inline-widget" data-url="https://calendly.com/suzana-aleksic-croftfinance/30min" style="min-width:320px;height:700px;"></div>
+            <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
+            <div style="padding: 16px; background: var(--gray-50); text-align: center; font-size: 11px; color: var(--gray-500); border-top: 1px solid var(--gray-200);">
+              <i class="fas fa-lock"></i> All meetings are confidential. You will receive a calendar invitation with joining details.
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="calendly-inline-widget" data-url="https://calendly.com/suzana-aleksic-croftfinance/30min" style="min-width:320px;height:700px;"></div>
-      <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
-      <div style="padding: 16px; background: var(--gray-50); text-align: center; font-size: 11px; color: var(--gray-500); border-top: 1px solid var(--gray-200);">
-        <i class="fas fa-lock"></i> All meetings are confidential. You will receive a calendar invitation with joining details.
-      </div>
-    </div>
-  </div>
-</div>
+
       <div id="tab-projects" class="portal-tab"><div class="page-header"><div class="page-title">My Projects</div><div class="page-subtitle">All mandates associated with your account.</div></div><div id="projectsList"></div><div id="projectDetailView" style="display:none;margin-top:20px;"></div></div>
     </main>
   </div>
 </div>
 
+<!-- ========== ADMIN PORTAL VIEW ========== -->
 <div id="view-admin" class="view">
   <nav class="portal-nav">
     <div style="display:flex;align-items:center;height:100%;"><button class="hamburger" onclick="toggleAdminSidebar()"><span></span><span></span><span></span></button><div class="portal-nav-brand">CROFT <span>FINANCE</span> <span style="font-size:9px;letter-spacing:2px;color:var(--blue);margin-left:8px;font-family:'Jost',sans-serif;">ADMIN</span></div></div>
@@ -2841,11 +2845,10 @@ body {
         <div class="sidebar-section-label" style="margin-top:8px;">System</div><button class="nav-item" onclick="switchAdminTab('audit',this)"><i class="fas fa-history"></i> Audit Log</button>
       </div>
       <div style="margin-top: 20px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1);">
-    <button class="nav-item" onclick="switchToAdminLogin()" style="color: var(--blue);">
-      <i class="fas fa-exchange-alt"></i> Switch to Admin Login
-    </button>
-  </div>
-</div>
+        <button class="nav-item" onclick="switchToAdminLogin()" style="color: var(--blue);">
+          <i class="fas fa-exchange-alt"></i> Switch to Admin Login
+        </button>
+      </div>
     </aside>
     <main class="main-content">
       <div id="admin-overview" class="admin-tab active">
@@ -2868,7 +2871,7 @@ body {
 
       <div id="admin-projects-admin" class="admin-tab"><div class="page-header"><div class="page-title">Projects</div></div><div style="display:flex;justify-content:flex-end;margin-bottom:16px;"><button class="btn btn-primary" onclick="showAddClientModal()">+ Add Client & Project</button></div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Project</th><th>Industry</th><th>Location</th><th>Funds Needed</th><th>Current Step</th><th>CF</th><th>ECF</th><th>Actions</th></tr></thead><tbody id="adminProjectsTable"></tbody></table></div></div>
 
-      <div id="admin-documents-admin" class="admin-tab"><div class="page-header"><div class="page-title">Documents</div><div class="page-subtitle" id="docCount"></div></div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap;"><select id="adminDocFilterClient" class="form-select" style="max-width:250px;" onchange="renderAdminDocumentsTable()"><option value="">All Clients</option></select><button class="btn btn-primary" onclick="showUploadDocumentModal()">+ Upload Document</button></div><div class="table-wrap"><table class="documents-table" id="adminDocumentsTable"><thead><tr><th>Client</th><th>Project</th><th>Document Name</th><th>Step</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="adminDocumentsTableBody"></tbody></table></div></div></div>
+      <div id="admin-documents-admin" class="admin-tab"><div class="page-header"><div class="page-title">Documents</div><div class="page-subtitle" id="docCount"></div></div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap;"><select id="adminDocFilterClient" class="form-select" style="max-width:250px;" onchange="renderAdminDocumentsTable()"><option value="">All Clients</option></select><button class="btn btn-primary" onclick="showUploadDocumentModal()">+ Upload Document</button></div><div class="table-wrap"><table class="documents-table" id="adminDocumentsTable"><thead><tr><th>Client</th><th>Project</th><th>Document Name</th><th>Step</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="adminDocumentsTableBody"></tbody></table></div></div>
 
       <div id="admin-brokers" class="admin-tab"><div class="page-header"><div class="page-title">Brokers & Introducers</div><div class="page-subtitle">Manage broker registrations and view their submissions</div></div><div class="card"><div class="card-body"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Broker</th><th>Firm</th><th>Country</th><th>Commission</th><th>Status</th><th>Registered</th><th>Actions</th></tr></thead><tbody id="adminBrokersTable"></tbody></table></div></div></div></div>
 
@@ -2883,6 +2886,7 @@ body {
   </div>
 </div>
 
+<!-- ========== BROKER PORTAL VIEW ========== -->
 <div id="view-broker" class="view">
   <nav class="portal-nav">
     <div style="display:flex;align-items:center;height:100%;"><button class="hamburger" onclick="toggleBrokerSidebar()"><span></span><span></span><span></span></button><div class="portal-nav-brand">CROFT <span>FINANCE</span> <span style="font-size:9px;letter-spacing:2px;color:var(--blue);margin-left:8px;font-family:'Jost',sans-serif;">BROKER</span></div></div>
@@ -2904,6 +2908,7 @@ body {
   </div>
 </div>
 
+<!-- ========== MODALS ========== -->
 <div id="loginModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Client Portal</h3><button class="modal-close" onclick="closeModal('loginModal')">✕</button></div><div class="modal-body">
   <div id="loginForm"><div class="form-group"><label class="form-label">Email Address</label><input type="email" id="loginEmail" class="form-input" onkeypress="if(event.key==='Enter')login()"></div><div class="form-group"><label class="form-label">Password</label><input type="password" id="loginPassword" class="form-input" onkeypress="if(event.key==='Enter')login()"></div><p id="loginError" style="color:var(--error);font-size:12px;margin-bottom:12px;display:none;"></p><button class="btn btn-primary" onclick="login()" style="width:100%">Sign In</button><div style="text-align:center;margin-top:16px;font-size:13px;color:var(--gray-500);">New client? <a href="#" onclick="showRegisterForm()" style="color:var(--navy);font-weight:500;">Request portal access</a></div><div style="text-align:center;margin-top:8px;"><a href="#" onclick="showForgotPassword()" style="color:var(--gray-400);font-size:12px;">Forgot password?</a></div><div style="text-align:center;margin-top:4px;font-size:12px;"><a href="#" onclick="showBrokerLoginForm()" style="color:var(--gray-400);">Broker access</a></div><div style="text-align:center;margin-top:4px;font-size:12px;"><a href="#" onclick="showAdminLogin()" style="color:var(--gray-400);">Admin access</a></div></div>
   <div id="registerForm" style="display:none;"><div style="max-height:60vh;overflow-y:auto;padding-right:10px;"><div class="form-grid-2"><div class="form-group"><label class="form-label">Full Name *</label><input type="text" id="regName" class="form-input"></div><div class="form-group"><label class="form-label">Email Address *</label><input type="email" id="regEmail" class="form-input"></div><div class="form-group"><label class="form-label">Password *</label><input type="password" id="regPassword" class="form-input"></div><div class="form-group"><label class="form-label">Confirm Password *</label><input type="password" id="regConfirmPassword" class="form-input"></div></div><div class="form-group"><label class="form-label">Project / Company Name *</label><input type="text" id="regProject" class="form-input"></div><div class="form-grid-3"><div class="form-group"><label class="form-label">Industry *</label><select id="regIndustry" class="form-select"><option value="">Select...</option><option>Real Estate</option><option>Infrastructure</option><option>Energy & Renewables</option><option>Mining</option><option>Oil & Gas</option></select></div><div class="form-group"><label class="form-label">Project Location</label><input type="text" id="regLocation" class="form-input" placeholder="City, Country"></div><div class="form-group"><label class="form-label">Total Project Cost (USD)</label><input type="text" id="regTotalCost" class="form-input" placeholder="e.g., 100,000,000"></div></div><div class="form-grid-3"><div class="form-group"><label class="form-label">Sponsor Equity (USD)</label><input type="text" id="regSponsorEquity" class="form-input" placeholder="e.g., 30,000,000"></div><div class="form-group"><label class="form-label">Funds Needed (USD)</label><input type="text" id="regFundsNeeded" class="form-input" placeholder="e.g., 50,000,000"></div><div class="form-group"><label class="form-label">Current Stage</label><select id="regCurrentStage" class="form-select"><option value="">Select...</option><option>Pre-Development</option><option>Development</option><option>Operational</option><option>Expansion</option></select></div></div><div class="form-grid-3"><div class="form-group"><label class="form-label">Use of Funds</label><textarea id="regUseOfFunds" rows="2" class="form-textarea" placeholder="Describe how funds will be used..."></textarea></div><div class="form-group"><label class="form-label">Target IRR (%)</label><input type="text" id="regTargetIRR" class="form-input" placeholder="e.g., 18"></div><div class="form-group"><label class="form-label">Target Close Date</label><input type="date" id="regCloseDate" class="form-input"></div></div><div class="form-grid-3"><div class="form-group"><label class="form-label">MOIC (x)</label><input type="text" id="regMOIC" class="form-input" placeholder="e.g., 2.5"></div><div class="form-group"><label class="form-label">Yield/Cap Rate (%)</label><input type="text" id="regCapRate" class="form-input" placeholder="e.g., 8.5"></div><div class="form-group"><label class="form-label">Exit Strategy</label><select id="regExitStrategy" class="form-select"><option value="">Select...</option><option>Sale</option><option>Refinance</option><option>IPO</option><option>Hold</option><option>Joint Venture</option></select></div></div><div class="form-grid-3"><div class="form-group"><label class="form-label">Exit Cap Rate (%)</label><input type="text" id="regExitCapRate" class="form-input" placeholder="e.g., 7.5"></div><div class="form-group"><label class="form-label">Permits Obtained?</label><select id="regPermits" class="form-select"><option value="">Select...</option><option>Yes</option><option>No</option><option>In Progress</option></select></div><div class="form-group"><label class="form-label">Annual Revenue (USD)</label><input type="text" id="regRevenue" class="form-input" placeholder="Current or projected"></div></div><div class="form-grid-3"><div class="form-group"><label class="form-label">Asset Class</label><input type="text" id="regAssetClass" class="form-input" placeholder="Office/Retail/Industrial/etc"></div><div class="form-group"><label class="form-label">Infrastructure Type</label><input type="text" id="regInfraType" class="form-input" placeholder="Transport/Energy/Telecom/etc"></div><div class="form-group"><label class="form-label">Mineral Commodity</label><input type="text" id="regCommodity" class="form-input" placeholder="Gold/Copper/Lithium/etc"></div></div><div class="form-grid-3"><div class="form-group"><label class="form-label">Mining Stage</label><select id="regMiningStage" class="form-select"><option value="">Select...</option><option>Exploration</option><option>Development</option><option>Production</option><option>Reclamation</option></select></div><div class="form-group"><label class="form-label">Reserve Life (years)</label><input type="text" id="regReserveLife" class="form-input" placeholder="e.g., 15"></div><div class="form-group"><label class="form-label">Data Room Link</label><input type="url" id="regDataRoom" class="form-input" placeholder="https://..."></div></div><div class="form-group" style="display:flex;align-items:flex-start;gap:10px;margin-top:16px;"><input type="checkbox" id="ndaCheckbox" style="margin-top:3px;flex-shrink:0;"><label for="ndaCheckbox" style="font-size:12px;color:var(--gray-600);line-height:1.5;">I confirm that I have read and agree to the Croft Finance <a href="#" onclick="openModal('termsModal')" style="color:var(--navy);">Confidentiality and Portal Access Terms</a>.</label></div><p id="regError" style="color:var(--error);font-size:12px;margin-bottom:12px;display:none;"></p><button class="btn btn-primary" onclick="register()" style="width:100%">Submit Registration</button></div><div style="text-align:center;margin-top:14px;font-size:13px;"><a href="#" onclick="showLoginForm()" style="color:var(--gray-500);">← Back to sign in</a></div></div>
@@ -2913,7 +2918,7 @@ body {
   <div id="brokerRegisterForm" style="display:none;"><div style="max-height:60vh;overflow-y:auto;padding-right:10px;"><div class="form-grid-2"><div class="form-group"><label class="form-label">Full Name *</label><input type="text" id="brokerRegName" class="form-input"></div><div class="form-group"><label class="form-label">Email *</label><input type="email" id="brokerRegEmail" class="form-input"></div><div class="form-group"><label class="form-label">Password *</label><input type="password" id="brokerRegPassword" class="form-input"></div><div class="form-group"><label class="form-label">Confirm Password *</label><input type="password" id="brokerRegConfirmPassword" class="form-input"></div><div class="form-group"><label class="form-label">Brokerage Firm Name *</label><input type="text" id="brokerRegFirm" class="form-input"></div><div class="form-group"><label class="form-label">Country of Operation *</label><input type="text" id="brokerRegCountry" class="form-input"></div><div class="form-group"><label class="form-label">License Number</label><input type="text" id="brokerRegLicense" class="form-input" placeholder="Optional"></div><div class="form-group"><label class="form-label">How did you hear about us?</label><select id="brokerRegHear" class="form-select"><option>Search Engine</option><option>LinkedIn</option><option>Referral</option><option>Conference</option><option>Other</option></select></div></div><div class="form-group" style="display:flex;align-items:flex-start;gap:10px;"><input type="checkbox" id="brokerNdaCheckbox" style="margin-top:3px;"><label style="font-size:12px;">I agree to the <a href="#" onclick="openModal('termsModal')">Confidentiality and Broker Terms</a></label></div><p id="brokerRegError" style="color:var(--error);font-size:12px;display:none;"></p><button class="btn btn-primary" onclick="brokerRegister()" style="width:100%">Register as Broker</button></div><div style="text-align:center;margin-top:14px;"><a href="#" onclick="showBrokerLoginForm()" style="color:var(--gray-500);">← Back to Broker Sign In</a></div></div>
 </div></div></div>
 
-<div id="uploadDocumentModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Upload Document</h3><button class="modal-close" onclick="closeModal('uploadDocumentModal')">✕</button></div><div class="modal-body"><div class="form-group"><label class="form-label">Client</label><select id="uploadClientId" class="form-select" onchange="updateProjectSelectForUpload(this.value)"><option value="">Select Client</option></select></div><div class="form-group"><label class="form-label">Project</label><select id="uploadProjectId" class="form-select"><option value="">Select Project</option></select></div><div class="form-group"><label class="form-label">Document Type</label><select id="documentType" class="form-select"><option>Indicative Term Sheet (Non-Binding)</option><option>Executed Term Sheet (Binding)</option><option>Commitment Fee Confirmation</option><option>Deed of Undertaking</option><option>ECF Guarantee Policy</option><option>Hard-Copy Closing Materials</option><option>ECF Escrow Confirmation</option><option>Transfer Confirmation</option><option>Funding Disbursement Confirmation</option><option>Other</option></select></div><div class="form-group"><label class="form-label">PDF File</label><input type="file" id="pdfFile" class="form-input" accept=".pdf"></div><div class="form-group"><label class="form-label">Or Document URL</label><input type="url" id="documentUrl" class="form-input" placeholder="https://..."></div><button class="btn btn-primary" onclick="uploadDocument()" style="width:100%">Upload</button></div></div></div>
+<div id="uploadDocumentModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Upload Document</h3><button class="modal-close" onclick="closeModal('uploadDocumentModal')">✕</button></div><div class="modal-body"><div class="form-group"><label class="form-label">Client</label><select id="uploadClientId" class="form-select" onchange="updateProjectSelectForUpload(this.value)"><option value="">Select Client</option></select></div><div class="form-group"><label class="form-label">Project</label><select id="uploadProjectId" class="form-select"><option value="">Select Project</option></select></div><div class="form-group"><label class="form-label">Document Type</label><select id="documentType" class="form-select"><option>Indicative Term Sheet (Non-Binding)</option><option>Executed Term Sheet (Binding)</option><option>Commitment Fee Confirmation</option><option>Deed of Undertaking</option><option>ECF Guarantee Policy</option><option>Hard-Copy Closing Materials</option><option>ECF Escrow Confirmation</option><option>Transfer Confirmation</option><option>Funding Disbursement Confirmation</option><option>Other</option></select></div><div class="form-group"><label class="form-label">PDF File</label><input type="file" id="pdfFile" class="form-input" accept=".pdf"></div><div class="form-group"><label class="form-label">Or Document URL</label><input type="url" id="documentUrl" class="form-input" placeholder="https://..."></div><button class="btn btn-primary" onclick="adminUploadDocument()" style="width:100%">Upload</button></div></div></div>
 
 <div id="editProjectModal" class="modal-overlay"><div class="modal modal-lg"><div class="modal-header"><h3>Edit Project</h3><button class="modal-close" onclick="closeModal('editProjectModal')">✕</button></div><div class="modal-body" style="max-height:70vh;overflow-y:auto;">
   <div class="form-grid-2">
@@ -2942,7 +2947,7 @@ body {
     <div class="form-group"><label class="form-label">Facility Amount</label><input type="text" id="editAmount" class="form-input"></div>
     <div class="form-group"><label class="form-label">Interest Rate</label><input type="text" id="editRate" class="form-input"></div>
     <div class="form-group"><label class="form-label">Term (years)</label><input type="text" id="editTerm" class="form-input"></div>
-        <div class="form-group"><label class="form-label">Grace Period (months)</label><input type="text" id="editGrace" class="form-input"></div>
+    <div class="form-group"><label class="form-label">Grace Period (months)</label><input type="text" id="editGrace" class="form-input"></div>
     <div class="form-group"><label class="form-label">ECF Amount</label><input type="text" id="editECF" class="form-input"></div>
     <div class="form-group"><label class="form-label">Next Milestone</label><input type="text" id="editNext" class="form-input"></div>
     <div class="form-group"><label class="form-label">Current Step</label><select id="editStep" class="form-select"><option value="1">Step 1: Term Sheet</option><option value="2">Step 2: Commitment Fee</option><option value="3">Step 3: Deed of Undertaking</option><option value="4">Step 4: Credit Support</option><option value="5">Step 5: Hard-Copy Submission</option><option value="6">Step 6: ECF Escrow</option><option value="7">Step 7: Transfer to Agent</option><option value="8">Step 8: Funded</option></select></div>
@@ -3006,6 +3011,7 @@ body {
 <div id="privacyModal" class="modal-overlay"><div class="modal modal-lg"><div class="modal-header"><h3>Privacy Policy</h3><button class="modal-close" onclick="closeModal('privacyModal')">✕</button></div><div class="modal-body" style="font-size:13px;line-height:1.8;color:var(--gray-700);"><p><strong>Data Controller:</strong> Croft Finance, represented by Suzana Aleksić, Principal. Contact: suzana.aleksic@croftfinance.com</p><p style="margin-top:12px;"><strong>Data Collected:</strong> Name, email address, password (hashed), project information, messages, meeting requests, and document metadata submitted through this portal.</p><p style="margin-top:12px;"><strong>Purpose:</strong> To provide secure client portal access, facilitate deal management, and communicate regarding your financing mandate.</p><p style="margin-top:12px;"><strong>Legal Basis:</strong> Contractual necessity and legitimate interests in providing financial intermediation services.</p><p style="margin-top:12px;"><strong>Retention:</strong> Data is retained for the duration of the business relationship plus 5 years, in accordance with applicable financial record-keeping requirements.</p><p style="margin-top:12px;"><strong>Your Rights:</strong> You have the right to access, correct, erase, and export your personal data. You may also object to processing. To exercise these rights, contact suzana.aleksic@croftfinance.com.</p><p style="margin-top:12px;"><strong>Data Storage:</strong> Data is stored securely using Google Firebase Firestore infrastructure with encryption at rest and in transit.</p><p style="margin-top:12px;"><strong>Third Parties:</strong> We use EmailJS for notification delivery and Firebase (Google) for data storage. No data is sold or shared with any other third parties.</p></div></div></div>
 
 <div id="termsModal" class="modal-overlay"><div class="modal modal-lg"><div class="modal-header"><h3>Confidentiality & Portal Access Terms</h3><button class="modal-close" onclick="closeModal('termsModal')">✕</button></div><div class="modal-body" style="font-size:13px;line-height:1.8;color:var(--gray-700);"><p><strong>1. Confidentiality.</strong> All information shared through this portal, including but not limited to deal terms, financing structures, investor identity, and transaction documentation, is strictly confidential. You agree not to disclose any such information to third parties without the prior written consent of Croft Finance.</p><p style="margin-top:12px;"><strong>2. Permitted Use.</strong> Access to this portal is granted solely for the purpose of managing your financing mandate with Croft Finance. Any other use is prohibited.</p><p style="margin-top:12px;"><strong>3. Investor Confidentiality.</strong> The identity of Croft Finance's capital partners is not disclosed as a condition of their participation. This is standard practice in private capital markets and does not affect the validity or enforceability of any agreement entered into.</p><p style="margin-top:12px;"><strong>4. No Solicitation.</strong> You agree not to solicit or approach Croft Finance's capital partners directly or through intermediaries without the express written permission of Croft Finance.</p><p style="margin-top:12px;"><strong>5. Governing Law.</strong> These terms are governed by the laws of the Republic of Serbia, without prejudice to any other governing law agreed in transaction documents.</p><p style="margin-top:12px;"><strong>6. Acceptance.</strong> By registering for portal access, you confirm that you have read, understood, and agree to be bound by these terms.</p></div></div></div>
+
 <div id="fullTermsModal" class="modal-overlay"><div class="modal modal-lg"><div class="modal-header"><h3>Terms & Conditions</h3><button class="modal-close" onclick="closeModal('fullTermsModal')">✕</button></div><div class="modal-body" style="font-size:13px;line-height:1.8;color:var(--gray-700);max-height:70vh;overflow-y:auto;">
   <p style="font-size:11px;color:var(--gray-500);margin-bottom:20px;"><strong>Last Updated:</strong> April 06, 2026</p>
   <p><strong>Welcome to Croft Finance.</strong> These Terms and Conditions ("Terms") govern your access to and use of our website and related services. By using this site, you agree to be bound by these Terms. If you do not agree, do not use the site.</p>
@@ -3020,21 +3026,24 @@ body {
   <p style="margin-top:16px;"><strong>10. Changes to These Terms</strong><br>We may update these Terms at any time. The "Last Updated" date at the top indicates when changes were made. Your continued use of the site after changes constitutes acceptance of the revised Terms.</p>
   <p style="margin-top:16px;"><strong>11. Contact</strong><br>For questions about these Terms, contact Croft Finance at <a href="mailto:suzana.aleksic@croftfinance.com" style="color:var(--blue);">suzana.aleksic@croftfinance.com</a>.</p>
 </div></div></div>
+
 <div id="printArea" style="display:none;"></div>
 <div id="cookieBanner"><span>Croft Finance uses essential cookies to operate this portal. By continuing you accept our <a href="#" onclick="openModal('privacyModal')">Privacy Policy</a>.</span><button class="btn btn-sm btn-sm-primary" onclick="acceptCookies()">Accept</button></div>
 
 <script>
 // ============================================================
-// FIREBASE CONFIGURATION (Your existing Firebase project)
+// FIREBASE CONFIGURATION
 // ============================================================
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyCt76DoCS-ysPspUkUnIokAWLf255GzurY",
   authDomain: "croft-finance-52a4d.firebaseapp.com",
   databaseURL: "https://croft-finance-52a4d-default-rtdb.firebaseio.com",
   projectId: "croft-finance-52a4d",
+  storageBucket: "croft-finance-52a4d.firebasestorage.app",
   messagingSenderId: "718693826553",
   appId: "1:718693826553:web:c764558447a34cccd74728"
 };
+
 const EMAILJS_CONFIG = {
   publicKey: "sgayReNOC1AIqBIZb",
   serviceId: "service_ri050ye",
@@ -3043,11 +3052,23 @@ const EMAILJS_CONFIG = {
 };
 
 // Global state
-let db = null, firebaseReady = false;
-let clients = [], projects = [], documents = [], messages = [], meetings = [], auditLog = [], notifications = [];
-let brokers = [], brokerSubmissions = [], brokerMessages = [];
+let db = null;
+let storage = null;
+let firebaseReady = false;
+let clients = [];
+let projects = [];
+let documents = [];
+let messages = [];
+let meetings = [];
+let auditLog = [];
+let notifications = [];
+let brokers = [];
+let brokerSubmissions = [];
+let brokerMessages = [];
 let clientActivityLog = [];
-let currentClient = null, currentProjectId = null, currentBroker = null;
+let currentClient = null;
+let currentProjectId = null;
+let currentBroker = null;
 let failedLoginAttempts = new Map();
 let sessionTimeout = null;
 let adminNotifications = [];
@@ -3058,6 +3079,7 @@ let adminMeetingUnsubscribe = null;
 let adminDocumentUnsubscribe = null;
 let adminClientUnsubscribe = null;
 let browserNotificationPermission = false;
+let unsubscribeListeners = [];
 
 const STEP_NAMES = ['', 'Term Sheet', 'Commitment Fee', 'Deed of Undertaking', 'Credit Support', 'Hard-Copy Submission', 'ECF Escrow', 'Transfer to Agent', 'Funded'];
 const STEP_WHO = ['', 'client', 'client', 'both', 'croft', 'client', 'client', 'croft', 'croft'];
@@ -3076,470 +3098,340 @@ const REQUIRED_DOCS = {
 };
 
 // ============================================================
+// FIREBASE STORAGE FUNCTIONS
+// ============================================================
+
+async function uploadDocumentToStorage(file, clientId, projectId, docType) {
+  if (!storage) throw new Error('Storage not initialized');
+  
+  const timestamp = Date.now();
+  const sanitizedType = docType.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+  const filename = `${timestamp}_${sanitizedType}.pdf`;
+  const storagePath = `documents/${clientId}/${projectId}/${filename}`;
+  
+  const storageRef = storage.ref(storagePath);
+  const metadata = {
+    contentType: 'application/pdf',
+    customMetadata: {
+      uploadedBy: clientId,
+      projectId: projectId,
+      documentType: docType,
+      uploadedAt: new Date().toISOString()
+    }
+  };
+  
+  const uploadTask = storageRef.put(file, metadata);
+  
+  return new Promise((resolve, reject) => {
+    uploadTask.on('state_changed',
+      (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log(`Upload progress: ${progress}%`);
+      },
+      (error) => reject(error),
+      async () => {
+        const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+        resolve(downloadURL);
+      }
+    );
+  });
+}
+
+async function deleteDocumentFromStorage(storagePath) {
+  if (!storage || !storagePath) return;
+  try {
+    const storageRef = storage.ref(storagePath);
+    await storageRef.delete();
+  } catch (error) {
+    console.error('Storage delete error:', error);
+  }
+}
+
+// ============================================================
 // INITIALIZATION
 // ============================================================
-function init() {
-  emailjs.init({ publicKey: EMAILJS_CONFIG.publicKey });
-  checkCookies();
-  setupNavScroll();
-  checkSession();
-  setupSessionTimeout();
-  
+
+async function initFirebase() {
   try {
     if (!firebase.apps.length) {
       firebase.initializeApp(FIREBASE_CONFIG);
     }
+    
     db = firebase.firestore();
+    storage = firebase.storage();
+    
+    await db.enablePersistence({ synchronizeTabs: true })
+      .catch(err => {
+        if (err.code === 'failed-precondition') {
+          console.warn('Multiple tabs open, persistence disabled');
+        }
+      });
+    
     firebaseReady = true;
-    loadFromFirebase();
+    
+    setupRealtimeListeners();
+    await loadFromFirebase();
+    
+    document.getElementById('loadingOverlay').style.display = 'none';
   } catch(e) { 
     console.error("Firebase init error:", e);
-    loadFromLocalStorage(); 
+    document.getElementById('loadingOverlay').style.display = 'none';
+    showToast('Connection error. Please refresh the page.', true);
+  }
+}
+
+function setupRealtimeListeners() {
+  unsubscribeListeners.forEach(unsub => unsub());
+  unsubscribeListeners = [];
+  
+  const user = firebase.auth().currentUser;
+  if (!user) return;
+  
+  const adminEmails = ['suzana.aleksic@croftfinance.com', 'suzana@croftfinance.com'];
+  const isAdminUser = adminEmails.includes(user.email);
+  
+  if (isAdminUser) {
+    unsubscribeListeners.push(
+      db.collection('clients').onSnapshot(snapshot => {
+        snapshot.docChanges().forEach(change => {
+          const data = { id: change.doc.id, ...change.doc.data() };
+          if (change.type === 'added') clients.push(data);
+          if (change.type === 'modified') {
+            const index = clients.findIndex(c => c.id === data.id);
+            if (index !== -1) clients[index] = data;
+          }
+          if (change.type === 'removed') {
+            clients = clients.filter(c => c.id !== data.id);
+          }
+        });
+        renderAdminTables();
+      }),
+      
+      db.collection('projects').onSnapshot(snapshot => {
+        snapshot.docChanges().forEach(change => {
+          const data = { id: change.doc.id, ...change.doc.data() };
+          if (change.type === 'added') projects.push(data);
+          if (change.type === 'modified') {
+            const index = projects.findIndex(p => p.id === data.id);
+            if (index !== -1) projects[index] = data;
+          }
+          if (change.type === 'removed') {
+            projects = projects.filter(p => p.id !== data.id);
+          }
+        });
+        renderAdminTables();
+        if (currentClient) loadCurrentProjectData();
+      })
+    );
+  } else {
+    const clientId = user.uid;
+    unsubscribeListeners.push(
+      db.collection('projects')
+        .where('clientId', '==', clientId)
+        .onSnapshot(snapshot => {
+          snapshot.docChanges().forEach(change => {
+            const data = { id: change.doc.id, ...change.doc.data() };
+            if (change.type === 'added') projects.push(data);
+            if (change.type === 'modified') {
+              const index = projects.findIndex(p => p.id === data.id);
+              if (index !== -1) projects[index] = data;
+            }
+            if (change.type === 'removed') {
+              projects = projects.filter(p => p.id !== data.id);
+            }
+          });
+          if (projects.length) {
+            currentProjectId = projects[0].id;
+            loadCurrentProjectData();
+          }
+        }),
+      
+      db.collection('messages')
+        .where('clientId', '==', clientId)
+        .orderBy('timestamp', 'asc')
+        .onSnapshot(() => {
+          if (currentClient) {
+            loadMessages();
+            updateMsgBadge();
+          }
+        }),
+      
+      db.collection('documents')
+        .where('clientId', '==', clientId)
+        .onSnapshot(() => {
+          if (currentClient && document.querySelector('#tab-documents.active')) {
+            renderDocuments();
+          }
+        })
+    );
+  }
+}
+
+async function loadFromFirebase() {
+  try {
+    let user = firebase.auth().currentUser;
+    
+    if (!user) {
+      await new Promise((resolve) => {
+        const unsubscribe = firebase.auth().onAuthStateChanged((authUser) => {
+          unsubscribe();
+          user = authUser;
+          resolve();
+        });
+      });
+    }
+    
+    console.log("User authenticated:", user?.email);
+    
+    const collections = {
+      clients: db.collection('clients'),
+      projects: db.collection('projects'),
+      documents: db.collection('documents'),
+      messages: db.collection('messages'),
+      meetings: db.collection('meetings'),
+      auditLog: db.collection('auditLog').orderBy('timestamp', 'desc').limit(100),
+      brokers: db.collection('brokers'),
+      brokerSubmissions: db.collection('brokerSubmissions'),
+      brokerMessages: db.collection('brokerMessages'),
+      clientActivityLog: db.collection('clientActivityLog')
+    };
+    
+    const results = {};
+    
+    for (const [key, query] of Object.entries(collections)) {
+      try {
+        const snapshot = await query.get();
+        results[key] = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        console.log(`Loaded ${key}: ${results[key].length} items`);
+      } catch(e) {
+        console.warn(`Could not load ${key}:`, e.message);
+        results[key] = [];
+      }
+    }
+    
+    clients = results.clients;
+    projects = results.projects;
+    documents = results.documents;
+    messages = results.messages;
+    meetings = results.meetings;
+    auditLog = results.auditLog;
+    brokers = results.brokers;
+    brokerSubmissions = results.brokerSubmissions;
+    brokerMessages = results.brokerMessages;
+    clientActivityLog = results.clientActivityLog;
+    
+    firebaseReady = true;
+    
+    const banner = document.getElementById('connectionBanner');
+    const overlay = document.getElementById('loadingOverlay');
+    if (banner) banner.style.display = 'none';
+    if (overlay) overlay.style.display = 'none';
+    
+    const adminEmails = ['suzana.aleksic@croftfinance.com', 'suzana@croftfinance.com'];
+    const isAdmin = adminEmails.includes(user?.email);
+    
+    if (isAdmin) {
+      console.log("Admin logged in - loading admin panel");
+      showView('admin');
+      renderAdminTables();
+      renderBrokerAdminTable();
+    } else if (user) {
+      currentClient = clients.find(c => c.id === user.uid);
+      if (currentClient) {
+        console.log("Client logged in:", currentClient.name);
+        const cp = projects.filter(p => p.clientId === currentClient.id);
+        if (cp.length) currentProjectId = cp[0].id;
+        showView('portal');
+        loadClientPortal();
+      } else {
+        console.log("Client record not found, but user is authenticated");
+        showView('portal');
+      }
+    } else {
+      showView('home');
+    }
+    
+    checkForNotifications();
+    checkAllExpiries();
+    console.log("Firebase Sync Complete.");
+    
+  } catch(e) { 
+    console.error('Critical Firebase load error:', e);
     document.getElementById('loadingOverlay').style.display = 'none';
   }
 }
 
-function setupSessionTimeout() {
-  const events = ['click', 'keypress', 'mousemove', 'scroll'];
-  events.forEach(event => window.addEventListener(event, resetSessionTimeout));
-  resetSessionTimeout();
-}
-
-function resetSessionTimeout() {
-  if (sessionTimeout) clearTimeout(sessionTimeout);
-  sessionTimeout = setTimeout(() => {
-    if (currentClient || localStorage.getItem('croftSession') || currentBroker || localStorage.getItem('croftBrokerSession')) {
-      showToast('Session expired due to inactivity. Please log in again.');
-      logout();
-    }
-  }, 30 * 60 * 1000);
-}
-
-async function loadFromFirebase() {
-    try {
-        // Wait for Firebase Auth to be ready
-        let user = firebase.auth().currentUser;
-        
-        if (!user) {
-            await new Promise((resolve) => {
-                const unsubscribe = firebase.auth().onAuthStateChanged((authUser) => {
-                    unsubscribe();
-                    user = authUser;
-                    resolve();
-                });
-            });
-        }
-        
-        console.log("User authenticated:", user?.email);
-        
-        // Load all collections
-        const collections = {
-            clients: db.collection('clients'),
-            projects: db.collection('projects'),
-            documents: db.collection('documents'),
-            messages: db.collection('messages'),
-            meetings: db.collection('meetings'),
-            auditLog: db.collection('auditLog').orderBy('timestamp', 'desc').limit(100),
-            brokers: db.collection('brokers'),
-            brokerSubmissions: db.collection('brokerSubmissions'),
-            brokerMessages: db.collection('brokerMessages'),
-            clientActivityLog: db.collection('clientActivityLog')
-        };
-
-        const results = {};
-        
-        for (const [key, query] of Object.entries(collections)) {
-            try {
-                const snapshot = await query.get();
-                results[key] = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                console.log(`Loaded ${key}: ${results[key].length} items`);
-            } catch(e) {
-                console.warn(`Could not load ${key}:`, e.message);
-                results[key] = [];
-            }
-        }
-
-        clients = results.clients;
-        projects = results.projects;
-        documents = results.documents;
-        messages = results.messages;
-        meetings = results.meetings;
-        auditLog = results.auditLog;
-        brokers = results.brokers;
-        brokerSubmissions = results.brokerSubmissions;
-        brokerMessages = results.brokerMessages;
-        clientActivityLog = results.clientActivityLog;
-
-        firebaseReady = true;
-        
-        const banner = document.getElementById('connectionBanner');
-        const overlay = document.getElementById('loadingOverlay');
-        if (banner) banner.style.display = 'none';
-        if (overlay) overlay.style.display = 'none';
-
-        // Check if user is admin
-        const adminEmails = ['suzana.aleksic@croftfinance.com', 'suzana@croftfinance.com'];
-        const isAdmin = adminEmails.includes(user?.email);
-        
-        if (isAdmin) {
-            console.log("Admin logged in - loading admin panel");
-            showView('admin');
-            renderAdminTables();
-            renderBrokerAdminTable();
-        } else if (user) {
-            // Regular client
-            currentClient = clients.find(c => c.id === user.uid);
-            if (currentClient) {
-                console.log("Client logged in:", currentClient.name);
-                const cp = projects.filter(p => p.clientId === currentClient.id);
-                if (cp.length) currentProjectId = cp[0].id;
-                showView('portal');
-                loadClientPortal();
-            } else {
-                console.log("Client record not found, but user is authenticated");
-                showView('portal');
-            }
-        } else {
-            showView('home');
-        }
-
-        checkForNotifications();
-        checkAllExpiries();
-        console.log("Firebase Sync Complete.");
-
-    } catch(e) { 
-        console.error('Critical Firebase load error:', e);
-        document.getElementById('loadingOverlay').style.display = 'none';
-        // Only fallback to localStorage if Firebase completely fails
-        loadFromLocalStorage();
-    }
-}
-  
-function loadFromLocalStorage() {
-  clients = JSON.parse(localStorage.getItem('croft_clients') || '[]');
-  projects = JSON.parse(localStorage.getItem('croft_projects') || '[]');
-  documents = JSON.parse(localStorage.getItem('croft_documents') || '[]');
-  messages = JSON.parse(localStorage.getItem('croft_messages') || '[]');
-  meetings = JSON.parse(localStorage.getItem('croft_meetings') || '[]');
-  brokers = JSON.parse(localStorage.getItem('croft_brokers') || '[]');
-  brokerSubmissions = JSON.parse(localStorage.getItem('croft_brokerSubmissions') || '[]');
-  brokerMessages = JSON.parse(localStorage.getItem('croft_brokerMessages') || '[]');
-  clientActivityLog = JSON.parse(localStorage.getItem('croft_client_activity') || '[]');
-  document.getElementById('loadingOverlay').style.display = 'none';
-  renderAdminTables();
-  renderBrokerAdminTable();
-}
-
-function saveLocal() {
-  localStorage.setItem('croft_clients', JSON.stringify(clients));
-  localStorage.setItem('croft_projects', JSON.stringify(projects));
-  localStorage.setItem('croft_documents', JSON.stringify(documents));
-  localStorage.setItem('croft_messages', JSON.stringify(messages));
-  localStorage.setItem('croft_meetings', JSON.stringify(meetings));
-  localStorage.setItem('croft_brokers', JSON.stringify(brokers));
-  localStorage.setItem('croft_brokerSubmissions', JSON.stringify(brokerSubmissions));
-  localStorage.setItem('croft_brokerMessages', JSON.stringify(brokerMessages));
-  localStorage.setItem('croft_client_activity', JSON.stringify(clientActivityLog));
-}
-
-function saveBrokersLocal() {
-  localStorage.setItem('croft_brokers', JSON.stringify(brokers));
-  localStorage.setItem('croft_brokerSubmissions', JSON.stringify(brokerSubmissions));
-  localStorage.setItem('croft_brokerMessages', JSON.stringify(brokerMessages));
-}
-
 async function fbSet(col, id, data) { 
-  if (!firebaseReady) { saveLocal(); return; } 
+  if (!firebaseReady) return; 
   try {
     await db.collection(col).doc(String(id)).set(data);
   } catch(e) {
     console.error(`fbSet error for ${col}/${id}:`, e);
-    saveLocal();
   }
 }
 
 async function fbUpdate(col, id, data) { 
-  if (!firebaseReady) { saveLocal(); return; } 
+  if (!firebaseReady) return; 
   try {
     await db.collection(col).doc(String(id)).update(data);
   } catch(e) {
     console.error(`fbUpdate error for ${col}/${id}:`, e);
-    saveLocal();
   }
 }
 
 async function fbDelete(col, id) { 
-  if (!firebaseReady) { saveLocal(); return; } 
+  if (!firebaseReady) return; 
   try {
     await db.collection(col).doc(String(id)).delete();
   } catch(e) {
     console.error(`fbDelete error for ${col}/${id}:`, e);
-    saveLocal();
   }
-}
-
-async function fbReload() { 
-  if (firebaseReady) await loadFromFirebase(); 
-  else { renderAdminTables(); if(currentClient) loadClientPortal(); } 
 }
 
 async function logAudit(action, details = '', targetClientId = '', targetProjectId = '') {
-  const entry = { action, details, targetClientId, targetProjectId, performedBy: currentClient ? currentClient.name : 'Admin', timestamp: new Date().toISOString() };
-  if (firebaseReady) { try { await db.collection('auditLog').add(entry); } catch(e) {} }
-  auditLog.unshift(entry);
+  const entry = { 
+    action, 
+    details, 
+    targetClientId, 
+    targetProjectId, 
+    performedBy: currentClient ? currentClient.name : 'Admin', 
+    timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+  };
+  if (firebaseReady) { 
+    try { 
+      await db.collection('auditLog').add(entry); 
+    } catch(e) {} 
+  }
+  auditLog.unshift({ ...entry, timestamp: new Date().toISOString() });
   if (auditLog.length > 100) auditLog.pop();
 }
 
-function checkSession() {
-  const sess = localStorage.getItem('croftSession');
-  const adminSess = localStorage.getItem('croftAdminSession');
-  const brokerSess = localStorage.getItem('croftBrokerSession');
-  
-  if (adminSess) {
+async function logClientActivity(clientId, projectId, action, description, performedBy) {
+  const entry = { 
+    clientId: String(clientId), 
+    projectId: String(projectId), 
+    action, 
+    description, 
+    performedBy, 
+    timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+  };
+  if (firebaseReady) {
     try {
-      const s = JSON.parse(adminSess);
-      if (Date.now() - s.ts < 7 * 24 * 60 * 60 * 1000) {
-        showView('admin');
-        loadAdminNotifications();
-        if (firebaseReady) {
-          initAdminListeners();
-          renderAdminTables();
-        }
-        return;
-      } else {
-        localStorage.removeItem('croftAdminSession');
-      }
-    } catch(e) {
-      localStorage.removeItem('croftAdminSession');
-    }
+      await db.collection('clientActivityLog').add(entry);
+    } catch(e) {}
   }
-  
-  if (brokerSess) {
-    try {
-      const s = JSON.parse(brokerSess);
-      if (Date.now() - s.ts < 7 * 24 * 60 * 60 * 1000) {
-        const broker = brokers.find(b => b.id === s.brokerId);
-        if (broker && broker.status === 'active') {
-          currentBroker = broker;
-          showView('broker');
-          loadBrokerPortal();
-          return;
-        } else {
-          localStorage.removeItem('croftBrokerSession');
-        }
-      } else {
-        localStorage.removeItem('croftBrokerSession');
-      }
-    } catch(e) {
-      localStorage.removeItem('croftBrokerSession');
-    }
+  clientActivityLog.unshift({ ...entry, id: Date.now().toString(), timestamp: new Date().toISOString() });
+  if (clientActivityLog.length > 500) clientActivityLog.pop();
+  if (currentClient && String(currentClient.id) === String(clientId)) { 
+    renderActivityLog(); 
+    renderDashboardTimeline(); 
   }
-  
-  if (sess) {
-    try {
-      const s = JSON.parse(sess);
-      if (Date.now() - s.ts < 7 * 24 * 60 * 60 * 1000) {
-        let client = clients.find(c => c.id === s.clientId);
-        
-        if (client && client.status === 'active') {
-          currentClient = client;
-          const cp = projects.filter(p => p.clientId === client.id);
-          if (cp.length) currentProjectId = cp[0].id;
-          showView('portal');
-          loadClientPortal();
-          return;
-        } else if (firebaseReady) {
-          db.collection('clients').doc(s.clientId).get().then(doc => {
-            if (doc.exists) {
-              client = { id: doc.id, ...doc.data() };
-              if (client.status === 'active') {
-                clients.push(client);
-                currentClient = client;
-                const cp = projects.filter(p => p.clientId === client.id);
-                if (cp.length) currentProjectId = cp[0].id;
-                showView('portal');
-                loadClientPortal();
-              } else {
-                localStorage.removeItem('croftSession');
-              }
-            } else {
-              localStorage.removeItem('croftSession');
-            }
-          }).catch(() => {
-            localStorage.removeItem('croftSession');
-          });
-          return;
-        } else {
-          localStorage.removeItem('croftSession');
-        }
-      } else {
-        localStorage.removeItem('croftSession');
-      }
-    } catch(e) {
-      localStorage.removeItem('croftSession');
-    }
-  }
-}
-
-function showView(v) {
-  document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
-  document.getElementById('view-' + v).classList.add('active');
-  if (v === 'home') document.title = 'Croft Finance — Structured Finance Solutions';
-}
-
-function openLoginModal() { showLoginForm(); openModal('loginModal'); }
-function openModal(id) { document.getElementById(id).classList.add('active'); }
-function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-function showLoginForm() {
-  document.getElementById('loginForm').style.display = 'block';
-  document.getElementById('registerForm').style.display = 'none';
-  document.getElementById('adminLoginForm').style.display = 'none';
-  document.getElementById('forgotPasswordForm').style.display = 'none';
-  document.getElementById('brokerLoginForm').style.display = 'none';
-  document.getElementById('brokerRegisterForm').style.display = 'none';
-}
-function showRegisterForm() {
-  document.getElementById('loginForm').style.display = 'none';
-  document.getElementById('registerForm').style.display = 'block';
-  document.getElementById('adminLoginForm').style.display = 'none';
-  document.getElementById('forgotPasswordForm').style.display = 'none';
-  document.getElementById('brokerLoginForm').style.display = 'none';
-  document.getElementById('brokerRegisterForm').style.display = 'none';
-}
-function showAdminLogin() {
-  document.getElementById('loginForm').style.display = 'none';
-  document.getElementById('registerForm').style.display = 'none';
-  document.getElementById('adminLoginForm').style.display = 'block';
-  document.getElementById('forgotPasswordForm').style.display = 'none';
-  document.getElementById('brokerLoginForm').style.display = 'none';
-  document.getElementById('brokerRegisterForm').style.display = 'none';
-}
-function showForgotPassword() {
-  document.getElementById('loginForm').style.display = 'none';
-  document.getElementById('registerForm').style.display = 'none';
-  document.getElementById('adminLoginForm').style.display = 'none';
-  document.getElementById('forgotPasswordForm').style.display = 'block';
-  document.getElementById('brokerLoginForm').style.display = 'none';
-  document.getElementById('brokerRegisterForm').style.display = 'none';
-}
-function showBrokerLoginForm() {
-  document.getElementById('loginForm').style.display = 'none';
-  document.getElementById('registerForm').style.display = 'none';
-  document.getElementById('adminLoginForm').style.display = 'none';
-  document.getElementById('forgotPasswordForm').style.display = 'none';
-  document.getElementById('brokerLoginForm').style.display = 'block';
-  document.getElementById('brokerRegisterForm').style.display = 'none';
-}
-function showBrokerRegisterForm() {
-  document.getElementById('loginForm').style.display = 'none';
-  document.getElementById('registerForm').style.display = 'none';
-  document.getElementById('adminLoginForm').style.display = 'none';
-  document.getElementById('forgotPasswordForm').style.display = 'none';
-  document.getElementById('brokerLoginForm').style.display = 'none';
-  document.getElementById('brokerRegisterForm').style.display = 'block';
-}
-
-function showToast(msg, isError = false) {
-  const t = document.createElement('div');
-  t.className = 'toast';
-  t.style.background = isError ? 'var(--error)' : 'var(--navy)';
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.remove(), 3500);
-}
-
-function setupNavScroll() {
-  const nav = document.getElementById('homeNav');
-  if (!nav) return;
-  window.addEventListener('scroll', () => { nav.classList.toggle('scrolled', window.scrollY > 60); });
-}
-
-function scrollToSection(id) { document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }); }
-
-function toggleSidebar() {
-  document.getElementById('clientSidebar').classList.toggle('open');
-  document.getElementById('sidebarOverlay').classList.toggle('show');
-}
-function toggleAdminSidebar() {
-  document.getElementById('adminSidebar').classList.toggle('open');
-  document.getElementById('adminSidebarOverlay').classList.toggle('show');
-}
-function toggleBrokerSidebar() {
-  document.getElementById('brokerSidebar').classList.toggle('open');
-  document.getElementById('brokerSidebarOverlay').classList.toggle('show');
-}
-function toggleNotifications() {
-  const center = document.getElementById('notificationCenter');
-  center.classList.toggle('open');
-  if (center.classList.contains('open')) markAllNotificationsRead();
-}
-function closeNotifications() { document.getElementById('notificationCenter').classList.remove('open'); }
-
-function switchPortalTab(tabName, el) {
-  document.querySelectorAll('#view-portal .portal-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-' + tabName).classList.add('active');
-  document.querySelectorAll('#view-portal .nav-item').forEach(i => i.classList.remove('active'));
-  if (el) el.classList.add('active');
-  if (tabName === 'messages') { markMessagesRead(); updateMsgBadge(); }
-  if (tabName === 'documents') { renderDocuments(); updateIVLDocumentCard(); }
-  if (tabName === 'projects') renderProjectsList();
-  if (tabName === 'checklist') renderChecklist();
-  if (tabName === 'activity') renderActivityLog();
-  if (window.innerWidth <= 768) {
-    document.getElementById('clientSidebar').classList.remove('open');
-    document.getElementById('sidebarOverlay').classList.remove('show');
-  }
-}
-
-function switchAdminTab(tabName, el) {
-  document.querySelectorAll('#view-admin .admin-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('admin-' + tabName).classList.add('active');
-  document.querySelectorAll('#view-admin .nav-item').forEach(i => i.classList.remove('active'));
-  if (el) el.classList.add('active');
-  if (tabName === 'audit') renderAuditLog();
-  if (tabName === 'messages-admin') renderAdminMessages();
-  if (tabName === 'brokers') renderBrokerAdminTable();
-  if (tabName === 'broker-submissions') renderAdminBrokerSubmissionsTable();
-  if (window.innerWidth <= 768) {
-    document.getElementById('adminSidebar').classList.remove('open');
-    document.getElementById('adminSidebarOverlay').classList.remove('show');
-  }
-}
-
-function switchBrokerTab(tabName, el) {
-  document.querySelectorAll('#view-broker .portal-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('broker-tab-' + tabName).classList.add('active');
-  document.querySelectorAll('#view-broker .nav-item').forEach(i => i.classList.remove('active'));
-  if (el) el.classList.add('active');
-  if (tabName === 'messages') loadBrokerMessages();
-  if (tabName === 'submissions') renderBrokerSubmissions();
-  if (window.innerWidth <= 768) {
-    document.getElementById('brokerSidebar').classList.remove('open');
-    document.getElementById('brokerSidebarOverlay').classList.remove('show');
-  }
-}
-
-function refreshData() { loadFromFirebase().then(() => showToast('Data refreshed')); }
-
-function testEmailConfig() {
-  emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
-    to_email: EMAILJS_CONFIG.adminEmail,
-    subject: '✅ Croft Finance - Email Test Successful',
-    message: 'This is a test email to confirm your EmailJS configuration is working correctly.\n\nTime: ' + new Date().toLocaleString() + '\n\nIf you received this, your email system is configured properly.'
-  }).then(() => { showToast('Test email sent to admin. Check your inbox.'); }).catch((error) => { console.error('Email test failed:', error); showToast('Email test failed. Check console for details.', true); });
-}
-
-function sendEmail(to, subject, message) {
-  return emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, { to_email: to, subject: subject, message: message });
-}
-
-function getUserIP() {
-  return fetch('https://api.ipify.org?format=json').then(r => r.json()).then(d => d.ip).catch(() => 'unknown');
 }
 
 // ============================================================
-// AUTHENTICATION (Firebase Auth)
+// AUTHENTICATION
 // ============================================================
+
 function register() {
   const name = document.getElementById('regName').value.trim();
   const email = document.getElementById('regEmail').value.trim().toLowerCase();
@@ -3644,6 +3536,8 @@ function register() {
       clearRegistrationForm();
       showLoginForm();
       renderAdminTables();
+      
+      await firebase.auth().signOut();
     })
     .catch((error) => {
       if (error.code === 'auth/email-already-in-use') {
@@ -3670,65 +3564,59 @@ async function login() {
   const errEl = document.getElementById('loginError');
   errEl.style.display = 'none';
 
-  firebase.auth().signInWithEmailAndPassword(email, pass)
-    .then(async (userCredential) => {
-      const uid = userCredential.user.uid;
-      
-      let client = clients.find(c => c.id === uid) || 
-                   clients.find(c => c.email === email);
-
-      if (!client && firebaseReady) {
-        const doc = await db.collection('clients').doc(uid).get();
-        if (doc.exists) {
-          client = { id: doc.id, ...doc.data() };
-          clients.push(client);
-        }
+  try {
+    const userCredential = await firebase.auth().signInWithEmailAndPassword(email, pass);
+    const uid = userCredential.user.uid;
+    
+    let client = clients.find(c => c.id === uid) || clients.find(c => c.email === email);
+    
+    if (!client && firebaseReady) {
+      const doc = await db.collection('clients').doc(uid).get();
+      if (doc.exists) {
+        client = { id: doc.id, ...doc.data() };
+        clients.push(client);
       }
-      
-      if (!client) {
-        firebase.auth().signOut();
-        errEl.textContent = 'Account not found. Please contact Suzana.';
-        errEl.style.display = 'block';
-        return;
-      }
-
-      if (client.status === 'pending') {
-        firebase.auth().signOut();
-        errEl.textContent = 'Your account is under review. Suzana will activate it within 24 hours.';
-        errEl.style.display = 'block';
-        return;
-      }
-
-      currentClient = client;
-      const cp = projects.filter(p => p.clientId === client.id);
-      if (cp.length) currentProjectId = cp[0].id;
-      
-      localStorage.setItem('croftSession', JSON.stringify({ 
-        clientId: client.id, 
-        name: client.name, 
-        email: client.email, 
-        ts: Date.now() 
-      }));
-      
-      closeModal('loginModal');
-      showView('portal');
-      document.title = 'Croft Finance — Client Portal — ' + client.name;
-      logAudit('Client logged in', client.name, client.id);
-      resetSessionTimeout();
-      
-      if (firebaseReady) {
-        loadFromFirebase().then(() => { 
-          currentClient = clients.find(c => c.id === client.id) || client; 
-          loadClientPortal(); 
-        });
-      } else {
-        loadClientPortal();
-      }
-    })
-    .catch((error) => {
-      errEl.textContent = 'Incorrect email or password.';
+    }
+    
+    if (!client) {
+      await firebase.auth().signOut();
+      errEl.textContent = 'Account not found. Please contact Suzana.';
       errEl.style.display = 'block';
-    });
+      return;
+    }
+
+    if (client.status === 'pending') {
+      await firebase.auth().signOut();
+      errEl.textContent = 'Your account is under review. Suzana will activate it within 24 hours.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    currentClient = client;
+    const cp = projects.filter(p => p.clientId === client.id);
+    if (cp.length) currentProjectId = cp[0].id;
+    
+    localStorage.setItem('croftSession', JSON.stringify({ 
+      clientId: client.id, 
+      name: client.name, 
+      email: client.email, 
+      ts: Date.now() 
+    }));
+    
+    closeModal('loginModal');
+    showView('portal');
+    document.title = 'Croft Finance — Client Portal — ' + client.name;
+    await logAudit('Client logged in', client.name, client.id);
+    resetSessionTimeout();
+    
+    setupRealtimeListeners();
+    await loadFromFirebase();
+    loadClientPortal();
+    
+  } catch (error) {
+    errEl.textContent = 'Incorrect email or password.';
+    errEl.style.display = 'block';
+  }
 }
 
 function requestPasswordReset() {
@@ -3778,10 +3666,10 @@ function doAdminLogin() {
       currentBroker = null;
       
       loadAdminNotifications();
-      if (firebaseReady) initAdminListeners();
+      setupRealtimeListeners();
       setTimeout(() => requestBrowserNotificationPermission(), 1000);
       renderAdminTables();
-      logAudit('Admin logged in', 'Suzana');
+      await logAudit('Admin logged in', 'Suzana');
       resetSessionTimeout();
     })
     .catch((error) => {
@@ -3798,7 +3686,8 @@ function logout() {
   localStorage.removeItem('croftSession');
   localStorage.removeItem('croftAdminSession');
   localStorage.removeItem('croftBrokerSession');
-  stopAdminListeners();
+  unsubscribeListeners.forEach(unsub => unsub());
+  unsubscribeListeners = [];
   firebase.auth().signOut().catch(() => {});
   showView('home');
   document.title = 'Croft Finance — Structured Finance Solutions';
@@ -3807,34 +3696,29 @@ function logout() {
 
 function switchToAdminLogin() {
   firebase.auth().signOut().catch(() => {});
-  
   localStorage.removeItem('croftSession');
   localStorage.removeItem('croftAdminSession');
   localStorage.removeItem('croftBrokerSession');
-  
   currentClient = null;
   currentProjectId = null;
   currentBroker = null;
-  
   showView('home');
   showAdminLogin();
   openModal('loginModal');
-  
   showToast('Please log in as administrator');
 }
 
 // ============================================================
-// CLIENT PORTAL (All original functionality preserved)
+// CLIENT PORTAL FUNCTIONS
 // ============================================================
-async function loadClientPortal() {
+
+function loadClientPortal() {
   if (!currentClient) return;
   const name = currentClient.name;
   document.getElementById('portalUserName').textContent = name;
   document.getElementById('portalUserEmail').textContent = currentClient.email;
   document.getElementById('portalNavUser').textContent = name;
   document.getElementById('clientAvatar').textContent = name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
-  if (firebaseReady) await loadClientActivityFromFirebase();
-  else loadClientActivityLocal();
   loadCurrentProjectData();
   loadMessages();
   loadRecentActivity();
@@ -3901,10 +3785,6 @@ function loadCurrentProjectData() {
   updateAdvisorNote();
   checkAndShowAcknowledgment();
 }
-
-// ============================================================
-// MISSING FUNCTIONS - ADDED HERE
-// ============================================================
 
 function renderTermSheetSummary(proj) {
   const container = document.getElementById('termSheetSummary');
@@ -4001,58 +3881,6 @@ function updateStepTrackerWithExpiryWarning() {
   }
 }
 
-function openLuminSign(docId) {
-  const doc = documents.find(d => d.id === docId || d.id === String(docId));
-  if (!doc || !doc.url) {
-    showToast('Document not available', true);
-    return;
-  }
-  
-  downloadPDF(docId);
-  
-  const modalHtml = `
-  <div id="luminModal" class="modal-overlay active">
-    <div class="modal modal-lg">
-      <div class="modal-header">
-        <h3><i class="fas fa-pen-fancy" style="color:#6B46C1;margin-right:8px;"></i>Sign with Lumin Sign</h3>
-        <button class="modal-close" onclick="document.getElementById('luminModal').remove()">✕</button>
-      </div>
-      <div class="modal-body">
-        <div style="background: #F5F3FF; border: 1px solid #6B46C1; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
-          <div style="font-size: 13px; color: #4C1D95; font-weight: 500; margin-bottom: 8px;">
-            <i class="fas fa-info-circle"></i> How to sign with Lumin Sign:
-          </div>
-          <ol style="font-size: 12px; color: #5B21B6; line-height: 2; margin-left: 20px;">
-            <li>Download the document using the button below</li>
-            <li>Go to Lumin Sign (luminpdf.com/sign)</li>
-            <li>Upload the document to Lumin Sign</li>
-            <li>Add your signature and complete signing</li>
-            <li>Download the signed version from Lumin</li>
-            <li>Upload the signed document back here via the Upload section below</li>
-          </ol>
-        </div>
-        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-          <button class="btn btn-primary" onclick="downloadPDF('${docId}'); document.getElementById('luminModal').remove();">
-            <i class="fas fa-download"></i> Download Document First
-          </button>
-          <a href="https://luminpdf.com/sign" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: #6B46C1; color: white; padding: 10px 22px; border-radius: 6px; font-size: 12px; font-weight: 500; text-decoration: none; letter-spacing: 1px;">
-            <i class="fas fa-external-link-alt"></i> Open Lumin Sign
-          </a>
-          <button class="btn btn-outline" onclick="document.getElementById('luminModal').remove(); switchPortalTab('documents', null);">
-            Upload Signed Document
-          </button>
-        </div>
-        <div style="margin-top: 20px; font-size: 11px; color: var(--gray-400); border-top: 1px solid var(--gray-100); padding-top: 12px;">
-          After signing in Lumin, upload the completed signed document using the Upload section on this page. 
-          Name it clearly e.g. "Signed Term Sheet - [Your Name]".
-        </div>
-      </div>
-    </div>
-  </div>`;
-  
-  document.body.insertAdjacentHTML('beforeend', modalHtml);
-}
-
 function renderDocuments() {
   renderClosingDocumentsTable();
   renderAdditionalDocuments();
@@ -4092,15 +3920,6 @@ function renderClosingDocumentsTable() {
         statusClass = 'doc-status-approved';
         dateDisplay = uploadedDoc.date || '—';
         actions = `<button class="doc-action-btn doc-action-view" onclick="viewPDF('${uploadedDoc.id}')">View</button><button class="doc-action-btn doc-action-download" onclick="downloadPDF('${uploadedDoc.id}')">Download</button>`;
-      } else if (uploadedDoc && (docType === 'Executed Term Sheet (Binding)' || docType === 'Deed of Undertaking') && uploadedDoc.url) {
-        status = 'uploaded';
-        statusText = 'Uploaded — Pending Signing';
-        statusClass = 'doc-status-uploaded';
-        dateDisplay = uploadedDoc.date || '—';
-        actions = `
-          <button class="doc-action-btn doc-action-view" onclick="viewPDF('${uploadedDoc.id}')">View</button>
-          <button class="doc-action-btn doc-action-download" onclick="downloadPDF('${uploadedDoc.id}')">Download</button>
-          <button class="doc-action-btn" style="background: #6B46C1; color: white; border: none; padding: 5px 12px;" onclick="openLuminSign('${uploadedDoc.id}')"><i class="fas fa-pen-fancy"></i> Sign via Lumin</button>`;
       } else if (uploadedDoc) {
         status = 'uploaded';
         statusText = 'Uploaded (Pending Review)';
@@ -4167,25 +3986,45 @@ async function clientUploadDocument() {
   const fileInput = document.getElementById('clientUploadFile');
   const statusDiv = document.getElementById('clientUploadStatus');
   const selectedValue = docTypeSelect.value;
+  
   if (!selectedValue) { showToast('Please select a document type', true); return; }
   const file = fileInput.files[0];
   if (!file) { showToast('Please select a PDF file', true); return; }
   if (file.type !== 'application/pdf') { showToast('Please upload a PDF file', true); return; }
   if (file.size > 10 * 1024 * 1024) { showToast('File size must be less than 10MB', true); return; }
+  
   const docType = selectedValue.split('|')[0];
   const proj = projects.find(p => p.id === currentProjectId);
+  
   statusDiv.style.display = 'block';
-  statusDiv.innerHTML = '<span style="color: var(--blue);"><i class="fas fa-spinner fa-spin"></i> Uploading...</span>';
-  const reader = new FileReader();
-  reader.onload = async function(e) {
-    const url = e.target.result;
+  statusDiv.innerHTML = '<span style="color: var(--blue);"><i class="fas fa-spinner fa-spin"></i> Uploading to secure storage...</span>';
+  
+  try {
+    const downloadURL = await uploadDocumentToStorage(file, currentClient.id, currentProjectId, docType);
+    
     const id = String(Date.now());
-    const doc = { id: id, clientId: String(currentClient.id), projectId: String(currentProjectId), type: docType, name: docType, url: url, date: new Date().toISOString().split('T')[0], approved: false };
+    const doc = { 
+      id: id, 
+      clientId: String(currentClient.id), 
+      projectId: String(currentProjectId), 
+      type: docType, 
+      name: docType, 
+      storagePath: `documents/${currentClient.id}/${currentProjectId}/${Date.now()}_${docType.replace(/[^a-z0-9]/gi, '_')}.pdf`,
+      url: downloadURL,
+      fileSize: file.size,
+      mimeType: file.type,
+      date: new Date().toISOString().split('T')[0], 
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      approved: false 
+    };
+    
     documents.push(doc);
-    if (firebaseReady) await fbSet('documents', id, doc);
-    else saveLocal();
-    await sendEmail(EMAILJS_CONFIG.adminEmail, `📄 Document Uploaded — ${currentClient.name} — ${docType}`, `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nDOCUMENT UPLOAD NOTIFICATION\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nClient: ${currentClient.name}\nEmail: ${currentClient.email}\nProject: ${proj?.name || 'N/A'}\nDocument Type: ${docType}\nUpload Date: ${doc.date}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nThe client has uploaded this document for review.\n\nPlease log in to the admin portal to review and approve.\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`).catch(() => {});
-    statusDiv.innerHTML = '<span style="color: var(--success);"><i class="fas fa-check-circle"></i> Upload successful! Refreshing...</span>';
+    await fbSet('documents', id, doc);
+    await logClientActivity(currentClient.id, currentProjectId, 'document_uploaded', `You uploaded: ${docType}`, 'client');
+    await sendEmail(EMAILJS_CONFIG.adminEmail, `📄 Document Uploaded — ${currentClient.name} — ${docType}`, `Client: ${currentClient.name}\nDocument: ${docType}\nView in admin portal.`);
+    
+    statusDiv.innerHTML = '<span style="color: var(--success);"><i class="fas fa-check-circle"></i> Upload successful!</span>';
+    
     setTimeout(() => {
       renderClosingDocumentsTable();
       renderAdditionalDocuments();
@@ -4196,16 +4035,20 @@ async function clientUploadDocument() {
       docTypeSelect.value = '';
       showToast(`${docType} uploaded successfully!`);
     }, 1000);
-  };
-  reader.readAsDataURL(file);
+    
+  } catch (error) {
+    console.error('Upload error:', error);
+    statusDiv.innerHTML = '<span style="color: var(--error);"><i class="fas fa-exclamation-triangle"></i> Upload failed. Please try again.</span>';
+    showToast('Upload failed: ' + error.message, true);
+  }
 }
 
 function viewPDF(docId) { 
-  console.log('viewPDF called with docId:', docId);
   const d = documents.find(x => x.id === docId || x.id === String(docId));
   if (d && d.url) window.open(d.url, '_blank');
   else showToast('PDF not available. Please contact support.', true);
 }
+
 function downloadPDF(docId) { 
   const d = documents.find(x => x.id === docId || x.id === String(docId));
   if (d && d.url) { const a = document.createElement('a'); a.href = d.url; a.download = (d.type || 'document') + '.pdf'; a.click(); }
@@ -4400,16 +4243,29 @@ function loadMessages() {
   container.scrollTop = container.scrollHeight;
 }
 
-function sendMessage() {
+async function sendMessage() {
   const input = document.getElementById('messageInput');
   const content = input.value.trim();
   if (!content) return;
-  const id = String(Date.now());
-  const msg = { id, clientId: String(currentClient.id), clientName: currentClient.name, sender: 'client', content, timestamp: new Date().toISOString() };
-  messages.push(msg);
-  fbSet('messages', id, msg).then(() => { loadMessages(); fbReload(); });
-  sendEmail(EMAILJS_CONFIG.adminEmail, `💬 New Message from ${currentClient.name}`, `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nNEW CLIENT MESSAGE\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n• From: ${currentClient.name}\n• Email: ${currentClient.email}\n• Project: ${projects.find(p => p.id === currentProjectId)?.name || 'N/A'}\n• Time: ${new Date().toLocaleString()}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nMESSAGE CONTENT:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n${content}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nPlease log in to the admin portal to reply.`).catch(() => {});
-  logClientActivity(currentClient.id, currentProjectId, 'message_sent', 'You sent a message to Croft Finance', 'client');
+  
+  const id = db.collection('messages').doc().id;
+  const msg = { 
+    id, 
+    clientId: String(currentClient.id), 
+    clientName: currentClient.name, 
+    sender: 'client', 
+    content, 
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    read: false
+  };
+  
+  await db.collection('messages').doc(id).set(msg);
+  messages.push({ ...msg, timestamp: new Date().toISOString() });
+  loadMessages();
+  
+  await sendEmail(EMAILJS_CONFIG.adminEmail, `💬 New Message from ${currentClient.name}`, `From: ${currentClient.name}\nProject: ${projects.find(p => p.id === currentProjectId)?.name}\n\nMessage:\n${content}`);
+  await logClientActivity(currentClient.id, currentProjectId, 'message_sent', 'You sent a message to Croft Finance', 'client');
+  
   input.value = '';
   showToast('Message sent to Croft Finance');
 }
@@ -4558,6 +4414,7 @@ function closeIVLViewModal() { const modal = document.getElementById('ivlViewMod
 // ============================================================
 // DASHBOARD UPGRADE FUNCTIONS
 // ============================================================
+
 function updateDashboardHero() {
   const proj = projects.find(p => p.id === currentProjectId);
   if (!proj) return;
@@ -4658,6 +4515,7 @@ function updateAdvisorNote() {
 // ============================================================
 // ACKNOWLEDGMENT GATES
 // ============================================================
+
 function checkAndShowAcknowledgment() {
   const proj = projects.find(p => p.id === currentProjectId);
   if (!proj) return;
@@ -4702,7 +4560,7 @@ async function acknowledgeCommitmentFee() {
   await fbUpdate('projects', currentProjectId, updates);
   await logAudit('Commitment Fee Acknowledged', `IP: ${ip}`, proj.clientId, currentProjectId);
   await logClientActivity(proj.clientId, currentProjectId, 'acknowledgment_given', 'You acknowledged the Commitment Fee terms', 'client');
-  await sendEmail(EMAILJS_CONFIG.adminEmail, `✅ Commitment Fee Acknowledged — ${currentClient.name}`, `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nCOMMITMENT FEE ACKNOWLEDGMENT\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nClient: ${currentClient.name}\nEmail: ${currentClient.email}\nProject: ${proj.name}\nTimestamp: ${new Date(timestamp).toLocaleString()}\nIP Address: ${ip}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nThe client has acknowledged the commitment fee requirement.\n\nAmount: USD 150,000\nTerms: Non-refundable after term sheet execution\nPayment window: 5 business days\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+  await sendEmail(EMAILJS_CONFIG.adminEmail, `✅ Commitment Fee Acknowledged — ${currentClient.name}`, `Client: ${currentClient.name}\nProject: ${proj.name}\nTimestamp: ${new Date(timestamp).toLocaleString()}\nIP Address: ${ip}`);
   const modal = document.getElementById('ackModal');
   if (modal) modal.remove();
   showToast('Commitment fee acknowledged. Thank you.');
@@ -4720,7 +4578,7 @@ async function acknowledgeECF() {
   await fbUpdate('projects', currentProjectId, updates);
   await logAudit('ECF Acknowledged', `IP: ${ip}`, proj.clientId, currentProjectId);
   await logClientActivity(proj.clientId, currentProjectId, 'acknowledgment_given', 'You acknowledged the ECF escrow terms', 'client');
-  await sendEmail(EMAILJS_CONFIG.adminEmail, `✅ ECF Acknowledged — ${currentClient.name}`, `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nECF ESCROW ACKNOWLEDGMENT\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nClient: ${currentClient.name}\nEmail: ${currentClient.email}\nProject: ${proj.name}\nECF Amount: ${proj.ecf || 'Specified in DOU'}\nTimestamp: ${new Date(timestamp).toLocaleString()}\nIP Address: ${ip}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nThe client has acknowledged the ECF escrow requirement.\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+  await sendEmail(EMAILJS_CONFIG.adminEmail, `✅ ECF Acknowledged — ${currentClient.name}`, `Client: ${currentClient.name}\nProject: ${proj.name}\nECF Amount: ${proj.ecf || 'Specified in DOU'}\nTimestamp: ${new Date(timestamp).toLocaleString()}\nIP Address: ${ip}`);
   const modal = document.getElementById('ackModal');
   if (modal) modal.remove();
   showToast('ECF escrow acknowledged. Thank you.');
@@ -4731,22 +4589,6 @@ async function acknowledgeECF() {
 // ============================================================
 // ACTIVITY LOG FUNCTIONS
 // ============================================================
-async function logClientActivity(clientId, projectId, action, description, performedBy) {
-  const entry = { id: String(Date.now()), clientId: String(clientId), projectId: String(projectId), action: action, description: description, performedBy: performedBy, timestamp: new Date().toISOString() };
-  clientActivityLog.unshift(entry);
-  const clientEntries = clientActivityLog.filter(e => e.clientId === String(clientId));
-  if (clientEntries.length > 500) {
-    const toRemove = clientEntries.slice(500);
-    toRemove.forEach(r => { const index = clientActivityLog.findIndex(e => e.id === r.id); if (index !== -1) clientActivityLog.splice(index, 1); });
-  }
-  if (firebaseReady) await db.collection('clientActivityLog').doc(entry.id).set(entry);
-  else saveClientActivityLocal();
-  if (currentClient && String(currentClient.id) === String(clientId)) { renderActivityLog(); renderDashboardTimeline(); }
-}
-
-function saveClientActivityLocal() { localStorage.setItem('croft_client_activity', JSON.stringify(clientActivityLog)); }
-function loadClientActivityLocal() { const saved = localStorage.getItem('croft_client_activity'); if (saved) clientActivityLog = JSON.parse(saved); }
-async function loadClientActivityFromFirebase() { if (!firebaseReady || !currentClient) return; try { const snapshot = await db.collection('clientActivityLog').where('clientId', '==', String(currentClient.id)).orderBy('timestamp', 'desc').limit(200).get(); clientActivityLog = snapshot.docs.map(d => ({ id: d.id, ...d.data() })); } catch(e) { loadClientActivityLocal(); } }
 
 function renderActivityLog() {
   const container = document.getElementById('activityTimeline');
@@ -4769,8 +4611,9 @@ function renderDashboardTimeline() {
 }
 
 // ============================================================
-// BROKER PORTAL (SIMPLIFIED - KEEP EXISTING FUNCTIONS)
+// BROKER PORTAL FUNCTIONS
 // ============================================================
+
 function renderBrokerAdminTable() {
   const container = document.getElementById('adminBrokersTable');
   if (!container) return;
@@ -4792,8 +4635,7 @@ function activateBroker(id) {
   if (!broker) return;
   broker.status = 'active';
   if (firebaseReady) fbUpdate('brokers', id, { status: 'active' });
-  else saveBrokersLocal();
-  sendEmail(broker.email, '✅ Croft Finance — Broker Portal Activated', `Dear ${broker.name},\n\nYour broker portal has been activated.\n\nYou can now log in at ${window.location.origin} to submit deals and track your introductions.\n\nEmail: ${broker.email}\n\n\n\nBest regards,\nSuzana Aleksić\nCroft Finance`).catch(() => {});
+  sendEmail(broker.email, '✅ Croft Finance — Broker Portal Activated', `Dear ${broker.name},\n\nYour broker portal has been activated.\n\nYou can now log in at ${window.location.origin} to submit deals and track your introductions.\n\nEmail: ${broker.email}\n\nBest regards,\nSuzana Aleksić\nCroft Finance`).catch(() => {});
   showToast(broker.name + ' activated.');
   renderBrokerAdminTable();
 }
@@ -4803,7 +4645,6 @@ function deleteBroker(id) {
   brokers = brokers.filter(b => b.id !== id);
   brokerSubmissions = brokerSubmissions.filter(s => s.brokerId !== id);
   if (firebaseReady) fbDelete('brokers', id);
-  else saveBrokersLocal();
   showToast('Broker deleted');
   renderBrokerAdminTable();
 }
@@ -4822,8 +4663,7 @@ function submitDeal() {
   const submission = { id, brokerId: currentBroker.id, brokerName: currentBroker.name, clientName, clientEmail, projectName, industry, location, fundsNeeded, description, status: 'pending', createdAt: new Date().toISOString() };
   brokerSubmissions.push(submission);
   if (firebaseReady) fbSet('brokerSubmissions', id, submission);
-  else saveBrokersLocal();
-  sendEmail(EMAILJS_CONFIG.adminEmail, `📋 NEW DEAL SUBMISSION from ${currentBroker.name}`, `A new deal has been submitted by broker ${currentBroker.name} (${currentBroker.email}, ${currentBroker.firm}).\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nDEAL DETAILS:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n• Client: ${clientName}\n• Client Email: ${clientEmail}\n• Project: ${projectName}\n• Industry: ${industry}\n• Location: ${location}\n• Funds Needed: $${fundsNeeded}\n• Description: ${description || 'Not provided'}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nBroker: ${currentBroker.name} (${currentBroker.firm})\n\n\nLog in to admin to review.`).catch(() => {});
+  sendEmail(EMAILJS_CONFIG.adminEmail, `📋 NEW DEAL SUBMISSION from ${currentBroker.name}`, `A new deal has been submitted by broker ${currentBroker.name} (${currentBroker.email}, ${currentBroker.firm}).\n\nClient: ${clientName}\nClient Email: ${clientEmail}\nProject: ${projectName}\nFunds Needed: $${fundsNeeded}\n\nLog in to admin to review.`).catch(() => {});
   document.getElementById('dealClientName').value = '';
   document.getElementById('dealClientEmail').value = '';
   document.getElementById('dealProjectName').value = '';
@@ -4866,7 +4706,6 @@ function sendBrokerMessage() {
   const msg = { id, brokerId: String(currentBroker.id), brokerName: currentBroker.name, sender: 'broker', content, timestamp: new Date().toISOString() };
   brokerMessages.push(msg);
   if (firebaseReady) fbSet('brokerMessages', id, msg);
-  else saveBrokersLocal();
   loadBrokerMessages();
   sendEmail(EMAILJS_CONFIG.adminEmail, `💬 New Message from Broker ${currentBroker.name}`, `${currentBroker.name} (${currentBroker.email}, ${currentBroker.firm}) sent:\n\n${content}`).catch(() => {});
   input.value = '';
@@ -4952,7 +4791,6 @@ function brokerRegister() {
       };
       brokers.push(newBroker);
       if (firebaseReady) fbSet('brokers', uid, newBroker);
-      else saveBrokersLocal();
 
       sendEmail(email, 'Croft Finance — Broker Registration Received', 
         `Dear ${name},\n\nThank you for registering as a broker with Croft Finance.\n\nYour registration is under review. You will receive an email once your account is activated.\n\nKind regards,\nCroft Finance Team`
@@ -4966,6 +4804,8 @@ function brokerRegister() {
       showToast('Broker registration submitted. You will receive an email once approved.');
       showBrokerLoginForm();
       renderBrokerAdminTable();
+      
+      await firebase.auth().signOut();
     })
     .catch((error) => {
       if (error.code === 'auth/email-already-in-use') {
@@ -4986,8 +4826,7 @@ function brokerLogin() {
   firebase.auth().signInWithEmailAndPassword(email, pass)
     .then(async (userCredential) => {
       const uid = userCredential.user.uid;
-      const broker = brokers.find(b => b.id === uid) || 
-                     brokers.find(b => b.email === email);
+      const broker = brokers.find(b => b.id === uid) || brokers.find(b => b.email === email);
       
       if (!broker) {
         firebase.auth().signOut();
@@ -5019,43 +4858,9 @@ function brokerLogin() {
 }
 
 // ============================================================
-// CONTACT FORM
+// ADMIN FUNCTIONS
 // ============================================================
-function submitContactForm(event) {
-  event.preventDefault();
-  const name = document.getElementById('contactName').value.trim();
-  const email = document.getElementById('contactEmail').value.trim();
-  const project = document.getElementById('contactProject').value.trim();
-  const message = document.getElementById('contactMessage').value.trim();
-  const nda = document.getElementById('contactNda').checked;
-  if (!name || !email || !project || !message) { showToast('Please fill all required fields.', true); return; }
-  if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) { showToast('Please enter a valid email address.', true); return; }
-  if (!nda) { showToast('Please agree to the Confidentiality Terms.', true); return; }
-  const submitBtn = document.querySelector('#homepageContactForm button[type="submit"]');
-  const originalText = submitBtn.textContent;
-  submitBtn.textContent = 'Sending...';
-  submitBtn.disabled = true;
-  const emailContent = `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nNEW CONTACT FORM SUBMISSION\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nCONTACT DETAILS:\n• Name: ${name}\n• Email: ${email}\n• Company/Project: ${project}\n\nMESSAGE:\n${message}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nSubmitted: ${new Date().toLocaleString()}\n\nPlease respond within 24 hours.\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
-  emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, { to_email: EMAILJS_CONFIG.adminEmail, subject: `📞 New Contact Form Submission - ${name} (${project})`, message: emailContent }).then(() => {
-    document.getElementById('contactFormContent').style.display = 'none';
-    document.getElementById('contactSuccessContent').style.display = 'block';
-    document.getElementById('contactName').value = '';
-    document.getElementById('contactEmail').value = '';
-    document.getElementById('contactProject').value = '';
-    document.getElementById('contactMessage').value = '';
-    document.getElementById('contactNda').checked = false;
-    emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, { to_email: email, subject: 'Croft Finance — We received your inquiry', message: `Dear ${name},\n\nThank you for reaching out to Croft Finance.\n\nWe have received your inquiry regarding "${project}" and Suzana Aleksić will respond to you within 24 hours.\n\nIn the meantime, you may find helpful information about our financing solutions at ${window.location.origin}.\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nSummary of your request:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n• Project: ${project}\n• Your message: ${message.substring(0, 200)}${message.length > 200 ? '...' : ''}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nBest regards,\nSuzana Aleksić\nPrincipal, Croft Finance\nsuzana.aleksic@croftfinance.com` }).catch(() => {});
-  }).catch((error) => { console.error('Email send failed:', error); showToast('Failed to send. Please try again or email directly.', true); }).finally(() => { submitBtn.textContent = originalText; submitBtn.disabled = false; });
-}
 
-function resetContactForm() {
-  document.getElementById('contactFormContent').style.display = 'block';
-  document.getElementById('contactSuccessContent').style.display = 'none';
-}
-
-// ============================================================
-// ADMIN FUNCTIONS (SIMPLIFIED - KEEP EXISTING)
-// ============================================================
 function renderAdminTables() {
   renderClientsTable();
   renderProjectsTable();
@@ -5073,7 +4878,7 @@ function renderClientsTable() {
       <td style="vertical-align:middle;"><span style="color:${c.status === 'pending' ? 'var(--warning)' : 'var(--success)'};">${c.status === 'pending' ? 'Pending' : 'Active'}</span></td>
       <td style="font-size:12px;color:var(--gray-400);">${c.createdAt ? new Date(c.createdAt).toLocaleDateString() : '—'}</td>
       <td style="vertical-align:middle;display:flex;gap:6px;flex-wrap:wrap;">${c.status === 'pending' ? `<button class="btn btn-success" style="padding:4px 10px;font-size:11px;" onclick="activateClient('${c.id}')">Activate</button>` : ''}<button class="btn btn-outline" style="padding:4px 10px;font-size:11px;color:var(--error);" onclick="deleteClient('${c.id}')">Delete</button></td>
-    </tr>`; }).join('');
+    </table>`; }).join('');
 }
 
 function renderProjectsTable() {
@@ -5094,7 +4899,7 @@ function renderProjectsTable() {
         <td style="vertical-align:middle;display:flex;gap:6px;">
           <button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="editProject('${p.id}')">Edit</button>
           <button class="btn btn-outline" style="padding:4px 10px;font-size:11px;color:var(--error);" onclick="deleteProject('${p.id}')">Delete</button>
-                </td>
+        </td>
       </tr>
     `;
   }).join('');
@@ -5125,8 +4930,6 @@ function renderAdminDocumentsTable() {
     const step = requiredTypesMap[doc.type] || '—';
     let statusHtml = '<span class="doc-status-badge doc-status-uploaded">Uploaded</span>';
     if (doc.approved) statusHtml = '<span class="doc-status-badge doc-status-approved">Approved ✓</span>';
-    else if (doc.type === 'Executed Term Sheet (Binding)' || doc.type === 'Deed of Undertaking') 
-      statusHtml = '<span class="doc-status-badge doc-status-uploaded">Uploaded — Pending Signing</span>';
     
     return `
       <tr>
@@ -5138,7 +4941,7 @@ function renderAdminDocumentsTable() {
         <td style="vertical-align:middle;">${doc.date || '—'}</td>
         <td style="vertical-align:middle;">
           <button class="doc-action-btn doc-action-view" onclick="viewPDF('${doc.id}')">View</button>
-          ${!doc.approved && !doc.signed ? `<button class="doc-action-btn" style="background: var(--success); color: white; border: none;" onclick="approveDocument('${doc.id}')">Approve</button>` : ''}
+          ${!doc.approved ? `<button class="doc-action-btn" style="background: var(--success); color: white; border: none;" onclick="approveDocument('${doc.id}')">Approve</button>` : ''}
           <button class="doc-action-btn doc-action-download" onclick="downloadPDF('${doc.id}')">Download</button>
           <button class="doc-action-btn" style="background: var(--error); color: white; border: none;" onclick="deleteDocument('${doc.id}')">Delete</button>
         </td>
@@ -5161,43 +4964,59 @@ function renderAdminMessages() {
   container.innerHTML = Object.entries(byClient).map(([cid, msgs]) => { const client = clients.find(c => c.id === cid || c.id === String(cid)); const sorted = msgs.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp)); return `<div class="admin-thread" data-client-id="${cid}"><div class="admin-thread-header"><div><div class="admin-thread-client">${client?.name || 'Unknown'}</div><div class="admin-thread-project">${client?.email || ''}</div></div><span class="badge badge-navy">${sorted.length} messages</span></div><div class="admin-thread-body"><div class="admin-thread-msgs">${sorted.map(m => `<div class="message ${m.sender === 'client' ? 'admin' : 'client'}" style="margin-bottom:10px;"><div class="message-bubble" style="${m.sender === 'admin' ? 'background:var(--navy);color:white;' : 'background:var(--gray-100);color:var(--navy);'}">${escapeHtml(m.content)}</div><div class="message-meta">${m.sender === 'admin' ? 'Suzana' : client?.name || 'Client'} · ${new Date(m.timestamp).toLocaleString()}</div></div>`).join('')}</div><div class="admin-reply-box"><textarea id="replyBox_${cid}" placeholder="Reply to ${client?.name || 'client'}..."></textarea><button class="btn btn-primary" onclick="sendAdminReply('${cid}')">Send Reply</button></div></div></div>`; }).join('');
 }
 
-function sendAdminReply(clientId) {
+async function sendAdminReply(clientId) {
   const textarea = document.getElementById('replyBox_' + clientId);
   const content = textarea?.value.trim();
   if (!content) return;
-  const id = String(Date.now());
+  
+  const id = db.collection('messages').doc().id;
   const client = clients.find(c => c.id === clientId || c.id === String(clientId));
   const proj = projects.find(p => p.clientId === clientId);
-  const msg = { id, clientId: String(clientId), clientName: client?.name || '', sender: 'admin', content, timestamp: new Date().toISOString() };
-  messages.push(msg);
-  fbSet('messages', id, msg).then(() => { renderAdminMessages(); if (currentClient && String(currentClient.id) === String(clientId)) loadMessages(); fbReload(); });
+  
+  const msg = { 
+    id, 
+    clientId: String(clientId), 
+    clientName: client?.name || '', 
+    sender: 'admin', 
+    content, 
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    read: false
+  };
+  
+  await db.collection('messages').doc(id).set(msg);
+  messages.push({ ...msg, timestamp: new Date().toISOString() });
+  
   if (textarea) textarea.value = '';
   showToast('Reply sent to ' + (client?.name || 'client'));
-  logAudit('Admin replied to client', content.substring(0, 60), String(clientId));
-  logClientActivity(clientId, proj?.id || '', 'message_received', 'New message from Suzana Aleksić', 'croft');
+  
+  await logAudit('Admin replied to client', content.substring(0, 60), String(clientId));
+  await logClientActivity(clientId, proj?.id || '', 'message_received', 'New message from Suzana Aleksić', 'croft');
+  
   if (client && client.email) {
-    sendEmail(client.email, `📨 New Message from Croft Finance - Regarding Your Project`, `Dear ${client.name},\n\nYou have received a new message from Suzana Aleksić regarding your project.\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nMESSAGE:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n${content}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nACTION REQUIRED:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nPlease log in to your client portal to view and respond to this message.\n\nPortal URL: ${window.location.origin}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nBest regards,\nSuzana Aleksić\nPrincipal, Croft Finance`).catch(() => {});
+    await sendEmail(client.email, `📨 New Message from Croft Finance`, `Dear ${client.name},\n\nYou have received a new message from Suzana Aleksić.\n\nMessage:\n${content}\n\nLog in to your portal to reply.`);
   }
+  
+  renderAdminMessages();
+  if (currentClient && String(currentClient.id) === String(clientId)) loadMessages();
 }
 
-function activateClient(id) {
+async function activateClient(id) {
   const client = clients.find(c => c.id === id || c.id === String(id));
   if (!client) return;
-  fbUpdate('clients', id, { status: 'active' }).then(async () => {
-    const cp = projects.filter(p => p.clientId === id || p.id === String(id));
-    for (const p of cp) await fbUpdate('projects', p.id, { status: 'active' });
-    await logAudit('Client activated', client.name, String(id));
-    await logClientActivity(client.id, cp[0]?.id || '', 'portal_activated', 'Your portal was activated by Croft Finance', 'croft');
-    
-    if (cp[0]) await generateAndStoreIVL(client.id, cp[0].id);
-    
-    sendEmail(client.email, '✅ Croft Finance — Portal Access Activated',
-      `Dear ${client.name},\n\nGreat news! Your Croft Finance client portal has been activated.\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nLOGIN INFORMATION:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n• Portal URL: ${window.location.origin}\n• Email: ${client.email}\n• Password: (the password you created during registration)\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nNEXT STEPS:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n1. Log in to your portal\n2. Review your project dashboard\n3. Upload any required documents\n4. Your deal advisor (Suzana) will guide you through the 8-step closing process\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nSUPPORT:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nIf you have any questions, reply to this email or contact:\nSuzana Aleksić\nPrincipal, Croft Finance\nsuzana.aleksic@croftfinance.com\n+381 69 288 0 191\n\nWelcome to Croft Finance. We look forward to working with you.\n\nBest regards,\nSuzana Aleksić\nPrincipal, Croft Finance`).catch(() => {});
-    
-    showToast(client.name + ' activated. Access email sent to client.');
-    if (cp.length) editProject(cp[0].id);
-    fbReload();
-  });
+  await fbUpdate('clients', id, { status: 'active' });
+  const cp = projects.filter(p => p.clientId === id || p.id === String(id));
+  for (const p of cp) await fbUpdate('projects', p.id, { status: 'active' });
+  await logAudit('Client activated', client.name, String(id));
+  await logClientActivity(client.id, cp[0]?.id || '', 'portal_activated', 'Your portal was activated by Croft Finance', 'croft');
+  
+  if (cp[0]) await generateAndStoreIVL(client.id, cp[0].id);
+  
+  await sendEmail(client.email, '✅ Croft Finance — Portal Access Activated',
+    `Dear ${client.name},\n\nGreat news! Your Croft Finance client portal has been activated.\n\nPortal URL: ${window.location.origin}\nEmail: ${client.email}\nPassword: (the password you created during registration)\n\nWelcome to Croft Finance. We look forward to working with you.\n\nBest regards,\nSuzana Aleksić\nPrincipal, Croft Finance`).catch(() => {});
+  
+  showToast(client.name + ' activated. Access email sent to client.');
+  if (cp.length) editProject(cp[0].id);
+  setupRealtimeListeners();
 }
 
 function editProject(id) {
@@ -5256,20 +5075,20 @@ function regenerateIVL() {
   if (proj) { generateAndStoreIVL(proj.clientId, window.editProjectId); updateIVLAdminInfo(); showToast('Investor Verification Letter regenerated'); }
 }
 
-function saveProjectInfo() {
+async function saveProjectInfo() {
   const id = window.editProjectId;
   const proj = projects.find(p => p.id === id || p.id === String(id));
   const newStep = parseInt(document.getElementById('editStep').value) || 1;
   const stepDates = { ...(proj?.stepDates || {}) };
   let stepAdvanced = false;
+  
   if (proj && newStep !== (proj.step || 1)) {
     const today = new Date().toISOString().split('T')[0];
     for (let s = proj.step || 1; s < newStep; s++) { if (!stepDates[s]) stepDates[s] = today; }
     if (!stepDates[newStep]) stepDates[newStep] = today;
     stepAdvanced = true;
   }
-  const note = document.getElementById('editAdminNote').value.trim();
-  const advisorNote = document.getElementById('editAdvisorNote').value.trim();
+  
   const updates = {
     name: document.getElementById('editProjectName').value,
     industry: document.getElementById('editIndustry').value,
@@ -5310,25 +5129,40 @@ function saveProjectInfo() {
     commitFeeDeadline: document.getElementById('editCommitFeeDeadline').value,
     deedExpiryDate: document.getElementById('editDeedExpiry').value,
     ecfPolicyExpiryDate: document.getElementById('editECFPolicyExpiry').value,
-    adminNote: note,
-    adminNoteDate: note ? new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '',
-    advisorNote: advisorNote
+    adminNote: document.getElementById('editAdminNote').value.trim(),
+    adminNoteDate: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }),
+    advisorNote: document.getElementById('editAdvisorNote').value.trim(),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   };
-  if (!proj) return;
+  
+  const batch = db.batch();
+  const projectRef = db.collection('projects').doc(id);
+  batch.update(projectRef, updates);
+  
+  if (stepAdvanced) {
+    const activityRef = db.collection('clientActivityLog').doc();
+    batch.set(activityRef, {
+      clientId: proj.clientId,
+      projectId: id,
+      action: 'step_advanced',
+      description: `Your deal advanced to Step ${newStep}: ${STEP_NAMES[newStep]}`,
+      performedBy: 'croft',
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }
+  
+  await batch.commit();
   Object.assign(proj, updates);
-  fbUpdate('projects', id, updates).then(async () => {
-    await logAudit('Project updated', 'Step ' + newStep + ': ' + STEP_NAMES[newStep], proj.clientId, String(id));
-    if (stepAdvanced) {
-      await logClientActivity(proj.clientId, id, 'step_advanced', `Your deal advanced to Step ${newStep}: ${STEP_NAMES[newStep]}`, 'croft');
-    }
-    if (note && note !== proj.adminNote) {
-      await logClientActivity(proj.clientId, id, 'admin_note_added', 'Your advisor added a note to your file', 'croft');
-    }
-    closeModal('editProjectModal');
-    showToast('Project updated');
-    if (currentClient && String(currentClient.id) === String(proj.clientId)) { currentProjectId = id; loadCurrentProjectData(); }
-    fbReload();
-  });
+  
+  closeModal('editProjectModal');
+  showToast('Project updated successfully');
+  
+  if (currentClient && String(currentClient.id) === String(proj.clientId)) { 
+    currentProjectId = id; 
+    loadCurrentProjectData(); 
+  }
+  
+  await logAudit('Project updated', 'Step ' + newStep + ': ' + STEP_NAMES[newStep], proj.clientId, String(id));
 }
 
 function deleteClient(id) {
@@ -5338,26 +5172,52 @@ function deleteClient(id) {
   projects = projects.filter(p => p.clientId !== id && p.clientId !== String(id));
   messages = messages.filter(m => m.clientId !== id && m.clientId !== String(id));
   meetings = meetings.filter(m => m.clientId !== id && m.clientId !== String(id));
-  fbDelete('clients', id).then(() => { fbReload(); logAudit('Client deleted', client?.name || '', String(id)); showToast('Client deleted'); });
+  fbDelete('clients', id).then(() => { logAudit('Client deleted', client?.name || '', String(id)); showToast('Client deleted'); });
 }
 
 function deleteProject(id) {
   if (!confirm('Delete this project?')) return;
   projects = projects.filter(p => p.id !== id && p.id !== String(id));
-  fbDelete('projects', id).then(() => { fbReload(); showToast('Project deleted'); });
+  fbDelete('projects', id).then(() => { showToast('Project deleted'); });
 }
 
-function approveDocument(id) {
+async function approveDocument(id) {
   const doc = documents.find(d => d.id === id || d.id === String(id));
   if (!doc) return;
   doc.approved = true;
-  fbUpdate('documents', id, { approved: true }).then(() => { renderAdminDocumentsTable(); if (currentClient) renderDocuments(); showToast('Document approved'); logAudit('Document approved', doc.type, String(doc.clientId), String(doc.projectId)); logClientActivity(doc.clientId, doc.projectId, 'document_approved', `Croft Finance approved: ${doc.type || doc.name}`, 'croft'); });
+  doc.approvedAt = new Date().toISOString();
+  doc.approvedBy = firebase.auth().currentUser?.email || 'admin';
+  await fbUpdate('documents', id, { approved: true, approvedAt: doc.approvedAt, approvedBy: doc.approvedBy });
+  renderAdminDocumentsTable();
+  if (currentClient) renderDocuments();
+  showToast('Document approved');
+  await logAudit('Document approved', doc.type, doc.clientId, doc.projectId);
+  await logClientActivity(doc.clientId, doc.projectId, 'document_approved', `Croft Finance approved: ${doc.type || doc.name}`, 'croft');
+  
+  const client = clients.find(c => c.id === doc.clientId);
+  if (client && client.email) {
+    await sendEmail(client.email, `Document Approved — ${doc.type} — Croft Finance`, `Dear ${client.name},\n\nYour document "${doc.type}" has been approved.\n\nLog in to your portal to view the updated status.`);
+  }
 }
 
-function deleteDocument(id) {
-  if (!confirm('Delete this document?')) return;
+async function deleteDocument(id) {
+  const doc = documents.find(d => d.id === id || d.id === String(id));
+  if (!doc) return;
+  if (!confirm(`Delete "${doc.type || doc.name}"? This action cannot be undone.`)) return;
+  
+  if (doc.storagePath && storage) {
+    try {
+      const storageRef = storage.ref(doc.storagePath);
+      await storageRef.delete();
+    } catch(e) { console.error('Storage delete error:', e); }
+  }
+  
+  await fbDelete('documents', id);
   documents = documents.filter(d => d.id !== id && d.id !== String(id));
-  fbDelete('documents', id).then(() => { fbReload(); showToast('Document deleted'); });
+  showToast('Document deleted');
+  renderAdminDocumentsTable();
+  if (currentClient) renderDocuments();
+  await logAudit('Document deleted', doc.type || doc.name, doc.clientId, doc.projectId);
 }
 
 function showAddClientModal() {
@@ -5366,7 +5226,7 @@ function showAddClientModal() {
   openModal('addClientModal');
 }
 
-function createClient() {
+async function createClient() {
   const name = document.getElementById('ncName').value.trim();
   const email = document.getElementById('ncEmail').value.trim().toLowerCase();
   const pass = document.getElementById('ncPassword').value.trim();
@@ -5377,84 +5237,75 @@ function createClient() {
     return; 
   }
 
-  firebase.auth().createUserWithEmailAndPassword(email, pass)
-    .then(async (userCredential) => {
-      const uid = userCredential.user.uid;
-      const pid = String(Date.now() + 1);
+  try {
+    const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, pass);
+    const uid = userCredential.user.uid;
+    const pid = String(Date.now() + 1);
 
-      const newClient = { 
-        id: uid, name, email, 
-        status: 'active', 
-        createdAt: new Date().toISOString() 
-      };
-      const newProject = {
-        id: pid, clientId: uid, name: projName, status: 'active', step: 1,
-        industry: document.getElementById('ncIndustry')?.value || '',
-        location: document.getElementById('ncLocation')?.value || '',
-        totalCost: document.getElementById('ncTotalCost')?.value || '',
-        sponsorEquity: document.getElementById('ncSponsorEquity')?.value || '',
-        fundsNeeded: document.getElementById('ncFundsNeeded')?.value || '',
-        currentStage: document.getElementById('ncCurrentStage')?.value || '',
-        useOfFunds: document.getElementById('ncUseOfFunds')?.value || '',
-        targetIRR: document.getElementById('ncTargetIRR')?.value || '',
-        targetCloseDate: document.getElementById('ncCloseDate')?.value || '',
-        moic: document.getElementById('ncMOIC')?.value || '',
-        capRate: document.getElementById('ncCapRate')?.value || '',
-        exitStrategy: document.getElementById('ncExitStrategy')?.value || '',
-        exitCapRate: document.getElementById('ncExitCapRate')?.value || '',
-        permits: document.getElementById('ncPermits')?.value || '',
-        revenue: document.getElementById('ncRevenue')?.value || '',
-        assetClass: document.getElementById('ncAssetClass')?.value || '',
-        infraType: document.getElementById('ncInfraType')?.value || '',
-        commodity: document.getElementById('ncCommodity')?.value || '',
-        miningStage: document.getElementById('ncMiningStage')?.value || '',
-        reserveLife: document.getElementById('ncReserveLife')?.value || '',
-        dataRoom: document.getElementById('ncDataRoom')?.value || '',
-        amount: document.getElementById('ncAmount')?.value || 'TBD',
-        interestRate: document.getElementById('ncRate')?.value || 'TBD',
-        term: document.getElementById('ncTerm')?.value || 'TBD',
-        gracePeriod: document.getElementById('ncGrace')?.value || '12',
-        ecf: document.getElementById('ncECF')?.value || 'TBD',
-        govLaw: document.getElementById('ncGovLaw')?.value || 'TBD',
-        termSheetExpiry: document.getElementById('ncExpiry')?.value || '',
-        nextMilestone: document.getElementById('ncMilestone')?.value || 'Awaiting Term Sheet',
-        stepDates: {}, checklistItems: {}, 
-        commitFeeStatus: 'pending', ecfStatus: 'pending',
-        commitFeeAcknowledged: false, ecfAcknowledged: false, 
-        ivrLetterAcknowledged: false,
-        createdAt: new Date().toISOString()
-      };
+    const newClient = { 
+      id: uid, name, email, 
+      status: 'active', 
+      createdAt: new Date().toISOString() 
+    };
+    const newProject = {
+      id: pid, clientId: uid, name: projName, status: 'active', step: 1,
+      industry: document.getElementById('ncIndustry')?.value || '',
+      location: document.getElementById('ncLocation')?.value || '',
+      totalCost: document.getElementById('ncTotalCost')?.value || '',
+      sponsorEquity: document.getElementById('ncSponsorEquity')?.value || '',
+      fundsNeeded: document.getElementById('ncFundsNeeded')?.value || '',
+      currentStage: document.getElementById('ncCurrentStage')?.value || '',
+      useOfFunds: document.getElementById('ncUseOfFunds')?.value || '',
+      targetIRR: document.getElementById('ncTargetIRR')?.value || '',
+      targetCloseDate: document.getElementById('ncCloseDate')?.value || '',
+      moic: document.getElementById('ncMOIC')?.value || '',
+      capRate: document.getElementById('ncCapRate')?.value || '',
+      exitStrategy: document.getElementById('ncExitStrategy')?.value || '',
+      exitCapRate: document.getElementById('ncExitCapRate')?.value || '',
+      permits: document.getElementById('ncPermits')?.value || '',
+      revenue: document.getElementById('ncRevenue')?.value || '',
+      assetClass: document.getElementById('ncAssetClass')?.value || '',
+      infraType: document.getElementById('ncInfraType')?.value || '',
+      commodity: document.getElementById('ncCommodity')?.value || '',
+      miningStage: document.getElementById('ncMiningStage')?.value || '',
+      reserveLife: document.getElementById('ncReserveLife')?.value || '',
+      dataRoom: document.getElementById('ncDataRoom')?.value || '',
+      amount: document.getElementById('ncAmount')?.value || 'TBD',
+      interestRate: document.getElementById('ncRate')?.value || 'TBD',
+      term: document.getElementById('ncTerm')?.value || 'TBD',
+      gracePeriod: document.getElementById('ncGrace')?.value || '12',
+      ecf: document.getElementById('ncECF')?.value || 'TBD',
+      govLaw: document.getElementById('ncGovLaw')?.value || 'TBD',
+      termSheetExpiry: document.getElementById('ncExpiry')?.value || '',
+      nextMilestone: document.getElementById('ncMilestone')?.value || 'Awaiting Term Sheet',
+      stepDates: {}, checklistItems: {}, 
+      commitFeeStatus: 'pending', ecfStatus: 'pending',
+      commitFeeAcknowledged: false, ecfAcknowledged: false, 
+      ivrLetterAcknowledged: false,
+      createdAt: new Date().toISOString()
+    };
 
-      clients.push(newClient);
-      projects.push(newProject);
-      await fbSet('clients', uid, newClient);
-      await fbSet('projects', pid, newProject);
-      await logAudit('Admin created client', name + ' (' + email + ')', uid, pid);
-      await generateAndStoreIVL(uid, pid);
-      
-      await firebase.auth().signOut();
-      
-      localStorage.removeItem('croftSession');
-      
-      showToast(`Client ${name} created successfully!`);
-      closeModal('addClientModal');
-      
-      document.getElementById('ncName').value = '';
-      document.getElementById('ncEmail').value = '';
-      document.getElementById('ncPassword').value = '';
-      document.getElementById('ncProject').value = '';
-      
-      showAdminLogin();
-      openModal('loginModal');
-      showToast('Please log back in as admin to continue.');
-    })
-    .catch((error) => {
-      if (error.code === 'auth/email-already-in-use') {
-        showToast('Email already exists', true);
-      } else {
-        showToast('Failed to create client: ' + error.message, true);
-      }
-    });
+    clients.push(newClient);
+    projects.push(newProject);
+    await fbSet('clients', uid, newClient);
+    await fbSet('projects', pid, newProject);
+    await logAudit('Admin created client', name + ' (' + email + ')', uid, pid);
+    await generateAndStoreIVL(uid, pid);
+    
+    await firebase.auth().signOut();
+    
+    showToast(`Client ${name} created successfully!`);
+    closeModal('addClientModal');
+    showAdminLogin();
+    openModal('loginModal');
+    showToast('Please log back in as admin to continue.');
+  } catch (error) {
+    if (error.code === 'auth/email-already-in-use') {
+      showToast('Email already exists', true);
+    } else {
+      showToast('Failed to create client: ' + error.message, true);
+    }
+  }
 }
 
 function showUploadDocumentModal() {
@@ -5470,53 +5321,380 @@ function updateProjectSelectForUpload(clientId) {
   document.getElementById('uploadProjectId').innerHTML = '<option value="">Select Project</option>' + cp.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
 }
 
-function uploadDocument() {
+async function adminUploadDocument() {
   const clientId = document.getElementById('uploadClientId').value;
   const projectId = document.getElementById('uploadProjectId').value;
   const docType = document.getElementById('documentType').value;
   const fileInput = document.getElementById('pdfFile');
   const urlInput = document.getElementById('documentUrl').value;
-  const client = clients.find(c => String(c.id) === String(clientId));
+  
   if (!clientId || !projectId) { showToast('Select client and project', true); return; }
-  if (!client) { showToast('Selected client not found', true); return; }
+  
+  let downloadURL = urlInput;
+  
   if (fileInput.files && fileInput.files[0]) {
     const file = fileInput.files[0];
     if (file.type !== 'application/pdf') { showToast('Please upload a PDF', true); return; }
     if (file.size > 10 * 1024 * 1024) { showToast('File size must be less than 10MB', true); return; }
-    const reader = new FileReader();
-    reader.onload = e => saveDocument(clientId, projectId, docType, e.target.result);
-    reader.readAsDataURL(file);
-  } else if (urlInput) { saveDocument(clientId, projectId, docType, urlInput); }
-  else { showToast('Select a file or provide a URL', true); }
-}
-
-function saveDocument(clientId, projectId, docType, url) {
-  const id = String(Date.now());
-  const doc = { id: id, clientId: String(clientId), projectId: String(projectId), type: docType, name: docType, url: url, date: new Date().toISOString().split('T')[0], approved: false };
-  documents.push(doc);
-  const client = clients.find(c => c.id === clientId || c.id === String(clientId));
-  const project = projects.find(p => p.id === projectId || p.id === String(projectId));
-  fbSet('documents', id, doc).then(() => { 
-    closeModal('uploadDocumentModal'); 
-    showToast(`${docType} uploaded for ${client?.name || 'client'}.`);
-    logAudit('Document uploaded', docType, String(clientId), String(projectId));
-    logClientActivity(clientId, projectId, 'document_uploaded', `Croft Finance uploaded: ${docType}`, 'croft');
-    fbReload().then(() => {
-      renderAdminDocumentsTable();
-      if (currentClient && String(currentClient.id) === String(clientId)) renderDocuments();
-    });
-    if (client && client.email && client.status === 'active') {
-      const projectName = project ? project.name : 'your project';
-      sendEmail(client.email, `New Document Available — ${docType} — Croft Finance`, `Dear ${client.name},\n\nA new document has been uploaded to your Croft Finance client portal.\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nDOCUMENT DETAILS:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n• Document Type: ${docType}\n• Project: ${projectName}\n• Uploaded: ${doc.date}\n• Status: Ready for review\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nACTION REQUIRED:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nPlease log in to your client portal to view and download this document.\n\nPortal URL: ${window.location.origin}\nLogin using your email address and password.\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nIf you have any questions about this document, please reply to this email or contact me directly.\n\nBest regards,\nSuzana Aleksić\nPrincipal, Croft Finance\nsuzana.aleksic@croftfinance.com\n+381 69 288 0 191`).catch(() => {});
+    
+    try {
+      downloadURL = await uploadDocumentToStorage(file, clientId, projectId, docType);
+    } catch (error) {
+      showToast('Upload failed: ' + error.message, true);
+      return;
     }
-  });
+  } else if (!urlInput) {
+    showToast('Select a file or provide a URL', true);
+    return;
+  }
+  
+  const id = String(Date.now());
+  const doc = { 
+    id: id, 
+    clientId: String(clientId), 
+    projectId: String(projectId), 
+    type: docType, 
+    name: docType, 
+    url: downloadURL,
+    date: new Date().toISOString().split('T')[0], 
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    approved: false 
+  };
+  
+  documents.push(doc);
+  await fbSet('documents', id, doc);
+  
+  const client = clients.find(c => c.id === clientId);
+  const project = projects.find(p => p.id === projectId);
+  
+  closeModal('uploadDocumentModal');
+  showToast(`${docType} uploaded for ${client?.name || 'client'}.`);
+  
+  await logAudit('Document uploaded', docType, String(clientId), String(projectId));
+  await logClientActivity(clientId, projectId, 'document_uploaded', `Croft Finance uploaded: ${docType}`, 'croft');
+  
+  if (client && client.email && client.status === 'active') {
+    await sendEmail(client.email, `New Document Available — ${docType} — Croft Finance`,
+      `Dear ${client.name},\n\nA new document has been uploaded to your portal.\n\nDocument: ${docType}\nProject: ${project?.name}\n\nLog in to view: ${window.location.origin}`);
+  }
+  
+  renderAdminDocumentsTable();
+  if (currentClient && String(currentClient.id) === String(clientId)) renderDocuments();
+  
   document.getElementById('pdfFile').value = '';
   document.getElementById('documentUrl').value = '';
 }
 
 // ============================================================
-// ADMIN NOTIFICATIONS
+// CONTACT FORM
 // ============================================================
+
+function submitContactForm(event) {
+  event.preventDefault();
+  const name = document.getElementById('contactName').value.trim();
+  const email = document.getElementById('contactEmail').value.trim();
+  const project = document.getElementById('contactProject').value.trim();
+  const message = document.getElementById('contactMessage').value.trim();
+  const nda = document.getElementById('contactNda').checked;
+  if (!name || !email || !project || !message) { showToast('Please fill all required fields.', true); return; }
+  if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) { showToast('Please enter a valid email address.', true); return; }
+  if (!nda) { showToast('Please agree to the Confidentiality Terms.', true); return; }
+  const submitBtn = document.querySelector('#homepageContactForm button[type="submit"]');
+  const originalText = submitBtn.textContent;
+  submitBtn.textContent = 'Sending...';
+  submitBtn.disabled = true;
+  const emailContent = `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nNEW CONTACT FORM SUBMISSION\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nCONTACT DETAILS:\n• Name: ${name}\n• Email: ${email}\n• Company/Project: ${project}\n\nMESSAGE:\n${message}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nSubmitted: ${new Date().toLocaleString()}\n\nPlease respond within 24 hours.\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
+  emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, { to_email: EMAILJS_CONFIG.adminEmail, subject: `📞 New Contact Form Submission - ${name} (${project})`, message: emailContent }).then(() => {
+    document.getElementById('contactFormContent').style.display = 'none';
+    document.getElementById('contactSuccessContent').style.display = 'block';
+    document.getElementById('contactName').value = '';
+    document.getElementById('contactEmail').value = '';
+    document.getElementById('contactProject').value = '';
+    document.getElementById('contactMessage').value = '';
+    document.getElementById('contactNda').checked = false;
+    emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, { to_email: email, subject: 'Croft Finance — We received your inquiry', message: `Dear ${name},\n\nThank you for reaching out to Croft Finance.\n\nWe have received your inquiry regarding "${project}" and Suzana Aleksić will respond to you within 24 hours.\n\nBest regards,\nSuzana Aleksić\nPrincipal, Croft Finance` }).catch(() => {});
+  }).catch((error) => { console.error('Email send failed:', error); showToast('Failed to send. Please try again or email directly.', true); }).finally(() => { submitBtn.textContent = originalText; submitBtn.disabled = false; });
+}
+
+function resetContactForm() {
+  document.getElementById('contactFormContent').style.display = 'block';
+  document.getElementById('contactSuccessContent').style.display = 'none';
+}
+
+// ============================================================
+// UI HELPER FUNCTIONS
+// ============================================================
+
+function showView(v) {
+  document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
+  document.getElementById('view-' + v).classList.add('active');
+  if (v === 'home') document.title = 'Croft Finance — Structured Finance Solutions';
+}
+
+function openLoginModal() { showLoginForm(); openModal('loginModal'); }
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+function showLoginForm() {
+  document.getElementById('loginForm').style.display = 'block';
+  document.getElementById('registerForm').style.display = 'none';
+  document.getElementById('adminLoginForm').style.display = 'none';
+  document.getElementById('forgotPasswordForm').style.display = 'none';
+  document.getElementById('brokerLoginForm').style.display = 'none';
+  document.getElementById('brokerRegisterForm').style.display = 'none';
+}
+function showRegisterForm() {
+  document.getElementById('loginForm').style.display = 'none';
+  document.getElementById('registerForm').style.display = 'block';
+  document.getElementById('adminLoginForm').style.display = 'none';
+  document.getElementById('forgotPasswordForm').style.display = 'none';
+  document.getElementById('brokerLoginForm').style.display = 'none';
+  document.getElementById('brokerRegisterForm').style.display = 'none';
+}
+function showAdminLogin() {
+  document.getElementById('loginForm').style.display = 'none';
+  document.getElementById('registerForm').style.display = 'none';
+  document.getElementById('adminLoginForm').style.display = 'block';
+  document.getElementById('forgotPasswordForm').style.display = 'none';
+  document.getElementById('brokerLoginForm').style.display = 'none';
+  document.getElementById('brokerRegisterForm').style.display = 'none';
+}
+function showForgotPassword() {
+  document.getElementById('loginForm').style.display = 'none';
+  document.getElementById('registerForm').style.display = 'none';
+  document.getElementById('adminLoginForm').style.display = 'none';
+  document.getElementById('forgotPasswordForm').style.display = 'block';
+  document.getElementById('brokerLoginForm').style.display = 'none';
+  document.getElementById('brokerRegisterForm').style.display = 'none';
+}
+function showBrokerLoginForm() {
+  document.getElementById('loginForm').style.display = 'none';
+  document.getElementById('registerForm').style.display = 'none';
+  document.getElementById('adminLoginForm').style.display = 'none';
+  document.getElementById('forgotPasswordForm').style.display = 'none';
+  document.getElementById('brokerLoginForm').style.display = 'block';
+  document.getElementById('brokerRegisterForm').style.display = 'none';
+}
+function showBrokerRegisterForm() {
+  document.getElementById('loginForm').style.display = 'none';
+  document.getElementById('registerForm').style.display = 'none';
+  document.getElementById('adminLoginForm').style.display = 'none';
+  document.getElementById('forgotPasswordForm').style.display = 'none';
+  document.getElementById('brokerLoginForm').style.display = 'none';
+  document.getElementById('brokerRegisterForm').style.display = 'block';
+}
+
+function showToast(msg, isError = false) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.style.background = isError ? 'var(--error)' : 'var(--navy)';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+function setupNavScroll() {
+  const nav = document.getElementById('homeNav');
+  if (!nav) return;
+  window.addEventListener('scroll', () => { nav.classList.toggle('scrolled', window.scrollY > 60); });
+}
+
+function scrollToSection(id) { document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }); }
+
+function toggleSidebar() {
+  document.getElementById('clientSidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('show');
+}
+function toggleAdminSidebar() {
+  document.getElementById('adminSidebar').classList.toggle('open');
+  document.getElementById('adminSidebarOverlay').classList.toggle('show');
+}
+function toggleBrokerSidebar() {
+  document.getElementById('brokerSidebar').classList.toggle('open');
+  document.getElementById('brokerSidebarOverlay').classList.toggle('show');
+}
+function toggleNotifications() {
+  const center = document.getElementById('notificationCenter');
+  center.classList.toggle('open');
+  if (center.classList.contains('open')) markAllNotificationsRead();
+}
+function closeNotifications() { document.getElementById('notificationCenter').classList.remove('open'); }
+
+function switchPortalTab(tabName, el) {
+  document.querySelectorAll('#view-portal .portal-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tabName).classList.add('active');
+  document.querySelectorAll('#view-portal .nav-item').forEach(i => i.classList.remove('active'));
+  if (el) el.classList.add('active');
+  if (tabName === 'messages') { markMessagesRead(); updateMsgBadge(); }
+  if (tabName === 'documents') { renderDocuments(); updateIVLDocumentCard(); }
+  if (tabName === 'projects') renderProjectsList();
+  if (tabName === 'checklist') renderChecklist();
+  if (tabName === 'activity') renderActivityLog();
+  if (window.innerWidth <= 768) {
+    document.getElementById('clientSidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('show');
+  }
+}
+
+function switchAdminTab(tabName, el) {
+  document.querySelectorAll('#view-admin .admin-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('admin-' + tabName).classList.add('active');
+  document.querySelectorAll('#view-admin .nav-item').forEach(i => i.classList.remove('active'));
+  if (el) el.classList.add('active');
+  if (tabName === 'audit') renderAuditLog();
+  if (tabName === 'messages-admin') renderAdminMessages();
+  if (tabName === 'brokers') renderBrokerAdminTable();
+  if (tabName === 'broker-submissions') renderAdminBrokerSubmissionsTable();
+  if (window.innerWidth <= 768) {
+    document.getElementById('adminSidebar').classList.remove('open');
+    document.getElementById('adminSidebarOverlay').classList.remove('show');
+  }
+}
+
+function switchBrokerTab(tabName, el) {
+  document.querySelectorAll('#view-broker .portal-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('broker-tab-' + tabName).classList.add('active');
+  document.querySelectorAll('#view-broker .nav-item').forEach(i => i.classList.remove('active'));
+  if (el) el.classList.add('active');
+  if (tabName === 'messages') loadBrokerMessages();
+  if (tabName === 'submissions') renderBrokerSubmissions();
+  if (window.innerWidth <= 768) {
+    document.getElementById('brokerSidebar').classList.remove('open');
+    document.getElementById('brokerSidebarOverlay').classList.remove('show');
+  }
+}
+
+function refreshData() { setupRealtimeListeners(); showToast('Data refreshed'); }
+
+function testEmailConfig() {
+  emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
+    to_email: EMAILJS_CONFIG.adminEmail,
+    subject: '✅ Croft Finance - Email Test Successful',
+    message: 'This is a test email to confirm your EmailJS configuration is working correctly.\n\nTime: ' + new Date().toLocaleString()
+  }).then(() => { showToast('Test email sent to admin. Check your inbox.'); }).catch((error) => { console.error('Email test failed:', error); showToast('Email test failed. Check console for details.', true); });
+}
+
+function sendEmail(to, subject, message) {
+  return emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, { to_email: to, subject: subject, message: message });
+}
+
+async function getUserIP() {
+  try {
+    const response = await fetch('https://api.ipify.org?format=json');
+    const data = await response.json();
+    return data.ip;
+  } catch {
+    return 'unknown';
+  }
+}
+
+function setupSessionTimeout() {
+  const events = ['click', 'keypress', 'mousemove', 'scroll'];
+  events.forEach(event => window.addEventListener(event, resetSessionTimeout));
+  resetSessionTimeout();
+}
+
+function resetSessionTimeout() {
+  if (sessionTimeout) clearTimeout(sessionTimeout);
+  sessionTimeout = setTimeout(() => {
+    if (currentClient || localStorage.getItem('croftSession') || currentBroker || localStorage.getItem('croftBrokerSession')) {
+      showToast('Session expired due to inactivity. Please log in again.');
+      logout();
+    }
+  }, 30 * 60 * 1000);
+}
+
+function checkSession() {
+  const sess = localStorage.getItem('croftSession');
+  const adminSess = localStorage.getItem('croftAdminSession');
+  const brokerSess = localStorage.getItem('croftBrokerSession');
+  
+  if (adminSess) {
+    try {
+      const s = JSON.parse(adminSess);
+      if (Date.now() - s.ts < 7 * 24 * 60 * 60 * 1000) {
+        showView('admin');
+        loadAdminNotifications();
+        setupRealtimeListeners();
+        renderAdminTables();
+        return;
+      } else {
+        localStorage.removeItem('croftAdminSession');
+      }
+    } catch(e) {
+      localStorage.removeItem('croftAdminSession');
+    }
+  }
+  
+  if (brokerSess) {
+    try {
+      const s = JSON.parse(brokerSess);
+      if (Date.now() - s.ts < 7 * 24 * 60 * 60 * 1000) {
+        const broker = brokers.find(b => b.id === s.brokerId);
+        if (broker && broker.status === 'active') {
+          currentBroker = broker;
+          showView('broker');
+          loadBrokerPortal();
+          return;
+        } else {
+          localStorage.removeItem('croftBrokerSession');
+        }
+      } else {
+        localStorage.removeItem('croftBrokerSession');
+      }
+    } catch(e) {
+      localStorage.removeItem('croftBrokerSession');
+    }
+  }
+  
+  if (sess) {
+    try {
+      const s = JSON.parse(sess);
+      if (Date.now() - s.ts < 7 * 24 * 60 * 60 * 1000) {
+        let client = clients.find(c => c.id === s.clientId);
+        if (client && client.status === 'active') {
+          currentClient = client;
+          const cp = projects.filter(p => p.clientId === client.id);
+          if (cp.length) currentProjectId = cp[0].id;
+          showView('portal');
+          loadClientPortal();
+          return;
+        } else {
+          localStorage.removeItem('croftSession');
+        }
+      } else {
+        localStorage.removeItem('croftSession');
+      }
+    } catch(e) {
+      localStorage.removeItem('croftSession');
+    }
+  }
+}
+
+function checkCookies() { if (localStorage.getItem('cookiesAccepted')) document.getElementById('cookieBanner').style.display = 'none'; }
+function acceptCookies() { localStorage.setItem('cookiesAccepted', '1'); document.getElementById('cookieBanner').style.display = 'none'; }
+
+function addNotification(title, message, type) { 
+  const notification = { id: Date.now(), title, message, type, timestamp: new Date().toISOString(), read: false }; 
+  notifications.unshift(notification); 
+  if (notifications.length > 50) notifications.pop(); 
+  renderNotifications(); 
+}
+
+function renderNotifications() { 
+  const container = document.getElementById('notificationList'); 
+  if (!container) return; 
+  if (notifications.length === 0) { container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--gray-400);">No notifications</div>'; return; } 
+  container.innerHTML = notifications.map(n => `<div class="notification-item ${n.read ? '' : 'unread'}"><div class="notification-icon"><i class="fas ${n.type === 'success' ? 'fa-check-circle' : n.type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'}"></i></div><div class="notification-content"><div class="notification-title">${escapeHtml(n.title)}</div><div class="notification-message">${escapeHtml(n.message)}</div><div class="notification-time">${new Date(n.timestamp).toLocaleString()}</div></div></div>`).join(''); 
+}
+
+function markAllNotificationsRead() { notifications.forEach(n => n.read = true); renderNotifications(); }
+
+function requestBrowserNotificationPermission() {
+  if ('Notification' in window && !browserNotificationPermission) {
+    Notification.requestPermission().then(permission => { browserNotificationPermission = permission === 'granted'; });
+  }
+}
+
 function loadAdminNotifications() {
   const saved = localStorage.getItem('croft_admin_notifications');
   if (saved) adminNotifications = JSON.parse(saved);
@@ -5571,15 +5749,6 @@ function renderAdminNotificationDropdown() {
 function saveAdminNotifications() { localStorage.setItem('croft_admin_notifications', JSON.stringify(adminNotifications)); localStorage.setItem('croft_admin_unread_count', adminUnreadCount); }
 
 function handleAdminNotificationClick(type, data) { closeAdminNotifications(); if (type === 'message') switchAdminTab('messages-admin', document.querySelector('[onclick*="messages-admin"]')); else if (type === 'meeting') switchAdminTab('meetings', document.querySelector('[onclick*="meetings"]')); else if (type === 'document') switchAdminTab('documents-admin', document.querySelector('[onclick*="documents-admin"]')); else if (type === 'registration' || type === 'submission') switchAdminTab('clients', document.querySelector('[onclick*="clients"]')); }
-
-function initAdminListeners() {
-  if (!firebaseReady) return;
-  adminSessionStart = new Date();
-}
-
-function stopAdminListeners() {
-  // No-op for now
-}
 
 function renderAdminBrokerSubmissionsTable() {
   const container = document.getElementById('adminBrokerSubmissionsTable');
@@ -5653,14 +5822,6 @@ function convertSubmissionToClient(submissionId) {
   }, 300);
 }
 
-function checkAllExpiries() {
-  // Placeholder for expiry checking
-}
-
-function checkForNotifications() {
-  // Placeholder for notifications
-}
-
 function renderAuditLog() {
   const container = document.getElementById('auditLogList');
   if (!container) return;
@@ -5696,31 +5857,60 @@ function scheduleMeeting() {
 
 function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
 
-function checkCookies() { if (localStorage.getItem('cookiesAccepted')) document.getElementById('cookieBanner').style.display = 'none'; }
-function acceptCookies() { localStorage.setItem('cookiesAccepted', '1'); document.getElementById('cookieBanner').style.display = 'none'; }
-
-function addNotification(title, message, type) { 
-  const notification = { id: Date.now(), title, message, type, timestamp: new Date().toISOString(), read: false }; 
-  notifications.unshift(notification); 
-  if (notifications.length > 50) notifications.pop(); 
-  renderNotifications(); 
+function checkAllExpiries() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  projects.forEach(proj => {
+    const expiryItems = [
+      { date: proj.termSheetExpiry, name: 'Term Sheet', step: 1 },
+      { date: proj.commitFeeDeadline, name: 'Commitment Fee', step: 2 },
+      { date: proj.deedExpiryDate, name: 'Deed of Undertaking', step: 3 },
+      { date: proj.ecfPolicyExpiryDate, name: 'ECF Policy', step: 4 }
+    ];
+    expiryItems.forEach(item => {
+      if (item.date && proj.step === item.step) {
+        const expiryDate = new Date(item.date);
+        expiryDate.setHours(0, 0, 0, 0);
+        const diffDays = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
+        if (diffDays <= 3 && diffDays >= 0) {
+          addAdminNotification('warning', `${proj.name} - ${item.name} expires in ${diffDays} days`, 'expiry', { projectId: proj.id, days: diffDays });
+        }
+      }
+    });
+  });
 }
-function renderNotifications() { 
-  const container = document.getElementById('notificationList'); 
-  if (!container) return; 
-  if (notifications.length === 0) { container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--gray-400);">No notifications</div>'; return; } 
-  container.innerHTML = notifications.map(n => `<div class="notification-item ${n.read ? '' : 'unread'}"><div class="notification-icon"><i class="fas ${n.type === 'success' ? 'fa-check-circle' : n.type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'}"></i></div><div class="notification-content"><div class="notification-title">${escapeHtml(n.title)}</div><div class="notification-message">${escapeHtml(n.message)}</div><div class="notification-time">${new Date(n.timestamp).toLocaleString()}</div></div></div>`).join(''); 
-}
-function markAllNotificationsRead() { notifications.forEach(n => n.read = true); renderNotifications(); }
 
-function requestBrowserNotificationPermission() {
-  if ('Notification' in window && !browserNotificationPermission) {
-    Notification.requestPermission().then(permission => { browserNotificationPermission = permission === 'granted'; });
+function addAdminNotification(type, title, message, data = {}) {
+  const notification = { id: Date.now(), type, title, message, data, timestamp: new Date().toISOString(), read: false };
+  adminNotifications.unshift(notification);
+  adminUnreadCount++;
+  if (adminNotifications.length > 100) adminNotifications.pop();
+  updateAdminBellBadge();
+  saveAdminNotifications();
+  renderAdminNotificationDropdown();
+}
+
+function checkForNotifications() {
+  if (!currentClient) return;
+  const unreadMessages = messages.filter(m => String(m.clientId) === String(currentClient.id) && m.sender === 'admin' && !m.read);
+  if (unreadMessages.length > 0) {
+    addNotification('New Messages', `You have ${unreadMessages.length} unread message${unreadMessages.length === 1 ? '' : 's'}`, 'info');
   }
 }
 
+async function fbReload() { 
+  if (firebaseReady) await loadFromFirebase(); 
+}
+
 // Initialize the application
-init();
+document.addEventListener('DOMContentLoaded', () => {
+  emailjs.init({ publicKey: EMAILJS_CONFIG.publicKey });
+  checkCookies();
+  setupNavScroll();
+  checkSession();
+  setupSessionTimeout();
+  initFirebase();
+});
 </script>
 </body>
 </html>
