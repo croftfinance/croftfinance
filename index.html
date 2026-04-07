@@ -14,7 +14,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 <style>
-/* ========== YOUR EXISTING STYLES (PRESERVED) ========== */
 :root {
   --navy: #0a1628;
   --navy-mid: #0f1c3f;
@@ -1084,7 +1083,6 @@ body {
   color: var(--navy);
 }
 
-/* Messages & Communication */
 .messages-container {
   height: 440px;
   display: flex;
@@ -1150,7 +1148,6 @@ body {
   border-color: var(--navy);
 }
 
-/* Admin Thread */
 .admin-thread {
   background: var(--white);
   border: 1px solid var(--gray-200);
@@ -1204,7 +1201,6 @@ body {
   border-color: var(--navy);
 }
 
-/* Checklist */
 .checklist-group {
   margin-bottom: 24px;
 }
@@ -1259,7 +1255,6 @@ body {
   color: var(--gray-400);
 }
 
-/* Required Documents */
 .req-doc-item {
   display: flex;
   align-items: center;
@@ -1303,7 +1298,6 @@ body {
   color: var(--gray-500);
 }
 
-/* Funded Screen */
 .funded-screen {
   text-align: center;
   padding: 60px 40px;
@@ -1347,7 +1341,6 @@ body {
   margin: 0 auto 32px;
 }
 
-/* Progress Bar */
 .progress-bar-wrap {
   background: var(--gray-100);
   border-radius: 4px;
@@ -1362,7 +1355,6 @@ body {
   transition: width 0.5s;
 }
 
-/* Expiry Warnings */
 .expiry-ok {
   font-size: 13px;
   color: var(--gray-600);
@@ -1378,7 +1370,6 @@ body {
   font-weight: 500;
 }
 
-/* Audit Log */
 .audit-entry {
   padding: 10px 0;
   border-bottom: 1px solid var(--gray-100);
@@ -1401,7 +1392,6 @@ body {
   margin-top: 2px;
 }
 
-/* Broker Portal Styles */
 .broker-stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -1452,7 +1442,6 @@ body {
   font-weight: 600;
 }
 
-/* Contact Form Section */
 .section-contact-form {
   background: var(--navy-mid);
   padding: 100px 60px;
@@ -1524,7 +1513,6 @@ body {
   background: var(--navy-light);
 }
 
-/* Redesigned Documents Section */
 .documents-table {
   width: 100%;
   border-collapse: collapse;
@@ -1656,7 +1644,6 @@ body {
   color: var(--blue);
 }
 
-/* Expiry Alerts */
 .expiry-alerts-section {
   margin-bottom: 24px;
 }
@@ -1756,7 +1743,6 @@ body {
   50% { opacity: 0.5; }
 }
 
-/* Dashboard Hero Section */
 .dashboard-hero {
   display: flex;
   justify-content: space-between;
@@ -1888,7 +1874,6 @@ body {
   color: var(--blue);
 }
 
-/* Stats Cards Upgrade */
 .stat-trend {
   font-size: 10px;
   margin-top: 6px;
@@ -1916,7 +1901,6 @@ body {
 .urgency-orange { color: var(--warning); }
 .urgency-red { color: var(--error); }
 
-/* Quick Actions Bar */
 .quick-actions-bar {
   display: flex;
   justify-content: space-around;
@@ -1954,7 +1938,6 @@ body {
   color: var(--gray-600);
 }
 
-/* Next Steps Card */
 .next-steps-list {
   display: flex;
   flex-direction: column;
@@ -2004,7 +1987,6 @@ body {
   color: var(--gray-500);
 }
 
-/* Advisor Card */
 .advisor-card {
   background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
   border-radius: 16px;
@@ -2090,7 +2072,6 @@ body {
   border-color: var(--blue);
 }
 
-/* Acknowledgment Badges */
 .ack-badge {
   display: inline-flex;
   align-items: center;
@@ -2207,7 +2188,6 @@ body {
   color: var(--blue);
 }
 
-/* Activity Log */
 .activity-timeline {
   position: relative;
   padding-left: 40px;
@@ -2382,7 +2362,6 @@ body {
   margin-top: 2px;
 }
 
-/* Investor Verification Letter */
 .ivl-modal {
   max-width: 860px;
   width: 95%;
@@ -3073,12 +3052,6 @@ let failedLoginAttempts = new Map();
 let sessionTimeout = null;
 let adminNotifications = [];
 let adminUnreadCount = 0;
-let adminSessionStart = null;
-let adminMessageUnsubscribe = null;
-let adminMeetingUnsubscribe = null;
-let adminDocumentUnsubscribe = null;
-let adminClientUnsubscribe = null;
-let browserNotificationPermission = false;
 let unsubscribeListeners = [];
 
 const STEP_NAMES = ['', 'Term Sheet', 'Commitment Fee', 'Deed of Undertaking', 'Credit Support', 'Hard-Copy Submission', 'ECF Escrow', 'Transfer to Agent', 'Funded'];
@@ -3096,56 +3069,6 @@ const REQUIRED_DOCS = {
   7: ['Transfer Confirmation'],
   8: ['Funding Disbursement Confirmation']
 };
-
-// ============================================================
-// FIREBASE STORAGE FUNCTIONS
-// ============================================================
-
-async function uploadDocumentToStorage(file, clientId, projectId, docType) {
-  if (!storage) throw new Error('Storage not initialized');
-  
-  const timestamp = Date.now();
-  const sanitizedType = docType.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-  const filename = `${timestamp}_${sanitizedType}.pdf`;
-  const storagePath = `documents/${clientId}/${projectId}/${filename}`;
-  
-  const storageRef = storage.ref(storagePath);
-  const metadata = {
-    contentType: 'application/pdf',
-    customMetadata: {
-      uploadedBy: clientId,
-      projectId: projectId,
-      documentType: docType,
-      uploadedAt: new Date().toISOString()
-    }
-  };
-  
-  const uploadTask = storageRef.put(file, metadata);
-  
-  return new Promise((resolve, reject) => {
-    uploadTask.on('state_changed',
-      (snapshot) => {
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log(`Upload progress: ${progress}%`);
-      },
-      (error) => reject(error),
-      async () => {
-        const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
-        resolve(downloadURL);
-      }
-    );
-  });
-}
-
-async function deleteDocumentFromStorage(storagePath) {
-  if (!storage || !storagePath) return;
-  try {
-    const storageRef = storage.ref(storagePath);
-    await storageRef.delete();
-  } catch (error) {
-    console.error('Storage delete error:', error);
-  }
-}
 
 // ============================================================
 // INITIALIZATION
@@ -3778,9 +3701,7 @@ function loadCurrentProjectData() {
   renderDocuments();
   renderFundedScreen(proj);
   renderExpiryAlerts();
-  updateStepTrackerWithExpiryWarning();
   updateDashboardHero();
-  updateStatsCardsUpgraded();
   updateNextStepsCard();
   updateAdvisorNote();
   checkAndShowAcknowledgment();
@@ -3846,39 +3767,6 @@ function renderFundingTimeline(proj) {
       }).join('')}
     </div>
   </div>`;
-}
-
-function updateStepTrackerWithExpiryWarning() {
-  const proj = projects.find(p => p.id === currentProjectId);
-  if (!proj) return;
-  const step = proj.step || 1;
-  const stepExpiryMap = { 
-    1: 'termSheetExpiry', 
-    2: 'commitFeeDeadline', 
-    3: 'deedExpiryDate', 
-    4: 'ecfPolicyExpiryDate', 
-    5: 'ecfPolicyExpiryDate', 
-    6: 'ecfPolicyExpiryDate', 
-    7: null, 
-    8: null 
-  };
-  const relevantField = stepExpiryMap[step];
-  if (relevantField && proj[relevantField]) {
-    const expiryDate = new Date(proj[relevantField]);
-    const today = new Date(); 
-    today.setHours(0, 0, 0, 0);
-    const diffDays = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
-    if (diffDays >= 0 && diffDays <= 7) {
-      const stepNode = document.querySelector(`.step-node[data-step="${step}"]`);
-      if (stepNode && !stepNode.querySelector('.step-warning-icon')) {
-        const warningIcon = document.createElement('span');
-        warningIcon.className = 'step-warning-icon';
-        warningIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
-        warningIcon.title = `${STEP_NAMES[step]} expires in ${diffDays} days`;
-        stepNode.querySelector('.step-label')?.appendChild(warningIcon);
-      }
-    }
-  }
 }
 
 function renderDocuments() {
@@ -4043,6 +3931,42 @@ async function clientUploadDocument() {
   }
 }
 
+async function uploadDocumentToStorage(file, clientId, projectId, docType) {
+  if (!storage) throw new Error('Storage not initialized');
+  
+  const timestamp = Date.now();
+  const sanitizedType = docType.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+  const filename = `${timestamp}_${sanitizedType}.pdf`;
+  const storagePath = `documents/${clientId}/${projectId}/${filename}`;
+  
+  const storageRef = storage.ref(storagePath);
+  const metadata = {
+    contentType: 'application/pdf',
+    customMetadata: {
+      uploadedBy: clientId,
+      projectId: projectId,
+      documentType: docType,
+      uploadedAt: new Date().toISOString()
+    }
+  };
+  
+  const uploadTask = storageRef.put(file, metadata);
+  
+  return new Promise((resolve, reject) => {
+    uploadTask.on('state_changed',
+      (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log(`Upload progress: ${progress}%`);
+      },
+      (error) => reject(error),
+      async () => {
+        const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+        resolve(downloadURL);
+      }
+    );
+  });
+}
+
 function viewPDF(docId) { 
   const d = documents.find(x => x.id === docId || x.id === String(docId));
   if (d && d.url) window.open(d.url, '_blank');
@@ -4131,26 +4055,22 @@ function renderFundedScreen(proj) {
 function renderExpiryAlerts() {
   const proj = projects.find(p => p.id === currentProjectId);
   if (!proj) return;
-  const alerts = checkExpiryDates(proj);
-  const container = document.getElementById('expiryAlertsContainer');
-  if (!container) return;
-  if (alerts.length === 0) { container.innerHTML = ''; return; }
-  container.innerHTML = `<div class="expiry-alerts-section">${alerts.map(alert => `<div class="expiry-alert expiry-alert-${alert.urgency}"><i class="fas ${alert.urgency === 'critical' ? 'fa-exclamation-triangle' : alert.urgency === 'warning' ? 'fa-clock' : alert.urgency === 'notice' ? 'fa-info-circle' : 'fa-skull-crossbones'}"></i><div class="expiry-alert-content"><div class="expiry-alert-title">${alert.name}</div><div class="expiry-alert-message">${alert.message}</div></div><a class="expiry-alert-action" onclick="switchPortalTab('messages',null)">Contact Suzana →</a></div>`).join('')}</div>`;
-}
-
-function checkExpiryDates(proj) {
-  const alerts = []; const today = new Date(); today.setHours(0, 0, 0, 0);
+  const alerts = [];
+  const today = new Date(); today.setHours(0, 0, 0, 0);
   const expiryItems = [{ date: proj.termSheetExpiry, name: 'Term Sheet' }, { date: proj.commitFeeDeadline, name: 'Commitment Fee Deadline' }, { date: proj.deedExpiryDate, name: 'Deed of Undertaking' }, { date: proj.ecfPolicyExpiryDate, name: 'ECF Guarantee Policy' }];
   for (const item of expiryItems) {
     if (!item.date) continue;
     const expiryDate = new Date(item.date); expiryDate.setHours(0, 0, 0, 0);
     const diffDays = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
-    if (diffDays < 0) alerts.push({ type: 'expired', name: item.name, days: Math.abs(diffDays), message: `${item.name} has expired. Your deal may be at risk.`, urgency: 'expired' });
-    else if (diffDays <= 3) alerts.push({ type: 'critical', name: item.name, days: diffDays, message: `URGENT: Your ${item.name} expires in ${diffDays} day${diffDays === 1 ? '' : 's'}. Contact Suzana immediately.`, urgency: 'critical' });
-    else if (diffDays <= 7) alerts.push({ type: 'warning', name: item.name, days: diffDays, message: `Your ${item.name} expires in ${diffDays} days. Please take action.`, urgency: 'warning' });
-    else if (diffDays <= 14) alerts.push({ type: 'notice', name: item.name, days: diffDays, message: `Note: Your ${item.name} expires on ${expiryDate.toLocaleDateString()}.`, urgency: 'notice' });
+    if (diffDays < 0) alerts.push({ name: item.name, message: `${item.name} has expired. Your deal may be at risk.`, urgency: 'expired' });
+    else if (diffDays <= 3) alerts.push({ name: item.name, message: `URGENT: Your ${item.name} expires in ${diffDays} day${diffDays === 1 ? '' : 's'}. Contact Suzana immediately.`, urgency: 'critical' });
+    else if (diffDays <= 7) alerts.push({ name: item.name, message: `Your ${item.name} expires in ${diffDays} days. Please take action.`, urgency: 'warning' });
+    else if (diffDays <= 14) alerts.push({ name: item.name, message: `Note: Your ${item.name} expires on ${expiryDate.toLocaleDateString()}.`, urgency: 'notice' });
   }
-  return alerts;
+  const container = document.getElementById('expiryAlertsContainer');
+  if (!container) return;
+  if (alerts.length === 0) { container.innerHTML = ''; return; }
+  container.innerHTML = `<div class="expiry-alerts-section">${alerts.map(alert => `<div class="expiry-alert expiry-alert-${alert.urgency}"><i class="fas ${alert.urgency === 'critical' ? 'fa-exclamation-triangle' : alert.urgency === 'warning' ? 'fa-clock' : alert.urgency === 'notice' ? 'fa-info-circle' : 'fa-skull-crossbones'}"></i><div class="expiry-alert-content"><div class="expiry-alert-title">${alert.name}</div><div class="expiry-alert-message">${alert.message}</div></div><a class="expiry-alert-action" onclick="switchPortalTab('messages',null)">Contact Suzana →</a></div>`).join('')}</div>`;
 }
 
 function renderEnhancedStepTracker(proj) {
@@ -4453,42 +4373,6 @@ function updateDashboardHero() {
   document.getElementById('nextActionText').className = `next-action-text ${actionClass}`;
 }
 
-function updateStatsCardsUpgraded() {
-  const proj = projects.find(p => p.id === currentProjectId);
-  if (!proj) return;
-  const step = proj.step || 1;
-  const stageCard = document.querySelector('.stat-card:first-child');
-  if (stageCard && !stageCard.querySelector('.mini-progress')) {
-    const miniProgress = document.createElement('div');
-    miniProgress.className = 'mini-progress';
-    for (let i = 1; i <= 8; i++) { const dot = document.createElement('div'); dot.className = `mini-progress-dot ${i < step ? 'completed' : i === step ? 'current' : ''}`; miniProgress.appendChild(dot); }
-    stageCard.querySelector('.stat-value').after(miniProgress);
-  }
-  const amountCard = document.querySelector('.stat-card:nth-child(2)');
-  if (amountCard && proj.amount && proj.amount !== 'TBD') {
-    const amountNum = parseFloat(String(proj.amount).replace(/[^0-9.-]/g, ''));
-    const rateNum = parseFloat(String(proj.interestRate).replace(/[^0-9.-]/g, ''));
-    if (!isNaN(amountNum) && !isNaN(rateNum)) {
-      const annualInterest = (amountNum * rateNum / 100).toLocaleString();
-      if (!amountCard.querySelector('.stat-sub-interest')) { const interestSub = document.createElement('div'); interestSub.className = 'stat-sub'; interestSub.innerHTML = `Annual interest: $${annualInterest}`; amountCard.appendChild(interestSub); }
-    }
-  }
-  const closingCard = document.querySelector('.stat-card:last-child');
-  if (closingCard) {
-    const stepDates = proj.stepDates || {};
-    const step1Date = stepDates['1'];
-    if (step1Date && step >= 1) {
-      const start = new Date(step1Date);
-      const earlyClose = addBusinessDays(start, 14);
-      const today = new Date();
-      const daysLeft = Math.max(0, Math.ceil((earlyClose - today) / 86400000));
-      const urgencyClass = daysLeft <= 7 ? 'urgency-red' : daysLeft <= 14 ? 'urgency-orange' : 'urgency-green';
-      const countdownEl = document.getElementById('dashCountdown');
-      if (countdownEl) countdownEl.className = `stat-value ${urgencyClass}`;
-    }
-  }
-}
-
 function updateNextStepsCard() {
   const proj = projects.find(p => p.id === currentProjectId);
   if (!proj) return;
@@ -4625,9 +4509,15 @@ function renderBrokerAdminTable() {
       <td style="vertical-align:middle;">${b.commissionRate !== undefined && b.commissionRate !== null ? b.commissionRate + '%' : '0%'}</td>
       <td style="vertical-align:middle;"><span style="color:${b.status === 'pending' ? 'var(--warning)' : 'var(--success)'};">${b.status === 'pending' ? 'Pending' : 'Active'}</span></td>
       <td style="vertical-align:middle;font-size:12px;">${b.createdAt ? new Date(b.createdAt).toLocaleDateString() : '—'}</td>
-      <td style="vertical-align:middle;">${b.status === 'pending' ? `<button class="btn btn-success" style="padding:4px 10px;font-size:11px;" onclick="activateBroker('${b.id}')">Activate</button>` : ''}<button class="btn btn-outline" style="padding:4px 10px;font-size:11px;color:var(--error);" onclick="deleteBroker('${b.id}')">Delete</button></td>
-    </tr>
+      <td style="vertical-align:middle;">
+        ${b.status === 'pending' ? `<button class="btn btn-success" style="padding:4px 10px;font-size:11px;" onclick="activateBroker('${b.id}')">Activate</button>` : ''}
+        <button class="btn btn-outline" style="padding:4px 10px;font-size:11px;color:var(--error);" onclick="deleteBroker('${b.id}')">Delete</button>
+      </td>
+    </table>
   `).join('');
+  const pendingBrokersCount = brokers.filter(b => b.status === 'pending').length;
+  const pendingBadge = document.getElementById('pendingBrokersCount');
+  if (pendingBadge) pendingBadge.textContent = pendingBrokersCount;
 }
 
 function activateBroker(id) {
@@ -4865,6 +4755,12 @@ function renderAdminTables() {
   renderClientsTable();
   renderProjectsTable();
   renderAdminDocumentsTable();
+  renderPipelineBoard();
+  renderPendingRegistrations();
+  updateAdminDashboardStats();
+  renderExpiryTable();
+  renderMeetings();
+  renderAuditLog();
 }
 
 function renderClientsTable() {
@@ -4872,13 +4768,24 @@ function renderClientsTable() {
   if (!tbody) return;
   const searchVal = (document.getElementById('clientSearch')?.value || '').toLowerCase();
   const filtered = clients.filter(c => c.name.toLowerCase().includes(searchVal) || c.email.toLowerCase().includes(searchVal));
-  tbody.innerHTML = filtered.map(c => { const cp = projects.filter(p => p.clientId === c.id); return `<tr>
-      <td style="vertical-align:middle;"><strong>${escapeHtml(c.name)}</strong><br><span style="font-size:11px;color:var(--gray-400);">${c.email}</span></td>
-      <td style="vertical-align:middle;">${cp.map(p => `<span class="badge badge-gray">${escapeHtml(p.name)}</span>`).join(' ') || '—'}</td>
-      <td style="vertical-align:middle;"><span style="color:${c.status === 'pending' ? 'var(--warning)' : 'var(--success)'};">${c.status === 'pending' ? 'Pending' : 'Active'}</span></td>
-      <td style="font-size:12px;color:var(--gray-400);">${c.createdAt ? new Date(c.createdAt).toLocaleDateString() : '—'}</td>
-      <td style="vertical-align:middle;display:flex;gap:6px;flex-wrap:wrap;">${c.status === 'pending' ? `<button class="btn btn-success" style="padding:4px 10px;font-size:11px;" onclick="activateClient('${c.id}')">Activate</button>` : ''}<button class="btn btn-outline" style="padding:4px 10px;font-size:11px;color:var(--error);" onclick="deleteClient('${c.id}')">Delete</button></td>
-    </table>`; }).join('');
+  tbody.innerHTML = filtered.map(c => { 
+    const cp = projects.filter(p => p.clientId === c.id); 
+    return `
+      <tr>
+        <td style="vertical-align:middle;"><strong>${escapeHtml(c.name)}</strong><br><span style="font-size:11px;color:var(--gray-400);">${c.email}</span></td>
+        <td style="vertical-align:middle;">${cp.map(p => `<span class="badge badge-gray">${escapeHtml(p.name)}</span>`).join(' ') || '—'}</td>
+        <td style="vertical-align:middle;"><span style="color:${c.status === 'pending' ? 'var(--warning)' : 'var(--success)'};">${c.status === 'pending' ? 'Pending' : 'Active'}</span></td>
+        <td style="font-size:12px;color:var(--gray-400);">${c.createdAt ? new Date(c.createdAt).toLocaleDateString() : '—'}</td>
+        <td style="vertical-align:middle;display:flex;gap:6px;flex-wrap:wrap;">
+          ${c.status === 'pending' ? `<button class="btn btn-success" style="padding:4px 10px;font-size:11px;" onclick="activateClient('${c.id}')">Activate</button>` : ''}
+          <button class="btn btn-outline" style="padding:4px 10px;font-size:11px;color:var(--error);" onclick="deleteClient('${c.id}')">Delete</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+  
+  const countEl = document.getElementById('clientCount');
+  if (countEl) countEl.textContent = filtered.length + ' clients';
 }
 
 function renderProjectsTable() {
@@ -4953,6 +4860,149 @@ function renderAdminDocumentsTable() {
   if (countEl) countEl.textContent = docsToShow.length + ' documents';
 }
 
+function renderPipelineBoard() {
+  const container = document.getElementById('pipelineBoard');
+  if (!container) return;
+  
+  const activeProjects = projects.filter(p => p.status === 'active');
+  const steps = [1, 2, 3, 4, 5, 6, 7, 8];
+  
+  container.innerHTML = steps.map(step => {
+    const stepProjects = activeProjects.filter(p => (p.step || 1) === step);
+    return `
+      <div class="pipeline-col">
+        <div class="pipeline-col-title">${STEP_NAMES[step]}</div>
+        ${stepProjects.map(proj => {
+          const client = clients.find(c => c.id === proj.clientId);
+          const daysRemaining = calculateDaysRemaining(proj);
+          return `
+            <div class="pipeline-card" onclick="editProject('${proj.id}')">
+              <div class="pipeline-card-name">${escapeHtml(client?.name || 'Unknown')}</div>
+              <div class="pipeline-card-project">${escapeHtml(proj.name)}</div>
+              <div class="pipeline-card-meta">
+                <span class="pipeline-card-amount">${proj.amount || 'TBD'}</span>
+                <span class="pipeline-card-days ${daysRemaining <= 7 ? 'expiry-days-critical' : daysRemaining <= 14 ? 'expiry-days-warning' : ''}">${daysRemaining > 0 ? daysRemaining + 'd' : 'Due'}</span>
+              </div>
+            </div>
+          `;
+        }).join('')}
+        ${stepProjects.length === 0 ? '<div style="padding:20px;text-align:center;color:var(--gray-400);font-size:12px;">No projects</div>' : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+function calculateDaysRemaining(proj) {
+  const stepDates = proj.stepDates || {};
+  const stepDate = stepDates[proj.step || 1];
+  if (!stepDate) return 30;
+  const start = new Date(stepDate);
+  const deadline = addBusinessDays(start, 21);
+  const today = new Date();
+  return Math.max(0, Math.ceil((deadline - today) / 86400000));
+}
+
+function renderPendingRegistrations() {
+  const container = document.getElementById('pendingRegistrationsTable');
+  const block = document.getElementById('pendingRegistrationsBlock');
+  if (!container || !block) return;
+  
+  const pendingClients = clients.filter(c => c.status === 'pending');
+  const pendingProjects = projects.filter(p => {
+    const client = clients.find(c => c.id === p.clientId);
+    return client?.status === 'pending';
+  });
+  
+  if (pendingClients.length === 0) {
+    block.style.display = 'none';
+    return;
+  }
+  
+  block.style.display = 'block';
+  container.innerHTML = pendingClients.map(client => {
+    const proj = projects.find(p => p.clientId === client.id);
+    return `
+      <tr>
+        <td><strong>${escapeHtml(client.name)}</strong></td>
+        <td>${escapeHtml(client.email)}</td>
+        <td>${escapeHtml(proj?.name || '—')}</td>
+        <td style="font-size:12px;">${client.createdAt ? new Date(client.createdAt).toLocaleDateString() : '—'}</td>
+        <td><button class="btn btn-success" style="padding:4px 10px;font-size:11px;" onclick="activateClient('${client.id}')">Activate</button></td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function updateAdminDashboardStats() {
+  const activeClients = clients.filter(c => c.status === 'active').length;
+  const activeProjects = projects.filter(p => p.status === 'active').length;
+  const totalDocs = documents.length;
+  const pendingClients = clients.filter(c => c.status === 'pending').length;
+  const unreadMessages = messages.filter(m => m.sender === 'client' && !m.read).length;
+  const pendingMeetings = meetings.filter(m => m.status === 'pending').length;
+  
+  const projectsWithIVL = projects.filter(p => p.ivrLetterAcknowledged === true).length;
+  const totalProjectsWithIVL = projects.filter(p => p.investorVerificationLetter).length;
+  
+  document.getElementById('totalClients').textContent = activeClients;
+  document.getElementById('totalProjects').textContent = activeProjects;
+  document.getElementById('totalDocuments').textContent = totalDocs;
+  document.getElementById('pendingClientsCount').textContent = pendingClients;
+  document.getElementById('pendingMessages').textContent = unreadMessages;
+  document.getElementById('scheduledMeetings').textContent = pendingMeetings;
+  document.getElementById('ivlAcknowledgedCount').textContent = `${projectsWithIVL} / ${totalProjectsWithIVL}`;
+}
+
+function renderExpiryTable() {
+  const container = document.getElementById('adminExpiryTable');
+  if (!container) return;
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const expiringItems = [];
+  
+  projects.forEach(proj => {
+    const expiryItems = [
+      { date: proj.termSheetExpiry, name: 'Term Sheet', step: 1 },
+      { date: proj.commitFeeDeadline, name: 'Commitment Fee', step: 2 },
+      { date: proj.deedExpiryDate, name: 'Deed of Undertaking', step: 3 },
+      { date: proj.ecfPolicyExpiryDate, name: 'ECF Policy', step: 4 }
+    ];
+    expiryItems.forEach(item => {
+      if (item.date && (proj.step || 1) === item.step) {
+        const expiryDate = new Date(item.date);
+        expiryDate.setHours(0, 0, 0, 0);
+        const diffDays = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
+        if (diffDays >= 0 && diffDays <= 7) {
+          const client = clients.find(c => c.id === proj.clientId);
+          expiringItems.push({ clientName: client?.name || 'Unknown', projectName: proj.name, document: item.name, daysLeft: diffDays });
+        }
+      }
+    });
+  });
+  
+  if (expiringItems.length === 0) {
+    container.innerHTML = '<p style="padding:20px;text-align:center;color:var(--gray-400);">No expiring documents this week</p>';
+    return;
+  }
+  
+  container.innerHTML = `
+    <table class="expiry-table">
+      <thead><tr><th>Client</th><th>Project</th><th>Document</th><th>Days Left</th></tr></thead>
+      <tbody>
+        ${expiringItems.map(item => `
+          <tr>
+            <td>${escapeHtml(item.clientName)}</td>
+            <td>${escapeHtml(item.projectName)}</td>
+            <td>${escapeHtml(item.document)}</td>
+            <td class="${item.daysLeft <= 3 ? 'expiry-days-critical' : 'expiry-days-warning'}">${item.daysLeft} days</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
 function renderAdminMessages() {
   const container = document.getElementById('allMessagesList');
   if (!container) return;
@@ -4961,7 +5011,11 @@ function renderAdminMessages() {
   messages.forEach(m => { const key = String(m.clientId); if (!byClient[key]) byClient[key] = []; byClient[key].push(m); });
   if (!Object.keys(byClient).length) { container.innerHTML = '<p style="color:var(--gray-400);font-size:13px;">No messages yet.</p>'; return; }
   
-  container.innerHTML = Object.entries(byClient).map(([cid, msgs]) => { const client = clients.find(c => c.id === cid || c.id === String(cid)); const sorted = msgs.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp)); return `<div class="admin-thread" data-client-id="${cid}"><div class="admin-thread-header"><div><div class="admin-thread-client">${client?.name || 'Unknown'}</div><div class="admin-thread-project">${client?.email || ''}</div></div><span class="badge badge-navy">${sorted.length} messages</span></div><div class="admin-thread-body"><div class="admin-thread-msgs">${sorted.map(m => `<div class="message ${m.sender === 'client' ? 'admin' : 'client'}" style="margin-bottom:10px;"><div class="message-bubble" style="${m.sender === 'admin' ? 'background:var(--navy);color:white;' : 'background:var(--gray-100);color:var(--navy);'}">${escapeHtml(m.content)}</div><div class="message-meta">${m.sender === 'admin' ? 'Suzana' : client?.name || 'Client'} · ${new Date(m.timestamp).toLocaleString()}</div></div>`).join('')}</div><div class="admin-reply-box"><textarea id="replyBox_${cid}" placeholder="Reply to ${client?.name || 'client'}..."></textarea><button class="btn btn-primary" onclick="sendAdminReply('${cid}')">Send Reply</button></div></div></div>`; }).join('');
+  container.innerHTML = Object.entries(byClient).map(([cid, msgs]) => { 
+    const client = clients.find(c => c.id === cid || c.id === String(cid)); 
+    const sorted = msgs.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp)); 
+    return `<div class="admin-thread" data-client-id="${cid}"><div class="admin-thread-header"><div><div class="admin-thread-client">${client?.name || 'Unknown'}</div><div class="admin-thread-project">${client?.email || ''}</div></div><span class="badge badge-navy">${sorted.length} messages</span></div><div class="admin-thread-body"><div class="admin-thread-msgs">${sorted.map(m => `<div class="message ${m.sender === 'client' ? 'admin' : 'client'}" style="margin-bottom:10px;"><div class="message-bubble" style="${m.sender === 'admin' ? 'background:var(--navy);color:white;' : 'background:var(--gray-100);color:var(--navy);'}">${escapeHtml(m.content)}</div><div class="message-meta">${m.sender === 'admin' ? 'Suzana' : client?.name || 'Client'} · ${new Date(m.timestamp).toLocaleString()}</div></div>`).join('')}</div><div class="admin-reply-box"><textarea id="replyBox_${cid}" placeholder="Reply to ${client?.name || 'client'}..."></textarea><button class="btn btn-primary" onclick="sendAdminReply('${cid}')">Send Reply</button></div></div></div>`; 
+  }).join('');
 }
 
 async function sendAdminReply(clientId) {
@@ -5017,6 +5071,7 @@ async function activateClient(id) {
   showToast(client.name + ' activated. Access email sent to client.');
   if (cp.length) editProject(cp[0].id);
   setupRealtimeListeners();
+  renderAdminTables();
 }
 
 function editProject(id) {
@@ -5163,6 +5218,7 @@ async function saveProjectInfo() {
   }
   
   await logAudit('Project updated', 'Step ' + newStep + ': ' + STEP_NAMES[newStep], proj.clientId, String(id));
+  renderAdminTables();
 }
 
 function deleteClient(id) {
@@ -5172,13 +5228,13 @@ function deleteClient(id) {
   projects = projects.filter(p => p.clientId !== id && p.clientId !== String(id));
   messages = messages.filter(m => m.clientId !== id && m.clientId !== String(id));
   meetings = meetings.filter(m => m.clientId !== id && m.clientId !== String(id));
-  fbDelete('clients', id).then(() => { logAudit('Client deleted', client?.name || '', String(id)); showToast('Client deleted'); });
+  fbDelete('clients', id).then(() => { logAudit('Client deleted', client?.name || '', String(id)); showToast('Client deleted'); renderAdminTables(); });
 }
 
 function deleteProject(id) {
   if (!confirm('Delete this project?')) return;
   projects = projects.filter(p => p.id !== id && p.id !== String(id));
-  fbDelete('projects', id).then(() => { showToast('Project deleted'); });
+  fbDelete('projects', id).then(() => { showToast('Project deleted'); renderAdminTables(); });
 }
 
 async function approveDocument(id) {
@@ -5299,6 +5355,7 @@ async function createClient() {
     showAdminLogin();
     openModal('loginModal');
     showToast('Please log back in as admin to continue.');
+    renderAdminTables();
   } catch (error) {
     if (error.code === 'auth/email-already-in-use') {
       showToast('Email already exists', true);
@@ -5383,6 +5440,98 @@ async function adminUploadDocument() {
   
   document.getElementById('pdfFile').value = '';
   document.getElementById('documentUrl').value = '';
+}
+
+function renderMeetings() {
+  const container = document.getElementById('meetingsList');
+  if (!container) return;
+  if (!meetings.length) { container.innerHTML = '<p style="color:var(--gray-400);font-size:13px;">No meeting requests yet.</p>'; return; }
+  container.innerHTML = [...meetings].reverse().map(m => `<div class="card"><div class="card-body" style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;"><div><strong>${escapeHtml(m.clientName)}</strong> <span class="badge ${m.status === 'confirmed' ? 'badge-green' : m.status === 'cancelled' ? 'badge-red' : 'badge-blue'}">${m.status}</span><div style="font-size:13px;margin-top:6px;">${m.type} — ${m.date || 'TBD'} ${m.time || ''}</div>${m.notes ? `<div style="font-size:12px;color:var(--gray-500);margin-top:4px;">${escapeHtml(m.notes)}</div>` : ''}</div><div style="display:flex;gap:8px;flex-shrink:0;"><button class="btn btn-success" style="padding:5px 12px;font-size:11px;" onclick="updateMeetingStatus('${m.id}','confirmed')">Confirm</button><button class="btn btn-outline" style="padding:5px 12px;font-size:11px;" onclick="updateMeetingStatus('${m.id}','cancelled')">Decline</button></div></div></div>`).join('');
+}
+
+function updateMeetingStatus(id, status) {
+  const m = meetings.find(x => x.id === id || x.id === String(id));
+  if (m) m.status = status;
+  fbUpdate('meetings', id, { status }).then(() => { renderMeetings(); showToast('Meeting ' + status); });
+}
+
+function renderAuditLog() {
+  const container = document.getElementById('auditLogList');
+  if (!container) return;
+  if (!auditLog.length) { container.innerHTML = '<p style="color:var(--gray-400);font-size:13px;">No audit entries yet.</p>'; return; }
+  container.innerHTML = auditLog.slice(0, 50).map(e => `<div class="audit-entry"><div class="audit-time">${new Date(e.timestamp).toLocaleString()}</div><div><div class="audit-action">${escapeHtml(e.action)}</div><div class="audit-detail">${escapeHtml(e.details || '')} ${e.performedBy ? '· ' + e.performedBy : ''}</div></div></div>`).join('');
+}
+
+function renderAdminBrokerSubmissionsTable() {
+  const container = document.getElementById('adminBrokerSubmissionsTable');
+  if (!container) return;
+  container.innerHTML = brokerSubmissions.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).map(s => `
+    <tr>
+      <td style="vertical-align:middle;font-size:12px;">${new Date(s.createdAt).toLocaleDateString()}</td>
+      <td style="vertical-align:middle;">${escapeHtml(s.brokerName)}</td>
+      <td style="vertical-align:middle;">${escapeHtml(s.clientName)}</td>
+      <td style="vertical-align:middle;">${escapeHtml(s.projectName)}</td>
+      <td style="vertical-align:middle;">$${s.fundsNeeded || 'TBD'}</td>
+      <td style="vertical-align:middle;"><span class="status-badge-${s.status === 'pending' ? 'pending' : s.status === 'active' ? 'active' : 'funded'}">${s.status === 'pending' ? 'Pending Review' : s.status === 'active' ? 'Active' : 'Funded'}</span></td>
+      <td style="vertical-align:middle;"><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="viewBrokerSubmission('${s.id}')">View</button></td>
+    </tr>
+  `).join('');
+}
+
+function viewBrokerSubmission(submissionId) {
+  const s = brokerSubmissions.find(x => x.id === submissionId);
+  if (!s) return;
+  const broker = brokers.find(b => b.id === s.brokerId);
+  const modalHtml = `
+  <div id="brokerSubmissionModal" class="modal-overlay active">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Broker Submission</h3>
+        <button class="modal-close" onclick="document.getElementById('brokerSubmissionModal').remove()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="project-details-grid">
+          <div class="project-detail-item"><div class="project-detail-label">Broker</div><div class="project-detail-value">${escapeHtml(s.brokerName)}</div></div>
+          <div class="project-detail-item"><div class="project-detail-label">Broker Firm</div><div class="project-detail-value">${escapeHtml(broker?.firm || '—')}</div></div>
+          <div class="project-detail-item"><div class="project-detail-label">Client Name</div><div class="project-detail-value">${escapeHtml(s.clientName)}</div></div>
+          <div class="project-detail-item"><div class="project-detail-label">Client Email</div><div class="project-detail-value">${escapeHtml(s.clientEmail)}</div></div>
+          <div class="project-detail-item"><div class="project-detail-label">Project</div><div class="project-detail-value">${escapeHtml(s.projectName)}</div></div>
+          <div class="project-detail-item"><div class="project-detail-label">Industry</div><div class="project-detail-value">${escapeHtml(s.industry || '—')}</div></div>
+          <div class="project-detail-item"><div class="project-detail-label">Location</div><div class="project-detail-value">${escapeHtml(s.location || '—')}</div></div>
+          <div class="project-detail-item"><div class="project-detail-label">Funds Needed</div><div class="project-detail-value">$${escapeHtml(s.fundsNeeded || '—')}</div></div>
+          <div class="project-detail-item"><div class="project-detail-label">Status</div><div class="project-detail-value">${s.status}</div></div>
+          <div class="project-detail-item"><div class="project-detail-label">Submitted</div><div class="project-detail-value">${new Date(s.createdAt).toLocaleString()}</div></div>
+        </div>
+        ${s.description ? `<div class="note-card" style="margin-top:16px;"><div class="note-card-label">Description</div><div class="note-card-text">${escapeHtml(s.description)}</div></div>` : ''}
+        <div style="display:flex;gap:12px;margin-top:20px;">
+          <button class="btn btn-primary" onclick="convertSubmissionToClient('${s.id}')">Convert to Client</button>
+          <button class="btn btn-outline" onclick="document.getElementById('brokerSubmissionModal').remove()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+function convertSubmissionToClient(submissionId) {
+  const s = brokerSubmissions.find(x => x.id === submissionId);
+  if (!s) return;
+  document.getElementById('brokerSubmissionModal')?.remove();
+  showAddClientModal();
+  setTimeout(() => {
+    const ncName = document.getElementById('ncName');
+    const ncEmail = document.getElementById('ncEmail');
+    const ncProject = document.getElementById('ncProject');
+    const ncIndustry = document.getElementById('ncIndustry');
+    const ncLocation = document.getElementById('ncLocation');
+    const ncFundsNeeded = document.getElementById('ncFundsNeeded');
+    if (ncName) ncName.value = s.clientName;
+    if (ncEmail) ncEmail.value = s.clientEmail;
+    if (ncProject) ncProject.value = s.projectName;
+    if (ncIndustry) ncIndustry.value = s.industry || '';
+    if (ncLocation) ncLocation.value = s.location || '';
+    if (ncFundsNeeded) ncFundsNeeded.value = s.fundsNeeded || '';
+  }, 300);
 }
 
 // ============================================================
@@ -5740,7 +5889,7 @@ function renderAdminNotificationDropdown() {
   }
   container.innerHTML = adminNotifications.slice(0, 20).map(n => {
     const timeAgo = getRelativeTime(new Date(n.timestamp));
-    const iconMap = { message: 'fa-comments', meeting: 'fa-calendar', document: 'fa-file-alt', registration: 'fa-user-plus', submission: 'fa-handshake' };
+    const iconMap = { message: 'fa-comments', meeting: 'fa-calendar', document: 'fa-file-alt', registration: 'fa-user-plus', submission: 'fa-handshake', expiry: 'fa-clock', warning: 'fa-exclamation-triangle' };
     const icon = iconMap[n.type] || 'fa-bell';
     return `<div class="notification-item ${n.read ? '' : 'unread'}" onclick="handleAdminNotificationClick('${n.type}', ${JSON.stringify(n.data).replace(/"/g, '&quot;')})"><div style="display:flex;align-items:flex-start;gap:12px;"><div class="notification-icon" style="background:rgba(44,95,138,0.1);"><i class="fas ${icon}" style="color:var(--blue);"></i></div><div class="notification-content"><div class="notification-title">${escapeHtml(n.title)}</div><div class="notification-message">${escapeHtml(n.message.substring(0, 80))}${n.message.length > 80 ? '...' : ''}</div><div class="notification-time">${timeAgo}</div></div></div></div>`;
   }).join('');
@@ -5748,114 +5897,14 @@ function renderAdminNotificationDropdown() {
 
 function saveAdminNotifications() { localStorage.setItem('croft_admin_notifications', JSON.stringify(adminNotifications)); localStorage.setItem('croft_admin_unread_count', adminUnreadCount); }
 
-function handleAdminNotificationClick(type, data) { closeAdminNotifications(); if (type === 'message') switchAdminTab('messages-admin', document.querySelector('[onclick*="messages-admin"]')); else if (type === 'meeting') switchAdminTab('meetings', document.querySelector('[onclick*="meetings"]')); else if (type === 'document') switchAdminTab('documents-admin', document.querySelector('[onclick*="documents-admin"]')); else if (type === 'registration' || type === 'submission') switchAdminTab('clients', document.querySelector('[onclick*="clients"]')); }
-
-function renderAdminBrokerSubmissionsTable() {
-  const container = document.getElementById('adminBrokerSubmissionsTable');
-  if (!container) return;
-  container.innerHTML = brokerSubmissions.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).map(s => `
-    <tr>
-      <td style="vertical-align:middle;font-size:12px;">${new Date(s.createdAt).toLocaleDateString()}</td>
-      <td style="vertical-align:middle;">${escapeHtml(s.brokerName)}</td>
-      <td style="vertical-align:middle;">${escapeHtml(s.clientName)}</td>
-      <td style="vertical-align:middle;">${escapeHtml(s.projectName)}</td>
-      <td style="vertical-align:middle;">$${s.fundsNeeded || 'TBD'}</td>
-      <td style="vertical-align:middle;"><span class="status-badge-${s.status === 'pending' ? 'pending' : s.status === 'active' ? 'active' : 'funded'}">${s.status === 'pending' ? 'Pending Review' : s.status === 'active' ? 'Active' : 'Funded'}</span></td>
-      <td style="vertical-align:middle;"><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="viewBrokerSubmission('${s.id}')">View</button></td>
-    </tr>
-  `).join('');
+function handleAdminNotificationClick(type, data) { 
+  closeAdminNotifications(); 
+  if (type === 'message') switchAdminTab('messages-admin', document.querySelector('[onclick*="messages-admin"]')); 
+  else if (type === 'meeting') switchAdminTab('meetings', document.querySelector('[onclick*="meetings"]')); 
+  else if (type === 'document') switchAdminTab('documents-admin', document.querySelector('[onclick*="documents-admin"]')); 
+  else if (type === 'registration' || type === 'submission') switchAdminTab('clients', document.querySelector('[onclick*="clients"]'));
+  else if (type === 'expiry') switchAdminTab('overview', document.querySelector('[onclick*="overview"]'));
 }
-
-function viewBrokerSubmission(submissionId) {
-  const s = brokerSubmissions.find(x => x.id === submissionId);
-  if (!s) return;
-  const broker = brokers.find(b => b.id === s.brokerId);
-  const modalHtml = `
-  <div id="brokerSubmissionModal" class="modal-overlay active">
-    <div class="modal">
-      <div class="modal-header">
-        <h3>Broker Submission</h3>
-        <button class="modal-close" onclick="document.getElementById('brokerSubmissionModal').remove()">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="project-details-grid">
-          <div class="project-detail-item"><div class="project-detail-label">Broker</div><div class="project-detail-value">${escapeHtml(s.brokerName)}</div></div>
-          <div class="project-detail-item"><div class="project-detail-label">Broker Firm</div><div class="project-detail-value">${escapeHtml(broker?.firm || '—')}</div></div>
-          <div class="project-detail-item"><div class="project-detail-label">Client Name</div><div class="project-detail-value">${escapeHtml(s.clientName)}</div></div>
-          <div class="project-detail-item"><div class="project-detail-label">Client Email</div><div class="project-detail-value">${escapeHtml(s.clientEmail)}</div></div>
-          <div class="project-detail-item"><div class="project-detail-label">Project</div><div class="project-detail-value">${escapeHtml(s.projectName)}</div></div>
-          <div class="project-detail-item"><div class="project-detail-label">Industry</div><div class="project-detail-value">${escapeHtml(s.industry || '—')}</div></div>
-          <div class="project-detail-item"><div class="project-detail-label">Location</div><div class="project-detail-value">${escapeHtml(s.location || '—')}</div></div>
-          <div class="project-detail-item"><div class="project-detail-label">Funds Needed</div><div class="project-detail-value">$${escapeHtml(s.fundsNeeded || '—')}</div></div>
-          <div class="project-detail-item"><div class="project-detail-label">Status</div><div class="project-detail-value">${s.status}</div></div>
-          <div class="project-detail-item"><div class="project-detail-label">Submitted</div><div class="project-detail-value">${new Date(s.createdAt).toLocaleString()}</div></div>
-        </div>
-        ${s.description ? `<div class="note-card" style="margin-top:16px;"><div class="note-card-label">Description</div><div class="note-card-text">${escapeHtml(s.description)}</div></div>` : ''}
-        <div style="display:flex;gap:12px;margin-top:20px;">
-          <button class="btn btn-primary" onclick="convertSubmissionToClient('${s.id}')">Convert to Client</button>
-          <button class="btn btn-outline" onclick="document.getElementById('brokerSubmissionModal').remove()">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>`;
-  document.body.insertAdjacentHTML('beforeend', modalHtml);
-}
-
-function convertSubmissionToClient(submissionId) {
-  const s = brokerSubmissions.find(x => x.id === submissionId);
-  if (!s) return;
-  document.getElementById('brokerSubmissionModal')?.remove();
-  showAddClientModal();
-  setTimeout(() => {
-    const ncName = document.getElementById('ncName');
-    const ncEmail = document.getElementById('ncEmail');
-    const ncProject = document.getElementById('ncProject');
-    const ncIndustry = document.getElementById('ncIndustry');
-    const ncLocation = document.getElementById('ncLocation');
-    const ncFundsNeeded = document.getElementById('ncFundsNeeded');
-    if (ncName) ncName.value = s.clientName;
-    if (ncEmail) ncEmail.value = s.clientEmail;
-    if (ncProject) ncProject.value = s.projectName;
-    if (ncIndustry) ncIndustry.value = s.industry || '';
-    if (ncLocation) ncLocation.value = s.location || '';
-    if (ncFundsNeeded) ncFundsNeeded.value = s.fundsNeeded || '';
-  }, 300);
-}
-
-function renderAuditLog() {
-  const container = document.getElementById('auditLogList');
-  if (!container) return;
-  if (!auditLog.length) { container.innerHTML = '<p style="color:var(--gray-400);font-size:13px;">No audit entries yet.</p>'; return; }
-  container.innerHTML = auditLog.slice(0, 50).map(e => `<div class="audit-entry"><div class="audit-time">${new Date(e.timestamp).toLocaleString()}</div><div><div class="audit-action">${escapeHtml(e.action)}</div><div class="audit-detail">${escapeHtml(e.details || '')} ${e.performedBy ? '· ' + e.performedBy : ''}</div></div></div>`).join('');
-}
-
-function renderMeetings() {
-  const container = document.getElementById('meetingsList');
-  if (!container) return;
-  if (!meetings.length) { container.innerHTML = '<p style="color:var(--gray-400);font-size:13px;">No meeting requests yet.</p>'; return; }
-  container.innerHTML = [...meetings].reverse().map(m => `<div class="card"><div class="card-body" style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;"><div><strong>${escapeHtml(m.clientName)}</strong> <span class="badge ${m.status === 'confirmed' ? 'badge-green' : m.status === 'cancelled' ? 'badge-red' : 'badge-blue'}">${m.status}</span><div style="font-size:13px;margin-top:6px;">${m.type} — ${m.date || 'TBD'} ${m.time || ''}</div>${m.notes ? `<div style="font-size:12px;color:var(--gray-500);margin-top:4px;">${escapeHtml(m.notes)}</div>` : ''}</div><div style="display:flex;gap:8px;flex-shrink:0;"><button class="btn btn-success" style="padding:5px 12px;font-size:11px;" onclick="updateMeetingStatus('${m.id}','confirmed')">Confirm</button><button class="btn btn-outline" style="padding:5px 12px;font-size:11px;" onclick="updateMeetingStatus('${m.id}','cancelled')">Decline</button></div></div></div>`).join('');
-}
-
-function updateMeetingStatus(id, status) {
-  const m = meetings.find(x => x.id === id || x.id === String(id));
-  if (m) m.status = status;
-  fbUpdate('meetings', id, { status }).then(() => { renderMeetings(); showToast('Meeting ' + status); });
-}
-
-function scheduleMeeting() {
-  const id = String(Date.now());
-  const meeting = { id, clientId: String(currentClient.id), clientName: currentClient.name, type: document.getElementById('meetingType')?.value || 'Video Call', date: document.getElementById('meetingDate')?.value || '', time: document.getElementById('meetingTime')?.value || '', notes: document.getElementById('meetingNotes')?.value || '', status: 'pending', timestamp: new Date().toISOString() };
-  meetings.push(meeting);
-  fbSet('meetings', id, meeting).then(() => { fbReload(); });
-  sendEmail(EMAILJS_CONFIG.adminEmail, `📅 MEETING REQUEST: ${currentClient.name}`, `New meeting request from ${currentClient.name} (${currentClient.email})`).catch(() => {});
-  logClientActivity(currentClient.id, currentProjectId, 'meeting_requested', `You requested a ${meeting.type} meeting`, 'client');
-  document.getElementById('meetingDate').value = '';
-  document.getElementById('meetingTime').value = '';
-  document.getElementById('meetingNotes').value = '';
-  showToast('Meeting request sent. Suzana will confirm within 24 hours.');
-}
-
-function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
 
 function checkAllExpiries() {
   const today = new Date();
@@ -5868,12 +5917,12 @@ function checkAllExpiries() {
       { date: proj.ecfPolicyExpiryDate, name: 'ECF Policy', step: 4 }
     ];
     expiryItems.forEach(item => {
-      if (item.date && proj.step === item.step) {
+      if (item.date && (proj.step || 1) === item.step) {
         const expiryDate = new Date(item.date);
         expiryDate.setHours(0, 0, 0, 0);
         const diffDays = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
         if (diffDays <= 3 && diffDays >= 0) {
-          addAdminNotification('warning', `${proj.name} - ${item.name} expires in ${diffDays} days`, 'expiry', { projectId: proj.id, days: diffDays });
+          addAdminNotification('expiry', `⚠️ Expiring Soon: ${proj.name}`, `${item.name} expires in ${diffDays} days`, { projectId: proj.id, days: diffDays });
         }
       }
     });
@@ -5898,9 +5947,7 @@ function checkForNotifications() {
   }
 }
 
-async function fbReload() { 
-  if (firebaseReady) await loadFromFirebase(); 
-}
+function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
