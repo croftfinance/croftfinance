@@ -3041,37 +3041,452 @@ const EMAILJS_CONFIG = {
   adminEmail: "suzana.aleksic@croftfinance.com"
 };
 
+// Replace your entire Firebase configuration and init with this:
+
 let db = null, firebaseReady = false;
 let clients = [], projects = [], documents = [], messages = [], meetings = [], auditLog = [], notifications = [];
 let brokers = [], brokerSubmissions = [], brokerMessages = [];
 let clientActivityLog = [];
 let currentClient = null, currentProjectId = null, currentBroker = null;
-let failedLoginAttempts = new Map();
-let sessionTimeout = null;
-let adminNotifications = [];
-let adminUnreadCount = 0;
-let adminSessionStart = null;
-let adminMessageUnsubscribe = null;
-let adminMeetingUnsubscribe = null;
-let adminDocumentUnsubscribe = null;
-let adminClientUnsubscribe = null;
-let browserNotificationPermission = false;
 
-const STEP_NAMES = ['', 'Term Sheet', 'Commitment Fee', 'Deed of Undertaking', 'Credit Support', 'Hard-Copy Submission', 'ECF Escrow', 'Transfer to Agent', 'Funded'];
-const STEP_WHO = ['', 'client', 'client', 'both', 'croft', 'client', 'client', 'croft', 'croft'];
-const STEP_WHO_LABELS = { client: 'Your Action Required', croft: 'Awaiting Croft Finance', both: 'Both Parties Required' };
-const STEP_WHO_CLASSES = { client: 'who-client', croft: 'who-croft', both: 'who-both' };
+// DISABLE FIREBASE - Use localStorage only
+const USE_FIREBASE = false;
 
-const REQUIRED_DOCS = {
-  1: ['Indicative Term Sheet (Non-Binding)', 'Executed Term Sheet (Binding)'],
-  2: ['Commitment Fee Confirmation'],
-  3: ['Deed of Undertaking'],
-  4: ['ECF Guarantee Policy'],
-  5: ['Hard-Copy Closing Materials'],
-  6: ['ECF Escrow Confirmation'],
-  7: ['Transfer Confirmation'],
-  8: ['Funding Disbursement Confirmation']
-};
+function init() {
+  setTimeout(() => {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) overlay.style.display = 'none';
+  }, 1000);
+  
+  emailjs.init({ publicKey: EMAILJS_CONFIG.publicKey });
+  checkCookies();
+  setupNavScroll();
+  checkSession();
+  setupSessionTimeout();
+  
+  // Load from localStorage only
+  loadFromLocalStorage();
+  document.getElementById('loadingOverlay').style.display = 'none';
+  document.getElementById('connectionBanner').style.display = 'none';
+  
+  console.log('App running in localStorage mode (Firebase disabled)');
+}
+
+// Simplified loadFromLocalStorage
+function loadFromLocalStorage() {
+  clients = JSON.parse(localStorage.getItem('croft_clients') || '[]');
+  projects = JSON.parse(localStorage.getItem('croft_projects') || '[]');
+  documents = JSON.parse(localStorage.getItem('croft_documents') || '[]');
+  messages = JSON.parse(localStorage.getItem('croft_messages') || '[]');
+  meetings = JSON.parse(localStorage.getItem('croft_meetings') || '[]');
+  brokers = JSON.parse(localStorage.getItem('croft_brokers') || '[]');
+  brokerSubmissions = JSON.parse(localStorage.getItem('croft_brokerSubmissions') || '[]');
+  brokerMessages = JSON.parse(localStorage.getItem('croft_brokerMessages') || '[]');
+  clientActivityLog = JSON.parse(localStorage.getItem('croft_client_activity') || '[]');
+  auditLog = JSON.parse(localStorage.getItem('croft_audit_log') || '[]');
+  
+  renderAdminTables();
+  renderBrokerAdminTable();
+}
+
+function saveLocal() {
+  localStorage.setItem('croft_clients', JSON.stringify(clients));
+  localStorage.setItem('croft_projects', JSON.stringify(projects));
+  localStorage.setItem('croft_documents', JSON.stringify(documents));
+  localStorage.setItem('croft_messages', JSON.stringify(messages));
+  localStorage.setItem('croft_meetings', JSON.stringify(meetings));
+  localStorage.setItem('croft_brokers', JSON.stringify(brokers));
+  localStorage.setItem('croft_brokerSubmissions', JSON.stringify(brokerSubmissions));
+  localStorage.setItem('croft_brokerMessages', JSON.stringify(brokerMessages));
+  localStorage.setItem('croft_client_activity', JSON.stringify(clientActivityLog));
+  localStorage.setItem('croft_audit_log', JSON.stringify(auditLog));
+}
+
+// No-op Firebase functions
+async function fbSet(col, id, data) { saveLocal(); return; }
+async function fbUpdate(col, id, data) { saveLocal(); return; }
+async function fbDelete(col, id) { saveLocal(); return; }
+async function fbReload() { loadFromLocalStorage(); renderAdminTables(); if(currentClient) loadClientPortal(); }
+
+async function logAudit(action, details = '', targetClientId = '', targetProjectId = '') {
+  const entry = { action, details, targetClientId, targetProjectId, performedBy: currentClient ? currentClient.name : 'Admin', timestamp: new Date().toISOString() };
+  auditLog.unshift(entry);
+  if (auditLog.length > 100) auditLog.pop();
+  saveLocal();
+}
+
+// Disable Firebase auth - use localStorage auth only
+function checkSession() {
+  const sess = localStorage.getItem('croftSession');
+  const adminSess = localStorage.getItem('croftAdminSession');
+  const brokerSess = localStorage.getItem('croftBrokerSession');
+  
+  if (adminSess) {
+    try {
+      const s = JSON.parse(adminSess);
+      if (Date.now() - s.ts < 7 * 24 * 60 * 60 * 1000) {
+        showView('admin');
+        loadAdminNotifications();
+        renderAdminTables();
+        return;
+      } else {
+        localStorage.removeItem('croftAdminSession');
+      }
+    } catch(e) {
+      localStorage.removeItem('croftAdminSession');
+    }
+  }
+  
+  if (brokerSess) {
+    try {
+      const s = JSON.parse(brokerSess);
+      if (Date.now() - s.ts < 7 * 24 * 60 * 60 * 1000) {
+        const broker = brokers.find(b => b.id === s.brokerId);
+        if (broker && broker.status === 'active') {
+          currentBroker = broker;
+          showView('broker');
+          loadBrokerPortal();
+          return;
+        } else {
+          localStorage.removeItem('croftBrokerSession');
+        }
+      } else {
+        localStorage.removeItem('croftBrokerSession');
+      }
+    } catch(e) {
+      localStorage.removeItem('croftBrokerSession');
+    }
+  }
+  
+  if (sess) {
+    try {
+      const s = JSON.parse(sess);
+      if (Date.now() - s.ts < 7 * 24 * 60 * 60 * 1000) {
+        let client = clients.find(c => c.id === s.clientId);
+        if (client && client.status === 'active') {
+          currentClient = client;
+          const cp = projects.filter(p => p.clientId === client.id);
+          if (cp.length) currentProjectId = cp[0].id;
+          showView('portal');
+          loadClientPortal();
+          return;
+        } else {
+          localStorage.removeItem('croftSession');
+        }
+      } else {
+        localStorage.removeItem('croftSession');
+      }
+    } catch(e) {
+      localStorage.removeItem('croftSession');
+    }
+  }
+}
+
+// Simplified registration (no Firebase Auth)
+function register() {
+  const name = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim().toLowerCase();
+  const pass = document.getElementById('regPassword').value;
+  const confirm = document.getElementById('regConfirmPassword').value;
+  const project = document.getElementById('regProject').value.trim();
+  const nda = document.getElementById('ndaCheckbox').checked;
+  const errEl = document.getElementById('regError');
+  errEl.style.display = 'none';
+
+  if (!name || !email || !pass || !project) { 
+    errEl.textContent = 'Please fill all required fields.'; 
+    errEl.style.display = 'block'; 
+    return; 
+  }
+  if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) { 
+    errEl.textContent = 'Please enter a valid email address.'; 
+    errEl.style.display = 'block'; 
+    return; 
+  }
+  if (pass !== confirm) { 
+    errEl.textContent = 'Passwords do not match.'; 
+    errEl.style.display = 'block'; 
+    return; 
+  }
+  if (pass.length < 6) { 
+    errEl.textContent = 'Password must be at least 6 characters.'; 
+    errEl.style.display = 'block'; 
+    return; 
+  }
+  if (!nda) { 
+    errEl.textContent = 'You must agree to the Confidentiality Terms.'; 
+    errEl.style.display = 'block'; 
+    return; 
+  }
+
+  const uid = String(Date.now());
+  const pid = String(Date.now() + 1);
+
+  const newClient = { 
+    id: uid, 
+    name, 
+    email, 
+    password: btoa(pass), // Simple encoding (not secure - for demo only)
+    status: 'pending', 
+    ndaAccepted: true, 
+    ndaAcceptedAt: new Date().toISOString(), 
+    createdAt: new Date().toISOString() 
+  };
+
+  const newProject = { 
+    id: pid, clientId: uid, name: project, status: 'pending', step: 1,
+    industry: document.getElementById('regIndustry')?.value || '',
+    location: document.getElementById('regLocation')?.value || '',
+    totalCost: document.getElementById('regTotalCost')?.value || '',
+    sponsorEquity: document.getElementById('regSponsorEquity')?.value || '',
+    fundsNeeded: document.getElementById('regFundsNeeded')?.value || '',
+    currentStage: document.getElementById('regCurrentStage')?.value || '',
+    useOfFunds: document.getElementById('regUseOfFunds')?.value || '',
+    targetIRR: document.getElementById('regTargetIRR')?.value || '',
+    targetCloseDate: document.getElementById('regCloseDate')?.value || '',
+    moic: document.getElementById('regMOIC')?.value || '',
+    capRate: document.getElementById('regCapRate')?.value || '',
+    exitStrategy: document.getElementById('regExitStrategy')?.value || '',
+    exitCapRate: document.getElementById('regExitCapRate')?.value || '',
+    permits: document.getElementById('regPermits')?.value || '',
+    revenue: document.getElementById('regRevenue')?.value || '',
+    assetClass: document.getElementById('regAssetClass')?.value || '',
+    infraType: document.getElementById('regInfraType')?.value || '',
+    commodity: document.getElementById('regCommodity')?.value || '',
+    miningStage: document.getElementById('regMiningStage')?.value || '',
+    reserveLife: document.getElementById('regReserveLife')?.value || '',
+    dataRoom: document.getElementById('regDataRoom')?.value || '',
+    amount: 'TBD', interestRate: 'TBD', term: 'TBD', 
+    gracePeriod: '12', ecf: 'TBD', govLaw: 'TBD',
+    nextMilestone: 'Awaiting Term Sheet', 
+    stepDates: {}, checklistItems: {}, 
+    commitFeeStatus: 'pending', ecfStatus: 'pending',
+    commitFeeAcknowledged: false, ecfAcknowledged: false, 
+    ivrLetterAcknowledged: false,
+    createdAt: new Date().toISOString()
+  };
+
+  clients.push(newClient);
+  projects.push(newProject);
+  saveLocal();
+  
+  logAudit('Client registered', name + ' (' + email + ')', uid, pid);
+  
+  sendEmail(email, 'Croft Finance — Registration Received', 
+    `Dear ${name},\n\nThank you for submitting your registration for the Croft Finance Client Portal.\n\nWe have received your request and will review your information within 24 hours.\n\nKind regards,\nCroft Finance Team`
+  ).catch(() => {});
+  
+  sendEmail(EMAILJS_CONFIG.adminEmail, 
+    `🔔 NEW REGISTRATION: ${name} - Action Required`, 
+    `A new client has registered.\n\n• Name: ${name}\n• Email: ${email}\n• Project: ${project}\n• Registered: ${new Date().toLocaleString()}`
+  ).catch(() => {});
+
+  showToast('Registration submitted. Check your email for confirmation.');
+  clearRegistrationForm();
+  showLoginForm();
+  renderAdminTables();
+}
+
+// Simplified login (no Firebase Auth)
+function login() {
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const pass = document.getElementById('loginPassword').value;
+  const errEl = document.getElementById('loginError');
+  errEl.style.display = 'none';
+
+  const client = clients.find(c => c.email === email);
+  
+  if (!client) {
+    errEl.textContent = 'Account not found. Please contact Suzana.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  if (client.password !== btoa(pass)) {
+    errEl.textContent = 'Incorrect password.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  if (client.status === 'pending') {
+    errEl.textContent = 'Your account is under review. Suzana will activate it within 24 hours.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  currentClient = client;
+  const cp = projects.filter(p => p.clientId === client.id);
+  if (cp.length) currentProjectId = cp[0].id;
+  
+  localStorage.setItem('croftSession', JSON.stringify({ 
+    clientId: client.id, 
+    name: client.name, 
+    email: client.email, 
+    ts: Date.now() 
+  }));
+  
+  closeModal('loginModal');
+  showView('portal');
+  document.title = 'Croft Finance — Client Portal — ' + client.name;
+  logAudit('Client logged in', client.name, client.id);
+  resetSessionTimeout();
+  loadClientPortal();
+}
+
+// Simplified admin login
+function doAdminLogin() {
+  const email = document.getElementById('adminUsername').value.trim();
+  const pass = document.getElementById('adminPassword').value;
+  const errEl = document.getElementById('adminLoginError');
+  errEl.style.display = 'none';
+
+  // Hardcoded admin credentials for demo
+  if (email === 'suzana.aleksic@croftfinance.com' && pass === 'admin123') {
+    localStorage.setItem('croftAdminSession', JSON.stringify({ 
+      ts: Date.now(),
+      email: email
+    }));
+    
+    closeModal('loginModal');
+    showView('admin');
+    document.title = 'Croft Finance — Admin';
+    
+    localStorage.removeItem('croftSession');
+    localStorage.removeItem('croftBrokerSession');
+    currentClient = null;
+    currentBroker = null;
+    
+    loadAdminNotifications();
+    renderAdminTables();
+    logAudit('Admin logged in', 'Suzana');
+    resetSessionTimeout();
+  } else {
+    errEl.textContent = 'Incorrect email or password.';
+    errEl.style.display = 'block';
+  }
+}
+
+function logout() {
+  currentClient = null;
+  currentProjectId = null;
+  currentBroker = null;
+  localStorage.removeItem('croftSession');
+  localStorage.removeItem('croftAdminSession');
+  localStorage.removeItem('croftBrokerSession');
+  showView('home');
+  document.title = 'Croft Finance — Structured Finance Solutions';
+  if (sessionTimeout) clearTimeout(sessionTimeout);
+}
+
+function switchToAdminLogin() {
+  localStorage.removeItem('croftSession');
+  localStorage.removeItem('croftAdminSession');
+  localStorage.removeItem('croftBrokerSession');
+  currentClient = null;
+  currentProjectId = null;
+  currentBroker = null;
+  showView('home');
+  showAdminLogin();
+  openModal('loginModal');
+  showToast('Please log in as administrator');
+}
+
+// Broker functions remain the same but use localStorage
+function brokerRegister() {
+  const name = document.getElementById('brokerRegName').value.trim();
+  const email = document.getElementById('brokerRegEmail').value.trim().toLowerCase();
+  const pass = document.getElementById('brokerRegPassword').value;
+  const confirm = document.getElementById('brokerRegConfirmPassword').value;
+  const firm = document.getElementById('brokerRegFirm').value.trim();
+  const country = document.getElementById('brokerRegCountry').value.trim();
+  const license = document.getElementById('brokerRegLicense').value.trim();
+  const hear = document.getElementById('brokerRegHear').value;
+  const nda = document.getElementById('brokerNdaCheckbox').checked;
+  const errEl = document.getElementById('brokerRegError');
+  errEl.style.display = 'none';
+
+  if (!name || !email || !pass || !firm || !country) { 
+    errEl.textContent = 'Please fill all required fields.'; 
+    errEl.style.display = 'block'; 
+    return; 
+  }
+  if (pass !== confirm) { 
+    errEl.textContent = 'Passwords do not match.'; 
+    errEl.style.display = 'block'; 
+    return; 
+  }
+  if (pass.length < 6) { 
+    errEl.textContent = 'Password must be at least 6 characters.'; 
+    errEl.style.display = 'block'; 
+    return; 
+  }
+  if (!nda) { 
+    errEl.textContent = 'You must agree to the Broker Terms.'; 
+    errEl.style.display = 'block'; 
+    return; 
+  }
+
+  const uid = String(Date.now());
+  const newBroker = { 
+    id: uid, name, email, 
+    password: btoa(pass),
+    firm, country, license, hear, 
+    status: 'pending', 
+    createdAt: new Date().toISOString() 
+  };
+  brokers.push(newBroker);
+  saveLocal();
+
+  sendEmail(email, 'Croft Finance — Broker Registration Received', 
+    `Dear ${name},\n\nThank you for registering as a broker with Croft Finance.\n\nYour registration is under review. You will receive an email once your account is activated.\n\nKind regards,\nCroft Finance Team`
+  ).catch(() => {});
+  
+  sendEmail(EMAILJS_CONFIG.adminEmail, 
+    `🔔 NEW BROKER REGISTRATION: ${name}`, 
+    `A new broker has registered.\n\n• Name: ${name}\n• Email: ${email}\n• Firm: ${firm}\n• Country: ${country}\n• License: ${license || 'Not provided'}\n\nLog in to admin to activate.`
+  ).catch(() => {});
+
+  showToast('Broker registration submitted. You will receive an email once approved.');
+  showBrokerLoginForm();
+  renderBrokerAdminTable();
+}
+
+function brokerLogin() {
+  const email = document.getElementById('brokerLoginEmail').value.trim().toLowerCase();
+  const pass = document.getElementById('brokerLoginPassword').value;
+  const errEl = document.getElementById('brokerLoginError');
+  errEl.style.display = 'none';
+
+  const broker = brokers.find(b => b.email === email);
+  
+  if (!broker) {
+    errEl.textContent = 'Broker account not found.';
+    errEl.style.display = 'block';
+    return;
+  }
+  
+  if (broker.password !== btoa(pass)) {
+    errEl.textContent = 'Incorrect password.';
+    errEl.style.display = 'block';
+    return;
+  }
+  
+  if (broker.status === 'pending') {
+    errEl.textContent = 'Your account is under review.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  currentBroker = broker;
+  localStorage.setItem('croftBrokerSession', JSON.stringify({ 
+    brokerId: broker.id, 
+    ts: Date.now() 
+  }));
+  closeModal('loginModal');
+  showView('broker');
+  document.title = 'Croft Finance — Broker Portal — ' + broker.name;
+  loadBrokerPortal();
+}
 
 // ============================================================
 // INITIALIZATION
