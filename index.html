@@ -3122,85 +3122,122 @@ function resetSessionTimeout() {
 }
 
 async function loadFromFirebase() {
-    // 1. Check if the user is actually logged in before knocking on the door
-    const user = firebase.auth().currentUser;
-    if (!user) {
-        console.log("Waiting for authentication to load data...");
-        return;
-    }
-
-    try {
-        const collections = {
-            clients: db.collection('clients'),
-            projects: db.collection('projects'),
-            documents: db.collection('documents'),
-            messages: db.collection('messages'),
-            meetings: db.collection('meetings'),
-            auditLog: db.collection('auditLog').orderBy('timestamp', 'desc').limit(100),
-            brokers: db.collection('brokers'),
-            brokerSubmissions: db.collection('brokerSubmissions'),
-            brokerMessages: db.collection('brokerMessages'),
-            clientActivityLog: db.collection('clientActivityLog')
-        };
-
-        const results = {};
+    // Set a timeout to prevent infinite waiting
+    const timeoutPromise = new Promise((resolve) => {
+        setTimeout(() => {
+            console.log("Firebase load timeout - using localStorage fallback");
+            document.getElementById('loadingOverlay').style.display = 'none';
+            loadFromLocalStorage();
+            resolve();
+        }, 5000);
+    });
+    
+    // Main loading promise
+    const loadPromise = (async () => {
+        // Wait for Firebase Auth to be ready (with timeout)
+        let user = firebase.auth().currentUser;
         
-        // 2. Loop through and fetch data
-        for (const [key, query] of Object.entries(collections)) {
-            try {
-                const snapshot = await query.get();
-                results[key] = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-            } catch(e) {
-                // This catches the error if you aren't an admin
-                // For example: A client can't load 'auditLog', so it just sets it to []
-                console.warn(`Note: Could not load ${key} (Expected if not Admin).`);
-                results[key] = [];
-            }
+        if (!user) {
+            // Wait for auth state to resolve
+            await new Promise((resolve) => {
+                const unsubscribe = firebase.auth().onAuthStateChanged((authUser) => {
+                    unsubscribe();
+                    user = authUser;
+                    resolve();
+                });
+            });
         }
-
-        // 3. Assign data to global variables
-        clients = results.clients;
-        projects = results.projects;
-        documents = results.documents;
-        messages = results.messages;
-        meetings = results.meetings;
-        brokers = results.brokers;
-        brokerSubmissions = results.brokerSubmissions;
-        brokerMessages = results.brokerMessages;
-        clientActivityLog = results.clientActivityLog;
-
-        firebaseReady = true;
         
-        // 4. Hide loading screens
-        const banner = document.getElementById('connectionBanner');
-        const overlay = document.getElementById('loadingOverlay');
-        if (banner) banner.style.display = 'none';
-        if (overlay) overlay.style.display = 'none';
-
-        // 5. Update UI based on who is logged in
-        if (user.email === "suzana.aleksic@croftfinance.com") {
-            renderAdminTables();
-            renderBrokerAdminTable();
-        } else {
-            // Logic for a client login
-            currentClient = clients.find(c => c.id === user.uid);
-            if (currentClient) {
-                const cp = projects.filter(p => p.clientId === currentClient.id);
-                if (cp.length) currentProjectId = cp[0].id;
-                loadClientPortal();
-            }
+        if (!user) {
+            console.log("No user logged in - using localStorage");
+            document.getElementById('loadingOverlay').style.display = 'none';
+            loadFromLocalStorage();
+            return;
         }
+        
+        console.log("User authenticated:", user.email);
+        
+        try {
+            const collections = {
+                clients: db.collection('clients'),
+                projects: db.collection('projects'),
+                documents: db.collection('documents'),
+                messages: db.collection('messages'),
+                meetings: db.collection('meetings'),
+                auditLog: db.collection('auditLog').orderBy('timestamp', 'desc').limit(100),
+                brokers: db.collection('brokers'),
+                brokerSubmissions: db.collection('brokerSubmissions'),
+                brokerMessages: db.collection('brokerMessages'),
+                clientActivityLog: db.collection('clientActivityLog')
+            };
 
-        checkForNotifications();
-        checkAllExpiries();
-        console.log("Firebase Sync Complete.");
+            const results = {};
+            
+            for (const [key, query] of Object.entries(collections)) {
+                try {
+                    const snapshot = await query.get();
+                    results[key] = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                    console.log(`Loaded ${key}: ${results[key].length} items`);
+                } catch(e) {
+                    console.warn(`Could not load ${key}:`, e.message);
+                    results[key] = [];
+                }
+            }
 
-    } catch(e) { 
-        console.error('Critical Firebase load error:', e);
-        loadFromLocalStorage(); 
-        const overlay = document.getElementById('loadingOverlay');
-        if (overlay) overlay.style.display = 'none';
-    }
+            clients = results.clients;
+            projects = results.projects;
+            documents = results.documents;
+            messages = results.messages;
+            meetings = results.meetings;
+            auditLog = results.auditLog;
+            brokers = results.brokers;
+            brokerSubmissions = results.brokerSubmissions;
+            brokerMessages = results.brokerMessages;
+            clientActivityLog = results.clientActivityLog;
+
+            firebaseReady = true;
+            
+            const banner = document.getElementById('connectionBanner');
+            const overlay = document.getElementById('loadingOverlay');
+            if (banner) banner.style.display = 'none';
+            if (overlay) overlay.style.display = 'none';
+
+            // Check if user is admin
+            const adminEmails = ['suzana.aleksic@croftfinance.com', 'suzana@croftfinance.com'];
+            const isAdmin = adminEmails.includes(user.email);
+            
+            if (isAdmin) {
+                console.log("Admin logged in - loading admin panel");
+                renderAdminTables();
+                renderBrokerAdminTable();
+            } else {
+                // Regular client
+                currentClient = clients.find(c => c.id === user.uid);
+                if (currentClient) {
+                    console.log("Client logged in:", currentClient.name);
+                    const cp = projects.filter(p => p.clientId === currentClient.id);
+                    if (cp.length) currentProjectId = cp[0].id;
+                    loadClientPortal();
+                } else {
+                    console.log("Client record not found, but user is authenticated");
+                    // Still show portal but with limited data
+                    showView('portal');
+                }
+            }
+
+            checkForNotifications();
+            checkAllExpiries();
+            console.log("Firebase Sync Complete.");
+
+        } catch(e) { 
+            console.error('Critical Firebase load error:', e);
+            document.getElementById('loadingOverlay').style.display = 'none';
+            loadFromLocalStorage();
+        }
+    })();
+    
+    // Race between timeout and actual load
+    await Promise.race([loadPromise, timeoutPromise]);
 }
 
 function loadFromLocalStorage() {
