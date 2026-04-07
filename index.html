@@ -3806,6 +3806,7 @@ async function loadClientPortal() {
   loadRecentActivity();
   updateMsgBadge();
   checkForNotifications();
+  showFirstLoginIVLModal();
 }
 
 function loadCurrentProjectData() {
@@ -3867,12 +3868,35 @@ function loadCurrentProjectData() {
   checkAndShowAcknowledgment();
 }
 
+// ============================================================
+// MISSING FUNCTIONS - ADDED HERE
+// ============================================================
+
 function renderTermSheetSummary(proj) {
   const container = document.getElementById('termSheetSummary');
   if (!container) return;
   if (proj.step >= 1 && proj.amount && proj.amount !== 'TBD') {
-    container.innerHTML = `<div class="term-sheet-card"><div class="term-sheet-header"><i class="fas fa-file-contract"></i><span>Executed Term Sheet</span></div><div class="term-sheet-grid"><div><label>Principal Amount</label><strong>${proj.amount}</strong></div><div><label>Interest Rate</label><strong>${proj.interestRate || 'TBD'} p.a.</strong></div><div><label>Term</label><strong>${proj.term || 'TBD'}</strong></div><div><label>Grace Period</label><strong>${proj.gracePeriod || 'TBD'} months</strong></div><div><label>Prepayment</label><strong>None</strong></div><div><label>Governing Law</label><strong>${proj.govLaw || 'TBD'}</strong></div></div><div class="term-sheet-actions"><button onclick="downloadTermSheet()"><i class="fas fa-download"></i> Download PDF</button><button onclick="requestAmendment()"><i class="fas fa-edit"></i> Request Amendment</button></div></div>`;
-  } else { container.innerHTML = ''; }
+    container.innerHTML = `<div class="term-sheet-card">
+      <div class="term-sheet-header">
+        <i class="fas fa-file-contract"></i>
+        <span>Executed Term Sheet</span>
+      </div>
+      <div class="term-sheet-grid">
+        <div><label>Principal Amount</label><strong>${proj.amount}</strong></div>
+        <div><label>Interest Rate</label><strong>${proj.interestRate || 'TBD'} p.a.</strong></div>
+        <div><label>Term</label><strong>${proj.term || 'TBD'}</strong></div>
+        <div><label>Grace Period</label><strong>${proj.gracePeriod || 'TBD'} months</strong></div>
+        <div><label>Prepayment</label><strong>None</strong></div>
+        <div><label>Governing Law</label><strong>${proj.govLaw || 'TBD'}</strong></div>
+      </div>
+      <div class="term-sheet-actions">
+        <button onclick="downloadTermSheet()"><i class="fas fa-download"></i> Download PDF</button>
+        <button onclick="requestAmendment()"><i class="fas fa-edit"></i> Request Amendment</button>
+      </div>
+    </div>`;
+  } else { 
+    container.innerHTML = ''; 
+  }
 }
 
 function renderFundingTimeline(proj) {
@@ -3882,73 +3906,117 @@ function renderFundingTimeline(proj) {
   const steps = [1, 2, 3, 4, 5, 6, 7, 8];
   const completedSteps = steps.filter(s => stepDates[s]).length;
   const progressPercent = (completedSteps / 8) * 100;
-  container.innerHTML = `<div class="funding-timeline"><div class="timeline-header"><h4><i class="fas fa-chart-line"></i> Funding Timeline</h4><div class="projected-date">Est. Completion: ${calculateEstimatedClose(stepDates)}</div></div><div class="gantt-view"><div class="gantt-bar"><div class="gantt-label">Overall Progress</div><div class="gantt-progress"><div class="gantt-fill" style="width:${progressPercent}%">${Math.round(progressPercent)}%</div></div></div>${steps.map(s => { const completed = stepDates[s]; const stepProgress = completed ? 100 : (s < (proj.step || 1) ? 100 : (s === (proj.step || 1) ? 50 : 0)); return `<div class="gantt-bar"><div class="gantt-label">Step ${s}</div><div class="gantt-progress"><div class="gantt-fill" style="width:${stepProgress}%;background:${completed ? 'var(--success)' : 'var(--navy)'}">${completed ? '✓' : ''}</div></div></div>`; }).join('')}</div></div>`;
+  container.innerHTML = `<div class="funding-timeline">
+    <div class="timeline-header">
+      <h4><i class="fas fa-chart-line"></i> Funding Timeline</h4>
+      <div class="projected-date">Est. Completion: ${calculateEstimatedClose(stepDates)}</div>
+    </div>
+    <div class="gantt-view">
+      <div class="gantt-bar">
+        <div class="gantt-label">Overall Progress</div>
+        <div class="gantt-progress">
+          <div class="gantt-fill" style="width:${progressPercent}%">${Math.round(progressPercent)}%</div>
+        </div>
+      </div>
+      ${steps.map(s => { 
+        const completed = stepDates[s]; 
+        const stepProgress = completed ? 100 : (s < (proj.step || 1) ? 100 : (s === (proj.step || 1) ? 50 : 0)); 
+        return `<div class="gantt-bar">
+          <div class="gantt-label">Step ${s}</div>
+          <div class="gantt-progress">
+            <div class="gantt-fill" style="width:${stepProgress}%;background:${completed ? 'var(--success)' : 'var(--navy)'}">
+              ${completed ? '✓' : ''}
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
 }
 
-function renderEnhancedStepTracker(proj) {
-  const container = document.getElementById('stepProgressTracker');
-  if (!container) return;
-  const currentStep = proj.step || 1;
-  const stepDates = proj.stepDates || {};
-  container.innerHTML = `<div class="step-progress-horizontal">${[1,2,3,4,5,6,7,8].map(step => { const status = step < currentStep ? 'completed' : step === currentStep ? 'current' : 'upcoming'; const date = stepDates[step] ? new Date(stepDates[step]).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : null; return `<div class="step-node ${status}" data-step="${step}" onclick="goToStep(${step})"><div class="step-circle">${status === 'completed' ? '✓' : step}</div><div class="step-label">${STEP_NAMES[step]}</div>${date ? `<div class="step-date">${date}</div>` : ''}</div>${step < 8 ? `<div class="step-line ${status === 'completed' ? 'completed' : ''}"></div>` : ''}`; }).join('')}</div>`;
-}
-
-function goToStep(step) { switchPortalTab('process', null); document.getElementById('currentStepNum').textContent = step; document.getElementById('currentStepName').textContent = STEP_NAMES[step]; document.getElementById('timeline')?.scrollIntoView({ behavior: 'smooth' }); }
-
-function downloadTermSheet() {
+function updateStepTrackerWithExpiryWarning() {
   const proj = projects.find(p => p.id === currentProjectId);
   if (!proj) return;
-  const html = `<div style="font-family:Georgia,serif;max-width:800px;margin:0 auto;padding:40px;"><div style="border-bottom:2px solid #0a1628;padding-bottom:20px;margin-bottom:30px;"><div style="font-size:28px;font-weight:700;color:#0a1628;">CROFT FINANCE</div><div style="font-size:12px;letter-spacing:3px;color:#2c5f8a;">EXECUTED TERM SHEET</div></div><div style="margin-bottom:30px;"><div style="font-size:22px;font-weight:600;color:#0a1628;">${escapeHtml(proj.name)}</div><div style="font-size:14px;color:#6b7280;">Date: ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</div></div><table style="width:100%;border-collapse:collapse;margin-bottom:30px;">${[['Facility Amount', proj.amount], ['Interest Rate', proj.interestRate + ' per annum'], ['Term', proj.term], ['Grace Period', proj.gracePeriod + ' months'], ['Prepayment Penalty', 'None'], ['Governing Law', proj.govLaw || 'English Law']].map(([k, v]) => `<tr style="border-bottom:1px solid #e5e7eb;"><td style="padding:12px 0;font-size:12px;color:#6b7280;width:40%">${k}</td><td style="padding:12px 0;font-size:14px;color:#0a1628;font-weight:500;">${v}</td></table>`).join('')}</table><div style="margin-top:40px;padding:20px;background:#f9fafb;border-radius:8px;"><div style="font-size:12px;color:#6b7280;margin-bottom:10px;">This term sheet is binding upon execution by both parties.</div><div style="display:flex;justify-content:space-between;margin-top:20px;"><div><div style="font-weight:600;">For Croft Finance</div><div style="margin-top:30px;">_________________</div><div>Suzana Aleksić, Principal</div></div><div><div style="font-weight:600;">For Sponsor</div><div style="margin-top:30px;">_________________</div><div>${currentClient.name}</div></div></div></div><div style="margin-top:30px;font-size:10px;color:#9ca3af;border-top:1px solid #f3f4f6;padding-top:16px;">Confidential — Not for distribution</div></div>`;
-  const printArea = document.getElementById('printArea');
-  printArea.innerHTML = html;
-  printArea.style.display = 'block';
-  window.print();
-  printArea.style.display = 'none';
-}
-
-function requestAmendment() {
-  showToast('Amendment request sent to Suzana. You will receive a response within 24 hours.');
-  sendEmail(EMAILJS_CONFIG.adminEmail, 'Term Sheet Amendment Request — ' + currentClient.name, currentClient.name + ' (' + currentClient.email + ') has requested an amendment to their term sheet for project: ' + (projects.find(p => p.id === currentProjectId)?.name || 'N/A')).catch(() => {});
-}
-
-function calculateEstimatedClose(stepDates) {
-  const step1Date = stepDates['1'];
-  if (!step1Date) return 'TBD';
-  const start = new Date(step1Date);
-  const estimatedClose = addBusinessDays(start, 18);
-  return formatDate(estimatedClose);
-}
-
-function renderFundedScreen(proj) {
-  const el = document.getElementById('fundedScreen');
-  if (proj.fundedDate && proj.step >= 8) {
-    el.innerHTML = `<div class="card" style="border-color:rgba(43,140,78,0.3);"><div class="card-body funded-screen"><div class="funded-icon"><i class="fas fa-check-circle"></i></div><div class="funded-title">Your project has been funded.</div><div class="funded-amount">${proj.amount}</div><div class="funded-date">Disbursed: ${formatDate(new Date(proj.fundedDate))}</div><div class="funded-note">Congratulations. Your facility has been successfully disbursed. Suzana and the Croft Finance team thank you for entrusting us with your project.</div><button class="btn btn-blue" onclick="requestReferral()"><i class="fas fa-star"></i> Request Referral Letter</button></div></div>`;
-  } else { el.innerHTML = ''; }
-}
-
-function renderTimeline(proj) {
   const step = proj.step || 1;
-  const stepDates = proj.stepDates || {};
-  const container = document.getElementById('timeline');
-  if (!container) return;
-  container.innerHTML = '';
-  document.getElementById('currentStepNum').textContent = step;
-  document.getElementById('currentStepName').textContent = STEP_NAMES[step] || '';
-  const stepDescs = ['', 'Commercial terms agreed and formally executed.', 'Sponsor pays USD 150,000 commitment fee.', 'Both parties execute Deed of Undertaking.', 'Lender arranges issuance of ECF Guarantee.', 'Sponsor delivers hard-copy closing materials.', 'Sponsor escrows Equity Contribution Fee.', 'Lender releases ECF to closing agent.', 'Lender disburses equity funding.'];
-  for (let i = 1; i <= 8; i++) {
-    const completed = i < step;
-    const current = i === step;
-    const locked = i > step;
-    let dotClass = locked ? 'locked' : completed ? 'completed' : current ? 'current' : '';
-    let dateStr = '';
-    if (completed && stepDates[i]) dateStr = 'Completed ' + formatDate(new Date(stepDates[i]));
-    else if (current && stepDates[i]) dateStr = 'In Progress — started ' + formatDate(new Date(stepDates[i]));
-    else if (locked) dateStr = 'Pending';
-    const who = STEP_WHO[i];
-    const whoLabel = STEP_WHO_LABELS[who];
-    const whoCls = STEP_WHO_CLASSES[who];
-    container.innerHTML += `<div class="timeline-item"><div class="timeline-dot ${dotClass}"></div><div class="timeline-header"><div class="timeline-title ${locked ? 'locked-text' : ''}">${i}. ${STEP_NAMES[i]}</div><span class="timeline-who ${whoCls}">${whoLabel}</span>${locked ? '<i class="fas fa-lock" style="color:var(--gray-300);font-size:11px;"></i>' : ''}</div><div class="timeline-desc ${locked ? 'locked-text' : ''}">${stepDescs[i]}</div><div class="timeline-date">${dateStr}</div></div>`;
+  const stepExpiryMap = { 
+    1: 'termSheetExpiry', 
+    2: 'commitFeeDeadline', 
+    3: 'deedExpiryDate', 
+    4: 'ecfPolicyExpiryDate', 
+    5: 'ecfPolicyExpiryDate', 
+    6: 'ecfPolicyExpiryDate', 
+    7: null, 
+    8: null 
+  };
+  const relevantField = stepExpiryMap[step];
+  if (relevantField && proj[relevantField]) {
+    const expiryDate = new Date(proj[relevantField]);
+    const today = new Date(); 
+    today.setHours(0, 0, 0, 0);
+    const diffDays = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
+    if (diffDays >= 0 && diffDays <= 7) {
+      const stepNode = document.querySelector(`.step-node[data-step="${step}"]`);
+      if (stepNode && !stepNode.querySelector('.step-warning-icon')) {
+        const warningIcon = document.createElement('span');
+        warningIcon.className = 'step-warning-icon';
+        warningIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+        warningIcon.title = `${STEP_NAMES[step]} expires in ${diffDays} days`;
+        stepNode.querySelector('.step-label')?.appendChild(warningIcon);
+      }
+    }
   }
+}
+
+function openLuminSign(docId) {
+  const doc = documents.find(d => d.id === docId || d.id === String(docId));
+  if (!doc || !doc.url) {
+    showToast('Document not available', true);
+    return;
+  }
+  
+  downloadPDF(docId);
+  
+  const modalHtml = `
+  <div id="luminModal" class="modal-overlay active">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <h3><i class="fas fa-pen-fancy" style="color:#6B46C1;margin-right:8px;"></i>Sign with Lumin Sign</h3>
+        <button class="modal-close" onclick="document.getElementById('luminModal').remove()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="background: #F5F3FF; border: 1px solid #6B46C1; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+          <div style="font-size: 13px; color: #4C1D95; font-weight: 500; margin-bottom: 8px;">
+            <i class="fas fa-info-circle"></i> How to sign with Lumin Sign:
+          </div>
+          <ol style="font-size: 12px; color: #5B21B6; line-height: 2; margin-left: 20px;">
+            <li>Download the document using the button below</li>
+            <li>Go to Lumin Sign (luminpdf.com/sign)</li>
+            <li>Upload the document to Lumin Sign</li>
+            <li>Add your signature and complete signing</li>
+            <li>Download the signed version from Lumin</li>
+            <li>Upload the signed document back here via the Upload section below</li>
+          </ol>
+        </div>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <button class="btn btn-primary" onclick="downloadPDF('${docId}'); document.getElementById('luminModal').remove();">
+            <i class="fas fa-download"></i> Download Document First
+          </button>
+          <a href="https://luminpdf.com/sign" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: #6B46C1; color: white; padding: 10px 22px; border-radius: 6px; font-size: 12px; font-weight: 500; text-decoration: none; letter-spacing: 1px;">
+            <i class="fas fa-external-link-alt"></i> Open Lumin Sign
+          </a>
+          <button class="btn btn-outline" onclick="document.getElementById('luminModal').remove(); switchPortalTab('documents', null);">
+            Upload Signed Document
+          </button>
+        </div>
+        <div style="margin-top: 20px; font-size: 11px; color: var(--gray-400); border-top: 1px solid var(--gray-100); padding-top: 12px;">
+          After signing in Lumin, upload the completed signed document using the Upload section on this page. 
+          Name it clearly e.g. "Signed Term Sheet - [Your Name]".
+        </div>
+      </div>
+    </div>
+  </div>`;
+  
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
 }
 
 function renderDocuments() {
@@ -4007,7 +4075,13 @@ function renderClosingDocumentsTable() {
         actions = `<button class="doc-action-btn doc-action-view" onclick="viewPDF('${uploadedDoc.id}')">View</button><button class="doc-action-btn doc-action-download" onclick="downloadPDF('${uploadedDoc.id}')">Download</button>`;
       }
       
-      rows.push(`<tr><td><strong>${escapeHtml(docType)}</strong></td><td style="text-align:center;">Step ${s}</td><td style="text-align:center;"><span class="doc-status-badge ${statusClass}">${statusText}</span></td><td style="text-align:center;">${dateDisplay}</td><td style="text-align:center;">${actions}</td>`);
+      rows.push(`<tr>
+        <td><strong>${escapeHtml(docType)}</strong></td>
+        <td style="text-align:center;">Step ${s}</td>
+        <td style="text-align:center;"><span class="doc-status-badge ${statusClass}">${statusText}</span></td>
+        <td style="text-align:center;">${dateDisplay}</td>
+        <td style="text-align:center;">${actions}</td>
+      </tr>`);
     });
   }
   tbody.innerHTML = rows.join('');
@@ -4092,6 +4166,18 @@ async function clientUploadDocument() {
   reader.readAsDataURL(file);
 }
 
+function viewPDF(docId) { 
+  console.log('viewPDF called with docId:', docId);
+  const d = documents.find(x => x.id === docId || x.id === String(docId));
+  if (d && d.url) window.open(d.url, '_blank');
+  else showToast('PDF not available. Please contact support.', true);
+}
+function downloadPDF(docId) { 
+  const d = documents.find(x => x.id === docId || x.id === String(docId));
+  if (d && d.url) { const a = document.createElement('a'); a.href = d.url; a.download = (d.type || 'document') + '.pdf'; a.click(); }
+  else showToast('PDF not available. Please contact support.', true);
+}
+
 function renderChecklist() {
   const proj = projects.find(p => p.id === currentProjectId);
   if (!proj) return;
@@ -4131,6 +4217,111 @@ function renderChecklist() {
     html += '</div>';
   }
   container.innerHTML = html;
+}
+
+function renderTimeline(proj) {
+  const step = proj.step || 1;
+  const stepDates = proj.stepDates || {};
+  const container = document.getElementById('timeline');
+  if (!container) return;
+  container.innerHTML = '';
+  document.getElementById('currentStepNum').textContent = step;
+  document.getElementById('currentStepName').textContent = STEP_NAMES[step] || '';
+  const stepDescs = ['', 'Commercial terms agreed and formally executed.', 'Sponsor pays USD 150,000 commitment fee.', 'Both parties execute Deed of Undertaking.', 'Lender arranges issuance of ECF Guarantee.', 'Sponsor delivers hard-copy closing materials.', 'Sponsor escrows Equity Contribution Fee.', 'Lender releases ECF to closing agent.', 'Lender disburses equity funding.'];
+  for (let i = 1; i <= 8; i++) {
+    const completed = i < step;
+    const current = i === step;
+    const locked = i > step;
+    let dotClass = locked ? 'locked' : completed ? 'completed' : current ? 'current' : '';
+    let dateStr = '';
+    if (completed && stepDates[i]) dateStr = 'Completed ' + formatDate(new Date(stepDates[i]));
+    else if (current && stepDates[i]) dateStr = 'In Progress — started ' + formatDate(new Date(stepDates[i]));
+    else if (locked) dateStr = 'Pending';
+    const who = STEP_WHO[i];
+    const whoLabel = STEP_WHO_LABELS[who];
+    const whoCls = STEP_WHO_CLASSES[who];
+    container.innerHTML += `<div class="timeline-item"><div class="timeline-dot ${dotClass}"></div><div class="timeline-header"><div class="timeline-title ${locked ? 'locked-text' : ''}">${i}. ${STEP_NAMES[i]}</div><span class="timeline-who ${whoCls}">${whoLabel}</span>${locked ? '<i class="fas fa-lock" style="color:var(--gray-300);font-size:11px;"></i>' : ''}</div><div class="timeline-desc ${locked ? 'locked-text' : ''}">${stepDescs[i]}</div><div class="timeline-date">${dateStr}</div></div>`;
+  }
+}
+
+function renderFundedScreen(proj) {
+  const el = document.getElementById('fundedScreen');
+  if (proj.fundedDate && proj.step >= 8) {
+    el.innerHTML = `<div class="card" style="border-color:rgba(43,140,78,0.3);"><div class="card-body funded-screen"><div class="funded-icon"><i class="fas fa-check-circle"></i></div><div class="funded-title">Your project has been funded.</div><div class="funded-amount">${proj.amount}</div><div class="funded-date">Disbursed: ${formatDate(new Date(proj.fundedDate))}</div><div class="funded-note">Congratulations. Your facility has been successfully disbursed. Suzana and the Croft Finance team thank you for entrusting us with your project.</div><button class="btn btn-blue" onclick="requestReferral()"><i class="fas fa-star"></i> Request Referral Letter</button></div></div>`;
+  } else { el.innerHTML = ''; }
+}
+
+function renderExpiryAlerts() {
+  const proj = projects.find(p => p.id === currentProjectId);
+  if (!proj) return;
+  const alerts = checkExpiryDates(proj);
+  const container = document.getElementById('expiryAlertsContainer');
+  if (!container) return;
+  if (alerts.length === 0) { container.innerHTML = ''; return; }
+  container.innerHTML = `<div class="expiry-alerts-section">${alerts.map(alert => `<div class="expiry-alert expiry-alert-${alert.urgency}"><i class="fas ${alert.urgency === 'critical' ? 'fa-exclamation-triangle' : alert.urgency === 'warning' ? 'fa-clock' : alert.urgency === 'notice' ? 'fa-info-circle' : 'fa-skull-crossbones'}"></i><div class="expiry-alert-content"><div class="expiry-alert-title">${alert.name}</div><div class="expiry-alert-message">${alert.message}</div></div><a class="expiry-alert-action" onclick="switchPortalTab('messages',null)">Contact Suzana →</a></div>`).join('')}</div>`;
+}
+
+function checkExpiryDates(proj) {
+  const alerts = []; const today = new Date(); today.setHours(0, 0, 0, 0);
+  const expiryItems = [{ date: proj.termSheetExpiry, name: 'Term Sheet' }, { date: proj.commitFeeDeadline, name: 'Commitment Fee Deadline' }, { date: proj.deedExpiryDate, name: 'Deed of Undertaking' }, { date: proj.ecfPolicyExpiryDate, name: 'ECF Guarantee Policy' }];
+  for (const item of expiryItems) {
+    if (!item.date) continue;
+    const expiryDate = new Date(item.date); expiryDate.setHours(0, 0, 0, 0);
+    const diffDays = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
+    if (diffDays < 0) alerts.push({ type: 'expired', name: item.name, days: Math.abs(diffDays), message: `${item.name} has expired. Your deal may be at risk.`, urgency: 'expired' });
+    else if (diffDays <= 3) alerts.push({ type: 'critical', name: item.name, days: diffDays, message: `URGENT: Your ${item.name} expires in ${diffDays} day${diffDays === 1 ? '' : 's'}. Contact Suzana immediately.`, urgency: 'critical' });
+    else if (diffDays <= 7) alerts.push({ type: 'warning', name: item.name, days: diffDays, message: `Your ${item.name} expires in ${diffDays} days. Please take action.`, urgency: 'warning' });
+    else if (diffDays <= 14) alerts.push({ type: 'notice', name: item.name, days: diffDays, message: `Note: Your ${item.name} expires on ${expiryDate.toLocaleDateString()}.`, urgency: 'notice' });
+  }
+  return alerts;
+}
+
+function renderEnhancedStepTracker(proj) {
+  const container = document.getElementById('stepProgressTracker');
+  if (!container) return;
+  const currentStep = proj.step || 1;
+  const stepDates = proj.stepDates || {};
+  container.innerHTML = `<div class="step-progress-horizontal">${[1,2,3,4,5,6,7,8].map(step => { const status = step < currentStep ? 'completed' : step === currentStep ? 'current' : 'upcoming'; const date = stepDates[step] ? new Date(stepDates[step]).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : null; return `<div class="step-node ${status}" data-step="${step}" onclick="goToStep(${step})"><div class="step-circle">${status === 'completed' ? '✓' : step}</div><div class="step-label">${STEP_NAMES[step]}</div>${date ? `<div class="step-date">${date}</div>` : ''}</div>${step < 8 ? `<div class="step-line ${status === 'completed' ? 'completed' : ''}"></div>` : ''}`; }).join('')}</div>`;
+}
+
+function goToStep(step) { switchPortalTab('process', null); document.getElementById('currentStepNum').textContent = step; document.getElementById('currentStepName').textContent = STEP_NAMES[step]; document.getElementById('timeline')?.scrollIntoView({ behavior: 'smooth' }); }
+
+function downloadTermSheet() {
+  const proj = projects.find(p => p.id === currentProjectId);
+  if (!proj) return;
+  const html = `<div style="font-family:Georgia,serif;max-width:800px;margin:0 auto;padding:40px;"><div style="border-bottom:2px solid #0a1628;padding-bottom:20px;margin-bottom:30px;"><div style="font-size:28px;font-weight:700;color:#0a1628;">CROFT FINANCE</div><div style="font-size:12px;letter-spacing:3px;color:#2c5f8a;">EXECUTED TERM SHEET</div></div><div style="margin-bottom:30px;"><div style="font-size:22px;font-weight:600;color:#0a1628;">${escapeHtml(proj.name)}</div><div style="font-size:14px;color:#6b7280;">Date: ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</div></div><table style="width:100%;border-collapse:collapse;margin-bottom:30px;">${[['Facility Amount', proj.amount], ['Interest Rate', proj.interestRate + ' per annum'], ['Term', proj.term], ['Grace Period', proj.gracePeriod + ' months'], ['Prepayment Penalty', 'None'], ['Governing Law', proj.govLaw || 'English Law']].map(([k, v]) => `<tr style="border-bottom:1px solid #e5e7eb;"><td style="padding:12px 0;font-size:12px;color:#6b7280;width:40%">${k}</td><td style="padding:12px 0;font-size:14px;color:#0a1628;font-weight:500;">${v}</td></tr>`).join('')}</table><div style="margin-top:40px;padding:20px;background:#f9fafb;border-radius:8px;"><div style="font-size:12px;color:#6b7280;margin-bottom:10px;">This term sheet is binding upon execution by both parties.</div><div style="display:flex;justify-content:space-between;margin-top:20px;"><div><div style="font-weight:600;">For Croft Finance</div><div style="margin-top:30px;">_________________</div><div>Suzana Aleksić, Principal</div></div><div><div style="font-weight:600;">For Sponsor</div><div style="margin-top:30px;">_________________</div><div>${currentClient.name}</div></div></div></div><div style="margin-top:30px;font-size:10px;color:#9ca3af;border-top:1px solid #f3f4f6;padding-top:16px;">Confidential — Not for distribution</div></div>`;
+  const printArea = document.getElementById('printArea');
+  printArea.innerHTML = html;
+  printArea.style.display = 'block';
+  window.print();
+  printArea.style.display = 'none';
+}
+
+function requestAmendment() {
+  showToast('Amendment request sent to Suzana. You will receive a response within 24 hours.');
+  sendEmail(EMAILJS_CONFIG.adminEmail, 'Term Sheet Amendment Request — ' + currentClient.name, currentClient.name + ' (' + currentClient.email + ') has requested an amendment to their term sheet for project: ' + (projects.find(p => p.id === currentProjectId)?.name || 'N/A')).catch(() => {});
+}
+
+function calculateEstimatedClose(stepDates) {
+  const step1Date = stepDates['1'];
+  if (!step1Date) return 'TBD';
+  const start = new Date(step1Date);
+  const estimatedClose = addBusinessDays(start, 18);
+  return formatDate(estimatedClose);
+}
+
+function addBusinessDays(date, days) {
+  const result = new Date(date);
+  let added = 0;
+  while (added < days) { result.setDate(result.getDate() + 1); if (result.getDay() !== 0 && result.getDay() !== 6) added++; }
+  return result;
+}
+
+function formatDate(date) { return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); }
+
+function requestReferral() {
+  sendEmail(EMAILJS_CONFIG.adminEmail, 'Referral Letter Request — ' + currentClient.name, currentClient.name + ' (' + currentClient.email + ') has requested a referral letter for project: ' + (projects.find(p => p.id === currentProjectId)?.name || 'N/A')).catch(() => {});
+  showToast('Referral letter request sent to Suzana.');
 }
 
 function renderProjectsList() {
@@ -4192,19 +4383,6 @@ function sendMessage() {
 function markMessagesRead() { if (!currentClient) return; localStorage.setItem('lastSeenMsg_' + currentClient.id, Date.now().toString()); }
 function updateMsgBadge() { if (!currentClient) return; const last = parseInt(localStorage.getItem('lastSeenMsg_' + currentClient.id) || '0'); const hasNew = messages.some(m => String(m.clientId) === String(currentClient.id) && m.sender === 'admin' && new Date(m.timestamp).getTime() > last); const badge = document.getElementById('msgBadge'); if (badge) badge.classList.toggle('show', hasNew); }
 
-function scheduleMeeting() {
-  const id = String(Date.now());
-  const meeting = { id, clientId: String(currentClient.id), clientName: currentClient.name, type: document.getElementById('meetingType').value, date: document.getElementById('meetingDate').value, time: document.getElementById('meetingTime').value, notes: document.getElementById('meetingNotes').value, status: 'pending', timestamp: new Date().toISOString() };
-  meetings.push(meeting);
-  fbSet('meetings', id, meeting).then(() => { fbReload(); });
-  sendEmail(EMAILJS_CONFIG.adminEmail, `📅 MEETING REQUEST: ${currentClient.name}`, `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nNEW MEETING REQUEST\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n• Client: ${currentClient.name}\n• Email: ${currentClient.email}\n• Project: ${projects.find(p => p.id === currentProjectId)?.name || 'N/A'}\n• Requested: ${new Date().toLocaleString()}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nMEETING DETAILS:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n• Type: ${meeting.type}\n• Date: ${meeting.date || 'TBD'}\n• Time: ${meeting.time || 'TBD'}\n• Notes: ${meeting.notes || 'None'}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nPlease log in to the admin portal to confirm or reschedule this meeting.`).catch(() => {});
-  logClientActivity(currentClient.id, currentProjectId, 'meeting_requested', `You requested a ${meeting.type} meeting`, 'client');
-  document.getElementById('meetingDate').value = '';
-  document.getElementById('meetingTime').value = '';
-  document.getElementById('meetingNotes').value = '';
-  showToast('Meeting request sent. Suzana will confirm within 24 hours.');
-}
-
 function loadRecentActivity() {
   const cid = String(currentClient.id);
   const all = [...messages.filter(m => String(m.clientId) === cid), ...meetings.filter(m => String(m.clientId) === cid)].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 5);
@@ -4214,773 +4392,134 @@ function loadRecentActivity() {
   el.innerHTML = all.map(a => `<div style="padding:10px 0;border-bottom:1px solid var(--gray-100);"><div style="font-size:13px;color:var(--navy);">${escapeHtml(a.content || a.type || 'Meeting request')}</div><div style="font-size:11px;color:var(--gray-400);margin-top:3px;">${new Date(a.timestamp).toLocaleString()}</div></div>`).join('');
 }
 
-function requestReferral() {
-  sendEmail(EMAILJS_CONFIG.adminEmail, 'Referral Letter Request — ' + currentClient.name, currentClient.name + ' (' + currentClient.email + ') has requested a referral letter for project: ' + (projects.find(p => p.id === currentProjectId)?.name || 'N/A')).catch(() => {});
-  showToast('Referral letter request sent to Suzana.');
-}
-
-function viewPDF(docId) { 
-  console.log('viewPDF called with docId:', docId);
-  const d = documents.find(x => x.id === docId || x.id === String(docId));
-  if (d && d.url) window.open(d.url, '_blank');
-  else showToast('PDF not available. Please contact support.', true);
-}
-function downloadPDF(docId) { 
-  const d = documents.find(x => x.id === docId || x.id === String(docId));
-  if (d && d.url) { const a = document.createElement('a'); a.href = d.url; a.download = (d.type || 'document') + '.pdf'; a.click(); }
-  else showToast('PDF not available. Please contact support.', true);
-}
-
-function addBusinessDays(date, days) {
-  const result = new Date(date);
-  let added = 0;
-  while (added < days) { result.setDate(result.getDate() + 1); if (result.getDay() !== 0 && result.getDay() !== 6) added++; }
-  return result;
-}
-
-function formatDate(date) { return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); }
-
-function checkCookies() { if (localStorage.getItem('cookiesAccepted')) document.getElementById('cookieBanner').style.display = 'none'; }
-function acceptCookies() { localStorage.setItem('cookiesAccepted', '1'); document.getElementById('cookieBanner').style.display = 'none'; }
-function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
-function addNotification(title, message, type) { const notification = { id: Date.now(), title, message, type, timestamp: new Date().toISOString(), read: false }; notifications.unshift(notification); if (notifications.length > 50) notifications.pop(); renderNotifications(); }
-function renderNotifications() { const container = document.getElementById('notificationList'); if (!container) return; if (notifications.length === 0) { container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--gray-400);">No notifications</div>'; return; } container.innerHTML = notifications.map(n => `<div class="notification-item ${n.read ? '' : 'unread'}"><div class="notification-icon"><i class="fas ${n.type === 'success' ? 'fa-check-circle' : n.type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'}"></i></div><div class="notification-content"><div class="notification-title">${escapeHtml(n.title)}</div><div class="notification-message">${escapeHtml(n.message)}</div><div class="notification-time">${new Date(n.timestamp).toLocaleString()}</div></div></div>`).join(''); }
-function markAllNotificationsRead() { notifications.forEach(n => n.read = true); renderNotifications(); }
-function checkForNotifications() { if (!currentClient) return; const lastCheck = localStorage.getItem('lastNotificationCheck_' + currentClient.id) || 0; const now = Date.now(); const proj = projects.find(p => p.id === currentProjectId); if (proj) { const step = proj.step || 1; const stepDates = proj.stepDates || {}; for (let s = 1; s <= step; s++) { if (stepDates[s] && new Date(stepDates[s]).getTime() > lastCheck) { addNotification(`Step ${s} Complete`, `${STEP_NAMES[s]} has been completed.`, 'success'); } } } localStorage.setItem('lastNotificationCheck_' + currentClient.id, now); }
-
 // ============================================================
-// ADMIN REAL-TIME NOTIFICATIONS
+// IVL FUNCTIONS
 // ============================================================
-function playNotificationSound() {
-  try {
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const now = audioCtx.currentTime;
-    const osc1 = audioCtx.createOscillator();
-    const gain1 = audioCtx.createGain();
-    osc1.connect(gain1);
-    gain1.connect(audioCtx.destination);
-    osc1.frequency.value = 880;
-    gain1.gain.value = 0.15;
-    osc1.start();
-    gain1.gain.exponentialRampToValueAtTime(0.00001, now + 0.3);
-    osc1.stop(now + 0.3);
-    setTimeout(() => {
-      const osc2 = audioCtx.createOscillator();
-      const gain2 = audioCtx.createGain();
-      osc2.connect(gain2);
-      gain2.connect(audioCtx.destination);
-      osc2.frequency.value = 1046.5;
-      gain2.gain.value = 0.15;
-      osc2.start();
-      gain2.gain.exponentialRampToValueAtTime(0.00001, now + 0.6);
-      osc2.stop(now + 0.6);
-    }, 150);
-  } catch(e) { console.log('Audio context not supported'); }
+
+function generateInvestorVerificationLetter(clientId, projectId) {
+  const client = clients.find(c => c.id === clientId);
+  const proj = projects.find(p => p.id === projectId);
+  if (!client || !proj) return '';
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  const year = now.getFullYear();
+  const refNumber = `CF-${year}-${String(projectId).slice(-4)}/IVL`;
+  const dealRef = `CF-${year}-${String(projectId).slice(-4)}`;
+  const firstName = client.name.split(' ')[0];
+  return `<div class="ivl-letter-container"><div class="ivl-letterhead"><div class="ivl-logo">CROFT <span>FINANCE</span></div><div class="ivl-subtitle">PRINCIPAL'S INVESTOR VERIFICATION LETTER</div><div class="ivl-address">Sokobanjska 6<br>37208 Kruševac, Serbia<br>T: +381 69 288 0 191<br>E: suzana.aleksic@croftfinance.com</div><div class="ivl-classification">STRICTLY CONFIDENTIAL</div></div><div style="display: flex; justify-content: space-between; margin: 20px 0;"><div>Date: ${dateStr}</div><div>Reference: ${refNumber}</div></div><hr class="ivl-hr"><div class="ivl-recipient">${client.name}<br>${client.email}<br>Portal Reference: ${dealRef}</div><div class="ivl-subject">Re: Verification of Capital Partner — Confirmation of Financial Capacity and Institutional Standing</div><p>Dear ${firstName},</p><p>I, Suzana Aleksić, Principal of Croft Finance, issue this letter in my personal and professional capacity to formally confirm the following with respect to the capital partner engaged in connection with your financing mandate referenced above.</p><div class="ivl-section-title">1. IDENTITY AND STANDING</div><p>The Capital Partner is a private capital entity incorporated and operating under the laws of the Commonwealth of Massachusetts, United States of America. The Capital Partner operates as a regulated private capital vehicle with confirmed deployable capital in excess of USD 550,000,000 (five hundred and fifty million United States dollars) and has been in continuous operation for a period exceeding twenty (20) years.</p><p>The Capital Partner maintains an established track record in the structured financing of real estate development projects across multiple jurisdictions and has successfully deployed capital in transactions of a nature and scale consistent with your mandate.</p><div class="ivl-section-title">2. VERIFICATION CONDUCTED</div><p>In connection with the acceptance of your mandate and prior to the presentation of your project to the Capital Partner, I have personally conducted the following verification procedures:</p><div class="ivl-subsection"><span class="ivl-subsection-label">(i) Review of Proof of Funds Documentation</span><br>I have reviewed and verified original proof of funds documentation confirming the Capital Partner's financial capacity to deploy capital at the facility size relevant to your mandate. This documentation has been reviewed in its original form and confirmed as authentic to the best of my professional knowledge.</div><div class="ivl-subsection"><span class="ivl-subsection-label">(ii) Legal Entity Verification</span><br>I have verified the legal entity registration and standing of the Capital Partner through independent review of corporate documentation confirming its incorporation, continued good standing, and authority to enter into financing transactions of this nature.</div><div class="ivl-subsection"><span class="ivl-subsection-label">(iii) Transaction History Review</span><br>I have reviewed and am personally familiar with the Capital Partner's prior transaction history, including the structure, execution, and successful completion of previous financing mandates. This review supports my confidence in the Capital Partner's ability and intention to perform its obligations under the proposed facility.</div><div class="ivl-subsection"><span class="ivl-subsection-label">(iv) Legal Counsel Verification</span><br>I am personally familiar with the legal counsel engaged by the Capital Partner in connection with its financing activities and am satisfied as to their professional standing and institutional credibility.</div><div class="ivl-section-title">3. CONFIDENTIALITY OF IDENTITY</div><p>The identity of the Capital Partner is maintained in strict confidence as a condition of their participation in this and all transactions arranged through Croft Finance. This is standard and accepted practice in private capital markets of this nature and does not in any way diminish the validity, enforceability, or credibility of any agreement entered into between the parties.</p><p>You are expressly prohibited from attempting to identify, contact, or approach the Capital Partner directly or through any intermediary without the prior written consent of Croft Finance. Any breach of this condition will be considered a material breach of the Confidentiality and Portal Access Terms you have accepted.</p><div class="ivl-section-title">4. PROFESSIONAL REPRESENTATION</div><p>I issue this letter on the basis of my personal knowledge of and professional relationship with the Capital Partner, accumulated over the course of my work in private structured finance. I stake my professional reputation on the representations made herein and would not present any mandate to a capital partner whose standing and capacity I had not personally verified to my complete satisfaction.</p><p>I remain personally available to discuss the contents of this letter or any aspect of the capital partner verification process at any time.</p><div class="ivl-signature">Yours faithfully,<br><br><div class="ivl-signature-name">Suzana Aleksić</div>Principal, Croft Finance<br>suzana.aleksic@croftfinance.com<br>+381 69 288 0 191<br>Sokobanjska 6, 37208 Kruševac, Serbia</div><div>Date: ${dateStr}</div><div>Reference: ${refNumber}</div><div class="ivl-disclaimer"><strong>DISCLAIMER AND LIMITATION OF LIABILITY</strong><br><br>This letter constitutes a professional representation by Suzana Aleksić in her capacity as Principal of Croft Finance and is issued in good faith on the basis of verification procedures described herein. This letter does not constitute a legal guarantee of performance by the Capital Partner, a warranty of investment outcome, or legal advice of any kind. Croft Finance has conducted the verification described herein to the best of its professional ability and in accordance with standard private capital market practice. Recipients are advised to seek independent legal and financial advice in connection with any financing transaction.<br><br>This letter is strictly confidential, non-transferable, and issued solely for the benefit of the named recipient in connection with the referenced mandate. Any reproduction, distribution, or disclosure of this letter without the prior written consent of Croft Finance is strictly prohibited.<br><br>© ${year} Croft Finance. All rights reserved.<br>Sokobanjska 6, 37208 Kruševac, Serbia.</div><div class="ivl-footer">STRICTLY CONFIDENTIAL — ${refNumber}</div></div>`;
 }
 
-function requestBrowserNotificationPermission() {
-  if ('Notification' in window && !browserNotificationPermission) {
-    Notification.requestPermission().then(permission => { browserNotificationPermission = permission === 'granted'; });
-  }
-}
-
-function sendBrowserNotification(title, body) {
-  if (browserNotificationPermission && document.visibilityState !== 'visible') {
-    new Notification(`Croft Finance - ${title}`, { body: body, icon: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#0a1628"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>'), silent: false });
-  }
-}
-
-function addAdminNotification(type, title, message, data) {
-  const id = Date.now();
-  const notification = { id, type, title, message, data, timestamp: new Date().toISOString(), read: false };
-  adminNotifications.unshift(notification);
-  const isNew = !adminSessionStart || new Date(notification.timestamp) > adminSessionStart;
-  if (isNew) { adminUnreadCount++; updateAdminBellBadge(); playNotificationSound(); sendBrowserNotification(title, message.substring(0, 100)); }
-  if (adminNotifications.length > 100) adminNotifications.pop();
-  saveAdminNotifications();
-  renderAdminNotificationDropdown();
-}
-
-function saveAdminNotifications() { localStorage.setItem('croft_admin_notifications', JSON.stringify(adminNotifications)); localStorage.setItem('croft_admin_unread_count', adminUnreadCount); }
-function loadAdminNotifications() { const saved = localStorage.getItem('croft_admin_notifications'); if (saved) adminNotifications = JSON.parse(saved); const savedCount = localStorage.getItem('croft_admin_unread_count'); if (savedCount) adminUnreadCount = parseInt(savedCount) || 0; updateAdminBellBadge(); renderAdminNotificationDropdown(); }
-function updateAdminBellBadge() { const badge = document.getElementById('adminNotificationBadge'); if (badge) { if (adminUnreadCount > 0) { badge.textContent = adminUnreadCount > 9 ? '9+' : adminUnreadCount; badge.style.display = 'flex'; } else { badge.style.display = 'none'; } } }
-function toggleAdminNotifications() { const dropdown = document.getElementById('adminNotificationDropdown'); if (dropdown.classList.contains('open')) dropdown.classList.remove('open'); else { dropdown.classList.add('open'); adminUnreadCount = 0; adminNotifications.forEach(n => n.read = true); updateAdminBellBadge(); saveAdminNotifications(); renderAdminNotificationDropdown(); } }
-function closeAdminNotifications() { document.getElementById('adminNotificationDropdown').classList.remove('open'); }
-function renderAdminNotificationDropdown() { const container = document.getElementById('adminNotificationList'); if (!container) return; if (adminNotifications.length === 0) { container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--gray-400);">No notifications</div>'; return; } container.innerHTML = adminNotifications.slice(0, 20).map(n => { const timeAgo = getTimeAgo(new Date(n.timestamp)); const iconMap = { message: 'fa-comments', meeting: 'fa-calendar', document: 'fa-file-alt', registration: 'fa-user-plus', submission: 'fa-handshake' }; const icon = iconMap[n.type] || 'fa-bell'; return `<div class="notification-item ${n.read ? '' : 'unread'}" onclick="handleAdminNotificationClick('${n.type}', ${JSON.stringify(n.data).replace(/"/g, '&quot;')})"><div style="display:flex;align-items:flex-start;gap:12px;"><div class="notification-icon" style="background:rgba(44,95,138,0.1);"><i class="fas ${icon}" style="color:var(--blue);"></i></div><div class="notification-content"><div class="notification-title">${escapeHtml(n.title)}</div><div class="notification-message">${escapeHtml(n.message.substring(0, 80))}${n.message.length > 80 ? '...' : ''}</div><div class="notification-time">${timeAgo}</div></div></div></div>`; }).join(''); }
-function getTimeAgo(date) { const seconds = Math.floor((new Date() - date) / 1000); if (seconds < 60) return 'just now'; const minutes = Math.floor(seconds / 60); if (minutes < 60) return `${minutes} minute${minutes === 1 ? '' : 's'} ago`; const hours = Math.floor(minutes / 60); if (hours < 24) return `${hours} hour${hours === 1 ? '' : 's'} ago`; const days = Math.floor(hours / 24); return `${days} day${days === 1 ? '' : 's'} ago`; }
-function handleAdminNotificationClick(type, data) { closeAdminNotifications(); if (type === 'message') switchAdminTab('messages-admin', document.querySelector('[onclick*="messages-admin"]')); else if (type === 'meeting') switchAdminTab('meetings', document.querySelector('[onclick*="meetings"]')); else if (type === 'document') switchAdminTab('documents-admin', document.querySelector('[onclick*="documents-admin"]')); else if (type === 'registration' || type === 'submission') switchAdminTab('clients', document.querySelector('[onclick*="clients"]')); }
-function initAdminListeners() {
-  if (!firebaseReady) return;
-
-  const currentUser = firebase.auth().currentUser;
-  if (!currentUser) {
-    console.warn('initAdminListeners: no authenticated user, waiting...');
-firebase.auth().onAuthStateChanged((user) => {
-  if (user) {
-    document.getElementById('loadingOverlay').style.display = 'none';
-    showView('admin');
-    loadAdminNotifications();
-    renderAdminTables();
-
-  adminSessionStart = new Date();
-
-  const safeListener = (query, handler) => {
-    try {
-      return query.onSnapshot(handler, (error) => {
-        console.warn('Snapshot listener error (non-fatal):', error.message);
-      });
-    } catch(e) {
-      console.warn('Could not attach listener:', e.message);
-      return () => {};
-    }
-  };
-
-  if (adminMessageUnsubscribe) adminMessageUnsubscribe();
-  adminMessageUnsubscribe = safeListener(
-    db.collection('messages').orderBy('timestamp', 'desc'),
-    snapshot => {
-      snapshot.docChanges().forEach(change => {
-        if (change.type === 'added') {
-          const msg = { id: change.doc.id, ...change.doc.data() };
-          const existing = messages.find(m => m.id === msg.id);
-          if (!existing) {
-            messages.unshift(msg);
-            const client = clients.find(c => String(c.id) === String(msg.clientId));
-            if (client && msg.sender === 'client') addAdminNotification('message', `New message from ${client.name}`, msg.content.substring(0, 100), { clientId: client.id, messageId: msg.id });
-          }
-        }
-      });
-      renderAdminMessages();
-      updateAdminStats();
-    }
-  );
-
-  if (adminMeetingUnsubscribe) adminMeetingUnsubscribe();
-  adminMeetingUnsubscribe = safeListener(
-    db.collection('meetings').orderBy('timestamp', 'desc'),
-    snapshot => {
-      snapshot.docChanges().forEach(change => {
-        if (change.type === 'added') {
-          const meeting = { id: change.doc.id, ...change.doc.data() };
-          const existing = meetings.find(m => m.id === meeting.id);
-          if (!existing) {
-            meetings.unshift(meeting);
-            const client = clients.find(c => String(c.id) === String(meeting.clientId));
-            if (client && meeting.status === 'pending') addAdminNotification('meeting', `New meeting request from ${client.name}`, `${meeting.type} on ${meeting.date || 'TBD'}`, { clientId: client.id, meetingId: meeting.id });
-          }
-        }
-      });
-      renderMeetings();
-      updateAdminStats();
-    }
-  );
-
-  if (adminDocumentUnsubscribe) adminDocumentUnsubscribe();
-  adminDocumentUnsubscribe = safeListener(
-    db.collection('documents').orderBy('date', 'desc'),
-    snapshot => {
-      snapshot.docChanges().forEach(change => {
-        if (change.type === 'added') {
-          const doc = { id: change.doc.id, ...change.doc.data() };
-          const existing = documents.find(d => d.id === doc.id);
-          if (!existing) {
-            documents.unshift(doc);
-            const client = clients.find(c => String(c.id) === String(doc.clientId));
-            if (client && !doc.approved) addAdminNotification('document', `New document uploaded by ${client.name}`, `${doc.type || doc.name}`, { clientId: client.id, documentId: doc.id });
-          }
-        } else if (change.type === 'modified') {
-          const updated = { id: change.doc.id, ...change.doc.data() };
-          const index = documents.findIndex(d => d.id === updated.id);
-          if (index !== -1) documents[index] = updated;
-        }
-      });
-      renderAdminDocumentsTable();
-      updateAdminStats();
-    }
-  );
-
-  if (adminClientUnsubscribe) adminClientUnsubscribe();
-  adminClientUnsubscribe = safeListener(
-    db.collection('clients').orderBy('createdAt', 'desc'),
-    snapshot => {
-      snapshot.docChanges().forEach(change => {
-        if (change.type === 'added') {
-          const client = { id: change.doc.id, ...change.doc.data() };
-          const existing = clients.find(c => c.id === client.id);
-          if (!existing) {
-            clients.unshift(client);
-            if (client.status === 'pending') addAdminNotification('registration', `New client registration`, `${client.name} (${client.email}) is awaiting activation`, { clientId: client.id });
-          }
-        }
-      });
-      renderClientsTable();
-      renderPendingRegistrations();
-      updateAdminStats();
-    }
-  );
-}
-function updateAdminStats() { const activeClients = clients.filter(c => c.status !== 'pending').length; const pendingRegistrations = clients.filter(c => c.status === 'pending').length; const activeProjects = projects.length; const unreadMessages = messages.filter(m => m.sender === 'client').length; const pendingMeetings = meetings.filter(m => m.status === 'pending').length; document.getElementById('totalClients').textContent = activeClients; document.getElementById('totalProjects').textContent = activeProjects; document.getElementById('pendingClientsCount').textContent = pendingRegistrations; document.getElementById('pendingMessages').textContent = unreadMessages; document.getElementById('scheduledMeetings').textContent = pendingMeetings; const activeProjs = projects.filter(p => p.status === 'active'); const acknowledgedIVL = activeProjs.filter(p => p.ivrLetterAcknowledged === true).length; document.getElementById('ivlAcknowledgedCount').textContent = `${acknowledgedIVL} / ${activeProjs.length}`; }
-function stopAdminListeners() { if (adminMessageUnsubscribe) adminMessageUnsubscribe(); if (adminMeetingUnsubscribe) adminMeetingUnsubscribe(); if (adminDocumentUnsubscribe) adminDocumentUnsubscribe(); if (adminClientUnsubscribe) adminClientUnsubscribe(); adminMessageUnsubscribe = null; adminMeetingUnsubscribe = null; adminDocumentUnsubscribe = null; adminClientUnsubscribe = null; }
-
-// ============================================================
-// ADMIN TABLES
-// ============================================================
-function renderAdminTables() {
-  renderPipelineBoard();
-  renderClientsTable();
-  renderProjectsTable();
-  renderAdminDocumentsTable();
-  renderAdminMessages();
-  renderMeetings();
-  renderPendingRegistrations();
-  renderAdminExpiryTable();
-  updateAdminStats();
-}
-
-function renderPipelineBoard() {
-  const board = document.getElementById('pipelineBoard');
-  if (!board) return;
-  const cols = [{ label: 'Term Sheet (Steps 1–2)', steps: [1, 2] }, { label: 'Due Diligence (Steps 3–4)', steps: [3, 4] }, { label: 'Closing (Steps 5–7)', steps: [5, 6, 7] }, { label: 'Funded (Step 8)', steps: [8] }];
-  board.innerHTML = cols.map(col => { const colProjs = projects.filter(p => col.steps.includes(p.step || 1)); return `<div class="pipeline-col"><div class="pipeline-col-title">${col.label} <span style="background:var(--gray-200);border-radius:10px;padding:1px 8px;font-size:11px;">${colProjs.length}</span></div>${colProjs.map(p => { const client = clients.find(c => c.id === p.clientId); const daysSince = p.createdAt ? Math.floor((Date.now() - new Date(p.createdAt).getTime()) / 86400000) : '?'; return `<div class="pipeline-card" onclick="editProject('${p.id}')"><div class="pipeline-card-name">${client?.name || 'Unknown'}</div><div class="pipeline-card-project">${escapeHtml(p.name)}</div><div class="pipeline-card-meta"><span class="pipeline-card-amount">${p.fundsNeeded ? '$' + p.fundsNeeded : (p.amount || 'TBD')}</span><span class="pipeline-card-days">Day ${daysSince}</span></div><div style="margin-top: 8px; display: flex; gap: 4px; flex-wrap: wrap;"><span class="badge badge-navy" style="font-size: 9px;">${p.industry || '—'} · Step ${p.step || 1}</span>${p.ivrLetterAcknowledged ? '<span class="ack-badge completed" style="margin-left: 4px;">IVL ✓</span>' : (p.investorVerificationLetter ? '<span class="ack-badge pending">IVL ⏳</span>' : '<span class="ack-badge" style="opacity:0.3;">IVL —</span>')}</div></div>`; }).join('')}</div>`; }).join('');
-}
-
-function renderClientsTable() {
-  const tbody = document.getElementById('adminClientsTable');
-  if (!tbody) return;
-  const searchVal = (document.getElementById('clientSearch')?.value || '').toLowerCase();
-  const filtered = clients.filter(c => c.name.toLowerCase().includes(searchVal) || c.email.toLowerCase().includes(searchVal));
-  tbody.innerHTML = filtered.map(c => { const cp = projects.filter(p => p.clientId === c.id); return `<tr><td><strong>${escapeHtml(c.name)}</strong><br><span style="font-size:11px;color:var(--gray-400);">${c.email}</span></td><td>${cp.map(p => `<span class="badge badge-gray">${escapeHtml(p.name)}</span>`).join(' ') || '—'}</td><td><span style="color:${c.status === 'pending' ? 'var(--warning)' : 'var(--success)'};">${c.status === 'pending' ? 'Pending' : 'Active'}</span></td><td style="font-size:12px;color:var(--gray-400);">${c.createdAt ? new Date(c.createdAt).toLocaleDateString() : '—'}</td><td style="display:flex;gap:6px;flex-wrap:wrap;">${c.status === 'pending' ? `<button class="btn btn-success" style="padding:4px 10px;font-size:11px;" onclick="activateClient('${c.id}')">Activate</button>` : ''}<button class="btn btn-outline" style="padding:4px 10px;font-size:11px;color:var(--error);" onclick="deleteClient('${c.id}')">Delete</button></td></tr>`; }).join('');}
-
-function renderProjectsTable() {
-  const tbody = document.getElementById('adminProjectsTable');
-  if (!tbody) return;
-  tbody.innerHTML = projects.map(p => { 
-    const client = clients.find(c => c.id === p.clientId); 
-    return `
-      <tr>
-        <td style="vertical-align:middle;font-size:12px;">${client?.name || '?'}</td>
-        <td style="vertical-align:middle;"><strong>${escapeHtml(p.name)}</strong></td>
-        <td style="vertical-align:middle;">${p.industry || '—'}</td>
-        <td style="vertical-align:middle;">${p.location || '—'}</td>
-        <td style="vertical-align:middle;">${p.fundsNeeded ? '$' + p.fundsNeeded : (p.amount || 'TBD')}</td>
-        <td style="vertical-align:middle;"><span class="badge badge-navy">${STEP_NAMES[p.step || 1] || 'Step ' + (p.step || 1)}</span></td>
-        <td style="vertical-align:middle;">${p.step >= 2 ? `<span class="ack-badge ${p.commitFeeAcknowledged ? 'completed' : 'pending'}" title="${p.commitFeeAcknowledged ? 'Acknowledged: ' + new Date(p.commitFeeAcknowledgedAt).toLocaleDateString() : 'Not yet acknowledged'}">${p.commitFeeAcknowledged ? '✓ CF' : '⏳ CF'}</span>` : '<span class="ack-badge" style="opacity:0.3;">— CF</span>'}</td>
-        <td style="vertical-align:middle;">${p.step >= 6 ? `<span class="ack-badge ${p.ecfAcknowledged ? 'completed' : 'pending'}" title="${p.ecfAcknowledged ? 'Acknowledged: ' + new Date(p.ecfAcknowledgedAt).toLocaleDateString() : 'Not yet acknowledged'}">${p.ecfAcknowledged ? '✓ ECF' : '⏳ ECF'}</span>` : '<span class="ack-badge" style="opacity:0.3;">— ECF</span>'}</td>
-        <td style="vertical-align:middle;display:flex;gap:6px;">
-          <button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="editProject('${p.id}')">Edit</button>
-          <button class="btn btn-outline" style="padding:4px 10px;font-size:11px;color:var(--error);" onclick="deleteProject('${p.id}')">Delete</button>
-        </td>
-      </tr>
-    `;
-  }).join('');
-}
-
-function renderAdminDocumentsTable() {
-  const tbody = document.getElementById('adminDocumentsTableBody');
-  const filterClientId = document.getElementById('adminDocFilterClient')?.value || '';
-  if (!tbody) return;
-  
-  const filterSelect = document.getElementById('adminDocFilterClient');
-  if (filterSelect && filterSelect.options.length <= 1) {
-    filterSelect.innerHTML = '<option value="">All Clients</option>' + clients.filter(c => c.status === 'active').map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
-  }
-  
-  let docsToShow = [...documents];
-  if (filterClientId) docsToShow = docsToShow.filter(d => String(d.clientId) === String(filterClientId));
-  
-  let requiredTypesMap = {};
-  for (let s = 1; s <= 8; s++) {
-    const reqs = REQUIRED_DOCS[s] || [];
-    reqs.forEach(docType => { requiredTypesMap[docType] = s; });
-  }
-  
-  tbody.innerHTML = docsToShow.map(doc => {
-    const client = clients.find(c => String(c.id) === String(doc.clientId));
-    const proj = projects.find(p => String(p.id) === String(doc.projectId));
-    const step = requiredTypesMap[doc.type] || '—';
-    let statusHtml = '<span class="doc-status-badge doc-status-uploaded">Uploaded</span>';
-    if (doc.approved) statusHtml = '<span class="doc-status-badge doc-status-approved">Approved ✓</span>';
-    else if (doc.type === 'Executed Term Sheet (Binding)' || doc.type === 'Deed of Undertaking') 
-      statusHtml = '<span class="doc-status-badge doc-status-uploaded">Uploaded — Pending Signing</span>';
-    
-    return `
-      <tr>
-        <td style="vertical-align:middle;">${client?.name || 'Unknown'}</td>
-        <td style="vertical-align:middle;">${proj?.name || '—'}</td>
-        <td style="vertical-align:middle;"><strong>${escapeHtml(doc.type || doc.name)}</strong></td>
-        <td style="vertical-align:middle;text-align:center;">${step !== '—' ? 'Step ' + step : '—'}</td>
-        <td style="vertical-align:middle;">${statusHtml}</td>
-        <td style="vertical-align:middle;">${doc.date || '—'}</td>
-        <td style="vertical-align:middle;">
-          <button class="doc-action-btn doc-action-view" onclick="viewPDF('${doc.id}')">View</button>
-          ${!doc.approved && !doc.signed ? `<button class="doc-action-btn" style="background: var(--success); color: white; border: none;" onclick="approveDocument('${doc.id}')">Approve</button>` : ''}
-          <button class="doc-action-btn doc-action-download" onclick="downloadPDF('${doc.id}')">Download</button>
-          <button class="doc-action-btn" style="background: var(--error); color: white; border: none;" onclick="deleteDocument('${doc.id}')">Delete</button>
-        </td>
-      </tr>
-    `;
-  }).join('');
-  
-  const countEl = document.getElementById('docCount');
-  if (countEl) countEl.textContent = docsToShow.length + ' documents';
-}
-
-function renderAdminMessages() {
-  const container = document.getElementById('allMessagesList');
-  if (!container) return;
-  
-  const brokerThreadsHtml = brokerMessages.length ? 
-    `<div style="margin-bottom:24px;">
-    <div style="font-size:10px;letter-spacing:3px;
-    text-transform:uppercase;color:var(--gray-400);
-    margin-bottom:12px;">BROKER MESSAGES</div>
-    ${Object.entries(brokerMessages.reduce((acc, m) => {
-      const key = String(m.brokerId);
-      if (!acc[key]) acc[key] = [];
-      acc[key].push(m);
-      return acc;
-    }, {})).map(([bid, msgs]) => {
-      const broker = brokers.find(b => 
-        b.id === bid || 
-        b.id === String(bid));
-      const sorted = msgs.sort((a,b) => 
-        new Date(a.timestamp) - new Date(b.timestamp));
-      return `<div class="admin-thread">
-      <div class="admin-thread-header">
-      <div><div class="admin-thread-client">
-      ${broker?.name || 'Unknown Broker'}</div>
-      <div class="admin-thread-project">
-      ${broker?.firm || ''} · ${broker?.email || ''}
-      </div></div>
-      <span class="badge badge-blue">Broker</span>
-      </div>
-      <div class="admin-thread-body">
-      <div class="admin-thread-msgs">
-      ${sorted.map(m => 
-        `<div class="message ${m.sender === 'broker' ? 
-        'admin' : 'client'}" style="margin-bottom:10px;">
-        <div class="message-bubble" style="${
-        m.sender === 'admin' ? 
-        'background:var(--navy);color:white;' : 
-        'background:var(--gray-100);color:var(--navy);'}">
-        ${escapeHtml(m.content)}</div>
-        <div class="message-meta">
-        ${m.sender === 'admin' ? 'Suzana' : 
-        broker?.name || 'Broker'} · 
-        ${new Date(m.timestamp).toLocaleString()}
-        </div></div>`).join('')}
-      </div>
-      <div class="admin-reply-box">
-      <textarea id="brokerReplyBox_${bid}" 
-      placeholder="Reply to ${broker?.name || 'broker'}...">
-      </textarea>
-      <button class="btn btn-primary" 
-      onclick="sendAdminBrokerReply('${bid}')">
-      Send Reply</button>
-      </div></div></div>`;
-    }).join('')}</div>` : '';
-  
-  const byClient = {};
-  messages.forEach(m => { const key = String(m.clientId); if (!byClient[key]) byClient[key] = []; byClient[key].push(m); });
-  const msgSearchVal = (document.getElementById('messageSearch')?.value || '').toLowerCase();
-  if (!Object.keys(byClient).length && !brokerMessages.length) { container.innerHTML = '<p style="color:var(--gray-400);font-size:13px;">No messages yet.</p>'; return; }
-  
-  const clientThreadsHtml = Object.entries(byClient).filter(([cid]) => { const client = clients.find(c => c.id === cid || c.id === String(cid)); return !msgSearchVal || (client?.name || '').toLowerCase().includes(msgSearchVal); }).map(([cid, msgs]) => { const client = clients.find(c => c.id === cid || c.id === String(cid)); const sorted = msgs.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp)); return `<div class="admin-thread" data-client-id="${cid}"><div class="admin-thread-header"><div><div class="admin-thread-client">${client?.name || 'Unknown'}</div><div class="admin-thread-project">${client?.email || ''}</div></div><span class="badge badge-navy">${sorted.length} messages</span></div><div class="admin-thread-body"><div class="admin-thread-msgs">${sorted.map(m => `<div class="message ${m.sender === 'client' ? 'admin' : 'client'}" style="margin-bottom:10px;"><div class="message-bubble" style="${m.sender === 'admin' ? 'background:var(--navy);color:white;' : 'background:var(--gray-100);color:var(--navy);'}">${escapeHtml(m.content)}</div><div class="message-meta">${m.sender === 'admin' ? 'Suzana' : client?.name || 'Client'} · ${new Date(m.timestamp).toLocaleString()}</div></div>`).join('')}</div><div class="admin-reply-box"><textarea id="replyBox_${cid}" placeholder="Reply to ${client?.name || 'client'}..."></textarea><button class="btn btn-primary" onclick="sendAdminReply('${cid}')">Send Reply</button></div></div></div>`; }).join('');
-  
-  container.innerHTML = brokerThreadsHtml + clientThreadsHtml;
-}
-
-function sendAdminBrokerReply(brokerId) {
-  const textarea = document.getElementById(
-    'brokerReplyBox_' + brokerId);
-  const content = textarea?.value.trim();
-  if (!content) return;
-  const id = String(Date.now());
-  const broker = brokers.find(b => 
-    b.id === brokerId || 
-    b.id === String(brokerId));
-  const msg = { id, 
-    brokerId: String(brokerId), 
-    brokerName: broker?.name || '', 
-    sender: 'admin', 
-    content, 
-    timestamp: new Date().toISOString() };
-  brokerMessages.push(msg);
-  if (firebaseReady) fbSet('brokerMessages', id, msg);
-  else saveBrokersLocal();
-  if (textarea) textarea.value = '';
-  showToast('Reply sent to ' + 
-    (broker?.name || 'broker'));
-  renderAdminMessages();
-  if (currentBroker && 
-    String(currentBroker.id) === String(brokerId)) {
-    loadBrokerMessages();
-  }
-  if (broker && broker.email) {
-    sendEmail(broker.email, 
-      'New Message from Croft Finance',
-      `Dear ${broker.name},\n\nYou have a new message from Suzana Aleksić.\n\n${content}\n\nLog in to your broker portal to reply.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`
-    ).catch(() => {});
-  }
-}
-
-function sendAdminReply(clientId) {
-  const textarea = document.getElementById('replyBox_' + clientId);
-  const content = textarea?.value.trim();
-  if (!content) return;
-  const id = String(Date.now());
-  const client = clients.find(c => c.id === clientId || c.id === String(clientId));
-  const proj = projects.find(p => p.clientId === clientId);
-  const msg = { id, clientId: String(clientId), clientName: client?.name || '', sender: 'admin', content, timestamp: new Date().toISOString() };
-  messages.push(msg);
-  fbSet('messages', id, msg).then(() => { renderAdminMessages(); if (currentClient && String(currentClient.id) === String(clientId)) loadMessages(); fbReload(); });
-  if (textarea) textarea.value = '';
-  showToast('Reply sent to ' + (client?.name || 'client'));
-  logAudit('Admin replied to client', content.substring(0, 60), String(clientId));
-  logClientActivity(clientId, proj?.id || '', 'message_received', 'New message from Suzana Aleksić', 'croft');
-  if (client && client.email) {
-    sendEmail(client.email, `📨 New Message from Croft Finance - Regarding Your Project`, `Dear ${client.name},\n\nYou have received a new message from Suzana Aleksić regarding your project.\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nMESSAGE:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n${content}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nACTION REQUIRED:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nPlease log in to your client portal to view and respond to this message.\n\nPortal URL: ${window.location.origin}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nBest regards,\nSuzana Aleksić\nPrincipal, Croft Finance`).catch(() => {});
-  }
-}
-
-function renderMeetings() {
-  const container = document.getElementById('meetingsList');
-  if (!container) return;
-  if (!meetings.length) { container.innerHTML = '<p style="color:var(--gray-400);font-size:13px;">No meeting requests yet.</p>'; return; }
-  container.innerHTML = [...meetings].reverse().map(m => `<div class="card"><div class="card-body" style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;"><div><strong>${escapeHtml(m.clientName)}</strong> <span class="badge ${m.status === 'confirmed' ? 'badge-green' : m.status === 'cancelled' ? 'badge-red' : 'badge-blue'}">${m.status}</span><div style="font-size:13px;margin-top:6px;">${m.type} — ${m.date || 'TBD'} ${m.time || ''}</div>${m.notes ? `<div style="font-size:12px;color:var(--gray-500);margin-top:4px;">${escapeHtml(m.notes)}</div>` : ''}</div><div style="display:flex;gap:8px;flex-shrink:0;"><button class="btn btn-success" style="padding:5px 12px;font-size:11px;" onclick="updateMeetingStatus('${m.id}','confirmed')">Confirm</button><button class="btn btn-outline" style="padding:5px 12px;font-size:11px;" onclick="updateMeetingStatus('${m.id}','cancelled')">Decline</button></div></div></div>`).join('');
-}
-
-function renderPendingRegistrations() {
-  const pending = clients.filter(c => c.status === 'pending');
-  const block = document.getElementById('pendingRegistrationsBlock');
-  const tbody = document.getElementById('pendingRegistrationsTable');
-  if (!block || !tbody) return;
-  block.style.display = pending.length ? 'block' : 'none';
-  tbody.innerHTML = pending.map(c => { const proj = projects.find(p => p.clientId === c.id); return `<tr><td style="vertical-align:middle;"><strong>${escapeHtml(c.name)}</strong></td><td style="vertical-align:middle;">${c.email}</td><td style="vertical-align:middle;">${proj?.name || '—'}<br><span style="font-size:10px;color:var(--gray-400);">${proj?.industry || ''} · ${proj?.fundsNeeded ? '$' + proj.fundsNeeded : ''}</span></td><td style="vertical-align:middle;font-size:12px;color:var(--gray-400);">${c.createdAt ? new Date(c.createdAt).toLocaleString() : '—'}</td><td style="vertical-align:middle;display:flex;gap:6px;"><button class="btn btn-success" style="padding:4px 10px;font-size:11px;" onclick="activateClient('${c.id}')">Activate</button><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;color:var(--error);" onclick="deleteClient('${c.id}')">Decline</button></td></tr>`; }).join('');
-}
-
-function renderAuditLog() {
-  const container = document.getElementById('auditLogList');
-  if (!container) return;
-  if (!auditLog.length) { container.innerHTML = '<p style="color:var(--gray-400);font-size:13px;">No audit entries yet.</p>'; return; }
-  container.innerHTML = auditLog.slice(0, 50).map(e => `<div class="audit-entry"><div class="audit-time">${new Date(e.timestamp).toLocaleString()}</div><div><div class="audit-action">${escapeHtml(e.action)}</div><div class="audit-detail">${escapeHtml(e.details || '')} ${e.performedBy ? '· ' + e.performedBy : ''}</div></div></div>`).join('');
-}
-
-// ============================================================
-// ADMIN ACTIONS
-// ============================================================
-async function activateClient(id) {
-  const client = clients.find(c => c.id === id || c.id === String(id));
-  if (!client) return;
-  fbUpdate('clients', id, { status: 'active' }).then(async () => {
-    const cp = projects.filter(p => p.clientId === id || p.id === String(id));
-    for (const p of cp) await fbUpdate('projects', p.id, { status: 'active' });
-    await logAudit('Client activated', client.name, String(id));
-    await logClientActivity(client.id, cp[0]?.id || '', 'portal_activated', 'Your portal was activated by Croft Finance', 'croft');
-    
-    if (cp[0]) await generateAndStoreIVL(client.id, cp[0].id);
-    
-    sendEmail(client.email, '✅ Croft Finance — Portal Access Activated',
-      `Dear ${client.name},\n\nGreat news! Your Croft Finance client portal has been activated.\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nLOGIN INFORMATION:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n• Portal URL: ${window.location.origin}\n• Email: ${client.email}\n• Password: (the password you created during registration)\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nNEXT STEPS:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n1. Log in to your portal\n2. Review your project dashboard\n3. Upload any required documents\n4. Your deal advisor (Suzana) will guide you through the 8-step closing process\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nSUPPORT:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nIf you have any questions, reply to this email or contact:\nSuzana Aleksić\nPrincipal, Croft Finance\nsuzana.aleksic@croftfinance.com\n+381 69 288 0 191\n\nWelcome to Croft Finance. We look forward to working with you.\n\nBest regards,\nSuzana Aleksić\nPrincipal, Croft Finance`).catch(() => {});
-    
-    showToast(client.name + ' activated. Access email sent to client.');
-    if (cp.length) editProject(cp[0].id);
-    fbReload();
-  });
-}
-
-function editProject(id) {
-  const proj = projects.find(p => p.id === id || p.id === String(id));
-  if (!proj) return;
-  const fields = {
-    editProjectName: 'name', editIndustry: 'industry', editLocation: 'location', editTotalCost: 'totalCost',
-    editSponsorEquity: 'sponsorEquity', editFundsNeeded: 'fundsNeeded', editCurrentStage: 'currentStage',
-    editUseOfFunds: 'useOfFunds', editTargetIRR: 'targetIRR', editCloseDate: 'targetCloseDate',
-    editMOIC: 'moic', editCapRate: 'capRate', editExitStrategy: 'exitStrategy', editExitCapRate: 'exitCapRate',
-    editPermits: 'permits', editRevenue: 'revenue', editAssetClass: 'assetClass', editInfraType: 'infraType',
-    editCommodity: 'commodity', editMiningStage: 'miningStage', editReserveLife: 'reserveLife', editDataRoom: 'dataRoom',
-    editAmount: 'amount', editRate: 'interestRate', editTerm: 'term', editGrace: 'gracePeriod',
-    editECF: 'ecf', editNext: 'nextMilestone', editExpiry: 'termSheetExpiry', editGovLaw: 'govLaw', editAdminNote: 'adminNote', editAdvisorNote: 'advisorNote'
-  };
-  Object.entries(fields).forEach(([elId, key]) => { const el = document.getElementById(elId); if (el) el.value = proj[key] || ''; });
-  document.getElementById('editStep').value = proj.step || 1;
-  document.getElementById('editCommitFee').value = proj.commitFeeStatus || 'pending';
-  document.getElementById('editCommitFeeDate').value = proj.commitFeeDate || '';
-  document.getElementById('editECFStatus').value = proj.ecfStatus || 'pending';
-  document.getElementById('editECFDate').value = proj.ecfDate || '';
-  document.getElementById('editFundedDate').value = proj.fundedDate || '';
-  document.getElementById('editCommitFeeDeadline').value = proj.commitFeeDeadline || '';
-  document.getElementById('editDeedExpiry').value = proj.deedExpiryDate || '';
-  document.getElementById('editECFPolicyExpiry').value = proj.ecfPolicyExpiryDate || '';
-  
-  window.editProjectId = id;
-  updateIVLAdminInfo();
-  openModal('editProjectModal');
-}
-
-function saveProjectInfo() {
-  const id = window.editProjectId;
-  const proj = projects.find(p => p.id === id || p.id === String(id));
-  const newStep = parseInt(document.getElementById('editStep').value) || 1;
-  const stepDates = { ...(proj?.stepDates || {}) };
-  let stepAdvanced = false;
-  if (proj && newStep !== (proj.step || 1)) {
-    const today = new Date().toISOString().split('T')[0];
-    for (let s = proj.step || 1; s < newStep; s++) { if (!stepDates[s]) stepDates[s] = today; }
-    if (!stepDates[newStep]) stepDates[newStep] = today;
-    stepAdvanced = true;
-  }
-  const note = document.getElementById('editAdminNote').value.trim();
-  const advisorNote = document.getElementById('editAdvisorNote').value.trim();
-  const updates = {
-    name: document.getElementById('editProjectName').value,
-    industry: document.getElementById('editIndustry').value,
-    location: document.getElementById('editLocation').value,
-    totalCost: document.getElementById('editTotalCost').value,
-    sponsorEquity: document.getElementById('editSponsorEquity').value,
-    fundsNeeded: document.getElementById('editFundsNeeded').value,
-    currentStage: document.getElementById('editCurrentStage').value,
-    useOfFunds: document.getElementById('editUseOfFunds').value,
-    targetIRR: document.getElementById('editTargetIRR').value,
-    targetCloseDate: document.getElementById('editCloseDate').value,
-    moic: document.getElementById('editMOIC').value,
-    capRate: document.getElementById('editCapRate').value,
-    exitStrategy: document.getElementById('editExitStrategy').value,
-    exitCapRate: document.getElementById('editExitCapRate').value,
-    permits: document.getElementById('editPermits').value,
-    revenue: document.getElementById('editRevenue').value,
-    assetClass: document.getElementById('editAssetClass').value,
-    infraType: document.getElementById('editInfraType').value,
-    commodity: document.getElementById('editCommodity').value,
-    miningStage: document.getElementById('editMiningStage').value,
-    reserveLife: document.getElementById('editReserveLife').value,
-    dataRoom: document.getElementById('editDataRoom').value,
-    amount: document.getElementById('editAmount').value,
-    interestRate: document.getElementById('editRate').value,
-    term: document.getElementById('editTerm').value,
-    gracePeriod: document.getElementById('editGrace').value,
-    ecf: document.getElementById('editECF').value,
-    nextMilestone: document.getElementById('editNext').value,
-    step: newStep, status: 'active', stepDates,
-    termSheetExpiry: document.getElementById('editExpiry').value,
-    govLaw: document.getElementById('editGovLaw').value,
-    commitFeeStatus: document.getElementById('editCommitFee').value,
-    commitFeeDate: document.getElementById('editCommitFeeDate').value,
-    ecfStatus: document.getElementById('editECFStatus').value,
-    ecfDate: document.getElementById('editECFDate').value,
-    fundedDate: document.getElementById('editFundedDate').value,
-    commitFeeDeadline: document.getElementById('editCommitFeeDeadline').value,
-    deedExpiryDate: document.getElementById('editDeedExpiry').value,
-    ecfPolicyExpiryDate: document.getElementById('editECFPolicyExpiry').value,
-    adminNote: note,
-    adminNoteDate: note ? new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '',
-    advisorNote: advisorNote
-  };
-  if (!proj) return;
-  Object.assign(proj, updates);
-  fbUpdate('projects', id, updates).then(async () => {
-    await logAudit('Project updated', 'Step ' + newStep + ': ' + STEP_NAMES[newStep], proj.clientId, String(id));
-    if (stepAdvanced) {
-      await logClientActivity(proj.clientId, id, 'step_advanced', `Your deal advanced to Step ${newStep}: ${STEP_NAMES[newStep]}`, 'croft');
-    }
-    if (note && note !== proj.adminNote) {
-      await logClientActivity(proj.clientId, id, 'admin_note_added', 'Your advisor added a note to your file', 'croft');
-    }
-    closeModal('editProjectModal');
-    showToast('Project updated');
-    if (currentClient && String(currentClient.id) === String(proj.clientId)) { currentProjectId = id; loadCurrentProjectData(); }
-    fbReload();
-  });
-}
-
-function deleteClient(id) {
-  if (!confirm('Delete this client and all their data? This cannot be undone.')) return;
-  const client = clients.find(c => c.id === id || c.id === String(id));
-  clients = clients.filter(c => c.id !== id && c.id !== String(id));
-  projects = projects.filter(p => p.clientId !== id && p.clientId !== String(id));
-  messages = messages.filter(m => m.clientId !== id && m.clientId !== String(id));
-  meetings = meetings.filter(m => m.clientId !== id && m.clientId !== String(id));
-  fbDelete('clients', id).then(() => { fbReload(); logAudit('Client deleted', client?.name || '', String(id)); showToast('Client deleted'); });
-}
-
-function deleteProject(id) {
-  if (!confirm('Delete this project?')) return;
-  projects = projects.filter(p => p.id !== id && p.id !== String(id));
-  fbDelete('projects', id).then(() => { fbReload(); showToast('Project deleted'); });
-}
-
-function approveDocument(id) {
-  const doc = documents.find(d => d.id === id || d.id === String(id));
-  if (!doc) return;
-  doc.approved = true;
-  fbUpdate('documents', id, { approved: true }).then(() => { renderAdminDocumentsTable(); if (currentClient) renderDocuments(); showToast('Document approved'); logAudit('Document approved', doc.type, String(doc.clientId), String(doc.projectId)); logClientActivity(doc.clientId, doc.projectId, 'document_approved', `Croft Finance approved: ${doc.type || doc.name}`, 'croft'); });
-}
-
-function deleteDocument(id) {
-  if (!confirm('Delete this document?')) return;
-  documents = documents.filter(d => d.id !== id && d.id !== String(id));
-  fbDelete('documents', id).then(() => { fbReload(); showToast('Document deleted'); });
-}
-
-function updateMeetingStatus(id, status) {
-  const m = meetings.find(x => x.id === id || x.id === String(id));
-  if (m) m.status = status;
-  fbUpdate('meetings', id, { status }).then(() => { renderMeetings(); showToast('Meeting ' + status); 
-    if (status === 'confirmed') {
-      const client = clients.find(c => c.id === m.clientId || c.id === String(m.clientId));
-      const proj = projects.find(p => p.clientId === m.clientId);
-      if (proj) logClientActivity(m.clientId, proj.id, 'meeting_confirmed', 'Your meeting was confirmed', 'croft');
-      if (client && client.email) {
-        sendEmail(client.email, `✅ Meeting Confirmed - ${m.type} with Croft Finance`,
-          `Dear ${client.name},\n\nYour meeting request has been confirmed.\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nMEETING DETAILS:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n• Type: ${m.type}\n• Date: ${m.date || 'TBD'}\n• Time: ${m.time || 'TBD'}\n• With: Suzana Aleksić (Principal)\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nPlease add this to your calendar. A calendar invitation will follow separately.\n\nIf you need to reschedule, please reply to this email.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`).catch(() => {});
-      }
-    }
-  });
-}
-
-// ============================================================
-// CLIENT ACTIVITY LOG
-// ============================================================
-async function logClientActivity(clientId, projectId, action, description, performedBy) {
-  const entry = { id: String(Date.now()), clientId: String(clientId), projectId: String(projectId), action: action, description: description, performedBy: performedBy, timestamp: new Date().toISOString() };
-  clientActivityLog.unshift(entry);
-  const clientEntries = clientActivityLog.filter(e => e.clientId === String(clientId));
-  if (clientEntries.length > 500) {
-    const toRemove = clientEntries.slice(500);
-    toRemove.forEach(r => { const index = clientActivityLog.findIndex(e => e.id === r.id); if (index !== -1) clientActivityLog.splice(index, 1); });
-  }
-  if (firebaseReady) await db.collection('clientActivityLog').doc(entry.id).set(entry);
-  else saveClientActivityLocal();
-  if (currentClient && String(currentClient.id) === String(clientId)) { renderActivityLog(); renderDashboardTimeline(); }
-}
-
-function saveClientActivityLocal() { localStorage.setItem('croft_client_activity', JSON.stringify(clientActivityLog)); }
-function loadClientActivityLocal() { const saved = localStorage.getItem('croft_client_activity'); if (saved) clientActivityLog = JSON.parse(saved); }
-async function loadClientActivityFromFirebase() { if (!firebaseReady || !currentClient) return; try { const snapshot = await db.collection('clientActivityLog').where('clientId', '==', String(currentClient.id)).orderBy('timestamp', 'desc').limit(200).get(); clientActivityLog = snapshot.docs.map(d => ({ id: d.id, ...d.data() })); } catch(e) { loadClientActivityLocal(); } }
-
-function renderActivityLog() {
-  const container = document.getElementById('activityTimeline');
-  if (!container) return;
-  const projectActivities = clientActivityLog.filter(a => a.projectId === currentProjectId).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-  if (projectActivities.length === 0) { container.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--gray-400);"><i class="fas fa-history fa-2x" style="margin-bottom: 12px; display: block;"></i>No activity recorded yet.</div>'; return; }
-  container.innerHTML = projectActivities.map(activity => { const dotClass = activity.performedBy === 'client' ? 'client' : activity.action === 'step_completed' ? 'completion' : 'croft'; const icon = getActivityIcon(activity.action); const performerName = activity.performedBy === 'client' ? 'You' : 'Croft Finance'; const performerClass = activity.performedBy === 'client' ? 'performer-client' : 'performer-croft'; const relativeTime = getRelativeTime(new Date(activity.timestamp)); const formattedDate = new Date(activity.timestamp).toLocaleString(); return `<div class="activity-item"><div class="activity-dot ${dotClass}"><i class="fas ${icon}"></i></div><div class="activity-content"><div class="activity-description">${escapeHtml(activity.description)}<span class="activity-performer ${performerClass}">${performerName}</span></div><div class="activity-time"><span>${formattedDate}</span><span class="activity-relative-time">• ${relativeTime}</span></div></div></div>`; }).join('');
-}
-
-function getActivityIcon(action) { const icons = { 'portal_activated': 'fa-check-circle', 'step_advanced': 'fa-arrow-right', 'document_uploaded': 'fa-file-upload', 'document_approved': 'fa-check', 'message_sent': 'fa-envelope', 'message_received': 'fa-envelope-open', 'meeting_requested': 'fa-calendar-plus', 'meeting_confirmed': 'fa-calendar-check', 'acknowledgment_given': 'fa-handshake', 'admin_note_added': 'fa-sticky-note', 'term_sheet_expiry': 'fa-clock', 'deal_created': 'fa-briefcase' }; return icons[action] || 'fa-info-circle'; }
-
-function getRelativeTime(date) { const seconds = Math.floor((new Date() - date) / 1000); if (seconds < 60) return 'just now'; const minutes = Math.floor(seconds / 60); if (minutes < 60) return `${minutes} minute${minutes === 1 ? '' : 's'} ago`; const hours = Math.floor(minutes / 60); if (hours < 24) return `${hours} hour${hours === 1 ? '' : 's'} ago`; const days = Math.floor(hours / 24); if (days < 7) return `${days} day${days === 1 ? '' : 's'} ago`; const weeks = Math.floor(days / 7); return `${weeks} week${weeks === 1 ? '' : 's'} ago`; }
-
-function renderDashboardTimeline() {
-  const container = document.getElementById('dashboardTimelineWidget');
-  if (!container) return;
-  const projectActivities = clientActivityLog.filter(a => a.projectId === currentProjectId).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 5);
-  if (projectActivities.length === 0) { container.innerHTML = `<div class="dashboard-timeline-widget"><div class="dashboard-timeline-header"><h4><i class="fas fa-history"></i> Recent Activity</h4><a onclick="switchPortalTab('activity',null)">View all →</a></div><div style="text-align: center; padding: 20px; color: var(--gray-400);">No recent activity</div></div>`; return; }
-  container.innerHTML = `<div class="dashboard-timeline-widget"><div class="dashboard-timeline-header"><h4><i class="fas fa-history"></i> Deal Timeline</h4><a onclick="switchPortalTab('activity',null)">View all →</a></div>${projectActivities.map(activity => { const iconClass = activity.performedBy === 'client' ? 'client' : activity.action === 'step_completed' ? 'completion' : 'croft'; const icon = getActivityIcon(activity.action); const relativeTime = getRelativeTime(new Date(activity.timestamp)); return `<div class="dashboard-activity-item"><div class="dashboard-activity-icon ${iconClass}"><i class="fas ${icon}"></i></div><div class="dashboard-activity-content"><div class="dashboard-activity-text">${escapeHtml(activity.description)}</div><div class="dashboard-activity-time">${relativeTime}</div></div></div>`; }).join('')}</div>`;
-}
-
-// ============================================================
-// EXPIRY TRACKING & ALERTS
-// ============================================================
-function checkExpiryDates(proj) {
-  const alerts = []; const today = new Date(); today.setHours(0, 0, 0, 0);
-  const expiryItems = [{ date: proj.termSheetExpiry, name: 'Term Sheet' }, { date: proj.commitFeeDeadline, name: 'Commitment Fee Deadline' }, { date: proj.deedExpiryDate, name: 'Deed of Undertaking' }, { date: proj.ecfPolicyExpiryDate, name: 'ECF Guarantee Policy' }];
-  for (const item of expiryItems) {
-    if (!item.date) continue;
-    const expiryDate = new Date(item.date); expiryDate.setHours(0, 0, 0, 0);
-    const diffDays = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
-    if (diffDays < 0) alerts.push({ type: 'expired', name: item.name, days: Math.abs(diffDays), message: `${item.name} has expired. Your deal may be at risk.`, urgency: 'expired' });
-    else if (diffDays <= 3) alerts.push({ type: 'critical', name: item.name, days: diffDays, message: `URGENT: Your ${item.name} expires in ${diffDays} day${diffDays === 1 ? '' : 's'}. Contact Suzana immediately.`, urgency: 'critical' });
-    else if (diffDays <= 7) alerts.push({ type: 'warning', name: item.name, days: diffDays, message: `Your ${item.name} expires in ${diffDays} days. Please take action.`, urgency: 'warning' });
-    else if (diffDays <= 14) alerts.push({ type: 'notice', name: item.name, days: diffDays, message: `Note: Your ${item.name} expires on ${expiryDate.toLocaleDateString()}.`, urgency: 'notice' });
-  }
-  return alerts;
-}
-
-function renderExpiryAlerts() {
-  const proj = projects.find(p => p.id === currentProjectId);
-  if (!proj) return;
-  const alerts = checkExpiryDates(proj);
-  const container = document.getElementById('expiryAlertsContainer');
-  if (!container) return;
-  if (alerts.length === 0) { container.innerHTML = ''; return; }
-  container.innerHTML = `<div class="expiry-alerts-section">${alerts.map(alert => `<div class="expiry-alert expiry-alert-${alert.urgency}"><i class="fas ${alert.urgency === 'critical' ? 'fa-exclamation-triangle' : alert.urgency === 'warning' ? 'fa-clock' : alert.urgency === 'notice' ? 'fa-info-circle' : 'fa-skull-crossbones'}"></i><div class="expiry-alert-content"><div class="expiry-alert-title">${alert.name}</div><div class="expiry-alert-message">${alert.message}</div></div><a class="expiry-alert-action" onclick="switchPortalTab('messages',null)">Contact Suzana →</a></div>`).join('')}</div>`;
-}
-
-function renderAdminExpiryTable() {
-  const container = document.getElementById('adminExpiryTable');
-  if (!container) return;
-  const today = new Date(); today.setHours(0, 0, 0, 0);
-  const expiringProjects = [];
-  for (const proj of projects) {
-    const client = clients.find(c => c.id === proj.clientId);
-    if (!client || client.status !== 'active') continue;
-    const expiryItems = [{ date: proj.termSheetExpiry, name: 'Term Sheet' }, { date: proj.commitFeeDeadline, name: 'Commitment Fee' }, { date: proj.deedExpiryDate, name: 'Deed of Undertaking' }, { date: proj.ecfPolicyExpiryDate, name: 'ECF Policy' }];
-    for (const item of expiryItems) {
-      if (!item.date) continue;
-      const expiryDate = new Date(item.date); expiryDate.setHours(0, 0, 0, 0);
-      const diffDays = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
-      if (diffDays >= 0 && diffDays <= 7) expiringProjects.push({ client: client, project: proj, document: item.name, expiryDate: item.date, daysLeft: diffDays });
-    }
-  }
-  if (expiringProjects.length === 0) { container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--gray-400);">No documents expiring this week.</div>'; return; }
-  container.innerHTML = `<div class="table-wrap"><table class="expiry-table"><thead><tr><th>Client</th><th>Project</th><th>Document</th><th>Expiry Date</th><th>Days Left</th><th>Action</th></tr></thead><tbody>${expiringProjects.map(item => `<tr><td style="vertical-align:middle;">${escapeHtml(item.client.name)}</td><td style="vertical-align:middle;">${escapeHtml(item.project.name)}</td><td style="vertical-align:middle;">${item.document}</td><td style="vertical-align:middle;">${new Date(item.expiryDate).toLocaleDateString()}</td><td class="${item.daysLeft <= 3 ? 'expiry-days-critical' : 'expiry-days-warning'}" style="vertical-align:middle;">${item.daysLeft} day${item.daysLeft === 1 ? '' : 's'}</td><td style="vertical-align:middle;"><button class="btn btn-outline" style="padding: 4px 10px; font-size: 11px;" onclick="sendExpiryReminder('${item.project.id}', '${item.document}', ${item.daysLeft})">Email Client</button></td>`).join('')}</tbody>}</div>`;
-}
-
-async function sendExpiryReminder(projectId, documentName, daysLeft) {
+async function generateAndStoreIVL(clientId, projectId) {
+  const html = generateInvestorVerificationLetter(clientId, projectId);
   const proj = projects.find(p => p.id === projectId);
   if (!proj) return;
-  const client = clients.find(c => c.id === proj.clientId);
-  if (!client) return;
-  const urgency = daysLeft <= 3 ? 'URGENT' : 'REMINDER';
-  const actionRequired = daysLeft <= 3 ? 'Immediate action required.' : 'Please review and take action.';
-  await sendEmail(client.email, `${urgency}: ${documentName} Expiring Soon - Croft Finance`, `Dear ${client.name},\n\nThis is a reminder regarding your ${documentName} for project "${proj.name}".\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nDOCUMENT EXPIRY NOTICE\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n• Document: ${documentName}\n• Days remaining: ${daysLeft} day${daysLeft === 1 ? '' : 's'}\n• Urgency: ${urgency}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n${actionRequired}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nPlease log in to your client portal to review the status of your deal.\n\nIf you have any questions, contact Suzana Aleksić directly:\n• Email: suzana.aleksic@croftfinance.com\n• Phone: +381 69 288 0 191\n\nBest regards,\nCroft Finance Team`);
-  showToast(`Reminder sent to ${client.name}`);
-  logAudit('Expiry reminder sent', `${documentName} for ${client.name}`, client.id, projectId);
+  const updates = { investorVerificationLetter: html, investorVerificationLetterDate: new Date().toISOString(), ivrLetterAcknowledged: proj.ivrLetterAcknowledged || false };
+  Object.assign(proj, updates);
+  await fbUpdate('projects', projectId, updates);
+  return html;
 }
 
-async function checkAllExpiries() {
-  if (!firebaseReady) return;
-  const today = new Date(); today.setHours(0, 0, 0, 0);
-  const todayStr = today.toISOString().split('T')[0];
-  for (const proj of projects) {
-    const client = clients.find(c => c.id === proj.clientId);
-    if (!client || client.status !== 'active') continue;
-    const lastReminder = proj.lastExpiryReminderSent || '';
-    if (lastReminder === todayStr) continue;
-    const expiryItems = [{ date: proj.termSheetExpiry, name: 'Term Sheet' }, { date: proj.commitFeeDeadline, name: 'Commitment Fee' }, { date: proj.deedExpiryDate, name: 'Deed of Undertaking' }, { date: proj.ecfPolicyExpiryDate, name: 'ECF Guarantee Policy' }];
-    let sentReminder = false;
-    for (const item of expiryItems) {
-      if (!item.date) continue;
-      const expiryDate = new Date(item.date); expiryDate.setHours(0, 0, 0, 0);
-      const diffDays = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
-      if (diffDays >= 0 && diffDays <= 3) { await sendExpiryReminder(proj.id, item.name, diffDays); sentReminder = true; break; }
-    }
-    if (sentReminder) { await fbUpdate('projects', proj.id, { lastExpiryReminderSent: todayStr }); await logAudit('Auto-expiry reminder sent', `For project ${proj.name}`, proj.clientId, proj.id); }
+function printInvestorVerificationLetter(projectId) {
+  const proj = projects.find(p => p.id === projectId);
+  if (!proj || !proj.investorVerificationLetter) { showToast('Letter not available', true); return; }
+  const printHtml = `<div style="padding: 20px; background: white;"><div style="text-align: center; margin-bottom: 20px; padding: 10px; background: #f8f9fa;"><span style="font-size: 10px; letter-spacing: 2px; color: #dc2626; font-weight: 600;">STRICTLY CONFIDENTIAL — FOR NAMED RECIPIENT ONLY</span></div>${proj.investorVerificationLetter}</div>`;
+  const printArea = document.getElementById('printArea');
+  printArea.innerHTML = printHtml;
+  printArea.style.display = 'block';
+  window.print();
+  printArea.style.display = 'none';
+}
+
+async function showFirstLoginIVLModal() {
+  const proj = projects.find(p => p.id === currentProjectId);
+  if (!proj || proj.ivrLetterAcknowledged) return;
+  const flagKey = `firstLoginIVL_${currentClient.id}`;
+  if (localStorage.getItem(flagKey) === 'seen') return;
+  if (!proj.investorVerificationLetter) { 
+    await generateAndStoreIVL(currentClient.id, currentProjectId); 
+    const updatedProj = projects.find(p => p.id === currentProjectId); 
+    if (updatedProj) proj.investorVerificationLetter = updatedProj.investorVerificationLetter; 
   }
+  const modalHtml = `<div id="ivlFirstLoginModal" class="modal-overlay active">
+    <div class="modal ivl-modal">
+      <div class="modal-header">
+        <h3><i class="fas fa-shield-alt"></i> Important Document — Please Read</h3>
+        <button class="modal-close" onclick="closeIVLModal()">✕</button>
+      </div>
+      <div class="modal-body ivl-modal-body">
+        <div class="ivl-modal-banner">
+          <i class="fas fa-info-circle"></i> 
+          Croft Finance has issued the following formal verification letter regarding your capital partner. 
+          Please read this carefully before proceeding.
+        </div>
+        ${proj.investorVerificationLetter}
+      </div>
+      <div class="modal-footer" style="padding: 20px 24px; border-top: 1px solid var(--gray-100); display: flex; gap: 12px; justify-content: flex-end;">
+        <button class="btn btn-outline" onclick="printInvestorVerificationLetter('${currentProjectId}'); closeIVLModal();">
+          <i class="fas fa-download"></i> Download for Your Records
+        </button>
+        <button id="ivlAcknowledgeBtn" class="btn btn-primary ivl-read-button disabled" disabled>
+          <i class="fas fa-check-circle"></i> I Have Read and Understood This Letter
+        </button>
+      </div>
+    </div>
+  </div>`;
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+  setTimeout(() => { 
+    const btn = document.getElementById('ivlAcknowledgeBtn'); 
+    if (btn) { 
+      btn.classList.remove('disabled'); 
+      btn.classList.add('active'); 
+      btn.disabled = false; 
+      btn.onclick = acknowledgeIVL;
+    } 
+  }, 10000);
 }
 
-function updateStepTrackerWithExpiryWarning() {
+function closeIVLModal() { 
+  const modal = document.getElementById('ivlFirstLoginModal'); 
+  if (modal) modal.remove(); 
+}
+
+async function acknowledgeIVL() {
   const proj = projects.find(p => p.id === currentProjectId);
   if (!proj) return;
-  const step = proj.step || 1;
-  const stepExpiryMap = { 1: 'termSheetExpiry', 2: 'commitFeeDeadline', 3: 'deedExpiryDate', 4: 'ecfPolicyExpiryDate', 5: 'ecfPolicyExpiryDate', 6: 'ecfPolicyExpiryDate', 7: null, 8: null };
-  const relevantField = stepExpiryMap[step];
-  if (relevantField && proj[relevantField]) {
-    const expiryDate = new Date(proj[relevantField]);
-    const today = new Date(); today.setHours(0, 0, 0, 0);
-    const diffDays = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
-    if (diffDays >= 0 && diffDays <= 7) {
-      const stepNode = document.querySelector(`.step-node[data-step="${step}"]`);
-      if (stepNode && !stepNode.querySelector('.step-warning-icon')) {
-        const warningIcon = document.createElement('span');
-        warningIcon.className = 'step-warning-icon';
-        warningIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
-        warningIcon.title = `${STEP_NAMES[step]} expires in ${diffDays} days`;
-        stepNode.querySelector('.step-label')?.appendChild(warningIcon);
-      }
-    }
+  const updates = { ivrLetterAcknowledged: true, ivrLetterAcknowledgedAt: new Date().toISOString() };
+  Object.assign(proj, updates);
+  await fbUpdate('projects', currentProjectId, updates);
+  await logAudit('IVL Acknowledged', 'Client acknowledged Investor Verification Letter', currentClient.id, currentProjectId);
+  localStorage.setItem(`firstLoginIVL_${currentClient.id}`, 'seen');
+  closeIVLModal();
+  showToast('Thank you for acknowledging this important document.');
+  updateIVLDocumentCard();
+}
+
+function updateIVLDocumentCard() {
+  const proj = projects.find(p => p.id === currentProjectId);
+  if (!proj || !proj.investorVerificationLetter) { document.getElementById('ivlDocumentCard').style.display = 'none'; return; }
+  document.getElementById('ivlDocumentCard').style.display = 'block';
+  const issueDate = proj.investorVerificationLetterDate ? new Date(proj.investorVerificationLetterDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Not dated';
+  document.getElementById('ivlIssueDate').textContent = issueDate;
+  const year = new Date().getFullYear();
+  const refNumber = `CF-${year}-${String(currentProjectId).slice(-4)}/IVL`;
+  document.getElementById('ivlReference').textContent = refNumber;
+  if (proj.ivrLetterAcknowledged) {
+    document.getElementById('ivlAcknowledgedStatus').style.display = 'inline-flex';
+    const ackDate = new Date(proj.ivrLetterAcknowledgedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+    document.getElementById('ivlAcknowledgedTimestamp').textContent = `Acknowledged on ${ackDate}`;
+  } else {
+    document.getElementById('ivlAcknowledgedStatus').style.display = 'none';
+    document.getElementById('ivlAcknowledgedTimestamp').textContent = '';
   }
 }
+
+function showIVLModal() {
+  const proj = projects.find(p => p.id === currentProjectId);
+  if (!proj || !proj.investorVerificationLetter) return;
+  const modalHtml = `<div id="ivlViewModal" class="modal-overlay active"><div class="modal ivl-modal"><div class="modal-header"><h3><i class="fas fa-shield-alt"></i> Capital Partner Verification Letter</h3><button class="modal-close" onclick="closeIVLViewModal()">✕</button></div><div class="modal-body ivl-modal-body">${proj.investorVerificationLetter}</div><div class="modal-footer" style="padding: 20px 24px; border-top: 1px solid var(--gray-100); display: flex; gap: 12px; justify-content: flex-end;"><button class="btn btn-outline" onclick="printInvestorVerificationLetter('${currentProjectId}'); closeIVLViewModal();"><i class="fas fa-download"></i> Download PDF</button><button class="btn btn-primary" onclick="closeIVLViewModal()">Close</button></div></div></div>`;
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+function closeIVLViewModal() { const modal = document.getElementById('ivlViewModal'); if (modal) modal.remove(); }
 
 // ============================================================
 // DASHBOARD UPGRADE FUNCTIONS
@@ -5156,150 +4695,62 @@ async function acknowledgeECF() {
 }
 
 // ============================================================
-// BROKER PORTAL
+// ACTIVITY LOG FUNCTIONS
+// ============================================================
+async function logClientActivity(clientId, projectId, action, description, performedBy) {
+  const entry = { id: String(Date.now()), clientId: String(clientId), projectId: String(projectId), action: action, description: description, performedBy: performedBy, timestamp: new Date().toISOString() };
+  clientActivityLog.unshift(entry);
+  const clientEntries = clientActivityLog.filter(e => e.clientId === String(clientId));
+  if (clientEntries.length > 500) {
+    const toRemove = clientEntries.slice(500);
+    toRemove.forEach(r => { const index = clientActivityLog.findIndex(e => e.id === r.id); if (index !== -1) clientActivityLog.splice(index, 1); });
+  }
+  if (firebaseReady) await db.collection('clientActivityLog').doc(entry.id).set(entry);
+  else saveClientActivityLocal();
+  if (currentClient && String(currentClient.id) === String(clientId)) { renderActivityLog(); renderDashboardTimeline(); }
+}
+
+function saveClientActivityLocal() { localStorage.setItem('croft_client_activity', JSON.stringify(clientActivityLog)); }
+function loadClientActivityLocal() { const saved = localStorage.getItem('croft_client_activity'); if (saved) clientActivityLog = JSON.parse(saved); }
+async function loadClientActivityFromFirebase() { if (!firebaseReady || !currentClient) return; try { const snapshot = await db.collection('clientActivityLog').where('clientId', '==', String(currentClient.id)).orderBy('timestamp', 'desc').limit(200).get(); clientActivityLog = snapshot.docs.map(d => ({ id: d.id, ...d.data() })); } catch(e) { loadClientActivityLocal(); } }
+
+function renderActivityLog() {
+  const container = document.getElementById('activityTimeline');
+  if (!container) return;
+  const projectActivities = clientActivityLog.filter(a => a.projectId === currentProjectId).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  if (projectActivities.length === 0) { container.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--gray-400);"><i class="fas fa-history fa-2x" style="margin-bottom: 12px; display: block;"></i>No activity recorded yet.</div>'; return; }
+  container.innerHTML = projectActivities.map(activity => { const dotClass = activity.performedBy === 'client' ? 'client' : activity.action === 'step_completed' ? 'completion' : 'croft'; const icon = getActivityIcon(activity.action); const performerName = activity.performedBy === 'client' ? 'You' : 'Croft Finance'; const performerClass = activity.performedBy === 'client' ? 'performer-client' : 'performer-croft'; const relativeTime = getRelativeTime(new Date(activity.timestamp)); const formattedDate = new Date(activity.timestamp).toLocaleString(); return `<div class="activity-item"><div class="activity-dot ${dotClass}"><i class="fas ${icon}"></i></div><div class="activity-content"><div class="activity-description">${escapeHtml(activity.description)}<span class="activity-performer ${performerClass}">${performerName}</span></div><div class="activity-time"><span>${formattedDate}</span><span class="activity-relative-time">• ${relativeTime}</span></div></div></div>`; }).join('');
+}
+
+function getActivityIcon(action) { const icons = { 'portal_activated': 'fa-check-circle', 'step_advanced': 'fa-arrow-right', 'document_uploaded': 'fa-file-upload', 'document_approved': 'fa-check', 'message_sent': 'fa-envelope', 'message_received': 'fa-envelope-open', 'meeting_requested': 'fa-calendar-plus', 'meeting_confirmed': 'fa-calendar-check', 'acknowledgment_given': 'fa-handshake', 'admin_note_added': 'fa-sticky-note', 'term_sheet_expiry': 'fa-clock', 'deal_created': 'fa-briefcase' }; return icons[action] || 'fa-info-circle'; }
+
+function getRelativeTime(date) { const seconds = Math.floor((new Date() - date) / 1000); if (seconds < 60) return 'just now'; const minutes = Math.floor(seconds / 60); if (minutes < 60) return `${minutes} minute${minutes === 1 ? '' : 's'} ago`; const hours = Math.floor(minutes / 60); if (hours < 24) return `${hours} hour${hours === 1 ? '' : 's'} ago`; const days = Math.floor(hours / 24); if (days < 7) return `${days} day${days === 1 ? '' : 's'} ago`; const weeks = Math.floor(days / 7); return `${weeks} week${weeks === 1 ? '' : 's'} ago`; }
+
+function renderDashboardTimeline() {
+  const container = document.getElementById('dashboardTimelineWidget');
+  if (!container) return;
+  const projectActivities = clientActivityLog.filter(a => a.projectId === currentProjectId).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 5);
+  if (projectActivities.length === 0) { container.innerHTML = `<div class="dashboard-timeline-widget"><div class="dashboard-timeline-header"><h4><i class="fas fa-history"></i> Recent Activity</h4><a onclick="switchPortalTab('activity',null)">View all →</a></div><div style="text-align: center; padding: 20px; color: var(--gray-400);">No recent activity</div></div>`; return; }
+  container.innerHTML = `<div class="dashboard-timeline-widget"><div class="dashboard-timeline-header"><h4><i class="fas fa-history"></i> Deal Timeline</h4><a onclick="switchPortalTab('activity',null)">View all →</a></div>${projectActivities.map(activity => { const iconClass = activity.performedBy === 'client' ? 'client' : activity.action === 'step_completed' ? 'completion' : 'croft'; const icon = getActivityIcon(activity.action); const relativeTime = getRelativeTime(new Date(activity.timestamp)); return `<div class="dashboard-activity-item"><div class="dashboard-activity-icon ${iconClass}"><i class="fas ${icon}"></i></div><div class="dashboard-activity-content"><div class="dashboard-activity-text">${escapeHtml(activity.description)}</div><div class="dashboard-activity-time">${relativeTime}</div></div></div>`; }).join('')}</div>`;
+}
+
+// ============================================================
+// BROKER PORTAL (SIMPLIFIED - KEEP EXISTING FUNCTIONS)
 // ============================================================
 function renderBrokerAdminTable() {
   const container = document.getElementById('adminBrokersTable');
   if (!container) return;
   container.innerHTML = brokers.map(b => `
     <tr>
-      <td><strong>${escapeHtml(b.name)}</strong><br><span style="font-size:11px;color:var(--gray-400);">${b.email}</span></td>
-      <td>${escapeHtml(b.firm)}</td>
+      <td style="vertical-align:middle;"><strong>${escapeHtml(b.name)}</strong><br><span style="font-size:11px;color:var(--gray-400);">${b.email}</span></td>
+      <td style="vertical-align:middle;">${escapeHtml(b.firm)}</td>
       <td style="vertical-align:middle;">${b.country}</td>
-      <td style="vertical-align:middle;">
-        <input type="number" id="commission_${b.id}" 
-               value="${b.commissionRate !== undefined && b.commissionRate !== null ? b.commissionRate : ''}" 
-               step="0.1" min="0" max="100" 
-               style="width:70px; padding:4px;" 
-               placeholder="0"
-               onchange="setBrokerCommissionRate('${b.id}', this.value)">
-        <span style="font-size:11px;">%</span>
-      </td>
+      <td style="vertical-align:middle;">${b.commissionRate !== undefined && b.commissionRate !== null ? b.commissionRate + '%' : '0%'}</td>
       <td style="vertical-align:middle;"><span style="color:${b.status === 'pending' ? 'var(--warning)' : 'var(--success)'};">${b.status === 'pending' ? 'Pending' : 'Active'}</span></td>
       <td style="vertical-align:middle;font-size:12px;">${b.createdAt ? new Date(b.createdAt).toLocaleDateString() : '—'}</td>
-      <td style="vertical-align:middle;">
-        ${b.status === 'pending' ? `<button class="btn btn-success" style="padding:4px 10px;font-size:11px;" onclick="activateBroker('${b.id}')">Activate</button>` : ''}
-        <button class="btn btn-outline" style="padding:4px 10px;font-size:11px;color:var(--error);" onclick="deleteBroker('${b.id}')">Delete</button>
-      </td>
+      <td style="vertical-align:middle;">${b.status === 'pending' ? `<button class="btn btn-success" style="padding:4px 10px;font-size:11px;" onclick="activateBroker('${b.id}')">Activate</button>` : ''}<button class="btn btn-outline" style="padding:4px 10px;font-size:11px;color:var(--error);" onclick="deleteBroker('${b.id}')">Delete</button></td>
     </tr>
   `).join('');
-  
-  const pendingCount = brokers.filter(b => b.status === 'pending').length;
-  const pendingSpan = document.getElementById('pendingBrokersCount');
-  if (pendingSpan) pendingSpan.textContent = pendingCount;
-}
-
-function setBrokerCommissionRate(brokerId, rate) {
-  const broker = brokers.find(b => b.id === brokerId || b.id === String(brokerId));
-  if (broker) {
-    const parsedRate = rate === '' || rate === null ? undefined : parseFloat(rate);
-    broker.commissionRate = (parsedRate === undefined || isNaN(parsedRate)) ? undefined : Math.max(0, Math.min(100, parsedRate));
-    
-    if (firebaseReady) {
-      fbUpdate('brokers', brokerId, { commissionRate: broker.commissionRate });
-    } else {
-      saveBrokersLocal();
-    }
-    
-    const displayRate = broker.commissionRate !== undefined ? broker.commissionRate + '%' : '0% (No commission)';
-    showToast(`Commission rate for ${broker.name} set to ${displayRate}`);
-    renderBrokerAdminTable();
-  }
-}
-
-function getBrokerCommissionRate(brokerId) {
-  const broker = brokers.find(b => b.id === brokerId || b.id === String(brokerId));
-  return broker?.commissionRate || 0;
-}
-
-function renderAdminBrokerSubmissionsTable() {
-  const container = document.getElementById('adminBrokerSubmissionsTable');
-  if (!container) return;
-  container.innerHTML = brokerSubmissions.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).map(s => `
-    <tr>
-      <td style="vertical-align:middle;font-size:12px;">${new Date(s.createdAt).toLocaleDateString()}</td>
-      <td style="vertical-align:middle;">${escapeHtml(s.brokerName)}</td>
-      <td style="vertical-align:middle;">${escapeHtml(s.clientName)}</td>
-      <td style="vertical-align:middle;">${escapeHtml(s.projectName)}</td>
-      <td style="vertical-align:middle;">$${s.fundsNeeded || 'TBD'}</td>
-      <td style="vertical-align:middle;"><span class="status-badge-${s.status === 'pending' ? 'pending' : s.status === 'active' ? 'active' : 'funded'}">${s.status === 'pending' ? 'Pending Review' : s.status === 'active' ? 'Active' : 'Funded'}</span></td>
-      <td style="vertical-align:middle;"><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="viewBrokerSubmission('${s.id}')">View</button></td>
-    </tr>
-  `).join('');
-}
-
-function viewBrokerSubmission(submissionId) {
-  const s = brokerSubmissions.find(x => x.id === submissionId);
-  if (!s) return;
-  const broker = brokers.find(b => b.id === s.brokerId);
-  const modalHtml = `
-  <div id="brokerSubmissionModal" class="modal-overlay active">
-  <div class="modal">
-  <div class="modal-header">
-  <h3>Broker Submission</h3>
-  <button class="modal-close" onclick="document.getElementById('brokerSubmissionModal').remove()">✕</button>
-  </div>
-  <div class="modal-body">
-  <div class="project-details-grid">
-  <div class="project-detail-item">
-  <div class="project-detail-label">Broker</div>
-  <div class="project-detail-value">${escapeHtml(s.brokerName)}</div></div>
-  <div class="project-detail-item">
-  <div class="project-detail-label">Broker Firm</div>
-  <div class="project-detail-value">${escapeHtml(broker?.firm || '—')}</div></div>
-  <div class="project-detail-item">
-  <div class="project-detail-label">Client Name</div>
-  <div class="project-detail-value">${escapeHtml(s.clientName)}</div></div>
-  <div class="project-detail-item">
-  <div class="project-detail-label">Client Email</div>
-  <div class="project-detail-value">${escapeHtml(s.clientEmail)}</div></div>
-  <div class="project-detail-item">
-  <div class="project-detail-label">Project</div>
-  <div class="project-detail-value">${escapeHtml(s.projectName)}</div></div>
-  <div class="project-detail-item">
-  <div class="project-detail-label">Industry</div>
-  <div class="project-detail-value">${escapeHtml(s.industry || '—')}</div></div>
-  <div class="project-detail-item">
-  <div class="project-detail-label">Location</div>
-  <div class="project-detail-value">${escapeHtml(s.location || '—')}</div></div>
-  <div class="project-detail-item">
-  <div class="project-detail-label">Funds Needed</div>
-  <div class="project-detail-value">$${escapeHtml(s.fundsNeeded || '—')}</div></div>
-  <div class="project-detail-item">
-  <div class="project-detail-label">Status</div>
-  <div class="project-detail-value">${s.status}</div></div>
-  <div class="project-detail-item">
-  <div class="project-detail-label">Submitted</div>
-  <div class="project-detail-value">${new Date(s.createdAt).toLocaleString()}</div></div>
-  </div>
-  ${s.description ? `<div class="note-card" style="margin-top:16px;"><div class="note-card-label">Description</div><div class="note-card-text">${escapeHtml(s.description)}</div></div>` : ''}
-  <div style="display:flex;gap:12px;margin-top:20px;">
-  <button class="btn btn-primary" onclick="convertSubmissionToClient('${s.id}')">Convert to Client</button>
-  <button class="btn btn-outline" onclick="document.getElementById('brokerSubmissionModal').remove()">Close</button>
-  </div>
-  </div></div></div>`;
-  document.body.insertAdjacentHTML('beforeend', modalHtml);
-}
-
-function convertSubmissionToClient(submissionId) {
-  const s = brokerSubmissions.find(x => x.id === submissionId);
-  if (!s) return;
-  document.getElementById('brokerSubmissionModal')?.remove();
-  showAddClientModal();
-  setTimeout(() => {
-    const ncName = document.getElementById('ncName');
-    const ncEmail = document.getElementById('ncEmail');
-    const ncProject = document.getElementById('ncProject');
-    const ncIndustry = document.getElementById('ncIndustry');
-    const ncLocation = document.getElementById('ncLocation');
-    const ncFundsNeeded = document.getElementById('ncFundsNeeded');
-    if (ncName) ncName.value = s.clientName;
-    if (ncEmail) ncEmail.value = s.clientEmail;
-    if (ncProject) ncProject.value = s.projectName;
-    if (ncIndustry) ncIndustry.value = s.industry || '';
-    if (ncLocation) ncLocation.value = s.location || '';
-    if (ncFundsNeeded) ncFundsNeeded.value = s.fundsNeeded || '';
-  }, 300);
 }
 
 function activateBroker(id) {
@@ -5321,6 +4772,105 @@ function deleteBroker(id) {
   else saveBrokersLocal();
   showToast('Broker deleted');
   renderBrokerAdminTable();
+}
+
+function submitDeal() {
+  const clientName = document.getElementById('dealClientName').value.trim();
+  const clientEmail = document.getElementById('dealClientEmail').value.trim();
+  const projectName = document.getElementById('dealProjectName').value.trim();
+  const industry = document.getElementById('dealIndustry').value;
+  const location = document.getElementById('dealLocation').value;
+  const fundsNeeded = document.getElementById('dealFundsNeeded').value;
+  const description = document.getElementById('dealDescription').value;
+  if (!clientName || !clientEmail || !projectName || !fundsNeeded) { showToast('Please fill all required fields.', true); return; }
+  if (!clientEmail.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) { showToast('Invalid client email.', true); return; }
+  const id = String(Date.now());
+  const submission = { id, brokerId: currentBroker.id, brokerName: currentBroker.name, clientName, clientEmail, projectName, industry, location, fundsNeeded, description, status: 'pending', createdAt: new Date().toISOString() };
+  brokerSubmissions.push(submission);
+  if (firebaseReady) fbSet('brokerSubmissions', id, submission);
+  else saveBrokersLocal();
+  sendEmail(EMAILJS_CONFIG.adminEmail, `📋 NEW DEAL SUBMISSION from ${currentBroker.name}`, `A new deal has been submitted by broker ${currentBroker.name} (${currentBroker.email}, ${currentBroker.firm}).\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nDEAL DETAILS:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n• Client: ${clientName}\n• Client Email: ${clientEmail}\n• Project: ${projectName}\n• Industry: ${industry}\n• Location: ${location}\n• Funds Needed: $${fundsNeeded}\n• Description: ${description || 'Not provided'}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nBroker: ${currentBroker.name} (${currentBroker.firm})\n\n\nLog in to admin to review.`).catch(() => {});
+  document.getElementById('dealClientName').value = '';
+  document.getElementById('dealClientEmail').value = '';
+  document.getElementById('dealProjectName').value = '';
+  document.getElementById('dealLocation').value = '';
+  document.getElementById('dealFundsNeeded').value = '';
+  document.getElementById('dealDescription').value = '';
+  showToast('Deal submitted! Croft Finance will review and contact the client.');
+  switchBrokerTab('submissions', null);
+  renderBrokerSubmissions();
+}
+
+function renderBrokerSubmissions() {
+  const mySubmissions = brokerSubmissions.filter(s => s.brokerId === currentBroker.id).sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const tbody = document.getElementById('brokerSubmissionsList');
+  if (!tbody) return;
+  tbody.innerHTML = mySubmissions.map(s => `
+    <tr>
+      <td style="vertical-align:middle;font-size:12px;">${new Date(s.createdAt).toLocaleDateString()}</td>
+      <td style="vertical-align:middle;">${escapeHtml(s.clientName)}</td>
+      <td style="vertical-align:middle;">${escapeHtml(s.projectName)}</td>
+      <td style="vertical-align:middle;">$${s.fundsNeeded || 'TBD'}</td>
+      <td style="vertical-align:middle;"><span class="status-badge-${s.status === 'pending' ? 'pending' : s.status === 'active' ? 'active' : 'funded'}">${s.status === 'pending' ? 'Pending Review' : s.status === 'active' ? 'Active' : 'Funded'}</span></td>
+    </tr>
+  `).join('');
+}
+
+function loadBrokerMessages() {
+  const msgs = brokerMessages.filter(m => String(m.brokerId) === String(currentBroker.id)).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+  const container = document.getElementById('brokerMessagesList');
+  if (!container) return;
+  container.innerHTML = msgs.map(m => `<div class="message ${m.sender === 'broker' ? 'client' : 'admin'}"><div class="message-bubble">${escapeHtml(m.content)}</div><div class="message-meta">${m.sender === 'admin' ? 'Suzana Aleksić' : currentBroker.name} · ${new Date(m.timestamp).toLocaleString()}</div></div>`).join('');
+  container.scrollTop = container.scrollHeight;
+}
+
+function sendBrokerMessage() {
+  const input = document.getElementById('brokerMessageInput');
+  const content = input.value.trim();
+  if (!content) return;
+  const id = String(Date.now());
+  const msg = { id, brokerId: String(currentBroker.id), brokerName: currentBroker.name, sender: 'broker', content, timestamp: new Date().toISOString() };
+  brokerMessages.push(msg);
+  if (firebaseReady) fbSet('brokerMessages', id, msg);
+  else saveBrokersLocal();
+  loadBrokerMessages();
+  sendEmail(EMAILJS_CONFIG.adminEmail, `💬 New Message from Broker ${currentBroker.name}`, `${currentBroker.name} (${currentBroker.email}, ${currentBroker.firm}) sent:\n\n${content}`).catch(() => {});
+  input.value = '';
+  showToast('Message sent');
+}
+
+function loadBrokerPortal() {
+  if (!currentBroker) return;
+  document.getElementById('brokerUserName').textContent = currentBroker.name;
+  document.getElementById('brokerUserEmail').textContent = currentBroker.email;
+  document.getElementById('brokerNavUser').textContent = currentBroker.name;
+  document.getElementById('brokerAvatar').textContent = currentBroker.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+  document.getElementById('brokerDashGreeting').textContent = 'Welcome, ' + currentBroker.name.split(' ')[0] + '.';
+  
+  const mySubmissions = brokerSubmissions.filter(s => s.brokerId === currentBroker.id);
+  const activeSubmissions = mySubmissions.filter(s => s.status === 'active');
+  const fundedSubmissions = mySubmissions.filter(s => s.status === 'funded');
+  
+  const brokerRate = currentBroker.commissionRate || 0;
+  const ratePercent = brokerRate / 100;
+  
+  const totalCommission = fundedSubmissions.reduce((sum, s) => { 
+    const amount = parseFloat(String(s.fundsNeeded || '0').replace(/[^0-9.-]/g, '')); 
+    return sum + (amount * ratePercent); 
+  }, 0);
+  
+  document.getElementById('brokerTotalSubmissions').textContent = mySubmissions.length;
+  document.getElementById('brokerActiveDeals').textContent = activeSubmissions.length;
+  document.getElementById('brokerFundedDeals').textContent = fundedSubmissions.length;
+  
+  if (brokerRate > 0) {
+    document.getElementById('brokerEstCommission').textContent = '$' + totalCommission.toLocaleString();
+  } else {
+    document.getElementById('brokerEstCommission').textContent = '$0';
+  }
+  
+  renderBrokerSubmissions();
+  loadBrokerMessages();
 }
 
 function brokerRegister() {
@@ -5434,129 +4984,8 @@ function brokerLogin() {
     });
 }
 
-function loadBrokerPortal() {
-  if (!currentBroker) return;
-  document.getElementById('brokerUserName').textContent = currentBroker.name;
-  document.getElementById('brokerUserEmail').textContent = currentBroker.email;
-  document.getElementById('brokerNavUser').textContent = currentBroker.name;
-  document.getElementById('brokerAvatar').textContent = currentBroker.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
-  document.getElementById('brokerDashGreeting').textContent = 'Welcome, ' + currentBroker.name.split(' ')[0] + '.';
-  
-  const mySubmissions = brokerSubmissions.filter(s => s.brokerId === currentBroker.id);
-  const activeSubmissions = mySubmissions.filter(s => s.status === 'active');
-  const fundedSubmissions = mySubmissions.filter(s => s.status === 'funded');
-  
-  const brokerRate = currentBroker.commissionRate || 0;
-  const ratePercent = brokerRate / 100;
-  
-  const totalCommission = fundedSubmissions.reduce((sum, s) => { 
-    const amount = parseFloat(String(s.fundsNeeded || '0').replace(/[^0-9.-]/g, '')); 
-    return sum + (amount * ratePercent); 
-  }, 0);
-  
-  document.getElementById('brokerTotalSubmissions').textContent = mySubmissions.length;
-  document.getElementById('brokerActiveDeals').textContent = activeSubmissions.length;
-  document.getElementById('brokerFundedDeals').textContent = fundedSubmissions.length;
-  
-  if (brokerRate > 0) {
-    document.getElementById('brokerEstCommission').textContent = '$' + totalCommission.toLocaleString();
-  } else {
-    document.getElementById('brokerEstCommission').textContent = '$0';
-  }
-  
-  const commissionStatCard = document.getElementById('brokerEstCommission')?.closest('.stat-card');
-  if (commissionStatCard) {
-    let rateDisplay = commissionStatCard.querySelector('.commission-rate-display');
-    if (!rateDisplay) {
-      rateDisplay = document.createElement('div');
-      rateDisplay.className = 'commission-rate-display';
-      rateDisplay.style.fontSize = '10px';
-      rateDisplay.style.marginTop = '6px';
-      rateDisplay.style.color = 'var(--gray-500)';
-      commissionStatCard.appendChild(rateDisplay);
-    }
-    if (brokerRate > 0) {
-      rateDisplay.innerHTML = `Your rate: <strong>${brokerRate}%</strong>`;
-    } else {
-      rateDisplay.innerHTML = `⚠️ No commission rate set`;
-    }
-  }
-  
-  renderBrokerSubmissions();
-  loadBrokerMessages();
-}
-
-function renderBrokerSubmissions() {
-  const mySubmissions = brokerSubmissions.filter(s => s.brokerId === currentBroker.id).sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
-  const tbody = document.getElementById('brokerSubmissionsList');
-  if (!tbody) return;
-  tbody.innerHTML = mySubmissions.map(s => `
-    <tr>
-      <td style="vertical-align:middle;font-size:12px;">${new Date(s.createdAt).toLocaleDateString()}</td>
-      <td style="vertical-align:middle;">${escapeHtml(s.clientName)}</td>
-      <td style="vertical-align:middle;">${escapeHtml(s.projectName)}</td>
-      <td style="vertical-align:middle;">$${s.fundsNeeded || 'TBD'}</td>
-      <td style="vertical-align:middle;"><span class="status-badge-${s.status === 'pending' ? 'pending' : s.status === 'active' ? 'active' : 'funded'}">${s.status === 'pending' ? 'Pending Review' : s.status === 'active' ? 'Active' : 'Funded'}</span></td>
-    </tr>
-  `).join('');
-}
-
-function submitDeal() {
-  const clientName = document.getElementById('dealClientName').value.trim();
-  const clientEmail = document.getElementById('dealClientEmail').value.trim();
-  const projectName = document.getElementById('dealProjectName').value.trim();
-  const industry = document.getElementById('dealIndustry').value;
-  const location = document.getElementById('dealLocation').value;
-  const fundsNeeded = document.getElementById('dealFundsNeeded').value;
-  const description = document.getElementById('dealDescription').value;
-  if (!clientName || !clientEmail || !projectName || !fundsNeeded) { showToast('Please fill all required fields.', true); return; }
-  if (!clientEmail.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) { showToast('Invalid client email.', true); return; }
-  const id = String(Date.now());
-  const submission = { id, brokerId: currentBroker.id, brokerName: currentBroker.name, clientName, clientEmail, projectName, industry, location, fundsNeeded, description, status: 'pending', createdAt: new Date().toISOString() };
-  brokerSubmissions.push(submission);
-  if (firebaseReady) fbSet('brokerSubmissions', id, submission);
-  else saveBrokersLocal();
-  const projectId = String(Date.now() + 1);
-  const newProject = { id: projectId, name: projectName, clientId: null, brokerId: currentBroker.id, industry, location, fundsNeeded, amount: fundsNeeded, status: 'pending', step: 1, nextMilestone: 'Awaiting Client Registration', createdAt: new Date().toISOString() };
-  projects.push(newProject);
-  if (firebaseReady) fbSet('projects', projectId, newProject);
-  sendEmail(EMAILJS_CONFIG.adminEmail, `📋 NEW DEAL SUBMISSION from ${currentBroker.name}`, `A new deal has been submitted by broker ${currentBroker.name} (${currentBroker.email}, ${currentBroker.firm}).\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nDEAL DETAILS:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n• Client: ${clientName}\n• Client Email: ${clientEmail}\n• Project: ${projectName}\n• Industry: ${industry}\n• Location: ${location}\n• Funds Needed: $${fundsNeeded}\n• Description: ${description || 'Not provided'}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nBroker: ${currentBroker.name} (${currentBroker.firm})\n\n\nLog in to admin to review.`).catch(() => {});
-  document.getElementById('dealClientName').value = '';
-  document.getElementById('dealClientEmail').value = '';
-  document.getElementById('dealProjectName').value = '';
-  document.getElementById('dealLocation').value = '';
-  document.getElementById('dealFundsNeeded').value = '';
-  document.getElementById('dealDescription').value = '';
-  showToast('Deal submitted! Croft Finance will review and contact the client.');
-  switchBrokerTab('submissions', null);
-  renderBrokerSubmissions();
-}
-
-function loadBrokerMessages() {
-  const msgs = brokerMessages.filter(m => String(m.brokerId) === String(currentBroker.id)).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-  const container = document.getElementById('brokerMessagesList');
-  if (!container) return;
-  container.innerHTML = msgs.map(m => `<div class="message ${m.sender === 'broker' ? 'client' : 'admin'}"><div class="message-bubble">${escapeHtml(m.content)}</div><div class="message-meta">${m.sender === 'admin' ? 'Suzana Aleksić' : currentBroker.name} · ${new Date(m.timestamp).toLocaleString()}</div></div>`).join('');
-  container.scrollTop = container.scrollHeight;
-}
-
-function sendBrokerMessage() {
-  const input = document.getElementById('brokerMessageInput');
-  const content = input.value.trim();
-  if (!content) return;
-  const id = String(Date.now());
-  const msg = { id, brokerId: String(currentBroker.id), brokerName: currentBroker.name, sender: 'broker', content, timestamp: new Date().toISOString() };
-  brokerMessages.push(msg);
-  if (firebaseReady) fbSet('brokerMessages', id, msg);
-  else saveBrokersLocal();
-  loadBrokerMessages();
-  sendEmail(EMAILJS_CONFIG.adminEmail, `💬 New Message from Broker ${currentBroker.name}`, `${currentBroker.name} (${currentBroker.email}, ${currentBroker.firm}) sent:\n\n${content}`).catch(() => {});
-  input.value = '';
-  showToast('Message sent');
-}
-
 // ============================================================
-// CONTACT FORM & OTHER FUNCTIONS
+// CONTACT FORM
 // ============================================================
 function submitContactForm(event) {
   event.preventDefault();
@@ -5591,140 +5020,180 @@ function resetContactForm() {
 }
 
 // ============================================================
-// LUMIN SIGN INTEGRATION
+// ADMIN FUNCTIONS (SIMPLIFIED - KEEP EXISTING)
 // ============================================================
+function renderAdminTables() {
+  renderClientsTable();
+  renderProjectsTable();
+  renderAdminDocumentsTable();
+}
 
-function openLuminSign(docId) {
-  const doc = documents.find(d => d.id === docId || d.id === String(docId));
-  if (!doc || !doc.url) { 
-    showToast('Document not available', true); 
-    return; 
+function renderClientsTable() {
+  const tbody = document.getElementById('adminClientsTable');
+  if (!tbody) return;
+  const searchVal = (document.getElementById('clientSearch')?.value || '').toLowerCase();
+  const filtered = clients.filter(c => c.name.toLowerCase().includes(searchVal) || c.email.toLowerCase().includes(searchVal));
+  tbody.innerHTML = filtered.map(c => { const cp = projects.filter(p => p.clientId === c.id); return `<tr>
+      <td style="vertical-align:middle;"><strong>${escapeHtml(c.name)}</strong><br><span style="font-size:11px;color:var(--gray-400);">${c.email}</span></td>
+      <td style="vertical-align:middle;">${cp.map(p => `<span class="badge badge-gray">${escapeHtml(p.name)}</span>`).join(' ') || '—'}</td>
+      <td style="vertical-align:middle;"><span style="color:${c.status === 'pending' ? 'var(--warning)' : 'var(--success)'};">${c.status === 'pending' ? 'Pending' : 'Active'}</span></td>
+      <td style="font-size:12px;color:var(--gray-400);">${c.createdAt ? new Date(c.createdAt).toLocaleDateString() : '—'}</td>
+      <td style="vertical-align:middle;display:flex;gap:6px;flex-wrap:wrap;">${c.status === 'pending' ? `<button class="btn btn-success" style="padding:4px 10px;font-size:11px;" onclick="activateClient('${c.id}')">Activate</button>` : ''}<button class="btn btn-outline" style="padding:4px 10px;font-size:11px;color:var(--error);" onclick="deleteClient('${c.id}')">Delete</button></td>
+    </tr>`; }).join('');
+}
+
+function renderProjectsTable() {
+  const tbody = document.getElementById('adminProjectsTable');
+  if (!tbody) return;
+  tbody.innerHTML = projects.map(p => { 
+    const client = clients.find(c => c.id === p.clientId); 
+    return `
+      <tr>
+        <td style="vertical-align:middle;font-size:12px;">${client?.name || '?'}</td>
+        <td style="vertical-align:middle;"><strong>${escapeHtml(p.name)}</strong></td>
+        <td style="vertical-align:middle;">${p.industry || '—'}</td>
+        <td style="vertical-align:middle;">${p.location || '—'}</td>
+        <td style="vertical-align:middle;">${p.fundsNeeded ? '$' + p.fundsNeeded : (p.amount || 'TBD')}</td>
+        <td style="vertical-align:middle;"><span class="badge badge-navy">${STEP_NAMES[p.step || 1] || 'Step ' + (p.step || 1)}</span></td>
+        <td style="vertical-align:middle;">${p.step >= 2 ? `<span class="ack-badge ${p.commitFeeAcknowledged ? 'completed' : 'pending'}" title="${p.commitFeeAcknowledged ? 'Acknowledged: ' + new Date(p.commitFeeAcknowledgedAt).toLocaleDateString() : 'Not yet acknowledged'}">${p.commitFeeAcknowledged ? '✓ CF' : '⏳ CF'}</span>` : '<span class="ack-badge" style="opacity:0.3;">— CF</span>'}</td>
+        <td style="vertical-align:middle;">${p.step >= 6 ? `<span class="ack-badge ${p.ecfAcknowledged ? 'completed' : 'pending'}" title="${p.ecfAcknowledged ? 'Acknowledged: ' + new Date(p.ecfAcknowledgedAt).toLocaleDateString() : 'Not yet acknowledged'}">${p.ecfAcknowledged ? '✓ ECF' : '⏳ ECF'}</span>` : '<span class="ack-badge" style="opacity:0.3;">— ECF</span>'}</td>
+        <td style="vertical-align:middle;display:flex;gap:6px;">
+          <button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="editProject('${p.id}')">Edit</button>
+          <button class="btn btn-outline" style="padding:4px 10px;font-size:11px;color:var(--error);" onclick="deleteProject('${p.id}')">Delete</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function renderAdminDocumentsTable() {
+  const tbody = document.getElementById('adminDocumentsTableBody');
+  const filterClientId = document.getElementById('adminDocFilterClient')?.value || '';
+  if (!tbody) return;
+  
+  const filterSelect = document.getElementById('adminDocFilterClient');
+  if (filterSelect && filterSelect.options.length <= 1) {
+    filterSelect.innerHTML = '<option value="">All Clients</option>' + clients.filter(c => c.status === 'active').map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
   }
   
-  downloadPDF(docId);
+  let docsToShow = [...documents];
+  if (filterClientId) docsToShow = docsToShow.filter(d => String(d.clientId) === String(filterClientId));
   
-  const modalHtml = `
-  <div id="luminModal" class="modal-overlay active">
-  <div class="modal modal-lg">
-  <div class="modal-header">
-  <h3><i class="fas fa-pen-fancy" style="color:#6B46C1;margin-right:8px;"></i>Sign with Lumin Sign</h3>
-  <button class="modal-close" onclick="document.getElementById('luminModal').remove()">✕</button>
-  </div>
-  <div class="modal-body">
-  <div style="background: #F5F3FF; border: 1px solid #6B46C1; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
-  <div style="font-size: 13px; color: #4C1D95; font-weight: 500; margin-bottom: 8px;"><i class="fas fa-info-circle"></i> How to sign with Lumin Sign:</div>
-  <ol style="font-size: 12px; color: #5B21B6; line-height: 2; margin-left: 20px;">
-  <li>Download the document using the button below</li>
-  <li>Go to Lumin Sign (luminpdf.com/sign)</li>
-  <li>Upload the document to Lumin Sign</li>
-  <li>Add your signature and complete signing</li>
-  <li>Download the signed version from Lumin</li>
-  <li>Upload the signed document back here via the Upload section below</li>
-  </ol>
-  </div>
-  <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-  <button class="btn btn-primary" onclick="downloadPDF('${docId}'); document.getElementById('luminModal').remove();"><i class="fas fa-download"></i> Download Document First</button>
-  <a href="https://luminpdf.com/sign" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: #6B46C1; color: white; padding: 10px 22px; border-radius: 6px; font-size: 12px; font-weight: 500; text-decoration: none; letter-spacing: 1px;"><i class="fas fa-external-link-alt"></i> Open Lumin Sign</a>
-  <button class="btn btn-outline" onclick="document.getElementById('luminModal').remove(); switchPortalTab('documents', null);">Upload Signed Document</button>
-  </div>
-  <div style="margin-top: 20px; font-size: 11px; color: var(--gray-400); border-top: 1px solid var(--gray-100); padding-top: 12px;">
-  After signing in Lumin, upload the completed signed document using the Upload section on this page. Name it clearly e.g. "Signed Term Sheet - [Your Name]".
-  </div>
-  </div></div></div>`;
+  let requiredTypesMap = {};
+  for (let s = 1; s <= 8; s++) {
+    const reqs = REQUIRED_DOCS[s] || [];
+    reqs.forEach(docType => { requiredTypesMap[docType] = s; });
+  }
   
-  document.body.insertAdjacentHTML('beforeend', modalHtml);
+  tbody.innerHTML = docsToShow.map(doc => {
+    const client = clients.find(c => String(c.id) === String(doc.clientId));
+    const proj = projects.find(p => String(p.id) === String(doc.projectId));
+    const step = requiredTypesMap[doc.type] || '—';
+    let statusHtml = '<span class="doc-status-badge doc-status-uploaded">Uploaded</span>';
+    if (doc.approved) statusHtml = '<span class="doc-status-badge doc-status-approved">Approved ✓</span>';
+    else if (doc.type === 'Executed Term Sheet (Binding)' || doc.type === 'Deed of Undertaking') 
+      statusHtml = '<span class="doc-status-badge doc-status-uploaded">Uploaded — Pending Signing</span>';
+    
+    return `
+      <tr>
+        <td style="vertical-align:middle;">${client?.name || 'Unknown'}</td>
+        <td style="vertical-align:middle;">${proj?.name || '—'}</td>
+        <td style="vertical-align:middle;"><strong>${escapeHtml(doc.type || doc.name)}</strong></td>
+        <td style="vertical-align:middle;text-align:center;">${step !== '—' ? 'Step ' + step : '—'}</td>
+        <td style="vertical-align:middle;">${statusHtml}</td>
+        <td style="vertical-align:middle;">${doc.date || '—'}</td>
+        <td style="vertical-align:middle;">
+          <button class="doc-action-btn doc-action-view" onclick="viewPDF('${doc.id}')">View</button>
+          ${!doc.approved && !doc.signed ? `<button class="doc-action-btn" style="background: var(--success); color: white; border: none;" onclick="approveDocument('${doc.id}')">Approve</button>` : ''}
+          <button class="doc-action-btn doc-action-download" onclick="downloadPDF('${doc.id}')">Download</button>
+          <button class="doc-action-btn" style="background: var(--error); color: white; border: none;" onclick="deleteDocument('${doc.id}')">Delete</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+  
+  const countEl = document.getElementById('docCount');
+  if (countEl) countEl.textContent = docsToShow.length + ' documents';
 }
 
-// ============================================================
-// INVESTOR VERIFICATION LETTER
-// ============================================================
-
-function generateInvestorVerificationLetter(clientId, projectId) {
-  const client = clients.find(c => c.id === clientId);
-  const proj = projects.find(p => p.id === projectId);
-  if (!client || !proj) return '';
-  const now = new Date();
-  const dateStr = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-  const year = now.getFullYear();
-  const refNumber = `CF-${year}-${String(projectId).slice(-4)}/IVL`;
-  const dealRef = `CF-${year}-${String(projectId).slice(-4)}`;
-  const firstName = client.name.split(' ')[0];
-  return `<div class="ivl-letter-container"><div class="ivl-letterhead"><div class="ivl-logo">CROFT <span>FINANCE</span></div><div class="ivl-subtitle">PRINCIPAL'S INVESTOR VERIFICATION LETTER</div><div class="ivl-address">Sokobanjska 6<br>37208 Kruševac, Serbia<br>T: +381 69 288 0 191<br>E: suzana.aleksic@croftfinance.com</div><div class="ivl-classification">STRICTLY CONFIDENTIAL</div></div><div style="display: flex; justify-content: space-between; margin: 20px 0;"><div>Date: ${dateStr}</div><div>Reference: ${refNumber}</div></div><hr class="ivl-hr"><div class="ivl-recipient">${client.name}<br>${client.email}<br>Portal Reference: ${dealRef}</div><div class="ivl-subject">Re: Verification of Capital Partner — Confirmation of Financial Capacity and Institutional Standing</div><p>Dear ${firstName},</p><p>I, Suzana Aleksić, Principal of Croft Finance, issue this letter in my personal and professional capacity to formally confirm the following with respect to the capital partner engaged in connection with your financing mandate referenced above.</p><div class="ivl-section-title">1. IDENTITY AND STANDING</div><p>The Capital Partner is a private capital entity incorporated and operating under the laws of the Commonwealth of Massachusetts, United States of America. The Capital Partner operates as a regulated private capital vehicle with confirmed deployable capital in excess of USD 550,000,000 (five hundred and fifty million United States dollars) and has been in continuous operation for a period exceeding twenty (20) years.</p><p>The Capital Partner maintains an established track record in the structured financing of real estate development projects across multiple jurisdictions and has successfully deployed capital in transactions of a nature and scale consistent with your mandate.</p><div class="ivl-section-title">2. VERIFICATION CONDUCTED</div><p>In connection with the acceptance of your mandate and prior to the presentation of your project to the Capital Partner, I have personally conducted the following verification procedures:</p><div class="ivl-subsection"><span class="ivl-subsection-label">(i) Review of Proof of Funds Documentation</span><br>I have reviewed and verified original proof of funds documentation confirming the Capital Partner's financial capacity to deploy capital at the facility size relevant to your mandate. This documentation has been reviewed in its original form and confirmed as authentic to the best of my professional knowledge.</div><div class="ivl-subsection"><span class="ivl-subsection-label">(ii) Legal Entity Verification</span><br>I have verified the legal entity registration and standing of the Capital Partner through independent review of corporate documentation confirming its incorporation, continued good standing, and authority to enter into financing transactions of this nature.</div><div class="ivl-subsection"><span class="ivl-subsection-label">(iii) Transaction History Review</span><br>I have reviewed and am personally familiar with the Capital Partner's prior transaction history, including the structure, execution, and successful completion of previous financing mandates. This review supports my confidence in the Capital Partner's ability and intention to perform its obligations under the proposed facility.</div><div class="ivl-subsection"><span class="ivl-subsection-label">(iv) Legal Counsel Verification</span><br>I am personally familiar with the legal counsel engaged by the Capital Partner in connection with its financing activities and am satisfied as to their professional standing and institutional credibility.</div><div class="ivl-section-title">3. CONFIDENTIALITY OF IDENTITY</div><p>The identity of the Capital Partner is maintained in strict confidence as a condition of their participation in this and all transactions arranged through Croft Finance. This is standard and accepted practice in private capital markets of this nature and does not in any way diminish the validity, enforceability, or credibility of any agreement entered into between the parties.</p><p>You are expressly prohibited from attempting to identify, contact, or approach the Capital Partner directly or through any intermediary without the prior written consent of Croft Finance. Any breach of this condition will be considered a material breach of the Confidentiality and Portal Access Terms you have accepted.</p><div class="ivl-section-title">4. PROFESSIONAL REPRESENTATION</div><p>I issue this letter on the basis of my personal knowledge of and professional relationship with the Capital Partner, accumulated over the course of my work in private structured finance. I stake my professional reputation on the representations made herein and would not present any mandate to a capital partner whose standing and capacity I had not personally verified to my complete satisfaction.</p><p>I remain personally available to discuss the contents of this letter or any aspect of the capital partner verification process at any time.</p><div class="ivl-signature">Yours faithfully,<br><br><div class="ivl-signature-name">Suzana Aleksić</div>Principal, Croft Finance<br>suzana.aleksic@croftfinance.com<br>+381 69 288 0 191<br>Sokobanjska 6, 37208 Kruševac, Serbia</div><div>Date: ${dateStr}</div><div>Reference: ${refNumber}</div><div class="ivl-disclaimer"><strong>DISCLAIMER AND LIMITATION OF LIABILITY</strong><br><br>This letter constitutes a professional representation by Suzana Aleksić in her capacity as Principal of Croft Finance and is issued in good faith on the basis of verification procedures described herein. This letter does not constitute a legal guarantee of performance by the Capital Partner, a warranty of investment outcome, or legal advice of any kind. Croft Finance has conducted the verification described herein to the best of its professional ability and in accordance with standard private capital market practice. Recipients are advised to seek independent legal and financial advice in connection with any financing transaction.<br><br>This letter is strictly confidential, non-transferable, and issued solely for the benefit of the named recipient in connection with the referenced mandate. Any reproduction, distribution, or disclosure of this letter without the prior written consent of Croft Finance is strictly prohibited.<br><br>© ${year} Croft Finance. All rights reserved.<br>Sokobanjska 6, 37208 Kruševac, Serbia.</div><div class="ivl-footer">STRICTLY CONFIDENTIAL — ${refNumber}</div></div>`;
+function renderAdminMessages() {
+  const container = document.getElementById('allMessagesList');
+  if (!container) return;
+  
+  const byClient = {};
+  messages.forEach(m => { const key = String(m.clientId); if (!byClient[key]) byClient[key] = []; byClient[key].push(m); });
+  if (!Object.keys(byClient).length) { container.innerHTML = '<p style="color:var(--gray-400);font-size:13px;">No messages yet.</p>'; return; }
+  
+  container.innerHTML = Object.entries(byClient).map(([cid, msgs]) => { const client = clients.find(c => c.id === cid || c.id === String(cid)); const sorted = msgs.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp)); return `<div class="admin-thread" data-client-id="${cid}"><div class="admin-thread-header"><div><div class="admin-thread-client">${client?.name || 'Unknown'}</div><div class="admin-thread-project">${client?.email || ''}</div></div><span class="badge badge-navy">${sorted.length} messages</span></div><div class="admin-thread-body"><div class="admin-thread-msgs">${sorted.map(m => `<div class="message ${m.sender === 'client' ? 'admin' : 'client'}" style="margin-bottom:10px;"><div class="message-bubble" style="${m.sender === 'admin' ? 'background:var(--navy);color:white;' : 'background:var(--gray-100);color:var(--navy);'}">${escapeHtml(m.content)}</div><div class="message-meta">${m.sender === 'admin' ? 'Suzana' : client?.name || 'Client'} · ${new Date(m.timestamp).toLocaleString()}</div></div>`).join('')}</div><div class="admin-reply-box"><textarea id="replyBox_${cid}" placeholder="Reply to ${client?.name || 'client'}..."></textarea><button class="btn btn-primary" onclick="sendAdminReply('${cid}')">Send Reply</button></div></div></div>`; }).join('');
 }
 
-async function generateAndStoreIVL(clientId, projectId) {
-  const html = generateInvestorVerificationLetter(clientId, projectId);
-  const proj = projects.find(p => p.id === projectId);
-  if (!proj) return;
-  const updates = { investorVerificationLetter: html, investorVerificationLetterDate: new Date().toISOString(), ivrLetterAcknowledged: proj.ivrLetterAcknowledged || false };
-  Object.assign(proj, updates);
-  await fbUpdate('projects', projectId, updates);
-  return html;
-}
-
-function printInvestorVerificationLetter(projectId) {
-  const proj = projects.find(p => p.id === projectId);
-  if (!proj || !proj.investorVerificationLetter) { showToast('Letter not available', true); return; }
-  const printHtml = `<div style="padding: 20px; background: white;"><div style="text-align: center; margin-bottom: 20px; padding: 10px; background: #f8f9fa;"><span style="font-size: 10px; letter-spacing: 2px; color: #dc2626; font-weight: 600;">STRICTLY CONFIDENTIAL — FOR NAMED RECIPIENT ONLY</span></div>${proj.investorVerificationLetter}</div>`;
-  const printArea = document.getElementById('printArea');
-  printArea.innerHTML = printHtml;
-  printArea.style.display = 'block';
-  window.print();
-  printArea.style.display = 'none';
-}
-
-async function showFirstLoginIVLModal() {
-  const proj = projects.find(p => p.id === currentProjectId);
-  if (!proj || proj.ivrLetterAcknowledged) return;
-  const flagKey = `firstLoginIVL_${currentClient.id}`;
-  if (localStorage.getItem(flagKey) === 'seen') return;
-  if (!proj.investorVerificationLetter) { await generateAndStoreIVL(currentClient.id, currentProjectId); const updatedProj = projects.find(p => p.id === currentProjectId); if (updatedProj) proj.investorVerificationLetter = updatedProj.investorVerificationLetter; }
-  const modalHtml = `<div id="ivlFirstLoginModal" class="modal-overlay active"><div class="modal ivl-modal"><div class="modal-header"><h3><i class="fas fa-shield-alt"></i> Important Document — Please Read</h3><button class="modal-close" onclick="closeIVLModal()">✕</button></div><div class="modal-body ivl-modal-body"><div class="ivl-modal-banner"><i class="fas fa-info-circle"></i> Croft Finance has issued the following formal verification letter regarding your capital partner. Please read this carefully before proceeding.</div>${proj.investorVerificationLetter}</div><div class="modal-footer" style="padding: 20px 24px; border-top: 1px solid var(--gray-100); display: flex; gap: 12px; justify-content: flex-end;"><button class="btn btn-outline" onclick="printInvestorVerificationLetter('${currentProjectId}')"><i class="fas fa-download"></i> Download for Your Records</button><button id="ivlAcknowledgeBtn" class="btn btn-primary ivl-read-button disabled" disabled><i class="fas fa-check-circle"></i> I Have Read and Understood This Letter</button></div></div></div>`;
-  document.body.insertAdjacentHTML('beforeend', modalHtml);
-  setTimeout(() => { const btn = document.getElementById('ivlAcknowledgeBtn'); if (btn) { btn.classList.remove('disabled'); btn.classList.add('active'); btn.disabled = false; } }, 10000);
-}
-
-async function acknowledgeIVL() {
-  const proj = projects.find(p => p.id === currentProjectId);
-  if (!proj) return;
-  const updates = { ivrLetterAcknowledged: true, ivrLetterAcknowledgedAt: new Date().toISOString() };
-  Object.assign(proj, updates);
-  await fbUpdate('projects', currentProjectId, updates);
-  await logAudit('IVL Acknowledged', 'Client acknowledged Investor Verification Letter', currentClient.id, currentProjectId);
-  localStorage.setItem(`firstLoginIVL_${currentClient.id}`, 'seen');
-  closeIVLModal();
-  showToast('Thank you for acknowledging this important document.');
-  updateIVLDocumentCard();
-}
-
-function closeIVLModal() { const modal = document.getElementById('ivlFirstLoginModal'); if (modal) modal.remove(); }
-
-function updateIVLDocumentCard() {
-  const proj = projects.find(p => p.id === currentProjectId);
-  if (!proj || !proj.investorVerificationLetter) { document.getElementById('ivlDocumentCard').style.display = 'none'; return; }
-  document.getElementById('ivlDocumentCard').style.display = 'block';
-  const issueDate = proj.investorVerificationLetterDate ? new Date(proj.investorVerificationLetterDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Not dated';
-  document.getElementById('ivlIssueDate').textContent = issueDate;
-  const year = new Date().getFullYear();
-  const refNumber = `CF-${year}-${String(currentProjectId).slice(-4)}/IVL`;
-  document.getElementById('ivlReference').textContent = refNumber;
-  if (proj.ivrLetterAcknowledged) {
-    document.getElementById('ivlAcknowledgedStatus').style.display = 'inline-flex';
-    const ackDate = new Date(proj.ivrLetterAcknowledgedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-    document.getElementById('ivlAcknowledgedTimestamp').textContent = `Acknowledged on ${ackDate}`;
-  } else {
-    document.getElementById('ivlAcknowledgedStatus').style.display = 'none';
-    document.getElementById('ivlAcknowledgedTimestamp').textContent = '';
+function sendAdminReply(clientId) {
+  const textarea = document.getElementById('replyBox_' + clientId);
+  const content = textarea?.value.trim();
+  if (!content) return;
+  const id = String(Date.now());
+  const client = clients.find(c => c.id === clientId || c.id === String(clientId));
+  const proj = projects.find(p => p.clientId === clientId);
+  const msg = { id, clientId: String(clientId), clientName: client?.name || '', sender: 'admin', content, timestamp: new Date().toISOString() };
+  messages.push(msg);
+  fbSet('messages', id, msg).then(() => { renderAdminMessages(); if (currentClient && String(currentClient.id) === String(clientId)) loadMessages(); fbReload(); });
+  if (textarea) textarea.value = '';
+  showToast('Reply sent to ' + (client?.name || 'client'));
+  logAudit('Admin replied to client', content.substring(0, 60), String(clientId));
+  logClientActivity(clientId, proj?.id || '', 'message_received', 'New message from Suzana Aleksić', 'croft');
+  if (client && client.email) {
+    sendEmail(client.email, `📨 New Message from Croft Finance - Regarding Your Project`, `Dear ${client.name},\n\nYou have received a new message from Suzana Aleksić regarding your project.\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nMESSAGE:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n${content}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nACTION REQUIRED:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nPlease log in to your client portal to view and respond to this message.\n\nPortal URL: ${window.location.origin}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nBest regards,\nSuzana Aleksić\nPrincipal, Croft Finance`).catch(() => {});
   }
 }
 
-function showIVLModal() {
-  const proj = projects.find(p => p.id === currentProjectId);
-  if (!proj || !proj.investorVerificationLetter) return;
-  const modalHtml = `<div id="ivlViewModal" class="modal-overlay active"><div class="modal ivl-modal"><div class="modal-header"><h3><i class="fas fa-shield-alt"></i> Capital Partner Verification Letter</h3><button class="modal-close" onclick="closeIVLViewModal()">✕</button></div><div class="modal-body ivl-modal-body">${proj.investorVerificationLetter}</div><div class="modal-footer" style="padding: 20px 24px; border-top: 1px solid var(--gray-100); display: flex; gap: 12px; justify-content: flex-end;"><button class="btn btn-outline" onclick="printInvestorVerificationLetter('${currentProjectId}'); closeIVLViewModal();"><i class="fas fa-download"></i> Download PDF</button><button class="btn btn-primary" onclick="closeIVLViewModal()">Close</button></div></div></div>`;
-  document.body.insertAdjacentHTML('beforeend', modalHtml);
+function activateClient(id) {
+  const client = clients.find(c => c.id === id || c.id === String(id));
+  if (!client) return;
+  fbUpdate('clients', id, { status: 'active' }).then(async () => {
+    const cp = projects.filter(p => p.clientId === id || p.id === String(id));
+    for (const p of cp) await fbUpdate('projects', p.id, { status: 'active' });
+    await logAudit('Client activated', client.name, String(id));
+    await logClientActivity(client.id, cp[0]?.id || '', 'portal_activated', 'Your portal was activated by Croft Finance', 'croft');
+    
+    if (cp[0]) await generateAndStoreIVL(client.id, cp[0].id);
+    
+    sendEmail(client.email, '✅ Croft Finance — Portal Access Activated',
+      `Dear ${client.name},\n\nGreat news! Your Croft Finance client portal has been activated.\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nLOGIN INFORMATION:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n• Portal URL: ${window.location.origin}\n• Email: ${client.email}\n• Password: (the password you created during registration)\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nNEXT STEPS:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n1. Log in to your portal\n2. Review your project dashboard\n3. Upload any required documents\n4. Your deal advisor (Suzana) will guide you through the 8-step closing process\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nSUPPORT:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nIf you have any questions, reply to this email or contact:\nSuzana Aleksić\nPrincipal, Croft Finance\nsuzana.aleksic@croftfinance.com\n+381 69 288 0 191\n\nWelcome to Croft Finance. We look forward to working with you.\n\nBest regards,\nSuzana Aleksić\nPrincipal, Croft Finance`).catch(() => {});
+    
+    showToast(client.name + ' activated. Access email sent to client.');
+    if (cp.length) editProject(cp[0].id);
+    fbReload();
+  });
 }
-function closeIVLViewModal() { const modal = document.getElementById('ivlViewModal'); if (modal) modal.remove(); }
+
+function editProject(id) {
+  const proj = projects.find(p => p.id === id || p.id === String(id));
+  if (!proj) return;
+  const fields = {
+    editProjectName: 'name', editIndustry: 'industry', editLocation: 'location', editTotalCost: 'totalCost',
+    editSponsorEquity: 'sponsorEquity', editFundsNeeded: 'fundsNeeded', editCurrentStage: 'currentStage',
+    editUseOfFunds: 'useOfFunds', editTargetIRR: 'targetIRR', editCloseDate: 'targetCloseDate',
+    editMOIC: 'moic', editCapRate: 'capRate', editExitStrategy: 'exitStrategy', editExitCapRate: 'exitCapRate',
+    editPermits: 'permits', editRevenue: 'revenue', editAssetClass: 'assetClass', editInfraType: 'infraType',
+    editCommodity: 'commodity', editMiningStage: 'miningStage', editReserveLife: 'reserveLife', editDataRoom: 'dataRoom',
+    editAmount: 'amount', editRate: 'interestRate', editTerm: 'term', editGrace: 'gracePeriod',
+    editECF: 'ecf', editNext: 'nextMilestone', editExpiry: 'termSheetExpiry', editGovLaw: 'govLaw', editAdminNote: 'adminNote', editAdvisorNote: 'advisorNote'
+  };
+  Object.entries(fields).forEach(([elId, key]) => { const el = document.getElementById(elId); if (el) el.value = proj[key] || ''; });
+  document.getElementById('editStep').value = proj.step || 1;
+  document.getElementById('editCommitFee').value = proj.commitFeeStatus || 'pending';
+  document.getElementById('editCommitFeeDate').value = proj.commitFeeDate || '';
+  document.getElementById('editECFStatus').value = proj.ecfStatus || 'pending';
+  document.getElementById('editECFDate').value = proj.ecfDate || '';
+  document.getElementById('editFundedDate').value = proj.fundedDate || '';
+  document.getElementById('editCommitFeeDeadline').value = proj.commitFeeDeadline || '';
+  document.getElementById('editDeedExpiry').value = proj.deedExpiryDate || '';
+  document.getElementById('editECFPolicyExpiry').value = proj.ecfPolicyExpiryDate || '';
+  
+  window.editProjectId = id;
+  updateIVLAdminInfo();
+  openModal('editProjectModal');
+}
 
 function updateIVLAdminInfo() {
   const proj = projects.find(p => p.id === window.editProjectId);
@@ -5736,21 +5205,126 @@ function updateIVLAdminInfo() {
   container.innerHTML = `<div style="font-size: 12px; margin-bottom: 8px;"><strong>Issue Date:</strong> ${issueDate}</div><div style="font-size: 12px; margin-bottom: 8px;"><strong>Acknowledgment Status:</strong> ${ackStatus}</div>`;
 }
 
-async function previewIVLFromAdmin() {
+function previewIVLFromAdmin() {
   const proj = projects.find(p => p.id === window.editProjectId);
   if (!proj) return;
   let letterHtml = proj.investorVerificationLetter;
-  if (!letterHtml) letterHtml = await generateAndStoreIVL(proj.clientId, window.editProjectId);
+  if (!letterHtml) letterHtml = generateInvestorVerificationLetter(proj.clientId, window.editProjectId);
   const modalHtml = `<div id="ivlPreviewModal" class="modal-overlay active"><div class="modal ivl-modal"><div class="modal-header"><h3><i class="fas fa-shield-alt"></i> Investor Verification Letter — ${proj.name}</h3><button class="modal-close" onclick="closeIVLPreviewModal()">✕</button></div><div class="modal-body ivl-modal-body">${letterHtml}</div><div class="modal-footer" style="padding: 20px 24px; border-top: 1px solid var(--gray-100); display: flex; gap: 12px; justify-content: flex-end;"><button class="btn btn-outline" onclick="printInvestorVerificationLetter('${window.editProjectId}'); closeIVLPreviewModal();">Print</button><button class="btn btn-primary" onclick="closeIVLPreviewModal()">Close</button></div></div></div>`;
   document.body.insertAdjacentHTML('beforeend', modalHtml);
 }
 
-async function regenerateIVL() {
+function closeIVLPreviewModal() { const modal = document.getElementById('ivlPreviewModal'); if (modal) modal.remove(); }
+
+function regenerateIVL() {
   if (!confirm('Regenerate the Investor Verification Letter? This will replace the existing letter.')) return;
   const proj = projects.find(p => p.id === window.editProjectId);
-  if (proj) { await generateAndStoreIVL(proj.clientId, window.editProjectId); updateIVLAdminInfo(); showToast('Investor Verification Letter regenerated'); }
+  if (proj) { generateAndStoreIVL(proj.clientId, window.editProjectId); updateIVLAdminInfo(); showToast('Investor Verification Letter regenerated'); }
 }
-function closeIVLPreviewModal() { const modal = document.getElementById('ivlPreviewModal'); if (modal) modal.remove(); }
+
+function saveProjectInfo() {
+  const id = window.editProjectId;
+  const proj = projects.find(p => p.id === id || p.id === String(id));
+  const newStep = parseInt(document.getElementById('editStep').value) || 1;
+  const stepDates = { ...(proj?.stepDates || {}) };
+  let stepAdvanced = false;
+  if (proj && newStep !== (proj.step || 1)) {
+    const today = new Date().toISOString().split('T')[0];
+    for (let s = proj.step || 1; s < newStep; s++) { if (!stepDates[s]) stepDates[s] = today; }
+    if (!stepDates[newStep]) stepDates[newStep] = today;
+    stepAdvanced = true;
+  }
+  const note = document.getElementById('editAdminNote').value.trim();
+  const advisorNote = document.getElementById('editAdvisorNote').value.trim();
+  const updates = {
+    name: document.getElementById('editProjectName').value,
+    industry: document.getElementById('editIndustry').value,
+    location: document.getElementById('editLocation').value,
+    totalCost: document.getElementById('editTotalCost').value,
+    sponsorEquity: document.getElementById('editSponsorEquity').value,
+    fundsNeeded: document.getElementById('editFundsNeeded').value,
+    currentStage: document.getElementById('editCurrentStage').value,
+    useOfFunds: document.getElementById('editUseOfFunds').value,
+    targetIRR: document.getElementById('editTargetIRR').value,
+    targetCloseDate: document.getElementById('editCloseDate').value,
+    moic: document.getElementById('editMOIC').value,
+    capRate: document.getElementById('editCapRate').value,
+    exitStrategy: document.getElementById('editExitStrategy').value,
+    exitCapRate: document.getElementById('editExitCapRate').value,
+    permits: document.getElementById('editPermits').value,
+    revenue: document.getElementById('editRevenue').value,
+    assetClass: document.getElementById('editAssetClass').value,
+    infraType: document.getElementById('editInfraType').value,
+    commodity: document.getElementById('editCommodity').value,
+    miningStage: document.getElementById('editMiningStage').value,
+    reserveLife: document.getElementById('editReserveLife').value,
+    dataRoom: document.getElementById('editDataRoom').value,
+    amount: document.getElementById('editAmount').value,
+    interestRate: document.getElementById('editRate').value,
+    term: document.getElementById('editTerm').value,
+    gracePeriod: document.getElementById('editGrace').value,
+    ecf: document.getElementById('editECF').value,
+    nextMilestone: document.getElementById('editNext').value,
+    step: newStep, status: 'active', stepDates,
+    termSheetExpiry: document.getElementById('editExpiry').value,
+    govLaw: document.getElementById('editGovLaw').value,
+    commitFeeStatus: document.getElementById('editCommitFee').value,
+    commitFeeDate: document.getElementById('editCommitFeeDate').value,
+    ecfStatus: document.getElementById('editECFStatus').value,
+    ecfDate: document.getElementById('editECFDate').value,
+    fundedDate: document.getElementById('editFundedDate').value,
+    commitFeeDeadline: document.getElementById('editCommitFeeDeadline').value,
+    deedExpiryDate: document.getElementById('editDeedExpiry').value,
+    ecfPolicyExpiryDate: document.getElementById('editECFPolicyExpiry').value,
+    adminNote: note,
+    adminNoteDate: note ? new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '',
+    advisorNote: advisorNote
+  };
+  if (!proj) return;
+  Object.assign(proj, updates);
+  fbUpdate('projects', id, updates).then(async () => {
+    await logAudit('Project updated', 'Step ' + newStep + ': ' + STEP_NAMES[newStep], proj.clientId, String(id));
+    if (stepAdvanced) {
+      await logClientActivity(proj.clientId, id, 'step_advanced', `Your deal advanced to Step ${newStep}: ${STEP_NAMES[newStep]}`, 'croft');
+    }
+    if (note && note !== proj.adminNote) {
+      await logClientActivity(proj.clientId, id, 'admin_note_added', 'Your advisor added a note to your file', 'croft');
+    }
+    closeModal('editProjectModal');
+    showToast('Project updated');
+    if (currentClient && String(currentClient.id) === String(proj.clientId)) { currentProjectId = id; loadCurrentProjectData(); }
+    fbReload();
+  });
+}
+
+function deleteClient(id) {
+  if (!confirm('Delete this client and all their data? This cannot be undone.')) return;
+  const client = clients.find(c => c.id === id || c.id === String(id));
+  clients = clients.filter(c => c.id !== id && c.id !== String(id));
+  projects = projects.filter(p => p.clientId !== id && p.clientId !== String(id));
+  messages = messages.filter(m => m.clientId !== id && m.clientId !== String(id));
+  meetings = meetings.filter(m => m.clientId !== id && m.clientId !== String(id));
+  fbDelete('clients', id).then(() => { fbReload(); logAudit('Client deleted', client?.name || '', String(id)); showToast('Client deleted'); });
+}
+
+function deleteProject(id) {
+  if (!confirm('Delete this project?')) return;
+  projects = projects.filter(p => p.id !== id && p.id !== String(id));
+  fbDelete('projects', id).then(() => { fbReload(); showToast('Project deleted'); });
+}
+
+function approveDocument(id) {
+  const doc = documents.find(d => d.id === id || d.id === String(id));
+  if (!doc) return;
+  doc.approved = true;
+  fbUpdate('documents', id, { approved: true }).then(() => { renderAdminDocumentsTable(); if (currentClient) renderDocuments(); showToast('Document approved'); logAudit('Document approved', doc.type, String(doc.clientId), String(doc.projectId)); logClientActivity(doc.clientId, doc.projectId, 'document_approved', `Croft Finance approved: ${doc.type || doc.name}`, 'croft'); });
+}
+
+function deleteDocument(id) {
+  if (!confirm('Delete this document?')) return;
+  documents = documents.filter(d => d.id !== id && d.id !== String(id));
+  fbDelete('documents', id).then(() => { fbReload(); showToast('Document deleted'); });
+}
 
 function showAddClientModal() {
   const fields = ['ncName', 'ncEmail', 'ncPassword', 'ncProject', 'ncIndustry', 'ncLocation', 'ncTotalCost', 'ncSponsorEquity', 'ncFundsNeeded', 'ncCurrentStage', 'ncUseOfFunds', 'ncTargetIRR', 'ncCloseDate', 'ncMOIC', 'ncCapRate', 'ncExitStrategy', 'ncExitCapRate', 'ncPermits', 'ncRevenue', 'ncAssetClass', 'ncInfraType', 'ncCommodity', 'ncMiningStage', 'ncReserveLife', 'ncDataRoom', 'ncAmount', 'ncRate', 'ncTerm', 'ncGrace', 'ncECF', 'ncGovLaw', 'ncExpiry', 'ncMilestone'];
@@ -5904,6 +5478,211 @@ function saveDocument(clientId, projectId, docType, url) {
   });
   document.getElementById('pdfFile').value = '';
   document.getElementById('documentUrl').value = '';
+}
+
+// ============================================================
+// ADMIN NOTIFICATIONS
+// ============================================================
+function loadAdminNotifications() {
+  const saved = localStorage.getItem('croft_admin_notifications');
+  if (saved) adminNotifications = JSON.parse(saved);
+  const savedCount = localStorage.getItem('croft_admin_unread_count');
+  if (savedCount) adminUnreadCount = parseInt(savedCount) || 0;
+  updateAdminBellBadge();
+  renderAdminNotificationDropdown();
+}
+
+function updateAdminBellBadge() {
+  const badge = document.getElementById('adminNotificationBadge');
+  if (badge) {
+    if (adminUnreadCount > 0) {
+      badge.textContent = adminUnreadCount > 9 ? '9+' : adminUnreadCount;
+      badge.style.display = 'flex';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+}
+
+function toggleAdminNotifications() {
+  const dropdown = document.getElementById('adminNotificationDropdown');
+  if (dropdown.classList.contains('open')) dropdown.classList.remove('open');
+  else {
+    dropdown.classList.add('open');
+    adminUnreadCount = 0;
+    adminNotifications.forEach(n => n.read = true);
+    updateAdminBellBadge();
+    saveAdminNotifications();
+    renderAdminNotificationDropdown();
+  }
+}
+
+function closeAdminNotifications() { document.getElementById('adminNotificationDropdown').classList.remove('open'); }
+
+function renderAdminNotificationDropdown() {
+  const container = document.getElementById('adminNotificationList');
+  if (!container) return;
+  if (adminNotifications.length === 0) {
+    container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--gray-400);">No notifications</div>';
+    return;
+  }
+  container.innerHTML = adminNotifications.slice(0, 20).map(n => {
+    const timeAgo = getRelativeTime(new Date(n.timestamp));
+    const iconMap = { message: 'fa-comments', meeting: 'fa-calendar', document: 'fa-file-alt', registration: 'fa-user-plus', submission: 'fa-handshake' };
+    const icon = iconMap[n.type] || 'fa-bell';
+    return `<div class="notification-item ${n.read ? '' : 'unread'}" onclick="handleAdminNotificationClick('${n.type}', ${JSON.stringify(n.data).replace(/"/g, '&quot;')})"><div style="display:flex;align-items:flex-start;gap:12px;"><div class="notification-icon" style="background:rgba(44,95,138,0.1);"><i class="fas ${icon}" style="color:var(--blue);"></i></div><div class="notification-content"><div class="notification-title">${escapeHtml(n.title)}</div><div class="notification-message">${escapeHtml(n.message.substring(0, 80))}${n.message.length > 80 ? '...' : ''}</div><div class="notification-time">${timeAgo}</div></div></div></div>`;
+  }).join('');
+}
+
+function saveAdminNotifications() { localStorage.setItem('croft_admin_notifications', JSON.stringify(adminNotifications)); localStorage.setItem('croft_admin_unread_count', adminUnreadCount); }
+
+function handleAdminNotificationClick(type, data) { closeAdminNotifications(); if (type === 'message') switchAdminTab('messages-admin', document.querySelector('[onclick*="messages-admin"]')); else if (type === 'meeting') switchAdminTab('meetings', document.querySelector('[onclick*="meetings"]')); else if (type === 'document') switchAdminTab('documents-admin', document.querySelector('[onclick*="documents-admin"]')); else if (type === 'registration' || type === 'submission') switchAdminTab('clients', document.querySelector('[onclick*="clients"]')); }
+
+function initAdminListeners() {
+  if (!firebaseReady) return;
+  adminSessionStart = new Date();
+}
+
+function stopAdminListeners() {
+  // No-op for now
+}
+
+function renderAdminBrokerSubmissionsTable() {
+  const container = document.getElementById('adminBrokerSubmissionsTable');
+  if (!container) return;
+  container.innerHTML = brokerSubmissions.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).map(s => `
+    <tr>
+      <td style="vertical-align:middle;font-size:12px;">${new Date(s.createdAt).toLocaleDateString()}</td>
+      <td style="vertical-align:middle;">${escapeHtml(s.brokerName)}</td>
+      <td style="vertical-align:middle;">${escapeHtml(s.clientName)}</td>
+      <td style="vertical-align:middle;">${escapeHtml(s.projectName)}</td>
+      <td style="vertical-align:middle;">$${s.fundsNeeded || 'TBD'}</td>
+      <td style="vertical-align:middle;"><span class="status-badge-${s.status === 'pending' ? 'pending' : s.status === 'active' ? 'active' : 'funded'}">${s.status === 'pending' ? 'Pending Review' : s.status === 'active' ? 'Active' : 'Funded'}</span></td>
+      <td style="vertical-align:middle;"><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="viewBrokerSubmission('${s.id}')">View</button></td>
+    </tr>
+  `).join('');
+}
+
+function viewBrokerSubmission(submissionId) {
+  const s = brokerSubmissions.find(x => x.id === submissionId);
+  if (!s) return;
+  const broker = brokers.find(b => b.id === s.brokerId);
+  const modalHtml = `
+  <div id="brokerSubmissionModal" class="modal-overlay active">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Broker Submission</h3>
+        <button class="modal-close" onclick="document.getElementById('brokerSubmissionModal').remove()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="project-details-grid">
+          <div class="project-detail-item"><div class="project-detail-label">Broker</div><div class="project-detail-value">${escapeHtml(s.brokerName)}</div></div>
+          <div class="project-detail-item"><div class="project-detail-label">Broker Firm</div><div class="project-detail-value">${escapeHtml(broker?.firm || '—')}</div></div>
+          <div class="project-detail-item"><div class="project-detail-label">Client Name</div><div class="project-detail-value">${escapeHtml(s.clientName)}</div></div>
+          <div class="project-detail-item"><div class="project-detail-label">Client Email</div><div class="project-detail-value">${escapeHtml(s.clientEmail)}</div></div>
+          <div class="project-detail-item"><div class="project-detail-label">Project</div><div class="project-detail-value">${escapeHtml(s.projectName)}</div></div>
+          <div class="project-detail-item"><div class="project-detail-label">Industry</div><div class="project-detail-value">${escapeHtml(s.industry || '—')}</div></div>
+          <div class="project-detail-item"><div class="project-detail-label">Location</div><div class="project-detail-value">${escapeHtml(s.location || '—')}</div></div>
+          <div class="project-detail-item"><div class="project-detail-label">Funds Needed</div><div class="project-detail-value">$${escapeHtml(s.fundsNeeded || '—')}</div></div>
+          <div class="project-detail-item"><div class="project-detail-label">Status</div><div class="project-detail-value">${s.status}</div></div>
+          <div class="project-detail-item"><div class="project-detail-label">Submitted</div><div class="project-detail-value">${new Date(s.createdAt).toLocaleString()}</div></div>
+        </div>
+        ${s.description ? `<div class="note-card" style="margin-top:16px;"><div class="note-card-label">Description</div><div class="note-card-text">${escapeHtml(s.description)}</div></div>` : ''}
+        <div style="display:flex;gap:12px;margin-top:20px;">
+          <button class="btn btn-primary" onclick="convertSubmissionToClient('${s.id}')">Convert to Client</button>
+          <button class="btn btn-outline" onclick="document.getElementById('brokerSubmissionModal').remove()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+function convertSubmissionToClient(submissionId) {
+  const s = brokerSubmissions.find(x => x.id === submissionId);
+  if (!s) return;
+  document.getElementById('brokerSubmissionModal')?.remove();
+  showAddClientModal();
+  setTimeout(() => {
+    const ncName = document.getElementById('ncName');
+    const ncEmail = document.getElementById('ncEmail');
+    const ncProject = document.getElementById('ncProject');
+    const ncIndustry = document.getElementById('ncIndustry');
+    const ncLocation = document.getElementById('ncLocation');
+    const ncFundsNeeded = document.getElementById('ncFundsNeeded');
+    if (ncName) ncName.value = s.clientName;
+    if (ncEmail) ncEmail.value = s.clientEmail;
+    if (ncProject) ncProject.value = s.projectName;
+    if (ncIndustry) ncIndustry.value = s.industry || '';
+    if (ncLocation) ncLocation.value = s.location || '';
+    if (ncFundsNeeded) ncFundsNeeded.value = s.fundsNeeded || '';
+  }, 300);
+}
+
+function checkAllExpiries() {
+  // Placeholder for expiry checking
+}
+
+function checkForNotifications() {
+  // Placeholder for notifications
+}
+
+function renderAuditLog() {
+  const container = document.getElementById('auditLogList');
+  if (!container) return;
+  if (!auditLog.length) { container.innerHTML = '<p style="color:var(--gray-400);font-size:13px;">No audit entries yet.</p>'; return; }
+  container.innerHTML = auditLog.slice(0, 50).map(e => `<div class="audit-entry"><div class="audit-time">${new Date(e.timestamp).toLocaleString()}</div><div><div class="audit-action">${escapeHtml(e.action)}</div><div class="audit-detail">${escapeHtml(e.details || '')} ${e.performedBy ? '· ' + e.performedBy : ''}</div></div></div>`).join('');
+}
+
+function renderMeetings() {
+  const container = document.getElementById('meetingsList');
+  if (!container) return;
+  if (!meetings.length) { container.innerHTML = '<p style="color:var(--gray-400);font-size:13px;">No meeting requests yet.</p>'; return; }
+  container.innerHTML = [...meetings].reverse().map(m => `<div class="card"><div class="card-body" style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;"><div><strong>${escapeHtml(m.clientName)}</strong> <span class="badge ${m.status === 'confirmed' ? 'badge-green' : m.status === 'cancelled' ? 'badge-red' : 'badge-blue'}">${m.status}</span><div style="font-size:13px;margin-top:6px;">${m.type} — ${m.date || 'TBD'} ${m.time || ''}</div>${m.notes ? `<div style="font-size:12px;color:var(--gray-500);margin-top:4px;">${escapeHtml(m.notes)}</div>` : ''}</div><div style="display:flex;gap:8px;flex-shrink:0;"><button class="btn btn-success" style="padding:5px 12px;font-size:11px;" onclick="updateMeetingStatus('${m.id}','confirmed')">Confirm</button><button class="btn btn-outline" style="padding:5px 12px;font-size:11px;" onclick="updateMeetingStatus('${m.id}','cancelled')">Decline</button></div></div></div>`).join('');
+}
+
+function updateMeetingStatus(id, status) {
+  const m = meetings.find(x => x.id === id || x.id === String(id));
+  if (m) m.status = status;
+  fbUpdate('meetings', id, { status }).then(() => { renderMeetings(); showToast('Meeting ' + status); });
+}
+
+function scheduleMeeting() {
+  const id = String(Date.now());
+  const meeting = { id, clientId: String(currentClient.id), clientName: currentClient.name, type: document.getElementById('meetingType')?.value || 'Video Call', date: document.getElementById('meetingDate')?.value || '', time: document.getElementById('meetingTime')?.value || '', notes: document.getElementById('meetingNotes')?.value || '', status: 'pending', timestamp: new Date().toISOString() };
+  meetings.push(meeting);
+  fbSet('meetings', id, meeting).then(() => { fbReload(); });
+  sendEmail(EMAILJS_CONFIG.adminEmail, `📅 MEETING REQUEST: ${currentClient.name}`, `New meeting request from ${currentClient.name} (${currentClient.email})`).catch(() => {});
+  logClientActivity(currentClient.id, currentProjectId, 'meeting_requested', `You requested a ${meeting.type} meeting`, 'client');
+  document.getElementById('meetingDate').value = '';
+  document.getElementById('meetingTime').value = '';
+  document.getElementById('meetingNotes').value = '';
+  showToast('Meeting request sent. Suzana will confirm within 24 hours.');
+}
+
+function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
+
+function checkCookies() { if (localStorage.getItem('cookiesAccepted')) document.getElementById('cookieBanner').style.display = 'none'; }
+function acceptCookies() { localStorage.setItem('cookiesAccepted', '1'); document.getElementById('cookieBanner').style.display = 'none'; }
+
+function addNotification(title, message, type) { 
+  const notification = { id: Date.now(), title, message, type, timestamp: new Date().toISOString(), read: false }; 
+  notifications.unshift(notification); 
+  if (notifications.length > 50) notifications.pop(); 
+  renderNotifications(); 
+}
+function renderNotifications() { 
+  const container = document.getElementById('notificationList'); 
+  if (!container) return; 
+  if (notifications.length === 0) { container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--gray-400);">No notifications</div>'; return; } 
+  container.innerHTML = notifications.map(n => `<div class="notification-item ${n.read ? '' : 'unread'}"><div class="notification-icon"><i class="fas ${n.type === 'success' ? 'fa-check-circle' : n.type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'}"></i></div><div class="notification-content"><div class="notification-title">${escapeHtml(n.title)}</div><div class="notification-message">${escapeHtml(n.message)}</div><div class="notification-time">${new Date(n.timestamp).toLocaleString()}</div></div></div>`).join(''); 
+}
+function markAllNotificationsRead() { notifications.forEach(n => n.read = true); renderNotifications(); }
+
+function requestBrowserNotificationPermission() {
+  if ('Notification' in window && !browserNotificationPermission) {
+    Notification.requestPermission().then(permission => { browserNotificationPermission = permission === 'granted'; });
+  }
 }
 
 init();
