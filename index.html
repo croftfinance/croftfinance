@@ -3101,12 +3101,13 @@ async function initFirebase() {
     db = firebase.firestore();
     storage = firebase.storage();
     
-    await db.enablePersistence({ synchronizeTabs: true })
-      .catch(err => {
-        if (err.code === 'failed-precondition') {
-          console.warn('Multiple tabs open, persistence disabled');
-        }
-      });
+const settings = {
+  cache: {
+    sizeBytes: 50 * 1024 * 1024, // 50 MB cache size
+    tabSynchronization: true    // enables multi-tab sync
+  }
+};
+db.settings(settings);
     
     firebaseReady = true;
     
