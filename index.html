@@ -4391,7 +4391,6 @@ function renderAdminTables() {
     if(cTbody) {
         cTbody.innerHTML = clients.map(c => {
             const p = projects.find(x => x.clientId === c.id);
-            // Calculate completed steps for this client
             let completedSteps = 0;
             if(p) {
                 for(let i = 1; i <= 8; i++) {
@@ -4414,43 +4413,51 @@ function renderAdminTables() {
         }).join('');
     }
 
-    // Projects Table with step completion badges
+    // Projects Table - FIXED VERSION
     const pTbody = document.getElementById('adminProjectsTable');
     if(pTbody) {
-        pTbody.innerHTML = projects.map(p => {
-            const c = clients.find(cl => cl.id === p.clientId);
-            // Calculate completed steps
-            let completedSteps = 0;
-            for(let i = 1; i <= 8; i++) {
-                if(p[`step${i}Completed`]) completedSteps++;
-            }
-            const stepStatus = p.step || 1;
-            
-            // Create step indicator dots
-            let stepDots = '';
-            for(let i = 1; i <= 8; i++) {
-                const isCompleted = p[`step${i}Completed`];
-                stepDots += `<span style="display:inline-block; width:20px; height:20px; border-radius:50%; background:${isCompleted ? 'var(--success)' : (i === stepStatus ? 'var(--blue)' : 'var(--gray-300)')}; margin-right:4px; font-size:10px; text-align:center; line-height:20px; color:white;">${isCompleted ? '✓' : i}</span>`;
-            }
-            
-            return `
-            <tr>
-                <td>${escapeHtml(c?.name || 'Unknown')}</td>
-                <td><strong>${escapeHtml(p.name)}</strong><br><span style="font-size:10px;">${stepDots}</span></td>
-                <td>${escapeHtml(p.industry || '—')}</td>
-                <td>${escapeHtml(p.location || '—')}</td>
-                <td>${escapeHtml(p.fundsNeeded || p.amount || 'TBD')}</td>
-                <td><span class="badge badge-navy">Step ${stepStatus}/8</span><br><span style="font-size:10px;">${completedSteps} completed</span></td>
-                <td>
-                    <button class="btn btn-outline" style="padding:4px 8px;font-size:10px;margin-right:4px;" onclick="editProject('${p.id}')">Edit</button>
-                    <button class="btn btn-danger" style="padding:4px 8px;font-size:10px;" onclick="deleteProject('${p.id}', event)">Delete</button>
-                </td>
-            </tr>
-            `;
-        }).join('');
+        if(projects.length === 0) {
+            pTbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:40px;">No projects found. Click "+ Add Client & Project" to create one.</td></tr>';
+        } else {
+            pTbody.innerHTML = projects.map(p => {
+                // Find client - IMPORTANT FIX
+                const c = clients.find(cl => cl && cl.id === p.clientId);
+                const clientName = c ? c.name : 'Unknown Client';
+                
+                // Calculate completed steps correctly
+                let completedSteps = 0;
+                for(let i = 1; i <= 8; i++) {
+                    if(p[`step${i}Completed`] === true) completedSteps++;
+                }
+                const stepStatus = p.step || 1;
+                
+                // Create step indicator dots
+                let stepDots = '';
+                for(let i = 1; i <= 8; i++) {
+                    const isCompleted = p[`step${i}Completed`] === true;
+                    stepDots += `<span style="display:inline-block; width:20px; height:20px; border-radius:50%; background:${isCompleted ? '#2b8c4e' : (i === stepStatus ? '#2c5f8a' : '#dee2e6')}; margin-right:4px; font-size:10px; text-align:center; line-height:20px; color:white;">${isCompleted ? '✓' : i}</span>`;
+                }
+                
+                return `
+                <tr>
+                    <td><strong>${escapeHtml(clientName)}</strong></td>
+                    <td><strong>${escapeHtml(p.name)}</strong><br><span style="font-size:10px;">${stepDots}</span></td>
+                    <td>${escapeHtml(p.industry || '—')}</td>
+                    <td>${escapeHtml(p.location || '—')}</td>
+                    <td>${escapeHtml(p.fundsNeeded || p.amount || 'TBD')}</td>
+                    <td><span class="badge badge-navy">Step ${stepStatus}/8</span><br><span style="font-size:10px; color:${completedSteps > 0 ? '#2b8c4e' : '#6c757d'};">${completedSteps} completed</span></td>
+                    <td>—</td><td>—</td>
+                    <td>
+                        <button class="btn btn-outline" style="padding:4px 8px;font-size:10px;margin-right:4px;" onclick="editProject('${p.id}')">Edit</button>
+                        <button class="btn btn-danger" style="padding:4px 8px;font-size:10px;" onclick="deleteProject('${p.id}', event)">Delete</button>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        }
     }
     
-    // Pipeline Board with step indicators
+    // Pipeline Board
     const board = document.getElementById('pipelineBoard');
     if(board) {
         board.innerHTML = '';
@@ -4460,7 +4467,7 @@ function renderAdminTables() {
             <div class="pipeline-col">
                 <div class="pipeline-col-title">${STEP_NAMES[stepNum]}</div>
                 ${stepProjects.map(p => {
-                    const client = clients.find(c => c.id === p.clientId);
+                    const client = clients.find(c => c && c.id === p.clientId);
                     return `
                     <div class="pipeline-card" onclick="editProject('${p.id}')" style="cursor:pointer;">
                         <div class="pipeline-card-name">${escapeHtml(client?.name || 'Unknown')}</div>
@@ -4478,21 +4485,26 @@ function renderAdminTables() {
     }
     
     // Update stats
-    document.getElementById('totalClients').innerHTML = clients.filter(c => c.status === 'active').length;
-    document.getElementById('totalProjects').innerHTML = projects.filter(p => p.status === 'active').length;
+    document.getElementById('totalClients').innerHTML = clients.filter(c => c && c.status === 'active').length;
+    document.getElementById('totalProjects').innerHTML = projects.filter(p => p && p.status === 'active').length;
     document.getElementById('totalDocuments').innerHTML = documents.length;
-    document.getElementById('pendingClientsCount').innerHTML = clients.filter(c => c.status === 'pending').length;
+    document.getElementById('pendingClientsCount').innerHTML = clients.filter(c => c && c.status === 'pending').length;
 }
   
 function renderBrokerAdminTable() {
     const tbody = document.getElementById('adminBrokersTable');
     if(!tbody) return;
+    if(brokers.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px;">No brokers registered yet.</td></tr>';
+        return;
+    }
     tbody.innerHTML = brokers.map(b => `
         <tr>
             <td><strong>${escapeHtml(b.name)}</strong><br><span style="font-size:11px;color:var(--gray-500);">${escapeHtml(b.email)}</span></td>
-            <td>${escapeHtml(b.firm)}</td>
+            <td>${escapeHtml(b.firm)}</td><td>—</td>
             <td><strong>${b.commissionRate || 0}%</strong></td>
             <td><span style="color:${b.status==='active'?'var(--success)':'var(--warning)'};">${b.status}</span></td>
+            <td>${b.createdAt ? b.createdAt.split('T')[0] : '—'}</td>
             <td>
                 ${b.status==='pending' ? `<button class="btn btn-success" style="padding:4px 8px;font-size:10px;margin-right:4px;" onclick="approveBroker('${b.id}')">Approve</button>` : ''}
                 <button class="btn btn-outline" style="padding:4px 8px;font-size:10px;margin-right:4px;" onclick="setBrokerCommission('${b.id}')">Set Rate</button>
@@ -4505,12 +4517,15 @@ function renderBrokerAdminTable() {
 function renderAdminBrokerSubmissionsTable() {
     const tbody = document.getElementById('adminBrokerSubmissionsTable');
     if(!tbody) return;
+    if(brokerSubmissions.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px;">No broker submissions yet.</td></tr>';
+        return;
+    }
     tbody.innerHTML = brokerSubmissions.map(s => `
         <tr>
             <td>${s.createdAt ? s.createdAt.split('T')[0] : '—'}</td>
             <td><strong>${escapeHtml(s.brokerName)}</strong></td>
-            <td>${escapeHtml(s.clientName)}</td>
-            <td>${escapeHtml(s.projectName)}</td>
+            <td>${escapeHtml(s.clientName)}</td><td>${escapeHtml(s.projectName)}</td>
             <td>$${escapeHtml(s.fundsNeeded||'—')}</td>
             <td><span class="status-badge-${s.status==='pending'?'pending':'active'}">${s.status==='pending'?'Pending':'Accepted'}</span></td>
             <td>
