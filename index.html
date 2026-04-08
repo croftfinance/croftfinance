@@ -754,6 +754,7 @@ body {
 .badge-navy { background: rgba(10,22,40,0.08); color: var(--navy); }
 .badge-red { background: rgba(220,38,38,0.1); color: #991b1b; }
 .badge-gray { background: var(--gray-100); color: var(--gray-600); }
+.badge-warning { background: rgba(217,119,6,0.1); color: var(--warning); }
 
 .notification-center {
   position: fixed;
@@ -921,6 +922,7 @@ body {
 .btn-blue:hover { background: var(--blue-light); }
 .btn-success { background: var(--success); color: white; }
 .btn-danger { background: var(--error); color: white; }
+.btn-warning { background: var(--warning); color: white; }
 
 .modal-overlay {
   display: none; position: fixed; inset: 0;
@@ -1436,6 +1438,14 @@ body {
 .status-badge-funded {
   background: rgba(43,140,78,0.1);
   color: var(--success);
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 600;
+}
+.status-badge-rejected {
+  background: rgba(220,38,38,0.1);
+  color: var(--error);
   padding: 3px 10px;
   border-radius: 20px;
   font-size: 10px;
@@ -2716,7 +2726,8 @@ body {
       <div class="sidebar-nav">
         <div class="sidebar-section-label">Deal Room</div>
         <button class="nav-item active" onclick="switchPortalTab('dashboard',this)"><i class="fas fa-chart-line"></i> Dashboard</button>
-        <button class="nav-item" onclick="switchPortalTab('process',this)"><i class="fas fa-tasks"></i> Closing Process</button>
+        <button class="nav-item" onclick="switchPortalTab('deal-sheet',this)"><i class="fas fa-info-circle"></i> Deal Sheet</button>
+        <button class="nav-item" onclick="switchPortalTab('process',this)"><i class="fas fa-tasks"></i> Process</button>
         <button class="nav-item" onclick="switchPortalTab('checklist',this)"><i class="fas fa-clipboard-check"></i> Closing Checklist</button>
         <button class="nav-item" onclick="switchPortalTab('documents',this)"><i class="fas fa-folder-open"></i> Documents</button>
         <button class="nav-item" onclick="switchPortalTab('activity',this)"><i class="fas fa-history"></i> Activity Log</button>
@@ -2764,6 +2775,8 @@ body {
         <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-clipboard-list"></i> Your Next Steps</div></div><div class="card-body"><div class="next-steps-list" id="nextStepsList"></div></div></div>
         <div class="advisor-card"><div class="advisor-header"><div class="advisor-avatar">SA</div><div class="advisor-info"><h4>Suzana Aleksić</h4><p>Principal, Croft Finance</p></div></div><div class="advisor-details"><div class="advisor-detail"><div class="advisor-detail-label">Availability</div><div class="advisor-detail-value">Mon–Fri, 9:00–18:00 CET</div></div><div class="advisor-detail"><div class="advisor-detail-label">Response Time</div><div class="advisor-detail-value">Typically within 4 hours</div></div></div><div class="advisor-note" id="advisorNote">Looking forward to helping you close your deal successfully.</div><div class="advisor-actions"><div class="advisor-btn" onclick="switchPortalTab('messages',null)">Send Message</div><div class="advisor-btn" onclick="switchPortalTab('schedule',null)">Schedule Call</div></div></div>
       </div>
+
+      <div id="tab-deal-sheet" class="portal-tab"><div class="page-header"><div class="page-title">Deal Sheet</div><div class="page-subtitle">Detailed project information</div></div><div id="dealSheetContent"></div></div>
 
       <div id="tab-process" class="portal-tab"><div class="page-header"><div class="page-title">Closing Process</div><div class="page-subtitle">Step <span id="currentStepNum">1</span> of 8 — <span id="currentStepName">Term Sheet</span></div></div><div class="card"><div class="card-body"><div class="timeline" id="timeline"></div></div></div></div>
 
@@ -2846,7 +2859,7 @@ body {
         <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-columns"></i> Active Deal Board</div></div><div class="card-body"><div class="pipeline-board" id="pipelineBoard"></div></div></div>
       </div>
 
-      <div id="admin-clients" class="admin-tab"><div class="page-header"><div class="page-title">Clients</div><div class="page-subtitle" id="clientCount"></div></div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap;"><input type="text" id="clientSearch" class="form-input" placeholder="Search by name or email..." style="max-width:320px;" oninput="renderClientsTable()"><button class="btn btn-primary" onclick="showAddClientModal()">+ Add Client</button></div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Email</th><th>Projects</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="adminClientsTable"></tbody></table></div></div>
+      <div id="admin-clients" class="admin-tab"><div class="page-header"><div class="page-title">Clients</div><div class="page-subtitle" id="clientCount"></div></div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap;"><input type="text" id="clientSearch" class="form-input" placeholder="Search by name or email..." style="max-width:320px;" oninput="renderClientsTable()"><button class="btn btn-primary" onclick="showAddClientModal()">+ Add Client</button></div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Projects</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="adminClientsTable"></tbody></table></div></div>
 
       <div id="admin-projects-admin" class="admin-tab"><div class="page-header"><div class="page-title">Projects</div></div><div style="display:flex;justify-content:flex-end;margin-bottom:16px;"><button class="btn btn-primary" onclick="showAddClientModal()">+ Add Client & Project</button></div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Project</th><th>Industry</th><th>Location</th><th>Funds Needed</th><th>Current Step</th><th>CF</th><th>ECF</th><th>Actions</th></tr></thead><tbody id="adminProjectsTable"></tbody></table></div></div>
 
@@ -2854,7 +2867,7 @@ body {
 
       <div id="admin-brokers" class="admin-tab"><div class="page-header"><div class="page-title">Brokers & Introducers</div><div class="page-subtitle">Manage broker registrations and view their submissions</div></div><div class="card"><div class="card-body"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Broker</th><th>Firm</th><th>Country</th><th>Commission</th><th>Status</th><th>Registered</th><th>Actions</th></tr></thead><tbody id="adminBrokersTable"></tbody></table></div></div></div></div>
 
-      <div id="admin-broker-submissions" class="admin-tab"><div class="page-header"><div class="page-title">Broker Submissions</div><div class="page-subtitle">All deals submitted by brokers</div></div><div class="card"><div class="card-body"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Date</th><th>Broker</th><th>Client</th><th>Project</th><th>Funds Needed</th><th>Status</th><th>Action</th></tr></thead><tbody id="adminBrokerSubmissionsTable"></tbody></table></div></div></div></div>
+      <div id="admin-broker-submissions" class="admin-tab"><div class="page-header"><div class="page-title">Broker Submissions</div><div class="page-subtitle">All deals submitted by brokers</div></div><div class="card"><div class="card-body"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Date</th><th>Broker</th><th>Client</th><th>Project</th><th>Funds Needed</th><th>Status</th><th>Actions</th></tr></thead><tbody id="adminBrokerSubmissionsTable"></tbody></table></div></div></div></div>
 
       <div id="admin-messages-admin" class="admin-tab"><div class="page-header"><div class="page-title">Messages</div></div><div style="margin-bottom:16px;"><input type="text" id="messageSearch" class="form-input" placeholder="Search by client name..." style="max-width:320px;" oninput="renderAdminMessages()"></div><div id="allMessagesList"></div></div>
 
@@ -2879,9 +2892,9 @@ body {
       <div class="sidebar-advisor"><div class="advisor-label">Croft Finance</div><div class="advisor-name">Suzana Aleksić</div><div class="advisor-title">Principal</div><div class="advisor-contact"><i class="fas fa-envelope" style="width:14px;color:var(--blue);margin-right:4px;"></i> suzana.aleksic@croftfinance.com</div></div>
     </aside>
     <main class="main-content">
-      <div id="broker-tab-dashboard" class="portal-tab active"><div class="page-header"><div class="page-title" id="brokerDashGreeting">Welcome.</div><div class="page-subtitle">Broker Portal - Track your deal flow and commissions</div></div><div class="broker-stats-grid"><div class="stat-card"><div class="stat-label">Total Submissions</div><div class="stat-value" id="brokerTotalSubmissions">0</div></div><div class="stat-card"><div class="stat-label">Active Deals</div><div class="stat-value" id="brokerActiveDeals">0</div></div><div class="stat-card"><div class="stat-label">Funded Deals</div><div class="stat-value" id="brokerFundedDeals">0</div></div><div class="stat-card"><div class="stat-label">Est. Commission Earned</div><div class="stat-value" id="brokerEstCommission">$0</div></div></div></div>
+      <div id="broker-tab-dashboard" class="portal-tab active"><div class="page-header"><div class="page-title" id="brokerDashGreeting">Welcome.</div><div class="page-subtitle">Broker Portal - Track your deal flow and commissions</div></div><div class="broker-stats-grid"><div class="stat-card"><div class="stat-label">Your Commission Rate</div><div class="stat-value" id="brokerCommissionRate">0%</div></div><div class="stat-card"><div class="stat-label">Total Submissions</div><div class="stat-value" id="brokerTotalSubmissions">0</div></div><div class="stat-card"><div class="stat-label">Active Deals</div><div class="stat-value" id="brokerActiveDeals">0</div></div><div class="stat-card"><div class="stat-label">Funded Deals</div><div class="stat-value" id="brokerFundedDeals">0</div></div><div class="stat-card"><div class="stat-label">Est. Commission Earned</div><div class="stat-value" id="brokerEstCommission">$0</div></div></div></div>
       <div id="broker-tab-submit-deal" class="portal-tab"><div class="page-header"><div class="page-title">Submit a Deal</div><div class="page-subtitle">Introduce a client to Croft Finance</div></div><div class="card"><div class="card-body" style="max-width:600px;"><div class="form-group"><label class="form-label">Client Name *</label><input type="text" id="dealClientName" class="form-input"></div><div class="form-group"><label class="form-label">Client Email *</label><input type="email" id="dealClientEmail" class="form-input"></div><div class="form-group"><label class="form-label">Project Name *</label><input type="text" id="dealProjectName" class="form-input"></div><div class="form-grid-2"><div class="form-group"><label class="form-label">Industry</label><select id="dealIndustry" class="form-select"><option>Real Estate</option><option>Infrastructure</option><option>Energy & Renewables</option><option>Mining</option><option>Oil & Gas</option></select></div><div class="form-group"><label class="form-label">Location</label><input type="text" id="dealLocation" class="form-input" placeholder="City, Country"></div></div><div class="form-group"><label class="form-label">Funds Needed (USD) *</label><input type="text" id="dealFundsNeeded" class="form-input" placeholder="e.g., 50,000,000"></div><div class="form-group"><label class="form-label">Brief Description</label><textarea id="dealDescription" rows="4" class="form-textarea" placeholder="Project overview, use of funds, timeline..."></textarea></div><button class="btn btn-primary" onclick="submitDeal()" style="width:100%">Submit Deal to Croft Finance</button></div></div></div>
-      <div id="broker-tab-submissions" class="portal-tab"><div class="page-header"><div class="page-title">My Submissions</div><div class="page-subtitle">Track all deals you've introduced</div></div><div class="card"><div class="card-body"><div class="table-wrap"><table class="submission-table"><thead><tr><th>Date</th><th>Client</th><th>Project</th><th>Funds Needed</th><th>Status</th></tr></thead><tbody id="brokerSubmissionsList"></tbody></table></div></div></div></div>
+      <div id="broker-tab-submissions" class="portal-tab"><div class="page-header"><div class="page-title">My Submissions</div><div class="page-subtitle">Track all deals you've introduced</div></div><div class="card"><div class="card-body"><div class="table-wrap"><table class="submission-table"><thead><tr><th>Date</th><th>Client</th><th>Project</th><th>Funds Needed</th><th>Status</th><th>Client Progress</th></tr></thead><tbody id="brokerSubmissionsList"></tbody>}</div></div></div></div>
       <div id="broker-tab-messages" class="portal-tab"><div class="page-header"><div class="page-title">Messages</div><div class="page-subtitle">Secure communication with Croft Finance</div></div><div class="card"><div class="card-body"><div class="messages-container"><div class="messages-list" id="brokerMessagesList"></div><div class="message-input"><input type="text" id="brokerMessageInput" autocomplete="off" placeholder="Write a message..." onkeypress="if(event.key==='Enter')sendBrokerMessage()"><button class="btn btn-primary" onclick="sendBrokerMessage()">Send</button></div></div></div></div></div>
     </main>
   </div>
@@ -2890,7 +2903,7 @@ body {
 <!-- ========== MODALS ========== -->
 <div id="loginModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Client Portal</h3><button class="modal-close" onclick="closeModal('loginModal')">✕</button></div><div class="modal-body">
   <div id="loginForm"><div class="form-group"><label class="form-label">Email Address</label><input type="email" id="loginEmail" class="form-input" onkeypress="if(event.key==='Enter')login()"></div><div class="form-group"><label class="form-label">Password</label><input type="password" id="loginPassword" class="form-input" onkeypress="if(event.key==='Enter')login()"></div><p id="loginError" style="color:var(--error);font-size:12px;margin-bottom:12px;display:none;"></p><button class="btn btn-primary" onclick="login()" style="width:100%">Sign In</button><div style="text-align:center;margin-top:16px;font-size:13px;color:var(--gray-500);">New client? <a href="#" onclick="showRegisterForm()" style="color:var(--navy);font-weight:500;">Request portal access</a></div><div style="text-align:center;margin-top:8px;"><a href="#" onclick="showForgotPassword()" style="color:var(--gray-400);font-size:12px;">Forgot password?</a></div><div style="text-align:center;margin-top:4px;font-size:12px;"><a href="#" onclick="showBrokerLoginForm()" style="color:var(--gray-400);">Broker access</a></div><div style="text-align:center;margin-top:4px;font-size:12px;"><a href="#" onclick="showAdminLogin()" style="color:var(--gray-400);">Admin access</a></div></div>
-  <div id="registerForm" style="display:none;"><div style="max-height:60vh;overflow-y:auto;padding-right:10px;"><div class="form-grid-2"><div class="form-group"><label class="form-label">Full Name *</label><input type="text" id="regName" class="form-input"></div><div class="form-group"><label class="form-label">Email Address *</label><input type="email" id="regEmail" class="form-input"></div><div class="form-group"><label class="form-label">Password *</label><input type="password" id="regPassword" class="form-input"></div><div class="form-group"><label class="form-label">Confirm Password *</label><input type="password" id="regConfirmPassword" class="form-input"></div></div><div class="form-group"><label class="form-label">Project / Company Name *</label><input type="text" id="regProject" class="form-input"></div><div class="form-grid-3"><div class="form-group"><label class="form-label">Industry *</label><select id="regIndustry" class="form-select"><option value="">Select...</option><option>Real Estate</option><option>Infrastructure</option><option>Energy & Renewables</option><option>Mining</option><option>Oil & Gas</option></select></div><div class="form-group"><label class="form-label">Project Location</label><input type="text" id="regLocation" class="form-input" placeholder="City, Country"></div><div class="form-group"><label class="form-label">Total Project Cost (USD)</label><input type="text" id="regTotalCost" class="form-input" placeholder="e.g., 100,000,000"></div></div><div class="form-grid-3"><div class="form-group"><label class="form-label">Sponsor Equity (USD)</label><input type="text" id="regSponsorEquity" class="form-input" placeholder="e.g., 30,000,000"></div><div class="form-group"><label class="form-label">Funds Needed (USD)</label><input type="text" id="regFundsNeeded" class="form-input" placeholder="e.g., 50,000,000"></div><div class="form-group"><label class="form-label">Current Stage</label><select id="regCurrentStage" class="form-select"><option value="">Select...</option><option>Pre-Development</option><option>Development</option><option>Operational</option><option>Expansion</option></select></div></div><div class="form-grid-3"><div class="form-group"><label class="form-label">Use of Funds</label><textarea id="regUseOfFunds" rows="2" class="form-textarea" placeholder="Describe how funds will be used..."></textarea></div><div class="form-group"><label class="form-label">Target IRR (%)</label><input type="text" id="regTargetIRR" class="form-input" placeholder="e.g., 18"></div><div class="form-group"><label class="form-label">Target Close Date</label><input type="date" id="regCloseDate" class="form-input"></div></div><div class="form-grid-3"><div class="form-group"><label class="form-label">MOIC (x)</label><input type="text" id="regMOIC" class="form-input" placeholder="e.g., 2.5"></div><div class="form-group"><label class="form-label">Yield/Cap Rate (%)</label><input type="text" id="regCapRate" class="form-input" placeholder="e.g., 8.5"></div><div class="form-group"><label class="form-label">Exit Strategy</label><select id="regExitStrategy" class="form-select"><option value="">Select...</option><option>Sale</option><option>Refinance</option><option>IPO</option><option>Hold</option><option>Joint Venture</option></select></div></div><div class="form-grid-3"><div class="form-group"><label class="form-label">Exit Cap Rate (%)</label><input type="text" id="regExitCapRate" class="form-input" placeholder="e.g., 7.5"></div><div class="form-group"><label class="form-label">Permits Obtained?</label><select id="regPermits" class="form-select"><option value="">Select...</option><option>Yes</option><option>No</option><option>In Progress</option></select></div><div class="form-group"><label class="form-label">Annual Revenue (USD)</label><input type="text" id="regRevenue" class="form-input" placeholder="Current or projected"></div></div><div class="form-grid-3"><div class="form-group"><label class="form-label">Asset Class</label><input type="text" id="regAssetClass" class="form-input" placeholder="Office/Retail/Industrial/etc"></div><div class="form-group"><label class="form-label">Infrastructure Type</label><input type="text" id="regInfraType" class="form-input" placeholder="Transport/Energy/Telecom/etc"></div><div class="form-group"><label class="form-label">Mineral Commodity</label><input type="text" id="regCommodity" class="form-input" placeholder="Gold/Copper/Lithium/etc"></div></div><div class="form-grid-3"><div class="form-group"><label class="form-label">Mining Stage</label><select id="regMiningStage" class="form-select"><option value="">Select...</option><option>Exploration</option><option>Development</option><option>Production</option><option>Reclamation</option></select></div><div class="form-group"><label class="form-label">Reserve Life (years)</label><input type="text" id="regReserveLife" class="form-input" placeholder="e.g., 15"></div><div class="form-group"><label class="form-label">Data Room Link</label><input type="url" id="regDataRoom" class="form-input" placeholder="https://..."></div></div><div class="form-group" style="display:flex;align-items:flex-start;gap:10px;margin-top:16px;"><input type="checkbox" id="ndaCheckbox" style="margin-top:3px;flex-shrink:0;"><label for="ndaCheckbox" style="font-size:12px;color:var(--gray-600);line-height:1.5;">I confirm that I have read and agree to the Croft Finance <a href="#" onclick="openModal('termsModal')" style="color:var(--navy);">Confidentiality and Portal Access Terms</a>.</label></div><p id="regError" style="color:var(--error);font-size:12px;margin-bottom:12px;display:none;"></p><button class="btn btn-primary" onclick="register()" style="width:100%">Submit Registration</button></div><div style="text-align:center;margin-top:14px;font-size:13px;"><a href="#" onclick="showLoginForm()" style="color:var(--gray-500);">← Back to sign in</a></div></div>
+  <div id="registerForm" style="display:none;"><div style="max-height:60vh;overflow-y:auto;padding-right:10px;"><div class="form-grid-2"><div class="form-group"><label class="form-label">Full Name *</label><input type="text" id="regName" class="form-input"></div><div class="form-group"><label class="form-label">Email Address *</label><input type="email" id="regEmail" class="form-input"></div><div class="form-group"><label class="form-label">Password *</label><input type="password" id="regPassword" class="form-input"></div><div class="form-group"><label class="form-label">Confirm Password *</label><input type="password" id="regConfirmPassword" class="form-input"></div></div><div class="form-group"><label class="form-label">Project / Company Name *</label><input type="text" id="regProject" class="form-input"></div><div class="form-grid-3"><div class="form-group"><label class="form-label">Industry *</label><select id="regIndustry" class="form-select"><option value="">Select...</option><option>Real Estate</option><option>Infrastructure</option><option>Energy & Renewables</option><option>Mining</option><option>Oil & Gas</option></select></div><div class="form-group"><label class="form-label">Project Location</label><input type="text" id="regLocation" class="form-input" placeholder="City, Country"></div><div class="form-group"><label class="form-label">Total Project Cost (USD)</label><input type="text" id="regTotalCost" class="form-input" placeholder="e.g., 100,000,000"></div></div><div class="form-grid-3"><div class="form-group"><label class="form-label">Sponsor Equity (USD)</label><input type="text" id="regSponsorEquity" class="form-input" placeholder="e.g., 30,000,000"></div><div class="form-group"><label class="form-label">Funds Needed (USD)</label><input type="text" id="regFundsNeeded" class="form-input" placeholder="e.g., 50,000,000"></div><div class="form-group"><label class="form-label">Current Stage</label><select id="regCurrentStage" class="form-select"><option value="">Select...</option><option>Pre-Development</option><option>Development</option><option>Operational</option><option>Expansion</option></select></div></div><div class="form-group" style="display:flex;align-items:flex-start;gap:10px;margin-top:16px;"><input type="checkbox" id="ndaCheckbox" style="margin-top:3px;flex-shrink:0;"><label for="ndaCheckbox" style="font-size:12px;color:var(--gray-600);line-height:1.5;">I confirm that I have read and agree to the Croft Finance <a href="#" onclick="openModal('termsModal')" style="color:var(--navy);">Confidentiality and Portal Access Terms</a>.</label></div><p id="regError" style="color:var(--error);font-size:12px;margin-bottom:12px;display:none;"></p><button class="btn btn-primary" onclick="register()" style="width:100%">Submit Registration</button></div><div style="text-align:center;margin-top:14px;font-size:13px;"><a href="#" onclick="showLoginForm()" style="color:var(--gray-500);">← Back to sign in</a></div></div>
   <div id="adminLoginForm" style="display:none;"><div class="form-group"><label class="form-label">Email</label><input type="email" id="adminUsername" class="form-input" placeholder="suzana@croftfinance.com" onkeypress="if(event.key==='Enter')doAdminLogin()"></div><div class="form-group"><label class="form-label">Password</label><input type="password" id="adminPassword" class="form-input" onkeypress="if(event.key==='Enter')doAdminLogin()"></div><p id="adminLoginError" style="color:var(--error);font-size:12px;margin-bottom:12px;display:none;">Incorrect credentials.</p><button class="btn btn-primary" onclick="doAdminLogin()" style="width:100%">Admin Sign In</button><div style="text-align:center;margin-top:14px;font-size:13px;"><a href="#" onclick="showLoginForm()" style="color:var(--gray-500);">← Back</a></div></div>
   <div id="forgotPasswordForm" style="display:none;"><div class="form-group"><label class="form-label">Email Address</label><input type="email" id="forgotEmail" class="form-input"></div><p id="forgotError" style="color:var(--error);font-size:12px;margin-bottom:12px;display:none;"></p><button class="btn btn-primary" onclick="requestPasswordReset()" style="width:100%">Send Reset Link</button><div style="text-align:center;margin-top:14px;font-size:13px;"><a href="#" onclick="showLoginForm()" style="color:var(--gray-500);">← Back to sign in</a></div></div>
   <div id="brokerLoginForm" style="display:none;"><div class="form-group"><label class="form-label">Email Address</label><input type="email" id="brokerLoginEmail" class="form-input"></div><div class="form-group"><label class="form-label">Password</label><input type="password" id="brokerLoginPassword" class="form-input"></div><p id="brokerLoginError" style="color:var(--error);font-size:12px;margin-bottom:12px;display:none;"></p><button class="btn btn-primary" onclick="brokerLogin()" style="width:100%">Sign In as Broker</button><div style="text-align:center;margin-top:16px;"><a href="#" onclick="showBrokerRegisterForm()" style="color:var(--navy);">Register as Broker</a> | <a href="#" onclick="showLoginForm()" style="color:var(--gray-500);">Client Portal</a></div></div>
@@ -2945,8 +2958,13 @@ body {
   <div class="form-group"><label class="form-label">Admin Note (shown to client)</label><textarea id="editAdminNote" class="form-textarea" rows="3"></textarea></div>
   <div id="editAckInfo"></div>
   <div class="form-group" style="background: var(--gray-50); padding: 16px; border-radius: 8px; margin-top: 16px;"><label class="form-label"><i class="fas fa-shield-alt"></i> Investor Verification Letter</label><div id="ivlAdminInfo"></div><div style="display: flex; gap: 12px; margin-top: 12px;"><button type="button" class="btn btn-outline" onclick="previewIVLFromAdmin()">Preview Letter</button><button type="button" class="btn btn-outline" onclick="regenerateIVL()">Regenerate Letter</button><button type="button" class="btn btn-outline" onclick="printInvestorVerificationLetter(window.editProjectId)">Print / Download</button></div></div>
+  <div class="form-group"><label class="form-label">Broker Commission Rate (%) for this deal</label><input type="number" id="editBrokerCommissionRate" class="form-input" step="0.1" placeholder="e.g., 5"></div>
   <button class="btn btn-primary" onclick="saveProjectInfo()" style="width:100%">Save Changes</button>
 </div></div></div>
+
+<div id="editClientModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Edit Client</h3><button class="modal-close" onclick="closeModal('editClientModal')">✕</button></div><div class="modal-body"><div class="form-group"><label class="form-label">Full Name</label><input type="text" id="editClientName" class="form-input"></div><div class="form-group"><label class="form-label">Email</label><input type="email" id="editClientEmail" class="form-input"></div><div class="form-group"><label class="form-label">Status</label><select id="editClientStatus" class="form-select"><option value="pending">Pending</option><option value="active">Active</option></select></div><button class="btn btn-primary" onclick="saveClientInfo()" style="width:100%">Save Changes</button></div></div></div>
+
+<div id="editBrokerCommissionModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Edit Broker Commission</h3><button class="modal-close" onclick="closeModal('editBrokerCommissionModal')">✕</button></div><div class="modal-body"><div class="form-group"><label class="form-label">Broker</label><input type="text" id="editBrokerCommissionName" class="form-input" disabled></div><div class="form-group"><label class="form-label">Commission Rate (%)</label><input type="number" id="editBrokerCommissionRate" class="form-input" step="0.1" placeholder="e.g., 5"></div><input type="hidden" id="editBrokerCommissionId"><button class="btn btn-primary" onclick="saveBrokerCommission()" style="width:100%">Save Commission Rate</button></div></div></div>
 
 <div id="addClientModal" class="modal-overlay"><div class="modal modal-lg"><div class="modal-header"><h3>Add New Client & Project</h3><button class="modal-close" onclick="closeModal('addClientModal')">✕</button></div><div class="modal-body" style="max-height:70vh;overflow-y:auto;">
   <div class="form-grid-2">
@@ -3144,10 +3162,86 @@ function setupRealtimeListeners() {
         });
         renderAdminTables();
         if (currentClient) loadCurrentProjectData();
+      }),
+      
+      db.collection('brokers').onSnapshot(snapshot => {
+        snapshot.docChanges().forEach(change => {
+          const data = { id: change.doc.id, ...change.doc.data() };
+          if (change.type === 'added') brokers.push(data);
+          if (change.type === 'modified') {
+            const index = brokers.findIndex(b => b.id === data.id);
+            if (index !== -1) brokers[index] = data;
+          }
+          if (change.type === 'removed') {
+            brokers = brokers.filter(b => b.id !== data.id);
+          }
+        });
+        renderBrokerAdminTable();
+        const pendingCount = brokers.filter(b => b.status === 'pending').length;
+        const badge = document.getElementById('pendingBrokersCount');
+        if (badge) badge.textContent = pendingCount;
+        if (pendingCount > 0) addAdminNotification('registration', `New Broker Registrations`, `${pendingCount} broker(s) pending approval`);
+      }),
+      
+      db.collection('brokerSubmissions').onSnapshot(snapshot => {
+        snapshot.docChanges().forEach(change => {
+          const data = { id: change.doc.id, ...change.doc.data() };
+          if (change.type === 'added') brokerSubmissions.push(data);
+          if (change.type === 'modified') {
+            const index = brokerSubmissions.findIndex(s => s.id === data.id);
+            if (index !== -1) brokerSubmissions[index] = data;
+          }
+          if (change.type === 'removed') {
+            brokerSubmissions = brokerSubmissions.filter(s => s.id !== data.id);
+          }
+        });
+        renderAdminBrokerSubmissionsTable();
+        if (currentBroker) loadBrokerPortal();
+      }),
+      
+      db.collection('documents').onSnapshot(snapshot => {
+        snapshot.docChanges().forEach(change => {
+          const data = { id: change.doc.id, ...change.doc.data() };
+          if (change.type === 'added') documents.push(data);
+          if (change.type === 'modified') {
+            const index = documents.findIndex(d => d.id === data.id);
+            if (index !== -1) documents[index] = data;
+          }
+          if (change.type === 'removed') {
+            documents = documents.filter(d => d.id !== data.id);
+          }
+        });
+        renderAdminDocumentsTable();
+        if (currentClient && document.querySelector('#tab-documents.active')) renderDocuments();
+      }),
+      
+      db.collection('messages').onSnapshot(snapshot => {
+        snapshot.docChanges().forEach(change => {
+          const data = { id: change.doc.id, ...change.doc.data() };
+          if (change.type === 'added') messages.push(data);
+          if (change.type === 'modified') {
+            const index = messages.findIndex(m => m.id === data.id);
+            if (index !== -1) messages[index] = data;
+          }
+          if (change.type === 'removed') {
+            messages = messages.filter(m => m.id !== data.id);
+          }
+        });
+        if (currentClient) {
+          loadMessages();
+          updateMsgBadge();
+          checkForNotifications();
+        }
+        if (isAdminUser) {
+          renderAdminMessages();
+          const unreadCount = messages.filter(m => m.sender === 'client' && !m.read).length;
+          document.getElementById('pendingMessages').textContent = unreadCount;
+          if (unreadCount > 0) addAdminNotification('message', `New Messages`, `${unreadCount} unread message(s)`);
+        }
       })
     );
-  } else {
-    const clientId = user.uid;
+  } else if (currentClient) {
+    const clientId = currentClient.id;
     unsubscribeListeners.push(
       db.collection('projects')
         .where('clientId', '==', clientId)
@@ -3163,10 +3257,8 @@ function setupRealtimeListeners() {
               projects = projects.filter(p => p.id !== data.id);
             }
           });
-          if (projects.length) {
-            currentProjectId = projects[0].id;
-            loadCurrentProjectData();
-          }
+          if (projects.length && !currentProjectId) currentProjectId = projects[0].id;
+          loadCurrentProjectData();
         }),
       
       db.collection('messages')
@@ -3182,9 +3274,7 @@ function setupRealtimeListeners() {
       db.collection('documents')
         .where('clientId', '==', clientId)
         .onSnapshot(() => {
-          if (currentClient && document.querySelector('#tab-documents.active')) {
-            renderDocuments();
-          }
+          if (currentClient && document.querySelector('#tab-documents.active')) renderDocuments();
         })
     );
   }
@@ -3258,6 +3348,7 @@ async function loadFromFirebase() {
       showView('admin');
       renderAdminTables();
       renderBrokerAdminTable();
+      renderAdminBrokerSubmissionsTable();
     } else if (user) {
       currentClient = clients.find(c => c.id === user.uid);
       if (currentClient) {
@@ -3647,7 +3738,6 @@ function loadClientPortal() {
   loadRecentActivity();
   updateMsgBadge();
   checkForNotifications();
-  showFirstLoginIVLModal();
 }
 
 function loadCurrentProjectData() {
@@ -3704,7 +3794,55 @@ function loadCurrentProjectData() {
   updateDashboardHero();
   updateNextStepsCard();
   updateAdvisorNote();
+  renderDealSheet();
   checkAndShowAcknowledgment();
+}
+
+function renderDealSheet() {
+  const proj = projects.find(p => p.id === currentProjectId);
+  if (!proj) return;
+  const container = document.getElementById('dealSheetContent');
+  if (!container) return;
+  
+  const sections = [
+    { title: 'Project Overview', fields: ['name', 'industry', 'location', 'currentStage', 'useOfFunds'] },
+    { title: 'Financials', fields: ['totalCost', 'sponsorEquity', 'fundsNeeded', 'targetIRR', 'moic', 'capRate', 'revenue'] },
+    { title: 'Exit & Timeline', fields: ['exitStrategy', 'exitCapRate', 'targetCloseDate', 'permits'] },
+    { title: 'Sector Specific', fields: ['assetClass', 'infraType', 'commodity', 'miningStage', 'reserveLife'] },
+    { title: 'Facility Terms', fields: ['amount', 'interestRate', 'term', 'gracePeriod', 'govLaw'] }
+  ];
+  
+  const fieldLabels = {
+    name: 'Project Name', industry: 'Industry', location: 'Location', currentStage: 'Current Stage',
+    useOfFunds: 'Use of Funds', totalCost: 'Total Project Cost', sponsorEquity: 'Sponsor Equity',
+    fundsNeeded: 'Funds Needed', targetIRR: 'Target IRR', moic: 'MOIC', capRate: 'Yield/Cap Rate',
+    revenue: 'Annual Revenue', exitStrategy: 'Exit Strategy', exitCapRate: 'Exit Cap Rate',
+    targetCloseDate: 'Target Close Date', permits: 'Permits', assetClass: 'Asset Class',
+    infraType: 'Infrastructure Type', commodity: 'Mineral Commodity', miningStage: 'Mining Stage',
+    reserveLife: 'Reserve Life', amount: 'Facility Amount', interestRate: 'Interest Rate',
+    term: 'Term', gracePeriod: 'Grace Period', govLaw: 'Governing Law'
+  };
+  
+  let html = '<div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-info-circle"></i> Deal Sheet</div></div><div class="card-body">';
+  
+  sections.forEach(section => {
+    html += `<h4 style="font-size: 13px; letter-spacing: 1px; color: var(--blue); margin: 20px 0 12px 0; border-bottom: 1px solid var(--gray-200); padding-bottom: 6px;">${section.title}</h4>`;
+    html += `<div class="project-details-grid">`;
+    section.fields.forEach(field => {
+      const value = proj[field] || '—';
+      html += `<div class="project-detail-item"><div class="project-detail-label">${fieldLabels[field] || field}</div><div class="project-detail-value">${escapeHtml(String(value))}</div></div>`;
+    });
+    html += `</div>`;
+  });
+  
+  if (proj.dataRoom) {
+    html += `<div style="margin-top: 20px; padding: 12px; background: var(--gray-50); border-radius: 8px; text-align: center;">
+      <a href="${escapeHtml(proj.dataRoom)}" target="_blank" style="color: var(--blue);"><i class="fas fa-external-link-alt"></i> Access Data Room →</a>
+    </div>`;
+  }
+  
+  html += `</div></div>`;
+  container.innerHTML = html;
 }
 
 function renderTermSheetSummary(proj) {
@@ -3773,6 +3911,7 @@ function renderDocuments() {
   renderClosingDocumentsTable();
   renderAdditionalDocuments();
   updateClientUploadDropdown();
+  updateIVLDocumentCard();
 }
 
 function renderClosingDocumentsTable() {
@@ -4188,6 +4327,7 @@ async function sendMessage() {
   
   input.value = '';
   showToast('Message sent to Croft Finance');
+  addAdminNotification('message', `New Message from ${currentClient.name}`, content.substring(0, 100));
 }
 
 function markMessagesRead() { if (!currentClient) return; localStorage.setItem('lastSeenMsg_' + currentClient.id, Date.now().toString()); }
@@ -4238,70 +4378,6 @@ function printInvestorVerificationLetter(projectId) {
   printArea.style.display = 'block';
   window.print();
   printArea.style.display = 'none';
-}
-
-async function showFirstLoginIVLModal() {
-  const proj = projects.find(p => p.id === currentProjectId);
-  if (!proj || proj.ivrLetterAcknowledged) return;
-  const flagKey = `firstLoginIVL_${currentClient.id}`;
-  if (localStorage.getItem(flagKey) === 'seen') return;
-  if (!proj.investorVerificationLetter) { 
-    await generateAndStoreIVL(currentClient.id, currentProjectId); 
-    const updatedProj = projects.find(p => p.id === currentProjectId); 
-    if (updatedProj) proj.investorVerificationLetter = updatedProj.investorVerificationLetter; 
-  }
-  const modalHtml = `<div id="ivlFirstLoginModal" class="modal-overlay active">
-    <div class="modal ivl-modal">
-      <div class="modal-header">
-        <h3><i class="fas fa-shield-alt"></i> Important Document — Please Read</h3>
-        <button class="modal-close" onclick="closeIVLModal()">✕</button>
-      </div>
-      <div class="modal-body ivl-modal-body">
-        <div class="ivl-modal-banner">
-          <i class="fas fa-info-circle"></i> 
-          Croft Finance has issued the following formal verification letter regarding your capital partner. 
-          Please read this carefully before proceeding.
-        </div>
-        ${proj.investorVerificationLetter}
-      </div>
-      <div class="modal-footer" style="padding: 20px 24px; border-top: 1px solid var(--gray-100); display: flex; gap: 12px; justify-content: flex-end;">
-        <button class="btn btn-outline" onclick="printInvestorVerificationLetter('${currentProjectId}'); closeIVLModal();">
-          <i class="fas fa-download"></i> Download for Your Records
-        </button>
-        <button id="ivlAcknowledgeBtn" class="btn btn-primary ivl-read-button disabled" disabled>
-          <i class="fas fa-check-circle"></i> I Have Read and Understood This Letter
-        </button>
-      </div>
-    </div>
-  </div>`;
-  document.body.insertAdjacentHTML('beforeend', modalHtml);
-  setTimeout(() => { 
-    const btn = document.getElementById('ivlAcknowledgeBtn'); 
-    if (btn) { 
-      btn.classList.remove('disabled'); 
-      btn.classList.add('active'); 
-      btn.disabled = false; 
-      btn.onclick = acknowledgeIVL;
-    } 
-  }, 10000);
-}
-
-function closeIVLModal() { 
-  const modal = document.getElementById('ivlFirstLoginModal'); 
-  if (modal) modal.remove(); 
-}
-
-async function acknowledgeIVL() {
-  const proj = projects.find(p => p.id === currentProjectId);
-  if (!proj) return;
-  const updates = { ivrLetterAcknowledged: true, ivrLetterAcknowledgedAt: new Date().toISOString() };
-  Object.assign(proj, updates);
-  await fbUpdate('projects', currentProjectId, updates);
-  await logAudit('IVL Acknowledged', 'Client acknowledged Investor Verification Letter', currentClient.id, currentProjectId);
-  localStorage.setItem(`firstLoginIVL_${currentClient.id}`, 'seen');
-  closeIVLModal();
-  showToast('Thank you for acknowledging this important document.');
-  updateIVLDocumentCard();
 }
 
 function updateIVLDocumentCard() {
@@ -4506,18 +4582,40 @@ function renderBrokerAdminTable() {
       <td style="vertical-align:middle;"><strong>${escapeHtml(b.name)}</strong><br><span style="font-size:11px;color:var(--gray-400);">${b.email}</span></td>
       <td style="vertical-align:middle;">${escapeHtml(b.firm)}</td>
       <td style="vertical-align:middle;">${b.country}</td>
-      <td style="vertical-align:middle;">${b.commissionRate !== undefined && b.commissionRate !== null ? b.commissionRate + '%' : '0%'}</td>
+      <td style="vertical-align:middle;"><button class="btn btn-outline" style="padding:2px 8px;font-size:10px;" onclick="editBrokerCommission('${b.id}', '${escapeHtml(b.name)}', ${b.commissionRate || 0})">${b.commissionRate !== undefined && b.commissionRate !== null ? b.commissionRate + '%' : '0%'} <i class="fas fa-edit"></i></button></td>
       <td style="vertical-align:middle;"><span style="color:${b.status === 'pending' ? 'var(--warning)' : 'var(--success)'};">${b.status === 'pending' ? 'Pending' : 'Active'}</span></td>
       <td style="vertical-align:middle;font-size:12px;">${b.createdAt ? new Date(b.createdAt).toLocaleDateString() : '—'}</td>
       <td style="vertical-align:middle;">
         ${b.status === 'pending' ? `<button class="btn btn-success" style="padding:4px 10px;font-size:11px;" onclick="activateBroker('${b.id}')">Activate</button>` : ''}
-        <button class="btn btn-outline" style="padding:4px 10px;font-size:11px;color:var(--error);" onclick="deleteBroker('${b.id}')">Delete</button>
+        ${b.status === 'active' ? `<button class="btn btn-warning" style="padding:4px 10px;font-size:11px;" onclick="deactivateBroker('${b.id}')">Deactivate</button>` : ''}
+        <button class="btn btn-danger" style="padding:4px 10px;font-size:11px;" onclick="deleteBroker('${b.id}')">Delete</button>
       </td>
-    </table>
+    </tr>
   `).join('');
   const pendingBrokersCount = brokers.filter(b => b.status === 'pending').length;
   const pendingBadge = document.getElementById('pendingBrokersCount');
   if (pendingBadge) pendingBadge.textContent = pendingBrokersCount;
+}
+
+function editBrokerCommission(id, name, currentRate) {
+  document.getElementById('editBrokerCommissionName').value = name;
+  document.getElementById('editBrokerCommissionRate').value = currentRate;
+  document.getElementById('editBrokerCommissionId').value = id;
+  openModal('editBrokerCommissionModal');
+}
+
+async function saveBrokerCommission() {
+  const id = document.getElementById('editBrokerCommissionId').value;
+  const rate = parseFloat(document.getElementById('editBrokerCommissionRate').value);
+  if (isNaN(rate) || rate < 0) { showToast('Please enter a valid commission rate', true); return; }
+  const broker = brokers.find(b => b.id === id);
+  if (!broker) return;
+  broker.commissionRate = rate;
+  await fbUpdate('brokers', id, { commissionRate: rate });
+  showToast(`Commission rate updated to ${rate}% for ${broker.name}`);
+  closeModal('editBrokerCommissionModal');
+  renderBrokerAdminTable();
+  if (currentBroker && currentBroker.id === id) loadBrokerPortal();
 }
 
 function activateBroker(id) {
@@ -4528,15 +4626,28 @@ function activateBroker(id) {
   sendEmail(broker.email, '✅ Croft Finance — Broker Portal Activated', `Dear ${broker.name},\n\nYour broker portal has been activated.\n\nYou can now log in at ${window.location.origin} to submit deals and track your introductions.\n\nEmail: ${broker.email}\n\nBest regards,\nSuzana Aleksić\nCroft Finance`).catch(() => {});
   showToast(broker.name + ' activated.');
   renderBrokerAdminTable();
+  addAdminNotification('registration', `Broker Activated`, `${broker.name} (${broker.firm}) has been activated`);
+}
+
+function deactivateBroker(id) {
+  const broker = brokers.find(b => b.id === id);
+  if (!broker) return;
+  if (!confirm(`Deactivate ${broker.name}? They will not be able to log in.`)) return;
+  broker.status = 'pending';
+  if (firebaseReady) fbUpdate('brokers', id, { status: 'pending' });
+  showToast(broker.name + ' deactivated.');
+  renderBrokerAdminTable();
 }
 
 function deleteBroker(id) {
-  if (!confirm('Delete this broker and all their submissions?')) return;
+  if (!confirm('Delete this broker and all their submissions? This cannot be undone.')) return;
+  const broker = brokers.find(b => b.id === id);
   brokers = brokers.filter(b => b.id !== id);
   brokerSubmissions = brokerSubmissions.filter(s => s.brokerId !== id);
   if (firebaseReady) fbDelete('brokers', id);
   showToast('Broker deleted');
   renderBrokerAdminTable();
+  renderAdminBrokerSubmissionsTable();
 }
 
 function submitDeal() {
@@ -4563,21 +4674,26 @@ function submitDeal() {
   showToast('Deal submitted! Croft Finance will review and contact the client.');
   switchBrokerTab('submissions', null);
   renderBrokerSubmissions();
+  addAdminNotification('submission', `New Deal Submission from ${currentBroker.name}`, `${clientName} - ${projectName} requesting $${fundsNeeded}`);
 }
 
 function renderBrokerSubmissions() {
   const mySubmissions = brokerSubmissions.filter(s => s.brokerId === currentBroker.id).sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
   const tbody = document.getElementById('brokerSubmissionsList');
   if (!tbody) return;
-  tbody.innerHTML = mySubmissions.map(s => `
-    <tr>
-      <td style="vertical-align:middle;font-size:12px;">${new Date(s.createdAt).toLocaleDateString()}</td>
-      <td style="vertical-align:middle;">${escapeHtml(s.clientName)}</td>
-      <td style="vertical-align:middle;">${escapeHtml(s.projectName)}</td>
-      <td style="vertical-align:middle;">$${s.fundsNeeded || 'TBD'}</td>
-      <td style="vertical-align:middle;"><span class="status-badge-${s.status === 'pending' ? 'pending' : s.status === 'active' ? 'active' : 'funded'}">${s.status === 'pending' ? 'Pending Review' : s.status === 'active' ? 'Active' : 'Funded'}</span></td>
-    </tr>
-  `).join('');
+  tbody.innerHTML = mySubmissions.map(s => {
+    const progressHtml = s.status === 'active' ? `<span class="status-badge-active">Active</span>` : s.status === 'funded' ? `<span class="status-badge-funded">Funded</span>` : s.status === 'rejected' ? `<span class="status-badge-rejected">Rejected</span>` : `<span class="status-badge-pending">Pending</span>`;
+    return `
+      <tr>
+        <td style="vertical-align:middle;font-size:12px;">${new Date(s.createdAt).toLocaleDateString()}</td>
+        <td style="vertical-align:middle;">${escapeHtml(s.clientName)}</td>
+        <td style="vertical-align:middle;">${escapeHtml(s.projectName)}</td>
+        <td style="vertical-align:middle;">$${s.fundsNeeded || 'TBD'}</td>
+        <td style="vertical-align:middle;">${progressHtml}</td>
+        <td style="vertical-align:middle;"><span class="badge badge-navy">Step ${s.clientStep || '—'}/8</span></td>
+      </table>
+    `;
+  }).join('');
 }
 
 function loadBrokerMessages() {
@@ -4600,6 +4716,7 @@ function sendBrokerMessage() {
   sendEmail(EMAILJS_CONFIG.adminEmail, `💬 New Message from Broker ${currentBroker.name}`, `${currentBroker.name} (${currentBroker.email}, ${currentBroker.firm}) sent:\n\n${content}`).catch(() => {});
   input.value = '';
   showToast('Message sent');
+  addAdminNotification('message', `New Message from Broker ${currentBroker.name}`, content.substring(0, 100));
 }
 
 function loadBrokerPortal() {
@@ -4610,13 +4727,14 @@ function loadBrokerPortal() {
   document.getElementById('brokerAvatar').textContent = currentBroker.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
   document.getElementById('brokerDashGreeting').textContent = 'Welcome, ' + currentBroker.name.split(' ')[0] + '.';
   
+  const commissionRate = currentBroker.commissionRate || 0;
+  document.getElementById('brokerCommissionRate').textContent = commissionRate + '%';
+  
   const mySubmissions = brokerSubmissions.filter(s => s.brokerId === currentBroker.id);
   const activeSubmissions = mySubmissions.filter(s => s.status === 'active');
   const fundedSubmissions = mySubmissions.filter(s => s.status === 'funded');
   
-  const brokerRate = currentBroker.commissionRate || 0;
-  const ratePercent = brokerRate / 100;
-  
+  const ratePercent = commissionRate / 100;
   const totalCommission = fundedSubmissions.reduce((sum, s) => { 
     const amount = parseFloat(String(s.fundsNeeded || '0').replace(/[^0-9.-]/g, '')); 
     return sum + (amount * ratePercent); 
@@ -4626,7 +4744,7 @@ function loadBrokerPortal() {
   document.getElementById('brokerActiveDeals').textContent = activeSubmissions.length;
   document.getElementById('brokerFundedDeals').textContent = fundedSubmissions.length;
   
-  if (brokerRate > 0) {
+  if (commissionRate > 0) {
     document.getElementById('brokerEstCommission').textContent = '$' + totalCommission.toLocaleString();
   } else {
     document.getElementById('brokerEstCommission').textContent = '$0';
@@ -4677,6 +4795,7 @@ function brokerRegister() {
         id: uid, name, email, 
         firm, country, license, hear, 
         status: 'pending', 
+        commissionRate: 0,
         createdAt: new Date().toISOString() 
       };
       brokers.push(newBroker);
@@ -4687,13 +4806,14 @@ function brokerRegister() {
       ).catch(() => {});
       
       sendEmail(EMAILJS_CONFIG.adminEmail, 
-        `🔔 NEW BROKER REGISTRATION: ${name}`, 
+        `🔔 NEW BROKER REGISTRATION: ${name} - Action Required`, 
         `A new broker has registered.\n\n• Name: ${name}\n• Email: ${email}\n• Firm: ${firm}\n• Country: ${country}\n• License: ${license || 'Not provided'}\n\nLog in to admin to activate.`
       ).catch(() => {});
 
       showToast('Broker registration submitted. You will receive an email once approved.');
       showBrokerLoginForm();
       renderBrokerAdminTable();
+      addAdminNotification('registration', `New Broker Registration: ${name}`, `${firm} - ${country}`);
       
       await firebase.auth().signOut();
     })
@@ -4724,9 +4844,9 @@ function brokerLogin() {
         errEl.style.display = 'block';
         return;
       }
-      if (broker.status === 'pending') {
+      if (broker.status !== 'active') {
         firebase.auth().signOut();
-        errEl.textContent = 'Your account is under review.';
+        errEl.textContent = 'Your account is not activated yet. Please contact support.';
         errEl.style.display = 'block';
         return;
       }
@@ -4777,8 +4897,9 @@ function renderClientsTable() {
         <td style="vertical-align:middle;"><span style="color:${c.status === 'pending' ? 'var(--warning)' : 'var(--success)'};">${c.status === 'pending' ? 'Pending' : 'Active'}</span></td>
         <td style="font-size:12px;color:var(--gray-400);">${c.createdAt ? new Date(c.createdAt).toLocaleDateString() : '—'}</td>
         <td style="vertical-align:middle;display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="editClient('${c.id}')"><i class="fas fa-edit"></i> Edit</button>
           ${c.status === 'pending' ? `<button class="btn btn-success" style="padding:4px 10px;font-size:11px;" onclick="activateClient('${c.id}')">Activate</button>` : ''}
-          <button class="btn btn-outline" style="padding:4px 10px;font-size:11px;color:var(--error);" onclick="deleteClient('${c.id}')">Delete</button>
+          <button class="btn btn-danger" style="padding:4px 10px;font-size:11px;" onclick="deleteClient('${c.id}')">Delete</button>
         </td>
       </tr>
     `;
@@ -4786,6 +4907,39 @@ function renderClientsTable() {
   
   const countEl = document.getElementById('clientCount');
   if (countEl) countEl.textContent = filtered.length + ' clients';
+}
+
+function editClient(id) {
+  const client = clients.find(c => c.id === id);
+  if (!client) return;
+  document.getElementById('editClientName').value = client.name;
+  document.getElementById('editClientEmail').value = client.email;
+  document.getElementById('editClientStatus').value = client.status;
+  window.editClientId = id;
+  openModal('editClientModal');
+}
+
+async function saveClientInfo() {
+  const id = window.editClientId;
+  const name = document.getElementById('editClientName').value.trim();
+  const email = document.getElementById('editClientEmail').value.trim().toLowerCase();
+  const status = document.getElementById('editClientStatus').value;
+  
+  if (!name || !email) { showToast('Name and email are required', true); return; }
+  
+  const updates = { name, email, status };
+  await fbUpdate('clients', id, updates);
+  
+  const client = clients.find(c => c.id === id);
+  if (client) {
+    client.name = name;
+    client.email = email;
+    client.status = status;
+  }
+  
+  showToast('Client information updated');
+  closeModal('editClientModal');
+  renderClientsTable();
 }
 
 function renderProjectsTable() {
@@ -4805,7 +4959,7 @@ function renderProjectsTable() {
         <td style="vertical-align:middle;">${p.step >= 6 ? `<span class="ack-badge ${p.ecfAcknowledged ? 'completed' : 'pending'}" title="${p.ecfAcknowledged ? 'Acknowledged: ' + new Date(p.ecfAcknowledgedAt).toLocaleDateString() : 'Not yet acknowledged'}">${p.ecfAcknowledged ? '✓ ECF' : '⏳ ECF'}</span>` : '<span class="ack-badge" style="opacity:0.3;">— ECF</span>'}</td>
         <td style="vertical-align:middle;display:flex;gap:6px;">
           <button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="editProject('${p.id}')">Edit</button>
-          <button class="btn btn-outline" style="padding:4px 10px;font-size:11px;color:var(--error);" onclick="deleteProject('${p.id}')">Delete</button>
+          <button class="btn btn-danger" style="padding:4px 10px;font-size:11px;" onclick="deleteProject('${p.id}')">Delete</button>
         </td>
       </tr>
     `;
@@ -5007,8 +5161,13 @@ function renderAdminMessages() {
   const container = document.getElementById('allMessagesList');
   if (!container) return;
   
+  const searchVal = (document.getElementById('messageSearch')?.value || '').toLowerCase();
   const byClient = {};
-  messages.forEach(m => { const key = String(m.clientId); if (!byClient[key]) byClient[key] = []; byClient[key].push(m); });
+  const filteredMessages = messages.filter(m => {
+    const client = clients.find(c => String(c.id) === String(m.clientId));
+    return !searchVal || client?.name.toLowerCase().includes(searchVal);
+  });
+  filteredMessages.forEach(m => { const key = String(m.clientId); if (!byClient[key]) byClient[key] = []; byClient[key].push(m); });
   if (!Object.keys(byClient).length) { container.innerHTML = '<p style="color:var(--gray-400);font-size:13px;">No messages yet.</p>'; return; }
   
   container.innerHTML = Object.entries(byClient).map(([cid, msgs]) => { 
@@ -5072,6 +5231,7 @@ async function activateClient(id) {
   if (cp.length) editProject(cp[0].id);
   setupRealtimeListeners();
   renderAdminTables();
+  addAdminNotification('registration', `Client Activated: ${client.name}`, `Portal access granted for ${client.name}`);
 }
 
 function editProject(id) {
@@ -5097,6 +5257,7 @@ function editProject(id) {
   document.getElementById('editCommitFeeDeadline').value = proj.commitFeeDeadline || '';
   document.getElementById('editDeedExpiry').value = proj.deedExpiryDate || '';
   document.getElementById('editECFPolicyExpiry').value = proj.ecfPolicyExpiryDate || '';
+  document.getElementById('editBrokerCommissionRate').value = proj.brokerCommissionRate || '';
   
   window.editProjectId = id;
   updateIVLAdminInfo();
@@ -5144,6 +5305,8 @@ async function saveProjectInfo() {
     stepAdvanced = true;
   }
   
+  const brokerCommissionRate = parseFloat(document.getElementById('editBrokerCommissionRate').value);
+  
   const updates = {
     name: document.getElementById('editProjectName').value,
     industry: document.getElementById('editIndustry').value,
@@ -5190,6 +5353,10 @@ async function saveProjectInfo() {
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   };
   
+  if (!isNaN(brokerCommissionRate) && brokerCommissionRate >= 0) {
+    updates.brokerCommissionRate = brokerCommissionRate;
+  }
+  
   const batch = db.batch();
   const projectRef = db.collection('projects').doc(id);
   batch.update(projectRef, updates);
@@ -5204,6 +5371,12 @@ async function saveProjectInfo() {
       performedBy: 'croft',
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
+    
+    const brokerSub = brokerSubmissions.find(s => s.clientEmail === proj.email);
+    if (brokerSub) {
+      brokerSub.clientStep = newStep;
+      await fbUpdate('brokerSubmissions', brokerSub.id, { clientStep: newStep });
+    }
   }
   
   await batch.commit();
@@ -5219,6 +5392,7 @@ async function saveProjectInfo() {
   
   await logAudit('Project updated', 'Step ' + newStep + ': ' + STEP_NAMES[newStep], proj.clientId, String(id));
   renderAdminTables();
+  renderAdminBrokerSubmissionsTable();
 }
 
 function deleteClient(id) {
@@ -5254,6 +5428,7 @@ async function approveDocument(id) {
   if (client && client.email) {
     await sendEmail(client.email, `Document Approved — ${doc.type} — Croft Finance`, `Dear ${client.name},\n\nYour document "${doc.type}" has been approved.\n\nLog in to your portal to view the updated status.`);
   }
+  addAdminNotification('document', `Document Approved`, `${doc.type} for ${client?.name || 'client'}`);
 }
 
 async function deleteDocument(id) {
@@ -5472,8 +5647,12 @@ function renderAdminBrokerSubmissionsTable() {
       <td style="vertical-align:middle;">${escapeHtml(s.clientName)}</td>
       <td style="vertical-align:middle;">${escapeHtml(s.projectName)}</td>
       <td style="vertical-align:middle;">$${s.fundsNeeded || 'TBD'}</td>
-      <td style="vertical-align:middle;"><span class="status-badge-${s.status === 'pending' ? 'pending' : s.status === 'active' ? 'active' : 'funded'}">${s.status === 'pending' ? 'Pending Review' : s.status === 'active' ? 'Active' : 'Funded'}</span></td>
-      <td style="vertical-align:middle;"><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="viewBrokerSubmission('${s.id}')">View</button></td>
+      <td style="vertical-align:middle;"><span class="status-badge-${s.status === 'pending' ? 'pending' : s.status === 'active' ? 'active' : s.status === 'rejected' ? 'rejected' : 'funded'}">${s.status === 'pending' ? 'Pending Review' : s.status === 'active' ? 'Active' : s.status === 'rejected' ? 'Rejected' : 'Funded'}</span></td>
+      <td style="vertical-align:middle;">
+        <button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="viewBrokerSubmission('${s.id}')">View</button>
+        ${s.status === 'pending' ? `<button class="btn btn-success" style="padding:4px 10px;font-size:11px;" onclick="approveBrokerSubmission('${s.id}')">Approve</button>` : ''}
+        <button class="btn btn-danger" style="padding:4px 10px;font-size:11px;" onclick="rejectBrokerSubmission('${s.id}')">Reject/Delete</button>
+      </td>
     </tr>
   `).join('');
 }
@@ -5511,6 +5690,28 @@ function viewBrokerSubmission(submissionId) {
     </div>
   </div>`;
   document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+function approveBrokerSubmission(id) {
+  const s = brokerSubmissions.find(x => x.id === id);
+  if (!s) return;
+  s.status = 'active';
+  fbUpdate('brokerSubmissions', id, { status: 'active' });
+  sendEmail(s.clientEmail, 'Croft Finance — Your Deal is Under Review', `Dear ${s.clientName},\n\nThank you for your submission through our broker partner ${s.brokerName}.\n\nYour project "${s.projectName}" has been received and is under review. Suzana Aleksić will contact you directly within 48 hours.\n\nBest regards,\nCroft Finance Team`).catch(() => {});
+  showToast(`Submission from ${s.clientName} approved. Client notified.`);
+  renderAdminBrokerSubmissionsTable();
+  addAdminNotification('submission', `Broker Submission Approved`, `${s.clientName} - ${s.projectName}`);
+}
+
+function rejectBrokerSubmission(id) {
+  if (!confirm('Reject this submission? The broker will be notified.')) return;
+  const s = brokerSubmissions.find(x => x.id === id);
+  if (!s) return;
+  s.status = 'rejected';
+  fbUpdate('brokerSubmissions', id, { status: 'rejected' });
+  sendEmail(s.brokerEmail, 'Croft Finance — Submission Update', `Dear ${s.brokerName},\n\nYour submission for ${s.clientName} (${s.projectName}) has been reviewed and is not proceeding at this time.\n\nThank you for your introduction.\n\nBest regards,\nSuzana Aleksić`).catch(() => {});
+  showToast(`Submission rejected. Broker notified.`);
+  renderAdminBrokerSubmissionsTable();
 }
 
 function convertSubmissionToClient(submissionId) {
@@ -5678,6 +5879,7 @@ function switchPortalTab(tabName, el) {
   if (tabName === 'projects') renderProjectsList();
   if (tabName === 'checklist') renderChecklist();
   if (tabName === 'activity') renderActivityLog();
+  if (tabName === 'deal-sheet') renderDealSheet();
   if (window.innerWidth <= 768) {
     document.getElementById('clientSidebar').classList.remove('open');
     document.getElementById('sidebarOverlay').classList.remove('show');
@@ -5906,6 +6108,16 @@ function handleAdminNotificationClick(type, data) {
   else if (type === 'expiry') switchAdminTab('overview', document.querySelector('[onclick*="overview"]'));
 }
 
+function addAdminNotification(type, title, message, data = {}) {
+  const notification = { id: Date.now(), type, title, message, data, timestamp: new Date().toISOString(), read: false };
+  adminNotifications.unshift(notification);
+  adminUnreadCount++;
+  if (adminNotifications.length > 100) adminNotifications.pop();
+  updateAdminBellBadge();
+  saveAdminNotifications();
+  renderAdminNotificationDropdown();
+}
+
 function checkAllExpiries() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -5927,16 +6139,6 @@ function checkAllExpiries() {
       }
     });
   });
-}
-
-function addAdminNotification(type, title, message, data = {}) {
-  const notification = { id: Date.now(), type, title, message, data, timestamp: new Date().toISOString(), read: false };
-  adminNotifications.unshift(notification);
-  adminUnreadCount++;
-  if (adminNotifications.length > 100) adminNotifications.pop();
-  updateAdminBellBadge();
-  saveAdminNotifications();
-  renderAdminNotificationDropdown();
 }
 
 function checkForNotifications() {
