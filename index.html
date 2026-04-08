@@ -3815,26 +3815,28 @@ window.sendBrokerMessage = async function() {
 // ADMIN PORTAL LOGIC
 // ============================================================
 function renderAdminTables() {
+    // Clients Table
     const cTbody = document.getElementById('adminClientsTable');
     if(cTbody) {
         cTbody.innerHTML = clients.map(c => {
             const p = projects.find(x => x.clientId === c.id);
             return `
             <tr>
-                <td><strong>${escapeHtml(c.name)}</strong><br><span style="font-size:11px; color:var(--gray-500);">${escapeHtml(c.email)}</span></td>
+                <td><strong>${escapeHtml(c.name)}</strong><br><span style="font-size:11px;color:var(--gray-500);">${escapeHtml(c.email)}</span></td>
                 <td>${escapeHtml(p?.name || '—')}</td>
-                <td><span style="color:${c.status==='active'?'var(--success)':'var(--warning)'}; font-weight:500;">${c.status}</span></td>
+                <td><span style="color:${c.status==='active'?'var(--success)':'var(--warning)'};">${c.status}</span></td>
                 <td>${c.createdAt ? c.createdAt.split('T')[0] : '—'}</td>
                 <td>
-                    ${c.status==='pending' ? `<button class="btn btn-success" style="padding:5px 10px; font-size:10px;" onclick="approveClient('${c.id}')">Approve</button>` : ''}
-                    <button class="btn btn-outline" style="padding:5px 10px; font-size:10px;" onclick="editProject('${p?.id}')">Edit</button>
-                    <button class="btn btn-danger" style="padding:5px 10px; font-size:10px;" onclick="deleteClient('${c.id}')">Delete</button>
+                    ${c.status==='pending' ? `<button class="btn btn-success" style="padding:4px 8px;font-size:10px;margin-right:4px;" onclick="approveClient('${c.id}')">Approve</button>` : ''}
+                    <button class="btn btn-outline" style="padding:4px 8px;font-size:10px;margin-right:4px;" onclick="editProject('${p?.id}')">Edit</button>
+                    <button class="btn btn-danger" style="padding:4px 8px;font-size:10px;" onclick="deleteClient('${c.id}', event)">Delete</button>
                 </td>
             </tr>
             `;
         }).join('');
     }
 
+    // Projects Table with Delete button
     const pTbody = document.getElementById('adminProjectsTable');
     if(pTbody) {
         pTbody.innerHTML = projects.map(p => {
@@ -3847,16 +3849,17 @@ function renderAdminTables() {
                 <td>${escapeHtml(p.location || '—')}</td>
                 <td>${escapeHtml(p.fundsNeeded || p.amount || 'TBD')}</td>
                 <td><span class="badge badge-navy">Step ${p.step||1}</span></td>
-                <td>—</td>
-                <td>—</td>
+                <td>—</td><td>—</td>
                 <td>
-                    <button class="btn btn-outline" style="padding:5px 10px; font-size:10px;" onclick="editProject('${p.id}')">Edit</button>
+                    <button class="btn btn-outline" style="padding:4px 8px;font-size:10px;margin-right:4px;" onclick="editProject('${p.id}')">Edit</button>
+                    <button class="btn btn-danger" style="padding:4px 8px;font-size:10px;" onclick="deleteProject('${p.id}', event)">Delete</button>
                 </td>
             </tr>
             `;
         }).join('');
     }
     
+    // Pipeline Board with Delete buttons
     const board = document.getElementById('pipelineBoard');
     if(board) {
         board.innerHTML = [1,2,3,4,5,6,7,8].map(step => {
@@ -3868,6 +3871,9 @@ function renderAdminTables() {
                     <div class="pipeline-card" onclick="editProject('${p.id}')">
                         <div class="pipeline-card-name">${escapeHtml(clients.find(c=>c.id===p.clientId)?.name||'Unknown')}</div>
                         <div class="pipeline-card-project">${escapeHtml(p.name)}</div>
+                        <div style="margin-top:8px;">
+                            <button class="btn btn-danger" style="padding:2px 6px;font-size:8px;" onclick="event.stopPropagation(); deleteProject('${p.id}', event)">Delete</button>
+                        </div>
                     </div>
                 `).join('')}
             </div>
@@ -3875,26 +3881,13 @@ function renderAdminTables() {
         }).join('');
     }
     
+    // Update stats
     document.getElementById('totalClients').innerHTML = clients.filter(c=>c.status==='active').length;
     document.getElementById('totalProjects').innerHTML = projects.filter(p=>p.status==='active').length;
     document.getElementById('totalDocuments').innerHTML = documents.length;
     document.getElementById('pendingClientsCount').innerHTML = clients.filter(c=>c.status==='pending').length;
 }
-
-window.approveClient = async function(id) {
-    await db.collection('clients').doc(id).update({status:'active'});
-    const p = projects.find(x=>x.clientId===id);
-    if(p) await db.collection('projects').doc(p.id).update({status:'active'});
-    showToast('Client approved');
-};
-window.deleteClient = async function(id) {
-    if(!confirm('Delete client entirely? This cannot be undone.')) return;
-    await db.collection('clients').doc(id).delete();
-    const p = projects.find(x=>x.clientId===id);
-    if(p) await db.collection('projects').doc(p.id).delete();
-    showToast('Client deleted');
-};
-
+  
 function renderBrokerAdminTable() {
     const tbody = document.getElementById('adminBrokersTable');
     if(!tbody) return;
@@ -3903,27 +3896,16 @@ function renderBrokerAdminTable() {
             <td><strong>${escapeHtml(b.name)}</strong><br><span style="font-size:11px;color:var(--gray-500);">${escapeHtml(b.email)}</span></td>
             <td>${escapeHtml(b.firm)}</td>
             <td><strong>${b.commissionRate || 0}%</strong></td>
-            <td><span style="color:${b.status==='active'?'var(--success)':'var(--warning)'}; font-weight:500;">${b.status}</span></td>
+            <td><span style="color:${b.status==='active'?'var(--success)':'var(--warning)'};">${b.status}</span></td>
             <td>
-                ${b.status==='pending' ? `<button class="btn btn-success" style="padding:5px 10px; font-size:10px;" onclick="approveBroker('${b.id}')">Approve</button>` : ''}
-                <button class="btn btn-outline" style="padding:5px 10px; font-size:10px;" onclick="setBrokerCommission('${b.id}')">Set Rate</button>
-                <button class="btn btn-danger" style="padding:5px 10px; font-size:10px;" onclick="deleteBroker('${b.id}')">Delete</button>
+                ${b.status==='pending' ? `<button class="btn btn-success" style="padding:4px 8px;font-size:10px;margin-right:4px;" onclick="approveBroker('${b.id}')">Approve</button>` : ''}
+                <button class="btn btn-outline" style="padding:4px 8px;font-size:10px;margin-right:4px;" onclick="setBrokerCommission('${b.id}')">Set Rate</button>
+                <button class="btn btn-danger" style="padding:4px 8px;font-size:10px;" onclick="deleteBroker('${b.id}', event)">Delete</button>
             </td>
         </tr>
     `).join('');
 }
-window.approveBroker = async function(id) { await db.collection('brokers').doc(id).update({status:'active'}); showToast('Broker approved'); };
-window.setBrokerCommission = async function(id) {
-    const b = brokers.find(x=>x.id===id);
-    const rate = prompt('Set Commission Rate (%) for ' + b.name, b.commissionRate || 0);
-    if(rate !== null) { await db.collection('brokers').doc(id).update({commissionRate: parseFloat(rate)}); showToast('Rate updated'); }
-};
-window.deleteBroker = async function(id) {
-    if(!confirm('Delete broker?')) return;
-    await db.collection('brokers').doc(id).delete();
-    showToast('Broker deleted');
-};
-
+  
 function renderAdminBrokerSubmissionsTable() {
     const tbody = document.getElementById('adminBrokerSubmissionsTable');
     if(!tbody) return;
@@ -3936,15 +3918,18 @@ function renderAdminBrokerSubmissionsTable() {
             <td>$${escapeHtml(s.fundsNeeded||'—')}</td>
             <td><span class="status-badge-${s.status==='pending'?'pending':'active'}">${s.status==='pending'?'Pending':'Accepted'}</span></td>
             <td>
-                <button class="btn btn-danger" style="padding:5px 10px; font-size:10px;" onclick="rejectBrokerSubmission('${s.id}')">Delete / Reject</button>
+                <button class="btn btn-danger" style="padding:4px 8px;font-size:10px;" onclick="deleteBrokerSubmission('${s.id}', event)">Delete</button>
             </td>
         </tr>
     `).join('');
 }
-window.rejectBrokerSubmission = async function(id) {
-    if(confirm('Delete/Reject this broker submission permanently?')) {
+
+// Add this function to delete broker submissions
+window.deleteBrokerSubmission = async function(id, event) {
+    if(event) event.stopPropagation();
+    if(confirm('Delete this broker submission?')) {
         await db.collection('brokerSubmissions').doc(id).delete();
-        showToast('Submission removed');
+        showToast('Submission deleted');
     }
 };
 
@@ -4608,19 +4593,146 @@ window.approveAdminDoc = async function(id) {
     showToast('Document approved');
 };
 
-window.deleteAdminDoc = async function(id) {
-    if(confirm('Delete this document?')) {
+// ============================================================
+// IMPROVED DELETE FUNCTIONS - REPLACE FROM HERE
+// ============================================================
+
+// Delete a single document (improved)
+window.deleteAdminDoc = async function(id, event) {
+    if(event) event.stopPropagation();
+    if(confirm('Delete this document permanently?')) {
         await db.collection('documents').doc(id).delete();
         showToast('Document deleted');
     }
 };
 
+// Delete a single project (improved - with better confirmation)
+window.deleteProject = async function(projectId, event) {
+    if(event) event.stopPropagation();
+    
+    const project = projects.find(p => p.id === projectId);
+    if(!project) {
+        showToast('Project not found', true);
+        return;
+    }
+    
+    const client = clients.find(c => c.id === project.clientId);
+    const confirmMsg = `Are you sure you want to delete the project "${project.name}"${client ? ` for client ${client.name}` : ''}?\n\nThis will also delete ALL documents associated with this project. This action cannot be undone.`;
+    
+    if(!confirm(confirmMsg)) return;
+    
+    try {
+        // Delete all documents for this project
+        const projectDocs = documents.filter(d => d.projectId === projectId);
+        for(const doc of projectDocs) {
+            await db.collection('documents').doc(doc.id).delete();
+        }
+        // Delete the project
+        await db.collection('projects').doc(projectId).delete();
+        showToast(`Project "${project.name}" deleted successfully`);
+        if(currentProjectId === projectId) currentProjectId = null;
+    } catch(error) {
+        showToast(error.message, true);
+    }
+};
+
+// Delete a client (improved - requires "DELETE" to be typed)
+window.deleteClient = async function(clientId, event) {
+    if(event) event.stopPropagation();
+    
+    const client = clients.find(c => c.id === clientId);
+    if(!client) {
+        showToast('Client not found', true);
+        return;
+    }
+    
+    const clientProjects = projects.filter(p => p.clientId === clientId);
+    const projectNames = clientProjects.map(p => `  - ${p.name}`).join('\n');
+    
+    const confirmMsg = `⚠️ WARNING: This is PERMANENT and cannot be undone! ⚠️\n\nYou are about to delete client:\n"${client.name}" (${client.email})\n\nThis client has ${clientProjects.length} project(s):\n${projectNames || '  - No projects'}\n\nThis will also delete:\n- ALL documents uploaded by this client\n- ALL message conversations\n\nType "DELETE" to confirm:`;
+    
+    const userInput = prompt(confirmMsg);
+    if(userInput !== 'DELETE') {
+        showToast('Deletion cancelled - you must type DELETE to confirm');
+        return;
+    }
+    
+    try {
+        // Delete all documents for all client projects
+        for(const project of clientProjects) {
+            const projectDocs = documents.filter(d => d.projectId === project.id);
+            for(const doc of projectDocs) {
+                await db.collection('documents').doc(doc.id).delete();
+            }
+        }
+        
+        // Delete all messages from this client
+        const clientMessages = messages.filter(m => m.clientId === clientId);
+        for(const msg of clientMessages) {
+            await db.collection('messages').doc(msg.id).delete();
+        }
+        
+        // Delete all projects
+        for(const project of clientProjects) {
+            await db.collection('projects').doc(project.id).delete();
+        }
+        
+        // Delete the client document
+        await db.collection('clients').doc(clientId).delete();
+        
+        showToast(`Client "${client.name}" and all associated data deleted successfully`);
+    } catch(error) {
+        console.error('Delete client error:', error);
+        showToast(error.message, true);
+    }
+};
+
+// Delete a broker (improved)
+window.deleteBroker = async function(brokerId, event) {
+    if(event) event.stopPropagation();
+    
+    const broker = brokers.find(b => b.id === brokerId);
+    if(!broker) return;
+    
+    if(!confirm(`Delete broker "${broker.name}" (${broker.email})? This will also remove all their deal submissions.`)) return;
+    
+    try {
+        // Delete broker's submissions
+        const submissions = brokerSubmissions.filter(s => s.brokerId === brokerId);
+        for(const sub of submissions) {
+            await db.collection('brokerSubmissions').doc(sub.id).delete();
+        }
+        
+        // Delete broker messages
+        const bMessages = brokerMessages.filter(m => m.brokerId === brokerId);
+        for(const msg of bMessages) {
+            await db.collection('brokerMessages').doc(msg.id).delete();
+        }
+        
+        // Delete broker
+        await db.collection('brokers').doc(brokerId).delete();
+        
+        showToast(`Broker "${broker.name}" deleted`);
+    } catch(error) {
+        showToast(error.message, true);
+    }
+};
+
+// ============================================================
 // Refresh all admin tables
+// ============================================================
 function refreshAllAdminTables() {
     renderClientsTable();
     renderAdminDocumentsTable();
     renderBrokerAdminTable();
     renderAdminBrokerSubmissionsTable();
+}
+
+// Call refresh when data changes
+if(typeof db !== 'undefined') {
+    db.collection('clients').onSnapshot(() => refreshAllAdminTables());
+    db.collection('projects').onSnapshot(() => refreshAllAdminTables());
+    db.collection('documents').onSnapshot(() => renderAdminDocumentsTable());
 }
 
 // Call refresh when data changes
