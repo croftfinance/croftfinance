@@ -4386,41 +4386,57 @@ window.sendBrokerMessage = async function() {
 // ADMIN PORTAL LOGIC
 // ============================================================
 function renderAdminTables() {
-    // Clients Table
+// Projects Table - COMPLETELY FIXED VERSION
 const pTbody = document.getElementById('adminProjectsTable');
 if(pTbody) {
     if(projects.length === 0) {
         pTbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:40px;">No projects found. Click "+ Add Client & Project" to create one.</td></tr>';
     } else {
         pTbody.innerHTML = projects.map(p => {
-            // Find client - IMPORTANT FIX
-            const c = clients.find(cl => cl && cl.id === p.clientId);
-            const clientName = c ? c.name : 'Unknown Client';
-            
-            // Calculate completed steps correctly
-            let completedSteps = 0;
-            for(let i = 1; i <= 8; i++) {
-                if(p[`step${i}Completed`] === true) completedSteps++;
+            // Find client - FIXED: better matching
+            let clientName = 'Unknown Client';
+            if (p.clientId) {
+                const c = clients.find(cl => cl && (cl.id === p.clientId || cl.id === p.clientId.toString()));
+                if (c && c.name) clientName = c.name;
             }
-            const stepStatus = p.step || 1;
             
-            // Create step indicator dots
-            let stepDots = '';
-            for(let i = 1; i <= 8; i++) {
-                const isCompleted = p[`step${i}Completed`] === true;
-                stepDots += `<span style="display:inline-block; width:20px; height:20px; border-radius:50%; background:${isCompleted ? '#2b8c4e' : (i === stepStatus ? '#2c5f8a' : '#dee2e6')}; margin-right:4px; font-size:10px; text-align:center; line-height:20px; color:white;">${isCompleted ? '✓' : i}</span>`;
-            }
+            // FIXED: Calculate completed steps based on current step
+            // If project is at step 3, then steps 1 and 2 are completed
+            const currentStep = p.step || 1;
+            const completedSteps = currentStep - 1;
+            
+            // FIXED: Location - try multiple possible field names
+            const location = p.location || p.projectLocation || p.city || p.country || '—';
+            
+            // FIXED: Funds needed - format nicely
+            let fundsNeeded = '—';
+            if (p.fundsNeeded) fundsNeeded = typeof p.fundsNeeded === 'number' ? `$${p.fundsNeeded.toLocaleString()}` : p.fundsNeeded;
+            else if (p.amount) fundsNeeded = typeof p.amount === 'number' ? `$${p.amount.toLocaleString()}` : p.amount;
+            
+            // FIXED: CF and ECF values
+            let cfValue = '—';
+            if (p.cf) cfValue = typeof p.cf === 'number' ? `$${p.cf.toLocaleString()}` : p.cf;
+            else if (p.cf_amount) cfValue = typeof p.cf_amount === 'number' ? `$${p.cf_amount.toLocaleString()}` : p.cf_amount;
+            
+            let ecfValue = '—';
+            if (p.ecf) ecfValue = typeof p.ecf === 'number' ? `$${p.ecf.toLocaleString()}` : p.ecf;
+            else if (p.ecf_amount) ecfValue = typeof p.ecf_amount === 'number' ? `$${p.ecf_amount.toLocaleString()}` : p.ecf_amount;
+            else if (p.ecfAmount) ecfValue = typeof p.ecfAmount === 'number' ? `$${p.ecfAmount.toLocaleString()}` : p.ecfAmount;
             
             return `
             <tr>
                 <td><strong>${escapeHtml(clientName)}</strong></td>
-                <td><strong>${escapeHtml(p.name)}</strong><br><span style="font-size:10px;">${stepDots}</span></td>
+                <td><strong>${escapeHtml(p.name || 'Unnamed Project')}</strong><br><span style="font-size:10px;">Step ${currentStep}/8</span></td>
                 <td>${escapeHtml(p.industry || '—')}</td>
-                <td>${escapeHtml(p.location || p.projectLocation || '—')}</td>
-                <td>${escapeHtml(p.fundsNeeded || p.amount || 'TBD')}</td>
-                <td><span class="badge badge-navy">Step ${stepStatus}/8</span><br><span style="font-size:10px; color:${completedSteps > 0 ? '#2b8c4e' : '#6c757d'};">${completedSteps} completed</span></td>
-                <td>${p.cf ? `$${p.cf.toLocaleString()}` : (p.cf_amount ? `$${p.cf_amount.toLocaleString()}` : '—')}</td>
-                <td>${p.ecf ? `$${p.ecf.toLocaleString()}` : (p.ecf_amount ? `$${p.ecf_amount.toLocaleString()}` : '—')}</td>
+                <td>${escapeHtml(location)}</td>
+                <td>${fundsNeeded}</td>
+                <td>
+                    <span class="badge badge-navy">Step ${currentStep}/8</span>
+                    <br>
+                    <span style="font-size:10px; color:${completedSteps > 0 ? '#2b8c4e' : '#6c757d'};">${completedSteps} completed</span>
+                </td>
+                <td>${cfValue}</td>
+                <td>${ecfValue}</td>
                 <td>
                     <button class="btn btn-outline" style="padding:4px 8px;font-size:10px;margin-right:4px;" onclick="editProject('${p.id}')">Edit</button>
                     <button class="btn btn-danger" style="padding:4px 8px;font-size:10px;" onclick="deleteProject('${p.id}', event)">Delete</button>
