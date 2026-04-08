@@ -3435,31 +3435,8 @@ function loadClientPortal() {
 function loadCurrentProjectData() {
     const p = projects.find(x => x.id === currentProjectId);
     if (!p) return;
-    
-    const step = p.step || 1;
-    document.getElementById('dashStage').innerHTML = STEP_NAMES[step];
-    document.getElementById('dashAmount').innerHTML = p.amount || 'TBD';
-    document.getElementById('dashRate').innerHTML = p.interestRate || 'TBD';
-    
-    const percent = Math.round((step / 8) * 100);
-    document.getElementById('progressPercentage').innerHTML = percent + '%';
-    const circle = document.querySelector('.progress-circle-fill');
-    if(circle) {
-        const circ = 2 * Math.PI * 45;
-        circle.style.strokeDashoffset = circ - (percent/100)*circ;
-    }
-    
-    // Action Banner
-    const bannerDiv = document.getElementById('actionBannerDisplay');
-    if(step === 2 && p.commitmentFeeStatus !== 'paid') {
-        bannerDiv.innerHTML = `<div class="action-banner client-action"><i class="fas fa-exclamation-triangle"></i><div class="action-banner-text"><strong>Action Required: Commitment Fee</strong><span>Please submit the commitment fee to proceed to Step 3. <a href="#" onclick="alert('Wiring instructions will be sent to your email')">Click for instructions</a></span></div></div>`;
-        bannerDiv.style.display = 'block';
-    } else if(step === 1 && !p.termSheetAck) {
-        bannerDiv.innerHTML = `<div class="action-banner client-action"><i class="fas fa-file-signature"></i><div class="action-banner-text"><strong>Action Required: Review Term Sheet</strong><span>Please review and sign your term sheet. <button class="btn-primary" style="padding:4px 12px;" onclick="openPDFWithWatermark(null, 'Term Sheet')">Review Now</button></span></div></div>`;
-        bannerDiv.style.display = 'block';
-    } else {
-        bannerDiv.style.display = 'none';
-    }
+    renderClientStepProgress(p);
+    renderCapitalStack();
 }
 
 // Client Document Engine
@@ -3592,6 +3569,194 @@ function renderCapitalStack() {
             }
         }
     });
+}
+
+// ============================================================
+// CLIENT DASHBOARD STEP TRACKING - INSERT THIS FUNCTION HERE
+// ============================================================
+
+function renderClientStepProgress(project) {
+    if(!project) return;
+    
+    const step = project.step || 1;
+    
+    // Update progress circle
+    const percent = Math.round(((step - 1) / 8) * 100);
+    const progressPercent = document.getElementById('progressPercentage');
+    if(progressPercent) progressPercent.innerHTML = percent + '%';
+    
+    const circle = document.querySelector('.progress-circle-fill');
+    if(circle) {
+        const circ = 2 * Math.PI * 45;
+        circle.style.strokeDashoffset = circ - (percent/100)*circ;
+    }
+    
+    // Update step info
+    const stepNumberEl = document.getElementById('stepNumber');
+    const stepNameEl = document.getElementById('stepName');
+    if(stepNumberEl) stepNumberEl.innerHTML = `Step ${step} of 8`;
+    if(stepNameEl) stepNameEl.innerHTML = STEP_NAMES[step] || 'In Progress';
+    
+    const currentStepNum = document.getElementById('currentStepNum');
+    const currentStepName = document.getElementById('currentStepName');
+    if(currentStepNum) currentStepNum.innerHTML = step;
+    if(currentStepName) currentStepName.innerHTML = STEP_NAMES[step] || 'In Progress';
+    
+    // Update dashboard stats
+    const dashStage = document.getElementById('dashStage');
+    const dashAmount = document.getElementById('dashAmount');
+    const dashRate = document.getElementById('dashRate');
+    if(dashStage) dashStage.innerHTML = STEP_NAMES[step] || 'Review';
+    if(dashAmount) dashAmount.innerHTML = project.amount || 'TBD';
+    if(dashRate) dashRate.innerHTML = project.interestRate || 'TBD';
+    
+    // Calculate days remaining
+    if(project.closeDate) {
+        const closeDate = new Date(project.closeDate);
+        const today = new Date();
+        const daysRemaining = Math.ceil((closeDate - today) / (1000 * 60 * 60 * 24));
+        const dashCountdown = document.getElementById('dashCountdown');
+        const dashClosingDate = document.getElementById('dashClosingDate');
+        const daysRemainingDisplay = document.getElementById('daysRemainingDisplay');
+        const closingDateDisplay = document.getElementById('closingDateDisplay');
+        
+        if(dashCountdown) dashCountdown.innerHTML = daysRemaining > 0 ? `${daysRemaining} days` : 'Ready for closing';
+        if(dashClosingDate) dashClosingDate.innerHTML = project.closeDate;
+        if(daysRemainingDisplay) daysRemainingDisplay.innerHTML = daysRemaining > 0 ? daysRemaining : '0';
+        if(closingDateDisplay) closingDateDisplay.innerHTML = project.closeDate;
+    }
+    
+    // Render the step timeline for client
+    const timelineContainer = document.getElementById('timeline');
+    if(timelineContainer) {
+        let timelineHtml = '<div class="timeline">';
+        for(let i = 1; i <= 8; i++) {
+            const isCompleted = project[`step${i}Completed`] === true;
+            const isCurrent = step === i;
+            const stepName = STEP_NAMES[i];
+            const completedAt = project[`step${i}CompletedAt`];
+            
+            let statusClass = '';
+            let statusIcon = '';
+            let statusText = '';
+            
+            if(isCompleted) {
+                statusClass = 'completed';
+                statusIcon = '✓';
+                statusText = 'COMPLETED';
+            } else if(isCurrent) {
+                statusClass = 'current';
+                statusIcon = '●';
+                statusText = 'IN PROGRESS';
+            } else {
+                statusClass = 'locked';
+                statusIcon = '○';
+                statusText = 'PENDING';
+            }
+            
+            timelineHtml += `
+                <div class="timeline-item">
+                    <div class="timeline-dot ${statusClass}">${statusIcon}</div>
+                    <div class="timeline-header">
+                        <div class="timeline-title ${isCompleted ? '' : (isCurrent ? '' : 'locked-text')}">
+                            Step ${i}: ${stepName}
+                        </div>
+                        <span class="timeline-who ${isCompleted ? 'who-both' : (isCurrent ? 'who-client' : 'who-croft')}">${statusText}</span>
+                    </div>
+                    ${completedAt ? `<div class="timeline-date">Completed: ${new Date(completedAt).toLocaleDateString()}</div>` : ''}
+                    ${i === 2 && !isCompleted && isCurrent ? `
+                        <div class="action-banner client-action" style="margin-top: 12px;">
+                            <i class="fas fa-dollar-sign"></i>
+                            <div class="action-banner-text">
+                                <strong>Action Required: Commitment Fee</strong>
+                                <span>Please submit the commitment fee to proceed. Contact Suzana for wiring instructions.</span>
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+        timelineHtml += '</div>';
+        timelineContainer.innerHTML = timelineHtml;
+    }
+    
+    // Update Next Steps list
+    const nextStepsContainer = document.getElementById('nextStepsList');
+    if(nextStepsContainer) {
+        let nextStepsHtml = '';
+        for(let i = step; i <= Math.min(step + 2, 8); i++) {
+            const isCompleted = project[`step${i}Completed`];
+            const stepName = STEP_NAMES[i];
+            nextStepsHtml += `
+                <div class="next-step-item">
+                    <div class="next-step-check ${isCompleted ? 'completed' : (i === step ? 'urgent' : 'pending')}">
+                        ${isCompleted ? '✓' : (i === step ? '!' : '○')}
+                    </div>
+                    <div class="next-step-content">
+                        <div class="next-step-title ${i === step && !isCompleted ? 'urgent' : ''}">
+                            ${stepName}
+                        </div>
+                        <div class="next-step-desc">
+                            ${i === step ? (i === 2 ? 'Awaiting Commitment Fee payment confirmation' : 'Pending your action') : 'Complete previous step first'}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        nextStepsContainer.innerHTML = nextStepsHtml;
+    }
+    
+    // Update Recent Activity
+    const recentActivity = document.getElementById('recentActivity');
+    if(recentActivity) {
+        let activities = [];
+        for(let i = 1; i <= 8; i++) {
+            if(project[`step${i}CompletedAt`]) {
+                activities.push(`
+                    <div class="dashboard-activity-item">
+                        <div class="dashboard-activity-icon completion">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="dashboard-activity-content">
+                            <div class="dashboard-activity-text">Step ${i}: ${STEP_NAMES[i]} completed</div>
+                            <div class="dashboard-activity-time">${new Date(project[`step${i}CompletedAt`]).toLocaleDateString()}</div>
+                        </div>
+                    </div>
+                `);
+            }
+        }
+        recentActivity.innerHTML = activities.length ? activities.join('') : '<p style="color:var(--gray-400);">No recent activity yet.</p>';
+    }
+    
+    // Update Action Banner
+    const actionBanner = document.getElementById('actionBannerDisplay');
+    if(actionBanner) {
+        if(step === 2 && !project.step2Completed) {
+            actionBanner.innerHTML = `
+                <div class="action-banner client-action">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div class="action-banner-text">
+                        <strong>⚠️ Action Required: Commitment Fee Payment</strong>
+                        <span>Please submit the commitment fee to proceed to Step 3. Contact your advisor for wiring instructions.</span>
+                    </div>
+                </div>
+            `;
+            actionBanner.style.display = 'block';
+        } else if(step === 1 && !project.termSheetAck) {
+            actionBanner.innerHTML = `
+                <div class="action-banner client-action">
+                    <i class="fas fa-file-signature"></i>
+                    <div class="action-banner-text">
+                        <strong>📄 Action Required: Review Term Sheet</strong>
+                        <span>Please review and sign your term sheet. <button class="btn-primary" style="padding:4px 12px; margin-left:8px;" onclick="openPDFWithWatermark(null, 'Term Sheet')">Review Now</button></span>
+                    </div>
+                </div>
+            `;
+            actionBanner.style.display = 'block';
+        } else {
+            actionBanner.style.display = 'none';
+        }
+    }
 }
 
 // ============================================================
@@ -3831,13 +3996,18 @@ window.markStepCompleted = async function(projectId, stepNumber) {
         [`step${stepNumber}CompletedAt`]: new Date().toISOString()
     };
     
+    // Also mark all required fields as true
+    for(const req of step.requires) {
+        updateData[req] = true;
+    }
+    
     if(project.step === stepNumber) {
         updateData.step = stepNumber + 1;
     }
     
     // Calculate overall progress
     let completedCount = 0;
-    for(let i = 1; i <= stepNumber; i++) {
+    for(let i = 1; i <= 8; i++) {
         if(i === stepNumber) {
             completedCount++;
         } else if(project[`step${i}Completed`]) {
@@ -3849,7 +4019,9 @@ window.markStepCompleted = async function(projectId, stepNumber) {
     await db.collection('projects').doc(projectId).update(updateData);
     
     const client = clients.find(c => c.id === project.clientId);
-    showToast(`Step ${stepNumber} (${step.name}) marked complete for ${client?.name}`);
+    showToast(`✅ Step ${stepNumber} (${step.name}) marked complete for ${client?.name}`);
+    
+    // Refresh all displays
     renderAdminTables();
     
     // Refresh the edit modal if open
@@ -4219,10 +4391,17 @@ function renderAdminTables() {
     if(cTbody) {
         cTbody.innerHTML = clients.map(c => {
             const p = projects.find(x => x.clientId === c.id);
+            // Calculate completed steps for this client
+            let completedSteps = 0;
+            if(p) {
+                for(let i = 1; i <= 8; i++) {
+                    if(p[`step${i}Completed`]) completedSteps++;
+                }
+            }
             return `
             <tr>
                 <td><strong>${escapeHtml(c.name)}</strong><br><span style="font-size:11px;color:var(--gray-500);">${escapeHtml(c.email)}</span></td>
-                <td>${escapeHtml(p?.name || '—')}</td>
+                <td>${escapeHtml(p?.name || '—')}<br><span style="font-size:10px;color:${completedSteps === 8 ? 'var(--success)' : 'var(--blue)'};">${completedSteps}/8 steps done</span></td>
                 <td><span style="color:${c.status==='active'?'var(--success)':'var(--warning)'};">${c.status}</span></td>
                 <td>${c.createdAt ? c.createdAt.split('T')[0] : '—'}</td>
                 <td>
@@ -4235,20 +4414,33 @@ function renderAdminTables() {
         }).join('');
     }
 
-    // Projects Table with Delete button
+    // Projects Table with step completion badges
     const pTbody = document.getElementById('adminProjectsTable');
     if(pTbody) {
         pTbody.innerHTML = projects.map(p => {
             const c = clients.find(cl => cl.id === p.clientId);
+            // Calculate completed steps
+            let completedSteps = 0;
+            for(let i = 1; i <= 8; i++) {
+                if(p[`step${i}Completed`]) completedSteps++;
+            }
+            const stepStatus = p.step || 1;
+            
+            // Create step indicator dots
+            let stepDots = '';
+            for(let i = 1; i <= 8; i++) {
+                const isCompleted = p[`step${i}Completed`];
+                stepDots += `<span style="display:inline-block; width:20px; height:20px; border-radius:50%; background:${isCompleted ? 'var(--success)' : (i === stepStatus ? 'var(--blue)' : 'var(--gray-300)')}; margin-right:4px; font-size:10px; text-align:center; line-height:20px; color:white;">${isCompleted ? '✓' : i}</span>`;
+            }
+            
             return `
             <tr>
                 <td>${escapeHtml(c?.name || 'Unknown')}</td>
-                <td><strong>${escapeHtml(p.name)}</strong></td>
+                <td><strong>${escapeHtml(p.name)}</strong><br><span style="font-size:10px;">${stepDots}</span></td>
                 <td>${escapeHtml(p.industry || '—')}</td>
                 <td>${escapeHtml(p.location || '—')}</td>
                 <td>${escapeHtml(p.fundsNeeded || p.amount || 'TBD')}</td>
-                <td><span class="badge badge-navy">Step ${p.step||1}</span></td>
-                <td>—</td><td>—</td>
+                <td><span class="badge badge-navy">Step ${stepStatus}/8</span><br><span style="font-size:10px;">${completedSteps} completed</span></td>
                 <td>
                     <button class="btn btn-outline" style="padding:4px 8px;font-size:10px;margin-right:4px;" onclick="editProject('${p.id}')">Edit</button>
                     <button class="btn btn-danger" style="padding:4px 8px;font-size:10px;" onclick="deleteProject('${p.id}', event)">Delete</button>
@@ -4258,33 +4450,38 @@ function renderAdminTables() {
         }).join('');
     }
     
-    // Pipeline Board with Delete buttons
+    // Pipeline Board with step indicators
     const board = document.getElementById('pipelineBoard');
     if(board) {
-        board.innerHTML = [1,2,3,4,5,6,7,8].map(step => {
-            const ps = projects.filter(x => (x.step||1) === step && x.status==='active');
-            return `
+        board.innerHTML = '';
+        for(let stepNum = 1; stepNum <= 8; stepNum++) {
+            const stepProjects = projects.filter(x => (x.step || 1) === stepNum && x.status === 'active');
+            board.innerHTML += `
             <div class="pipeline-col">
-                <div class="pipeline-col-title">${STEP_NAMES[step]}</div>
-                ${ps.map(p => `
-                    <div class="pipeline-card" onclick="editProject('${p.id}')">
-                        <div class="pipeline-card-name">${escapeHtml(clients.find(c=>c.id===p.clientId)?.name||'Unknown')}</div>
+                <div class="pipeline-col-title">${STEP_NAMES[stepNum]}</div>
+                ${stepProjects.map(p => {
+                    const client = clients.find(c => c.id === p.clientId);
+                    return `
+                    <div class="pipeline-card" onclick="editProject('${p.id}')" style="cursor:pointer;">
+                        <div class="pipeline-card-name">${escapeHtml(client?.name || 'Unknown')}</div>
                         <div class="pipeline-card-project">${escapeHtml(p.name)}</div>
-                        <div style="margin-top:8px;">
-                            <button class="btn btn-danger" style="padding:2px 6px;font-size:8px;" onclick="event.stopPropagation(); deleteProject('${p.id}', event)">Delete</button>
+                        <div class="pipeline-card-meta">
+                            <span class="pipeline-card-amount">${p.amount || 'TBD'}</span>
                         </div>
                     </div>
-                `).join('')}
+                    `;
+                }).join('')}
+                ${stepProjects.length === 0 ? '<div style="padding:20px;text-align:center;color:var(--gray-400);font-size:11px;">No deals</div>' : ''}
             </div>
             `;
-        }).join('');
+        }
     }
     
     // Update stats
-    document.getElementById('totalClients').innerHTML = clients.filter(c=>c.status==='active').length;
-    document.getElementById('totalProjects').innerHTML = projects.filter(p=>p.status==='active').length;
+    document.getElementById('totalClients').innerHTML = clients.filter(c => c.status === 'active').length;
+    document.getElementById('totalProjects').innerHTML = projects.filter(p => p.status === 'active').length;
     document.getElementById('totalDocuments').innerHTML = documents.length;
-    document.getElementById('pendingClientsCount').innerHTML = clients.filter(c=>c.status==='pending').length;
+    document.getElementById('pendingClientsCount').innerHTML = clients.filter(c => c.status === 'pending').length;
 }
   
 function renderBrokerAdminTable() {
@@ -5122,13 +5319,6 @@ function refreshAllAdminTables() {
     renderAdminDocumentsTable();
     renderBrokerAdminTable();
     renderAdminBrokerSubmissionsTable();
-}
-
-// Call refresh when data changes
-if(typeof db !== 'undefined') {
-    db.collection('clients').onSnapshot(() => refreshAllAdminTables());
-    db.collection('projects').onSnapshot(() => refreshAllAdminTables());
-    db.collection('documents').onSnapshot(() => renderAdminDocumentsTable());
 }
 
 // Call refresh when data changes
