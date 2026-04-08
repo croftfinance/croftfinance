@@ -2990,7 +2990,6 @@ body {
         <div class="form-group"><label class="form-label">Term (years)</label><input type="text" id="editTerm" class="form-input"></div>
         <div class="form-group"><label class="form-label">Grace Period (months)</label><input type="text" id="editGrace" class="form-input"></div>
         <div class="form-group"><label class="form-label">ECF Amount</label><input type="text" id="editECF" class="form-input"></div>
-        <div class="form-group"><label class="form-label">Next Milestone Goal</label><input type="text" id="editNext" class="form-input"></div>
         <div class="form-group"><label class="form-label">Term Sheet Expiry</label><input type="date" id="editExpiry" class="form-input"></div>
         <div class="form-group"><label class="form-label">Commitment Fee Deadline</label><input type="date" id="editCommitFeeDeadline" class="form-input"></div>
         <div class="form-group"><label class="form-label">Deed of Undertaking Expiry</label><input type="date" id="editDeedExpiry" class="form-input"></div>
@@ -3058,7 +3057,6 @@ body {
     <div class="form-group"><label class="form-label">ECF</label><input type="text" id="ncECF" class="form-input"></div>
     <div class="form-group"><label class="form-label">Governing Law</label><input type="text" id="ncGovLaw" class="form-input"></div>
     <div class="form-group"><label class="form-label">Term Sheet Expiry</label><input type="date" id="ncExpiry" class="form-input"></div>
-    <div class="form-group"><label class="form-label">Next Milestone</label><input type="text" id="ncMilestone" class="form-input"></div>
   </div>
   <button class="btn btn-primary" onclick="createClient()" style="width:100%">Create Client Portal</button>
 </div></div></div>
@@ -3600,76 +3598,191 @@ function renderCapitalStack() {
 // COMPLETE STEP MANAGEMENT SYSTEM
 // ============================================================
 
-// Step definitions with required actions
+// Step definitions
 const STEP_CONFIG = {
-    1: { name: 'Term Sheet', requires: ['termSheetSigned'], clientAction: 'Sign Term Sheet', adminAction: 'Upload Signed Term Sheet' },
-    2: { name: 'Commitment Fee', requires: ['commitmentFeePaid'], clientAction: 'Pay Commitment Fee', adminAction: 'Confirm Fee Receipt' },
-    3: { name: 'Deed of Undertaking', requires: ['deedSigned'], clientAction: 'Sign Deed', adminAction: 'Upload Signed Deed' },
-    4: { name: 'Credit Support', requires: ['creditSupportProvided'], clientAction: 'Provide Credit Support', adminAction: 'Verify Credit Support' },
-    5: { name: 'Hard-Copy Submission', requires: ['hardCopySubmitted'], clientAction: 'Submit Hard Copies', adminAction: 'Review Submission' },
-    6: { name: 'ECF Escrow', requires: ['ecfEscrowed'], clientAction: 'Fund ECF Account', adminAction: 'Confirm ECF Receipt' },
-    7: { name: 'Transfer to Agent', requires: ['transferCompleted'], clientAction: 'Await Transfer', adminAction: 'Execute Transfer' },
-    8: { name: 'Funded', requires: ['fundingCompleted'], clientAction: 'Funding Complete', adminAction: 'Mark Funded' }
+    1: { name: 'Term Sheet', requiredDocs: ['term_sheet.pdf'], clientAction: 'Review & Sign', adminAction: 'Upload Signed Copy' },
+    2: { name: 'Commitment Fee', requiredDocs: ['commitment_fee_receipt.pdf'], clientAction: 'Pay Fee', adminAction: 'Verify & Confirm' },
+    3: { name: 'Deed of Undertaking', requiredDocs: ['deed_signed.pdf'], clientAction: 'Sign Deed', adminAction: 'Review & Approve' },
+    4: { name: 'Credit Support', requiredDocs: ['credit_support.pdf'], clientAction: 'Provide Documents', adminAction: 'Verify Credit' },
+    5: { name: 'Hard-Copy Submission', requiredDocs: ['hard_copies.pdf'], clientAction: 'Submit Copies', adminAction: 'Review Submission' },
+    6: { name: 'ECF Escrow', requiredDocs: ['ecf_confirmation.pdf'], clientAction: 'Fund ECF', adminAction: 'Confirm Receipt' },
+    7: { name: 'Transfer to Agent', requiredDocs: ['transfer_confirmation.pdf'], clientAction: 'Await Transfer', adminAction: 'Execute Transfer' },
+    8: { name: 'Funded', requiredDocs: ['funding_confirmation.pdf'], clientAction: 'Complete', adminAction: 'Mark Funded' }
 };
 
-// Update step completion status
-window.updateStepCompletion = async function(projectId, stepNumber, fieldName, isComplete) {
-    const updateData = {};
-    updateData[fieldName] = isComplete;
+// Render the complete step status dashboard for admin
+function renderStepDashboard(project) {
+    if(!project) return '<div>No project data</div>';
     
-    if(isComplete) {
-        updateData[`step${stepNumber}CompletedAt`] = new Date().toISOString();
-    }
+    let html = `
+        <div style="background: white; border-radius: 12px; overflow: hidden; margin-top: 20px;">
+            <div style="background: var(--navy); color: white; padding: 16px 20px;">
+                <h3 style="margin: 0; font-size: 16px;"><i class="fas fa-chart-line"></i> Closing Process Dashboard</h3>
+                <p style="margin: 5px 0 0; opacity: 0.7; font-size: 12px;">Track each step of the closing process</p>
+            </div>
+            <div style="padding: 20px;">
+                <!-- Progress Bar -->
+                <div style="margin-bottom: 30px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="font-size: 13px; font-weight: 500;">Overall Progress</span>
+                        <span style="font-size: 13px; font-weight: 500;" id="overallProgress">${project.overallProgress || 0}%</span>
+                    </div>
+                    <div style="background: var(--gray-200); height: 8px; border-radius: 10px; overflow: hidden;">
+                        <div style="background: var(--success); height: 100%; width: ${project.overallProgress || 0}%; transition: width 0.3s;"></div>
+                    </div>
+                </div>
+                
+                <!-- Steps Grid -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;">
+    `;
     
-    const step = STEP_CONFIG[stepNumber];
-    const currentProject = projects.find(p => p.id === projectId);
-    
-    let allRequirementsMet = true;
-    for(const req of step.requires) {
-        if(!currentProject[req]) allRequirementsMet = false;
-    }
-    
-    if(allRequirementsMet && currentProject.step <= stepNumber) {
-        updateData.step = stepNumber + 1;
-        updateData[`step${stepNumber}Completed`] = true;
+    for(let i = 1; i <= 8; i++) {
+        const step = STEP_CONFIG[i];
+        const isCompleted = project[`step${i}Completed`] === true;
+        const isCurrent = (project.step || 1) === i;
+        const completedAt = project[`step${i}CompletedAt`];
+        const stepData = project[`step${i}Data`] || {};
         
-        const client = clients.find(c => c.id === currentProject.clientId);
-        if(client) {
-            try {
-                await emailjs.send('service_croft', 'template_step_update', {
-                    to_name: client.name,
-                    to_email: client.email,
-                    step_name: step.name,
-                    next_action: STEP_CONFIG[stepNumber + 1]?.clientAction || 'Finalize closing'
-                });
-                showToast(`Step ${stepNumber} completion email sent to ${client.name}`);
-            } catch(e) { console.warn('Email not sent:', e); }
-        }
+        html += `
+            <div style="border: 1px solid ${isCompleted ? 'var(--success)' : (isCurrent ? 'var(--blue)' : 'var(--gray-200)')}; border-radius: 12px; overflow: hidden; background: ${isCompleted ? 'var(--success-light)' : 'white'}; transition: all 0.2s;">
+                <div style="padding: 16px; background: ${isCompleted ? 'var(--success)' : (isCurrent ? 'var(--navy)' : 'var(--gray-50)')}; color: ${(isCompleted || isCurrent) ? 'white' : 'var(--gray-600)'};">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <span style="font-size: 11px; opacity: 0.8;">STEP ${i}</span>
+                            <h4 style="margin: 5px 0 0; font-size: 16px;">${step.name}</h4>
+                        </div>
+                        <div style="text-align: right;">
+                            ${isCompleted ? 
+                                '<span style="background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 20px; font-size: 11px;"><i class="fas fa-check"></i> COMPLETE</span>' : 
+                                (isCurrent ? '<span style="background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 20px; font-size: 11px;"><i class="fas fa-spinner fa-pulse"></i> IN PROGRESS</span>' : 
+                                '<span style="background: rgba(0,0,0,0.1); padding: 4px 10px; border-radius: 20px; font-size: 11px;">PENDING</span>')}
+                        </div>
+                    </div>
+                </div>
+                <div style="padding: 16px;">
+                    <div style="margin-bottom: 12px;">
+                        <div style="font-size: 11px; color: var(--gray-500); margin-bottom: 4px;">Required Action</div>
+                        <div style="font-size: 13px;"><i class="fas fa-user-check"></i> ${step.clientAction}</div>
+                        <div style="font-size: 13px; margin-top: 4px;"><i class="fas fa-shield-alt"></i> ${step.adminAction}</div>
+                    </div>
+                    
+                    ${completedAt ? `<div style="font-size: 11px; color: var(--gray-500); margin-bottom: 12px;"><i class="fas fa-calendar-check"></i> Completed: ${new Date(completedAt).toLocaleString()}</div>` : ''}
+                    
+                    ${i === 2 && !isCompleted ? `
+                        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--gray-200);">
+                            <div style="background: var(--warning-light); padding: 10px; border-radius: 8px; margin-bottom: 10px;">
+                                <div style="font-size: 12px; font-weight: 500;">Commitment Fee Details</div>
+                                <div style="font-size: 11px; margin-top: 5px;">
+                                    <div><strong>Amount:</strong> ${project.commitmentFeeAmount || 'Not recorded'} ${project.commitmentFeeAmount ? `(Paid: ${project.commitmentFeePaidAt ? new Date(project.commitmentFeePaidAt).toLocaleDateString() : 'N/A'})` : ''}</div>
+                                    <div><strong>Reference:</strong> ${project.commitmentFeeReference || 'None'}</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-primary" style="padding: 8px 12px; font-size: 12px; flex: 1;" onclick="showCommitmentFeeModal('${project.id}')">
+                                    <i class="fas fa-dollar-sign"></i> Confirm Fee Receipt
+                                </button>
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--gray-200); display: flex; gap: 8px;">
+                        ${!isCompleted ? 
+                            `<button class="btn btn-success" style="padding: 6px 12px; font-size: 11px; flex: 1;" onclick="markStepCompleted('${project.id}', ${i})">
+                                <i class="fas fa-check"></i> Mark Complete
+                            </button>` : ''
+                        }
+                        <button class="btn btn-outline" style="padding: 6px 12px; font-size: 11px; flex: 1;" onclick="revertStepStatus('${project.id}', ${i})">
+                            <i class="fas fa-undo"></i> ${isCompleted ? 'Revert' : 'Skip / Revert'}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
     }
     
-    await db.collection('projects').doc(projectId).update(updateData);
-    showToast(`${step.name} ${isComplete ? 'completed' : 'updated'}`);
+    // Add Documents Section
+    const uploadedDocs = documents.filter(d => d.projectId === project.id);
+    html += `
+                </div>
+                
+                <!-- Documents Summary -->
+                <div style="margin-top: 30px; background: var(--gray-50); border-radius: 12px; padding: 16px;">
+                    <h4 style="margin: 0 0 12px 0; font-size: 14px;"><i class="fas fa-file-alt"></i> Document Status</h4>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                        ${STEP_CONFIG[project.step || 1]?.requiredDocs.map(doc => {
+                            const isUploaded = uploadedDocs.some(d => d.name === doc || d.url.includes(doc));
+                            return `
+                                <div style="display: flex; align-items: center; gap: 6px; padding: 4px 10px; background: ${isUploaded ? 'var(--success-light)' : 'var(--warning-light)'}; border-radius: 20px;">
+                                    <i class="fas ${isUploaded ? 'fa-check-circle' : 'fa-clock'}" style="color: ${isUploaded ? 'var(--success)' : 'var(--warning)'}; font-size: 11px;"></i>
+                                    <span style="font-size: 11px;">${doc}</span>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    return html;
+}
+
+// Show modal for commitment fee confirmation
+window.showCommitmentFeeModal = function(projectId) {
+    const project = projects.find(p => p.id === projectId);
+    const modalHtml = `
+        <div id="feeModal" style="position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 10001;">
+            <div style="background: white; border-radius: 16px; max-width: 450px; width: 90%; padding: 24px;">
+                <h3 style="margin: 0 0 8px 0;">Confirm Commitment Fee</h3>
+                <p style="color: var(--gray-500); font-size: 13px; margin-bottom: 20px;">Enter the fee details received from ${project.clientName || 'client'}</p>
+                <div class="form-group">
+                    <label class="form-label">Amount Received (USD)</label>
+                    <input type="text" id="feeAmount" class="form-input" placeholder="e.g., 50,000">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Transaction Reference</label>
+                    <input type="text" id="feeReference" class="form-input" placeholder="Wire/Transfer Reference #">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Payment Date</label>
+                    <input type="date" id="feeDate" class="form-input" value="${new Date().toISOString().split('T')[0]}">
+                </div>
+                <div style="display: flex; gap: 12px; margin-top: 20px;">
+                    <button class="btn btn-primary" style="flex: 1;" onclick="confirmCommitmentFeeWithDetails('${projectId}')">Confirm Payment</button>
+                    <button class="btn btn-outline" style="flex: 1;" onclick="closeFeeModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
 };
 
-// Admin: Confirm Commitment Fee payment
-window.confirmCommitmentFee = async function(projectId) {
+window.closeFeeModal = function() {
+    const modal = document.getElementById('feeModal');
+    if(modal) modal.remove();
+};
+
+window.confirmCommitmentFeeWithDetails = async function(projectId) {
+    const amount = document.getElementById('feeAmount')?.value;
+    const reference = document.getElementById('feeReference')?.value;
+    const date = document.getElementById('feeDate')?.value;
+    
+    if(!amount || !reference) {
+        showToast('Please enter amount and reference number', true);
+        return;
+    }
+    
     const project = projects.find(p => p.id === projectId);
-    if(!project) return;
-    
-    const amount = prompt('Enter Commitment Fee amount received (USD):', '50,000');
-    if(!amount) return;
-    
-    const reference = prompt('Enter transaction reference number:', `CF-${Date.now()}`);
-    if(!reference) return;
     
     await db.collection('projects').doc(projectId).update({
         commitmentFeePaid: true,
         commitmentFeeAmount: amount,
         commitmentFeeReference: reference,
-        commitmentFeePaidAt: new Date().toISOString(),
+        commitmentFeePaidAt: date || new Date().toISOString(),
         step2Completed: true,
         step2CompletedAt: new Date().toISOString(),
-        step: 3
+        step: 3,
+        overallProgress: 25
     });
     
     const client = clients.find(c => c.id === project.clientId);
@@ -3685,106 +3798,131 @@ window.confirmCommitmentFee = async function(projectId) {
     }
     
     showToast(`Commitment Fee of $${amount} confirmed for ${client?.name}`);
+    closeFeeModal();
     renderAdminTables();
+    // Refresh the edit modal if open
+    if(window.editProjectId === projectId) {
+        const stepContainer = document.getElementById('stepStatusContainer');
+        if(stepContainer) {
+            const updatedProject = projects.find(p => p.id === projectId);
+            stepContainer.innerHTML = renderStepDashboard(updatedProject);
+        }
+    }
 };
 
-// Admin: Mark any step as complete
-window.markStepComplete = async function(projectId, stepNumber) {
+// Mark step as completed
+window.markStepCompleted = async function(projectId, stepNumber) {
     const project = projects.find(p => p.id === projectId);
     if(!project) return;
     
     const step = STEP_CONFIG[stepNumber];
-    if(!step) return;
     
-    const updateData = {};
-    for(const req of step.requires) {
-        updateData[req] = true;
+    // For Step 2, use the fee modal instead
+    if(stepNumber === 2) {
+        showCommitmentFeeModal(projectId);
+        return;
     }
-    updateData[`step${stepNumber}Completed`] = true;
-    updateData[`step${stepNumber}CompletedAt`] = new Date().toISOString();
+    
+    const confirmMsg = `Mark Step ${stepNumber} (${step.name}) as complete?\n\nThis will move the deal to the next step.`;
+    if(!confirm(confirmMsg)) return;
+    
+    const updateData = {
+        [`step${stepNumber}Completed`]: true,
+        [`step${stepNumber}CompletedAt`]: new Date().toISOString()
+    };
     
     if(project.step === stepNumber) {
         updateData.step = stepNumber + 1;
     }
+    
+    // Calculate overall progress
+    let completedCount = 0;
+    for(let i = 1; i <= stepNumber; i++) {
+        if(i === stepNumber) {
+            completedCount++;
+        } else if(project[`step${i}Completed`]) {
+            completedCount++;
+        }
+    }
+    updateData.overallProgress = Math.round((completedCount / 8) * 100);
     
     await db.collection('projects').doc(projectId).update(updateData);
     
     const client = clients.find(c => c.id === project.clientId);
     showToast(`Step ${stepNumber} (${step.name}) marked complete for ${client?.name}`);
     renderAdminTables();
+    
+    // Refresh the edit modal if open
+    if(window.editProjectId === projectId) {
+        const stepContainer = document.getElementById('stepStatusContainer');
+        if(stepContainer) {
+            const updatedProject = projects.find(p => p.id === projectId);
+            stepContainer.innerHTML = renderStepDashboard(updatedProject);
+        }
+    }
 };
 
-// Admin: Revert a step
-window.revertStep = async function(projectId, stepNumber) {
-    if(!confirm(`Revert Step ${stepNumber}? This will require the client to re-complete this step.`)) return;
-    
+// Revert step status
+window.revertStepStatus = async function(projectId, stepNumber) {
     const project = projects.find(p => p.id === projectId);
-    const step = STEP_CONFIG[stepNumber];
+    if(!project) return;
     
-    const updateData = {
-        step: stepNumber,
-        [`step${stepNumber}Completed`]: false
-    };
-    for(const req of step.requires) {
-        updateData[req] = false;
+    const step = STEP_CONFIG[stepNumber];
+    const isCurrentlyCompleted = project[`step${stepNumber}Completed`];
+    
+    let confirmMsg;
+    if(isCurrentlyCompleted) {
+        confirmMsg = `Revert Step ${stepNumber} (${step.name}) to incomplete?\n\nThis will require the client to re-complete this step.`;
+    } else {
+        confirmMsg = `Skip/Mark as complete without verification?\n\nUse this only if the step was completed outside the system.`;
     }
+    
+    if(!confirm(confirmMsg)) return;
+    
+    const updateData = {};
+    
+    if(isCurrentlyCompleted) {
+        updateData[`step${stepNumber}Completed`] = false;
+        updateData[`step${stepNumber}CompletedAt`] = null;
+        if(project.step > stepNumber) {
+            updateData.step = stepNumber;
+        }
+    } else {
+        updateData[`step${stepNumber}Completed`] = true;
+        updateData[`step${stepNumber}CompletedAt`] = new Date().toISOString();
+        if(project.step === stepNumber) {
+            updateData.step = stepNumber + 1;
+        }
+    }
+    
+    // Recalculate progress
+    let completedCount = 0;
+    for(let i = 1; i <= 8; i++) {
+        if(i === stepNumber) {
+            if(updateData[`step${stepNumber}Completed`] === true) completedCount++;
+            else if(isCurrentlyCompleted && updateData[`step${stepNumber}Completed`] === false) {}
+            else if(project[`step${i}Completed`]) completedCount++;
+        } else if(project[`step${i}Completed`]) {
+            completedCount++;
+        }
+    }
+    updateData.overallProgress = Math.round((completedCount / 8) * 100);
     
     await db.collection('projects').doc(projectId).update(updateData);
-    showToast(`Step ${stepNumber} reverted`);
+    showToast(`Step ${stepNumber} status updated`);
     renderAdminTables();
+    
+    if(window.editProjectId === projectId) {
+        const stepContainer = document.getElementById('stepStatusContainer');
+        if(stepContainer) {
+            const updatedProject = projects.find(p => p.id === projectId);
+            stepContainer.innerHTML = renderStepDashboard(updatedProject);
+        }
+    }
 };
 
-// Render Step Status for Admin
-function renderStepStatus(project) {
-    let html = '<div style="margin-top: 16px; border-top: 1px solid var(--gray-200); padding-top: 16px;">';
-    html += '<h4 style="font-size: 13px; margin-bottom: 12px;">Closing Process Status</h4>';
-    html += '<div style="display: flex; flex-direction: column; gap: 12px;">';
-    
-    for(let i = 1; i <= 8; i++) {
-        const step = STEP_CONFIG[i];
-        const isCompleted = project[`step${i}Completed`] || false;
-        const isCurrent = project.step === i;
-        const completedAt = project[`step${i}CompletedAt`];
-        
-        html += `
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px; background: ${isCompleted ? 'var(--success-light)' : (isCurrent ? 'var(--info-light)' : 'var(--gray-50)')}; border-radius: 8px;">
-                <div style="flex: 2;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <span style="font-weight: 600; min-width: 30px;">Step ${i}:</span>
-                        <span>${step.name}</span>
-                        ${isCompleted ? '<span class="badge badge-green"><i class="fas fa-check"></i> Complete</span>' : (isCurrent ? '<span class="badge badge-blue">In Progress</span>' : '<span class="badge badge-gray">Pending</span>')}
-                        ${completedAt ? `<span style="font-size: 10px; color: var(--gray-500);">Completed: ${new Date(completedAt).toLocaleDateString()}</span>` : ''}
-                    </div>
-                    ${i === 2 && !isCompleted ? `
-                        <div style="margin-top: 8px; margin-left: 40px;">
-                            <button class="btn btn-primary" style="padding: 4px 12px; font-size: 11px;" onclick="confirmCommitmentFee('${project.id}')">
-                                <i class="fas fa-dollar-sign"></i> Confirm Fee Receipt
-                            </button>
-                        </div>
-                    ` : ''}
-                </div>
-                <div>
-                    ${!isCompleted ? 
-                        `<button class="btn btn-success" style="padding: 4px 12px; font-size: 11px;" onclick="markStepComplete('${project.id}', ${i})">
-                            <i class="fas fa-check"></i> Mark Complete
-                        </button>
-                        <button class="btn btn-outline" style="padding: 4px 12px; font-size: 11px; margin-left: 8px;" onclick="revertStep('${project.id}', ${i})">
-                            <i class="fas fa-undo"></i> Revert
-                        </button>` : 
-                        `<button class="btn btn-outline" style="padding: 4px 12px; font-size: 11px;" onclick="revertStep('${project.id}', ${i})">
-                            <i class="fas fa-undo"></i> Revert
-                        </button>`
-                    }
-                </div>
-            </div>
-        `;
-    }
-    
-    html += '</div></div>';
-    return html;
-}
-
-// Update editProject to include step status
+// Override the editProject function to use the new dashboard
+const originalEditProject = window.editProject;
 window.editProject = function(pid) {
     if(!pid) return showToast('No project selected', true);
     const p = projects.find(x => x.id === pid);
@@ -3792,6 +3930,7 @@ window.editProject = function(pid) {
     window.editProjectId = pid;
     const c = clients.find(cl => cl.id === p.clientId);
     
+    // Fill all form fields (same as before)
     document.getElementById('editClientName').value = c?.name || '';
     document.getElementById('editClientEmail').value = c?.email || '';
     document.getElementById('editProjectName').value = p.name || '';
@@ -3824,23 +3963,13 @@ window.editProject = function(pid) {
     document.getElementById('editTerm').value = p.term || '';
     document.getElementById('editGrace').value = p.gracePeriod || '';
     document.getElementById('editECF').value = p.ecfAmount || '';
-    document.getElementById('editNext').value = p.nextMilestone || '';
-    document.getElementById('editExpiry').value = p.termSheetExpiry || '';
-    document.getElementById('editCommitFeeDeadline').value = p.commitmentFeeDeadline || '';
-    document.getElementById('editDeedExpiry').value = p.deedExpiry || '';
-    document.getElementById('editECFPolicyExpiry').value = p.ecfPolicyExpiry || '';
-    document.getElementById('editCommitFee').value = p.commitmentFeeStatus || 'pending';
-    document.getElementById('editCommitFeeDate').value = p.commitmentFeeDate || '';
-    document.getElementById('editECFStatus').value = p.ecfStatus || 'pending';
-    document.getElementById('editECFDate').value = p.ecfEscrowDate || '';
-    document.getElementById('editFundedDate').value = p.fundedDate || '';
     document.getElementById('editAdvisorNote').value = p.advisorNote || '';
     document.getElementById('editAdminNote').value = p.adminNote || '';
     
-    // Add Step Status display to the Process tab
-    const stepStatusContainer = document.getElementById('stepStatusContainer');
-    if(stepStatusContainer) {
-        stepStatusContainer.innerHTML = renderStepStatus(p);
+    // Render the new step dashboard
+    const stepContainer = document.getElementById('stepStatusContainer');
+    if(stepContainer) {
+        stepContainer.innerHTML = renderStepDashboard(p);
     }
     
     const brokerSelect = document.getElementById('editBrokerAssign');
@@ -4511,7 +4640,6 @@ window.createClient = async function() {
             ecfAmount: document.getElementById('ncECF').value,
             governingLaw: document.getElementById('ncGovLaw').value,
             termSheetExpiry: document.getElementById('ncExpiry').value,
-            nextMilestone: document.getElementById('ncMilestone').value,
             step: 1,
             status: 'active',
             createdAt: new Date().toISOString()
@@ -4570,7 +4698,6 @@ window.editProject = function(pid) {
     document.getElementById('editTerm').value = p.term || '';
     document.getElementById('editGrace').value = p.gracePeriod || '';
     document.getElementById('editECF').value = p.ecfAmount || '';
-    document.getElementById('editNext').value = p.nextMilestone || '';
     document.getElementById('editExpiry').value = p.termSheetExpiry || '';
     document.getElementById('editCommitFeeDeadline').value = p.commitmentFeeDeadline || '';
     document.getElementById('editDeedExpiry').value = p.deedExpiry || '';
@@ -4644,7 +4771,6 @@ window.saveProjectInfo = async function() {
         term: document.getElementById('editTerm').value,
         gracePeriod: document.getElementById('editGrace').value,
         ecfAmount: document.getElementById('editECF').value,
-        nextMilestone: document.getElementById('editNext').value,
         termSheetExpiry: document.getElementById('editExpiry').value,
         commitmentFeeDeadline: document.getElementById('editCommitFeeDeadline').value,
         deedExpiry: document.getElementById('editDeedExpiry').value,
