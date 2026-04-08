@@ -3001,15 +3001,28 @@ body {
         <div class="form-group"><label class="form-label">ECF Escrow Date</label><input type="date" id="editECFDate" class="form-input"></div>
         <div class="form-group"><label class="form-label">Funded Date</label><input type="date" id="editFundedDate" class="form-input"></div>
       </div>
+      <div id="stepStatusContainer"></div>
       <div class="form-group"><label class="form-label">Advisor Note (Shown to Client)</label><textarea id="editAdvisorNote" class="form-textarea" rows="2" placeholder="Personal note to client..."></textarea></div>
       <div class="form-group"><label class="form-label">Admin Note (Private)</label><textarea id="editAdminNote" class="form-textarea" rows="2"></textarea></div>
       <div id="editAckInfo"></div>
-      <div class="form-group" style="background: var(--gray-50); padding: 16px; border-radius: 8px; margin-top: 16px;"><label class="form-label"><i class="fas fa-shield-alt"></i> Investor Verification Letter</label><div id="ivlAdminInfo"></div><div style="display: flex; gap: 12px; margin-top: 12px;"><button type="button" class="btn btn-outline" onclick="previewIVLFromAdmin()">Preview Letter</button><button type="button" class="btn btn-outline" onclick="regenerateIVL()">Regenerate Letter</button><button type="button" class="btn btn-outline" onclick="printInvestorVerificationLetter(window.editProjectId)">Print / Download</button></div></div>
-    </div>
+            <div class="form-group" style="background: var(--gray-50); padding: 16px; border-radius: 8px; margin-top: 16px;">
+        <label class="form-label"><i class="fas fa-shield-alt"></i> Investor Verification Letter</label>
+        <div id="ivlAdminInfo"></div>
+        <div style="display: flex; gap: 12px; margin-top: 12px;">
+          <button type="button" class="btn btn-outline" onclick="previewIVLFromAdmin()">Preview Letter</button>
+          <button type="button" class="btn btn-outline" onclick="regenerateIVL()">Regenerate Letter</button>
+          <button type="button" class="btn btn-outline" onclick="printInvestorVerificationLetter(window.editProjectId)">Print / Download</button>
+        </div>
+      </div>
 
-    <button class="btn btn-primary" onclick="saveProjectInfo()" style="width:100%; margin-top:15px;">Save All Changes</button>
-  </div>
-</div></div>
+    </div>  <!-- closes edit-tab-process -->
+
+  </div>  <!-- closes modal-body -->
+
+  <button class="btn btn-primary" onclick="saveProjectInfo()" style="width:100%; margin-top:15px;">Save All Changes</button>
+
+ </div>  <!-- closes modal -->
+</div>  <!-- closes modal-overlay -->
 
 <div id="addClientModal" class="modal-overlay"><div class="modal modal-lg"><div class="modal-header"><h3>Add New Client & Project</h3><button class="modal-close" onclick="closeModal('addClientModal')">✕</button></div><div class="modal-body" style="max-height:70vh;overflow-y:auto;">
   <div class="form-grid-2">
@@ -3582,6 +3595,263 @@ function renderCapitalStack() {
         }
     });
 }
+
+// ============================================================
+// COMPLETE STEP MANAGEMENT SYSTEM
+// ============================================================
+
+// Step definitions with required actions
+const STEP_CONFIG = {
+    1: { name: 'Term Sheet', requires: ['termSheetSigned'], clientAction: 'Sign Term Sheet', adminAction: 'Upload Signed Term Sheet' },
+    2: { name: 'Commitment Fee', requires: ['commitmentFeePaid'], clientAction: 'Pay Commitment Fee', adminAction: 'Confirm Fee Receipt' },
+    3: { name: 'Deed of Undertaking', requires: ['deedSigned'], clientAction: 'Sign Deed', adminAction: 'Upload Signed Deed' },
+    4: { name: 'Credit Support', requires: ['creditSupportProvided'], clientAction: 'Provide Credit Support', adminAction: 'Verify Credit Support' },
+    5: { name: 'Hard-Copy Submission', requires: ['hardCopySubmitted'], clientAction: 'Submit Hard Copies', adminAction: 'Review Submission' },
+    6: { name: 'ECF Escrow', requires: ['ecfEscrowed'], clientAction: 'Fund ECF Account', adminAction: 'Confirm ECF Receipt' },
+    7: { name: 'Transfer to Agent', requires: ['transferCompleted'], clientAction: 'Await Transfer', adminAction: 'Execute Transfer' },
+    8: { name: 'Funded', requires: ['fundingCompleted'], clientAction: 'Funding Complete', adminAction: 'Mark Funded' }
+};
+
+// Update step completion status
+window.updateStepCompletion = async function(projectId, stepNumber, fieldName, isComplete) {
+    const updateData = {};
+    updateData[fieldName] = isComplete;
+    
+    if(isComplete) {
+        updateData[`step${stepNumber}CompletedAt`] = new Date().toISOString();
+    }
+    
+    const step = STEP_CONFIG[stepNumber];
+    const currentProject = projects.find(p => p.id === projectId);
+    
+    let allRequirementsMet = true;
+    for(const req of step.requires) {
+        if(!currentProject[req]) allRequirementsMet = false;
+    }
+    
+    if(allRequirementsMet && currentProject.step <= stepNumber) {
+        updateData.step = stepNumber + 1;
+        updateData[`step${stepNumber}Completed`] = true;
+        
+        const client = clients.find(c => c.id === currentProject.clientId);
+        if(client) {
+            try {
+                await emailjs.send('service_croft', 'template_step_update', {
+                    to_name: client.name,
+                    to_email: client.email,
+                    step_name: step.name,
+                    next_action: STEP_CONFIG[stepNumber + 1]?.clientAction || 'Finalize closing'
+                });
+                showToast(`Step ${stepNumber} completion email sent to ${client.name}`);
+            } catch(e) { console.warn('Email not sent:', e); }
+        }
+    }
+    
+    await db.collection('projects').doc(projectId).update(updateData);
+    showToast(`${step.name} ${isComplete ? 'completed' : 'updated'}`);
+};
+
+// Admin: Confirm Commitment Fee payment
+window.confirmCommitmentFee = async function(projectId) {
+    const project = projects.find(p => p.id === projectId);
+    if(!project) return;
+    
+    const amount = prompt('Enter Commitment Fee amount received (USD):', '50,000');
+    if(!amount) return;
+    
+    const reference = prompt('Enter transaction reference number:', `CF-${Date.now()}`);
+    if(!reference) return;
+    
+    await db.collection('projects').doc(projectId).update({
+        commitmentFeePaid: true,
+        commitmentFeeAmount: amount,
+        commitmentFeeReference: reference,
+        commitmentFeePaidAt: new Date().toISOString(),
+        step2Completed: true,
+        step2CompletedAt: new Date().toISOString(),
+        step: 3
+    });
+    
+    const client = clients.find(c => c.id === project.clientId);
+    if(client) {
+        try {
+            await emailjs.send('service_croft', 'template_step_update', {
+                to_name: client.name,
+                to_email: client.email,
+                step_name: 'Commitment Fee',
+                next_action: 'Proceed to Deed of Undertaking'
+            });
+        } catch(e) {}
+    }
+    
+    showToast(`Commitment Fee of $${amount} confirmed for ${client?.name}`);
+    renderAdminTables();
+};
+
+// Admin: Mark any step as complete
+window.markStepComplete = async function(projectId, stepNumber) {
+    const project = projects.find(p => p.id === projectId);
+    if(!project) return;
+    
+    const step = STEP_CONFIG[stepNumber];
+    if(!step) return;
+    
+    const updateData = {};
+    for(const req of step.requires) {
+        updateData[req] = true;
+    }
+    updateData[`step${stepNumber}Completed`] = true;
+    updateData[`step${stepNumber}CompletedAt`] = new Date().toISOString();
+    
+    if(project.step === stepNumber) {
+        updateData.step = stepNumber + 1;
+    }
+    
+    await db.collection('projects').doc(projectId).update(updateData);
+    
+    const client = clients.find(c => c.id === project.clientId);
+    showToast(`Step ${stepNumber} (${step.name}) marked complete for ${client?.name}`);
+    renderAdminTables();
+};
+
+// Admin: Revert a step
+window.revertStep = async function(projectId, stepNumber) {
+    if(!confirm(`Revert Step ${stepNumber}? This will require the client to re-complete this step.`)) return;
+    
+    const project = projects.find(p => p.id === projectId);
+    const step = STEP_CONFIG[stepNumber];
+    
+    const updateData = {
+        step: stepNumber,
+        [`step${stepNumber}Completed`]: false
+    };
+    for(const req of step.requires) {
+        updateData[req] = false;
+    }
+    
+    await db.collection('projects').doc(projectId).update(updateData);
+    showToast(`Step ${stepNumber} reverted`);
+    renderAdminTables();
+};
+
+// Render Step Status for Admin
+function renderStepStatus(project) {
+    let html = '<div style="margin-top: 16px; border-top: 1px solid var(--gray-200); padding-top: 16px;">';
+    html += '<h4 style="font-size: 13px; margin-bottom: 12px;">Closing Process Status</h4>';
+    html += '<div style="display: flex; flex-direction: column; gap: 12px;">';
+    
+    for(let i = 1; i <= 8; i++) {
+        const step = STEP_CONFIG[i];
+        const isCompleted = project[`step${i}Completed`] || false;
+        const isCurrent = project.step === i;
+        const completedAt = project[`step${i}CompletedAt`];
+        
+        html += `
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px; background: ${isCompleted ? 'var(--success-light)' : (isCurrent ? 'var(--info-light)' : 'var(--gray-50)')}; border-radius: 8px;">
+                <div style="flex: 2;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-weight: 600; min-width: 30px;">Step ${i}:</span>
+                        <span>${step.name}</span>
+                        ${isCompleted ? '<span class="badge badge-green"><i class="fas fa-check"></i> Complete</span>' : (isCurrent ? '<span class="badge badge-blue">In Progress</span>' : '<span class="badge badge-gray">Pending</span>')}
+                        ${completedAt ? `<span style="font-size: 10px; color: var(--gray-500);">Completed: ${new Date(completedAt).toLocaleDateString()}</span>` : ''}
+                    </div>
+                    ${i === 2 && !isCompleted ? `
+                        <div style="margin-top: 8px; margin-left: 40px;">
+                            <button class="btn btn-primary" style="padding: 4px 12px; font-size: 11px;" onclick="confirmCommitmentFee('${project.id}')">
+                                <i class="fas fa-dollar-sign"></i> Confirm Fee Receipt
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+                <div>
+                    ${!isCompleted ? 
+                        `<button class="btn btn-success" style="padding: 4px 12px; font-size: 11px;" onclick="markStepComplete('${project.id}', ${i})">
+                            <i class="fas fa-check"></i> Mark Complete
+                        </button>
+                        <button class="btn btn-outline" style="padding: 4px 12px; font-size: 11px; margin-left: 8px;" onclick="revertStep('${project.id}', ${i})">
+                            <i class="fas fa-undo"></i> Revert
+                        </button>` : 
+                        `<button class="btn btn-outline" style="padding: 4px 12px; font-size: 11px;" onclick="revertStep('${project.id}', ${i})">
+                            <i class="fas fa-undo"></i> Revert
+                        </button>`
+                    }
+                </div>
+            </div>
+        `;
+    }
+    
+    html += '</div></div>';
+    return html;
+}
+
+// Update editProject to include step status
+window.editProject = function(pid) {
+    if(!pid) return showToast('No project selected', true);
+    const p = projects.find(x => x.id === pid);
+    if(!p) return;
+    window.editProjectId = pid;
+    const c = clients.find(cl => cl.id === p.clientId);
+    
+    document.getElementById('editClientName').value = c?.name || '';
+    document.getElementById('editClientEmail').value = c?.email || '';
+    document.getElementById('editProjectName').value = p.name || '';
+    document.getElementById('editIndustry').value = p.industry || 'Real Estate';
+    document.getElementById('editLocation').value = p.location || '';
+    document.getElementById('editTotalCost').value = p.totalCost || '';
+    document.getElementById('editSponsorEquity').value = p.sponsorEquity || '';
+    document.getElementById('editFundsNeeded').value = p.fundsNeeded || '';
+    document.getElementById('editCurrentStage').value = p.currentStage || 'Development';
+    document.getElementById('editUseOfFunds').value = p.useOfFunds || '';
+    document.getElementById('editTargetIRR').value = p.targetIRR || '';
+    document.getElementById('editCloseDate').value = p.closeDate || '';
+    document.getElementById('editMOIC').value = p.moic || '';
+    document.getElementById('editCapRate').value = p.capRate || '';
+    document.getElementById('editExitStrategy').value = p.exitStrategy || 'Sale';
+    document.getElementById('editExitCapRate').value = p.exitCapRate || '';
+    document.getElementById('editPermits').value = p.permits || 'No';
+    document.getElementById('editRevenue').value = p.revenue || '';
+    document.getElementById('editAssetClass').value = p.assetClass || '';
+    document.getElementById('editInfraType').value = p.infraType || '';
+    document.getElementById('editCommodity').value = p.commodity || '';
+    document.getElementById('editMiningStage').value = p.miningStage || 'Development';
+    document.getElementById('editReserveLife').value = p.reserveLife || '';
+    document.getElementById('editDataRoom').value = p.dataRoom || '';
+    document.getElementById('editGovLaw').value = p.governingLaw || '';
+    
+    document.getElementById('editStep').value = p.step || 1;
+    document.getElementById('editAmount').value = p.amount || '';
+    document.getElementById('editRate').value = p.interestRate || '';
+    document.getElementById('editTerm').value = p.term || '';
+    document.getElementById('editGrace').value = p.gracePeriod || '';
+    document.getElementById('editECF').value = p.ecfAmount || '';
+    document.getElementById('editNext').value = p.nextMilestone || '';
+    document.getElementById('editExpiry').value = p.termSheetExpiry || '';
+    document.getElementById('editCommitFeeDeadline').value = p.commitmentFeeDeadline || '';
+    document.getElementById('editDeedExpiry').value = p.deedExpiry || '';
+    document.getElementById('editECFPolicyExpiry').value = p.ecfPolicyExpiry || '';
+    document.getElementById('editCommitFee').value = p.commitmentFeeStatus || 'pending';
+    document.getElementById('editCommitFeeDate').value = p.commitmentFeeDate || '';
+    document.getElementById('editECFStatus').value = p.ecfStatus || 'pending';
+    document.getElementById('editECFDate').value = p.ecfEscrowDate || '';
+    document.getElementById('editFundedDate').value = p.fundedDate || '';
+    document.getElementById('editAdvisorNote').value = p.advisorNote || '';
+    document.getElementById('editAdminNote').value = p.adminNote || '';
+    
+    // Add Step Status display to the Process tab
+    const stepStatusContainer = document.getElementById('stepStatusContainer');
+    if(stepStatusContainer) {
+        stepStatusContainer.innerHTML = renderStepStatus(p);
+    }
+    
+    const brokerSelect = document.getElementById('editBrokerAssign');
+    if(brokerSelect) {
+        brokerSelect.innerHTML = '<option value="">Direct Client (No Broker)</option>' + 
+            brokers.map(b => `<option value="${b.id}" ${p.brokerId === b.id ? 'selected' : ''}>${escapeHtml(b.name)} (${b.commissionRate || 0}%)</option>`).join('');
+    }
+    
+    switchEditTab('project');
+    openModal('editProjectModal');
+};
 
 // ============================================================
 // IN-APP PDF VIEWER WITH DYNAMIC WATERMARKING
