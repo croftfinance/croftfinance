@@ -2856,6 +2856,8 @@ body {
 
       <div id="admin-projects-admin" class="admin-tab"><div class="page-header"><div class="page-title">Projects</div></div><div style="display:flex;justify-content:flex-end;margin-bottom:16px;"><button class="btn btn-primary" onclick="showAddClientModal()">+ Add Client & Project</button></div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Project</th><th>Industry</th><th>Location</th><th>Funds Needed</th><th>Current Step</th><th>CF</th><th>ECF</th><th>Actions</th></tr></thead><tbody id="adminProjectsTable"></tbody></table></div></div>
 
+      <div id="admin-projects" class="admin-tab" style="display:none;"><div id="allProjectsAdmin"></div></div>
+
       <div id="admin-documents-admin" class="admin-tab"><div class="page-header"><div class="page-title">Documents</div><div class="page-subtitle" id="docCount"></div></div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap;"><select id="adminDocFilterClient" class="form-select" style="max-width:250px;" onchange="renderAdminDocumentsTable()"><option value="">All Clients</option></select><button class="btn btn-primary" onclick="showUploadDocumentModal()">+ Upload Document</button></div><div class="table-wrap"><table class="documents-table" id="adminDocumentsTable"><thead><tr><th>Client</th><th>Project</th><th>Document Name</th><th>Step</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="adminDocumentsTableBody"></tbody></table></div></div>
 
       <div id="admin-brokers" class="admin-tab"><div class="page-header"><div class="page-title">Brokers & Introducers</div><div class="page-subtitle">Manage broker registrations and view their submissions</div></div><div class="card"><div class="card-body"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Broker</th><th>Firm</th><th>Country</th><th>Commission</th><th>Status</th><th>Registered</th><th>Actions</th></tr></thead><tbody id="adminBrokersTable"></tbody></table></div></div></div></div>
@@ -4169,6 +4171,464 @@ document.addEventListener('DOMContentLoaded', () => {
         if(currentProjectId) renderCapitalStack();
     }, 2000);
 });
+// ============================================================
+// COMPLETE ADMIN CLIENT & PROJECT MANAGEMENT FUNCTIONS
+// ============================================================
+
+// Show Add Client Modal
+window.showAddClientModal = function() {
+    // Clear all fields
+    const fields = ['ncName', 'ncEmail', 'ncPassword', 'ncProject', 'ncIndustry', 'ncLocation', 
+                    'ncTotalCost', 'ncSponsorEquity', 'ncFundsNeeded', 'ncCurrentStage', 'ncUseOfFunds',
+                    'ncTargetIRR', 'ncCloseDate', 'ncMOIC', 'ncCapRate', 'ncExitStrategy', 'ncExitCapRate',
+                    'ncPermits', 'ncRevenue', 'ncAssetClass', 'ncInfraType', 'ncCommodity', 'ncMiningStage',
+                    'ncReserveLife', 'ncDataRoom', 'ncAmount', 'ncRate', 'ncTerm', 'ncGrace', 'ncECF', 
+                    'ncGovLaw', 'ncExpiry', 'ncMilestone'];
+    fields.forEach(f => { 
+        const el = document.getElementById(f); 
+        if(el) el.value = ''; 
+    });
+    openModal('addClientModal');
+};
+
+// Create Client (with full project)
+window.createClient = async function() {
+    const name = document.getElementById('ncName').value.trim();
+    const email = document.getElementById('ncEmail').value.trim().toLowerCase();
+    const password = document.getElementById('ncPassword').value;
+    const projectName = document.getElementById('ncProject').value.trim();
+    
+    if(!name || !email || !password || !projectName) {
+        showToast('Please fill in Name, Email, Password, and Project Name', true);
+        return;
+    }
+    
+    if(password.length < 6) {
+        showToast('Password must be at least 6 characters', true);
+        return;
+    }
+    
+    try {
+        // Create Firebase Auth user
+        const userCred = await auth.createUserWithEmailAndPassword(email, password);
+        const uid = userCred.user.uid;
+        
+        // Create client document
+        await db.collection('clients').doc(uid).set({
+            id: uid,
+            name: name,
+            email: email,
+            status: 'active',
+            createdAt: new Date().toISOString()
+        });
+        
+        // Create project document
+        const projectId = db.collection('projects').doc().id;
+        const projectData = {
+            id: projectId,
+            clientId: uid,
+            name: projectName,
+            industry: document.getElementById('ncIndustry').value,
+            location: document.getElementById('ncLocation').value,
+            totalCost: document.getElementById('ncTotalCost').value,
+            sponsorEquity: document.getElementById('ncSponsorEquity').value,
+            fundsNeeded: document.getElementById('ncFundsNeeded').value,
+            currentStage: document.getElementById('ncCurrentStage').value,
+            useOfFunds: document.getElementById('ncUseOfFunds').value,
+            targetIRR: document.getElementById('ncTargetIRR').value,
+            closeDate: document.getElementById('ncCloseDate').value,
+            moic: document.getElementById('ncMOIC').value,
+            capRate: document.getElementById('ncCapRate').value,
+            exitStrategy: document.getElementById('ncExitStrategy').value,
+            exitCapRate: document.getElementById('ncExitCapRate').value,
+            permits: document.getElementById('ncPermits').value,
+            revenue: document.getElementById('ncRevenue').value,
+            assetClass: document.getElementById('ncAssetClass').value,
+            infraType: document.getElementById('ncInfraType').value,
+            commodity: document.getElementById('ncCommodity').value,
+            miningStage: document.getElementById('ncMiningStage').value,
+            reserveLife: document.getElementById('ncReserveLife').value,
+            dataRoom: document.getElementById('ncDataRoom').value,
+            amount: document.getElementById('ncAmount').value || 'TBD',
+            interestRate: document.getElementById('ncRate').value || 'TBD',
+            term: document.getElementById('ncTerm').value,
+            gracePeriod: document.getElementById('ncGrace').value,
+            ecfAmount: document.getElementById('ncECF').value,
+            governingLaw: document.getElementById('ncGovLaw').value,
+            termSheetExpiry: document.getElementById('ncExpiry').value,
+            nextMilestone: document.getElementById('ncMilestone').value,
+            step: 1,
+            status: 'active',
+            createdAt: new Date().toISOString()
+        };
+        
+        await db.collection('projects').doc(projectId).set(projectData);
+        
+        showToast(`Client ${name} created successfully!`);
+        closeModal('addClientModal');
+        
+    } catch(error) {
+        console.error('Create client error:', error);
+        showToast(error.message, true);
+    }
+};
+
+// Edit Project Modal - Fix missing data loading
+window.editProject = function(pid) {
+    if(!pid) return showToast('No project selected', true);
+    const p = projects.find(x => x.id === pid);
+    if(!p) return;
+    window.editProjectId = pid;
+    const c = clients.find(cl => cl.id === p.clientId);
+    
+    // Tab 1: Client & Project details
+    document.getElementById('editClientName').value = c?.name || '';
+    document.getElementById('editClientEmail').value = c?.email || '';
+    document.getElementById('editProjectName').value = p.name || '';
+    document.getElementById('editIndustry').value = p.industry || 'Real Estate';
+    document.getElementById('editLocation').value = p.location || '';
+    document.getElementById('editTotalCost').value = p.totalCost || '';
+    document.getElementById('editSponsorEquity').value = p.sponsorEquity || '';
+    document.getElementById('editFundsNeeded').value = p.fundsNeeded || '';
+    document.getElementById('editCurrentStage').value = p.currentStage || 'Development';
+    document.getElementById('editUseOfFunds').value = p.useOfFunds || '';
+    document.getElementById('editTargetIRR').value = p.targetIRR || '';
+    document.getElementById('editCloseDate').value = p.closeDate || '';
+    document.getElementById('editMOIC').value = p.moic || '';
+    document.getElementById('editCapRate').value = p.capRate || '';
+    document.getElementById('editExitStrategy').value = p.exitStrategy || 'Sale';
+    document.getElementById('editExitCapRate').value = p.exitCapRate || '';
+    document.getElementById('editPermits').value = p.permits || 'No';
+    document.getElementById('editRevenue').value = p.revenue || '';
+    document.getElementById('editAssetClass').value = p.assetClass || '';
+    document.getElementById('editInfraType').value = p.infraType || '';
+    document.getElementById('editCommodity').value = p.commodity || '';
+    document.getElementById('editMiningStage').value = p.miningStage || 'Development';
+    document.getElementById('editReserveLife').value = p.reserveLife || '';
+    document.getElementById('editDataRoom').value = p.dataRoom || '';
+    document.getElementById('editGovLaw').value = p.governingLaw || '';
+    
+    // Tab 2: Process & Status
+    document.getElementById('editStep').value = p.step || 1;
+    document.getElementById('editAmount').value = p.amount || '';
+    document.getElementById('editRate').value = p.interestRate || '';
+    document.getElementById('editTerm').value = p.term || '';
+    document.getElementById('editGrace').value = p.gracePeriod || '';
+    document.getElementById('editECF').value = p.ecfAmount || '';
+    document.getElementById('editNext').value = p.nextMilestone || '';
+    document.getElementById('editExpiry').value = p.termSheetExpiry || '';
+    document.getElementById('editCommitFeeDeadline').value = p.commitmentFeeDeadline || '';
+    document.getElementById('editDeedExpiry').value = p.deedExpiry || '';
+    document.getElementById('editECFPolicyExpiry').value = p.ecfPolicyExpiry || '';
+    document.getElementById('editCommitFee').value = p.commitmentFeeStatus || 'pending';
+    document.getElementById('editCommitFeeDate').value = p.commitmentFeeDate || '';
+    document.getElementById('editECFStatus').value = p.ecfStatus || 'pending';
+    document.getElementById('editECFDate').value = p.ecfEscrowDate || '';
+    document.getElementById('editFundedDate').value = p.fundedDate || '';
+    document.getElementById('editAdvisorNote').value = p.advisorNote || '';
+    document.getElementById('editAdminNote').value = p.adminNote || '';
+    
+    // Broker dropdown
+    const brokerSelect = document.getElementById('editBrokerAssign');
+    if(brokerSelect) {
+        brokerSelect.innerHTML = '<option value="">Direct Client (No Broker)</option>' + 
+            brokers.map(b => `<option value="${b.id}" ${p.brokerId === b.id ? 'selected' : ''}>${escapeHtml(b.name)} (${b.commissionRate || 0}%)</option>`).join('');
+    }
+    
+    switchEditTab('project');
+    openModal('editProjectModal');
+};
+
+// Save Project Info (Enhanced)
+window.saveProjectInfo = async function() {
+    const pid = window.editProjectId;
+    const p = projects.find(x => x.id === pid);
+    if(!p) return;
+    
+    const clientName = document.getElementById('editClientName').value.trim();
+    const clientEmail = document.getElementById('editClientEmail').value.trim();
+    const oldStep = p.step || 1;
+    const newStep = parseInt(document.getElementById('editStep').value);
+    
+    // Update Client
+    if(p.clientId && clientName) {
+        await db.collection('clients').doc(p.clientId).update({ 
+            name: clientName, 
+            email: clientEmail 
+        });
+    }
+    
+    // Update Project
+    const updates = {
+        name: document.getElementById('editProjectName').value,
+        industry: document.getElementById('editIndustry').value,
+        location: document.getElementById('editLocation').value,
+        totalCost: document.getElementById('editTotalCost').value,
+        sponsorEquity: document.getElementById('editSponsorEquity').value,
+        fundsNeeded: document.getElementById('editFundsNeeded').value,
+        currentStage: document.getElementById('editCurrentStage').value,
+        useOfFunds: document.getElementById('editUseOfFunds').value,
+        targetIRR: document.getElementById('editTargetIRR').value,
+        closeDate: document.getElementById('editCloseDate').value,
+        moic: document.getElementById('editMOIC').value,
+        capRate: document.getElementById('editCapRate').value,
+        exitStrategy: document.getElementById('editExitStrategy').value,
+        exitCapRate: document.getElementById('editExitCapRate').value,
+        permits: document.getElementById('editPermits').value,
+        revenue: document.getElementById('editRevenue').value,
+        assetClass: document.getElementById('editAssetClass').value,
+        infraType: document.getElementById('editInfraType').value,
+        commodity: document.getElementById('editCommodity').value,
+        miningStage: document.getElementById('editMiningStage').value,
+        reserveLife: document.getElementById('editReserveLife').value,
+        dataRoom: document.getElementById('editDataRoom').value,
+        governingLaw: document.getElementById('editGovLaw').value,
+        step: newStep,
+        amount: document.getElementById('editAmount').value,
+        interestRate: document.getElementById('editRate').value,
+        term: document.getElementById('editTerm').value,
+        gracePeriod: document.getElementById('editGrace').value,
+        ecfAmount: document.getElementById('editECF').value,
+        nextMilestone: document.getElementById('editNext').value,
+        termSheetExpiry: document.getElementById('editExpiry').value,
+        commitmentFeeDeadline: document.getElementById('editCommitFeeDeadline').value,
+        deedExpiry: document.getElementById('editDeedExpiry').value,
+        ecfPolicyExpiry: document.getElementById('editECFPolicyExpiry').value,
+        commitmentFeeStatus: document.getElementById('editCommitFee').value,
+        commitmentFeeDate: document.getElementById('editCommitFeeDate').value,
+        ecfStatus: document.getElementById('editECFStatus').value,
+        ecfEscrowDate: document.getElementById('editECFDate').value,
+        fundedDate: document.getElementById('editFundedDate').value,
+        advisorNote: document.getElementById('editAdvisorNote').value,
+        adminNote: document.getElementById('editAdminNote').value,
+        brokerId: document.getElementById('editBrokerAssign').value || null
+    };
+    
+    await db.collection('projects').doc(pid).update(updates);
+    
+    // Send automated email on step change
+    if(newStep !== oldStep && newStep > oldStep) {
+        const client = clients.find(c => c.id === p.clientId);
+        if(client) {
+            try {
+                await emailjs.send('service_croft', 'template_step_update', {
+                    to_name: client.name,
+                    to_email: client.email,
+                    step_name: STEP_NAMES[newStep] || `Step ${newStep}`,
+                    next_action: newStep === 2 ? 'Submit Commitment Fee via portal' : 
+                                newStep === 3 ? 'Review Deed of Undertaking' :
+                                newStep === 8 ? 'Congratulations! Funding is being arranged' :
+                                'Continue with next steps in your portal'
+                });
+                showToast(`Step update email sent to ${client.name}`);
+            } catch(e) { console.warn('EmailJS not configured:', e); }
+        }
+    }
+    
+    closeModal('editProjectModal');
+    showToast('Client and Project updated successfully!');
+    renderAdminTables(); // Refresh tables
+};
+
+// Delete Project (separate from delete client)
+window.deleteProject = async function(pid) {
+    if(!confirm('Delete this project permanently? This action cannot be undone.')) return;
+    await db.collection('projects').doc(pid).delete();
+    showToast('Project deleted');
+};
+
+// Render Clients Table with search
+window.renderClientsTable = function() {
+    const searchTerm = document.getElementById('clientSearch')?.value.toLowerCase() || '';
+    const filtered = clients.filter(c => 
+        c.name.toLowerCase().includes(searchTerm) || 
+        (c.email || '').toLowerCase().includes(searchTerm)
+    );
+    const tbody = document.getElementById('adminClientsTable');
+    if(!tbody) return;
+    tbody.innerHTML = filtered.map(c => {
+        const p = projects.find(x => x.clientId === c.id);
+        return `
+        <tr>
+            <td><strong>${escapeHtml(c.name)}</strong><br><span style="font-size:11px;color:var(--gray-500);">${escapeHtml(c.email)}</span></td>
+            <td>${escapeHtml(p?.name || '—')}</td>
+            <td><span style="color:${c.status==='active'?'var(--success)':'var(--warning)'};">${c.status || 'pending'}</span></td>
+            <td>${c.createdAt ? c.createdAt.split('T')[0] : '—'}</td>
+            <td>
+                ${c.status === 'pending' ? `<button class="btn btn-success" style="padding:4px 8px;font-size:10px;" onclick="approveClient('${c.id}')">Approve</button>` : ''}
+                <button class="btn btn-outline" style="padding:4px 8px;font-size:10px;" onclick="editProject('${p?.id}')">Edit</button>
+                <button class="btn btn-danger" style="padding:4px 8px;font-size:10px;" onclick="deleteClient('${c.id}')">Del</button>
+            </td>
+        </tr>
+        `;
+    }).join('');
+};
+
+// Approve pending client
+window.approveClient = async function(id) {
+    await db.collection('clients').doc(id).update({status: 'active'});
+    const p = projects.find(x => x.clientId === id);
+    if(p) await db.collection('projects').doc(p.id).update({status: 'active'});
+    showToast('Client approved and activated');
+};
+
+// Delete client and all associated data
+window.deleteClient = async function(id) {
+    if(!confirm('WARNING: This will delete the client, all projects, documents, and messages. This cannot be undone!')) return;
+    
+    // Delete client doc
+    await db.collection('clients').doc(id).delete();
+    
+    // Delete associated projects
+    const clientProjects = projects.filter(p => p.clientId === id);
+    for(const p of clientProjects) {
+        await db.collection('projects').doc(p.id).delete();
+    }
+    
+    // Delete associated documents
+    const clientDocs = documents.filter(d => d.clientId === id);
+    for(const d of clientDocs) {
+        await db.collection('documents').doc(d.id).delete();
+    }
+    
+    // Delete associated messages
+    const clientMsgs = messages.filter(m => m.clientId === id);
+    for(const m of clientMsgs) {
+        await db.collection('messages').doc(m.id).delete();
+    }
+    
+    showToast('Client and all associated data deleted');
+};
+
+// Upload Document Modal
+window.showUploadDocumentModal = function() {
+    // Populate client dropdown
+    const clientSelect = document.getElementById('uploadClientId');
+    if(clientSelect) {
+        clientSelect.innerHTML = '<option value="">Select Client</option>' + 
+            clients.filter(c => c.status === 'active').map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+    }
+    openModal('uploadDocumentModal');
+};
+
+window.updateProjectSelectForUpload = function(clientId) {
+    const projectSelect = document.getElementById('uploadProjectId');
+    if(!projectSelect) return;
+    if(!clientId) {
+        projectSelect.innerHTML = '<option value="">Select Project</option>';
+        return;
+    }
+    const clientProjects = projects.filter(p => p.clientId === clientId);
+    projectSelect.innerHTML = '<option value="">Select Project</option>' + 
+        clientProjects.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
+};
+
+window.adminUploadDocument = async function() {
+    const clientId = document.getElementById('uploadClientId').value;
+    const projectId = document.getElementById('uploadProjectId').value;
+    const docType = document.getElementById('documentType').value;
+    const file = document.getElementById('pdfFile').files[0];
+    const url = document.getElementById('documentUrl').value;
+    
+    if(!clientId || !projectId) {
+        showToast('Please select client and project', true);
+        return;
+    }
+    
+    try {
+        let docUrl = url;
+        if(file) {
+            const filename = `admin_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+            const ref = storage.ref(`documents/${clientId}/${projectId}/${filename}`);
+            await ref.put(file);
+            docUrl = await ref.getDownloadURL();
+        }
+        
+        if(!docUrl) {
+            showToast('Please provide a file or URL', true);
+            return;
+        }
+        
+        await db.collection('documents').add({
+            clientId: clientId,
+            projectId: projectId,
+            name: docType,
+            type: docType,
+            url: docUrl,
+            approved: true,
+            uploadedBy: 'admin',
+            date: new Date().toISOString().split('T')[0]
+        });
+        
+        showToast('Document uploaded successfully');
+        closeModal('uploadDocumentModal');
+        document.getElementById('pdfFile').value = '';
+        document.getElementById('documentUrl').value = '';
+    } catch(e) {
+        showToast(e.message, true);
+    }
+};
+
+// Render Admin Documents Table with filters
+window.renderAdminDocumentsTable = function() {
+    const tbody = document.getElementById('adminDocumentsTableBody');
+    if(!tbody) return;
+    const filterClient = document.getElementById('adminDocFilterClient')?.value || '';
+    let filtered = documents;
+    if(filterClient) filtered = filtered.filter(d => d.clientId === filterClient);
+    
+    // Populate client filter dropdown
+    const filterSelect = document.getElementById('adminDocFilterClient');
+    if(filterSelect && filterSelect.options.length <= 1) {
+        filterSelect.innerHTML = '<option value="">All Clients</option>' + 
+            clients.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+    }
+    
+    tbody.innerHTML = filtered.map(d => {
+        const client = clients.find(c => c.id === d.clientId);
+        const proj = projects.find(p => p.id === d.projectId);
+        return `
+        <tr>
+            <td><strong>${escapeHtml(client?.name || 'Unknown')}</strong><br><span style="font-size:10px;">${escapeHtml(proj?.name || '')}</span></td>
+            <td>${escapeHtml(d.name)}</td>
+            <td><span class="doc-status-badge ${d.approved ? 'doc-status-approved' : 'doc-status-uploaded'}">${d.approved ? 'Approved' : 'Pending'}</span></td>
+            <td>${d.date || '—'}</td>
+            <td>
+                <a href="${d.url}" target="_blank" class="doc-action-btn doc-action-view">View</a>
+                ${!d.approved ? `<button class="doc-action-btn" onclick="approveAdminDoc('${d.id}')">Approve</button>` : ''}
+                <button class="doc-action-btn" onclick="deleteAdminDoc('${d.id}')">Delete</button>
+            </td>
+        </tr>
+        `;
+    }).join('');
+};
+
+window.approveAdminDoc = async function(id) {
+    await db.collection('documents').doc(id).update({approved: true});
+    showToast('Document approved');
+};
+
+window.deleteAdminDoc = async function(id) {
+    if(confirm('Delete this document?')) {
+        await db.collection('documents').doc(id).delete();
+        showToast('Document deleted');
+    }
+};
+
+// Refresh all admin tables
+function refreshAllAdminTables() {
+    renderClientsTable();
+    renderAdminDocumentsTable();
+    renderBrokerAdminTable();
+    renderAdminBrokerSubmissionsTable();
+}
+
+// Call refresh when data changes
+if(typeof db !== 'undefined') {
+    db.collection('clients').onSnapshot(() => refreshAllAdminTables());
+    db.collection('projects').onSnapshot(() => refreshAllAdminTables());
+    db.collection('documents').onSnapshot(() => renderAdminDocumentsTable());
+}
 </script>
 </body>
 </html>
