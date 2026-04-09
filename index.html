@@ -3264,10 +3264,20 @@ const REQUIRED_DOCS = {
 // ============================================================
 // INITIALIZATION
 // ============================================================
-async function init() {
+function init() {
   emailjs.init({ publicKey: EMAILJS_CONFIG.publicKey });
   checkCookies();
   setupNavScroll();
+  checkSession();
+  setupSessionTimeout();
+  setTimeout(() => { if (!firebaseReady) document.getElementById('connectionBanner').style.display = 'block'; }, 6000);
+  try {
+    firebase.initializeApp(FIREBASE_CONFIG);
+    db = firebase.firestore();
+    storage = firebase.storage();  // ADD THIS LINE
+    loadFromFirebase();
+  } catch(e) { loadFromLocalStorage(); }
+}
   
   // Set up auth state listener
 auth.onAuthStateChanged(async (user) => {
