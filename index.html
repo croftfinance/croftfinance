@@ -1338,6 +1338,123 @@ body {
 .contact-success p { font-size: 13px; color: var(--g500); margin-bottom: 24px; }
 
 /* ─────────────────────────────────────────
+   ADMIN ACTION DASHBOARD
+───────────────────────────────────────── */
+.action-dashboard {
+  margin-bottom: 24px;
+}
+
+.action-filter-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  align-items: center;
+  padding: 16px 20px;
+  background: var(--white);
+  border: 1px solid var(--g200);
+  border-radius: 2px;
+}
+
+.action-filter-bar span {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-right: 4px;
+}
+
+.action-filter-bar .btn-sm {
+  padding: 6px 14px;
+  font-size: 9px;
+}
+
+.action-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 24px;
+  background: var(--white);
+  border: 1px solid var(--g200);
+  border-radius: 2px;
+  margin-bottom: 12px;
+  transition: all 0.2s ease;
+}
+
+.action-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.action-client {
+  flex: 2;
+}
+
+.action-client strong {
+  font-size: 14px;
+  color: var(--ink);
+  font-weight: 600;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.action-client span {
+  font-size: 11px;
+  color: var(--g500);
+}
+
+.action-type {
+  flex: 2;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 2px;
+  display: inline-block;
+  width: fit-content;
+}
+
+.action-type.commitment {
+  background: rgba(201, 169, 110, 0.12);
+  color: var(--gold-dim);
+  border-left: 2px solid var(--gold);
+}
+
+.action-type.submission {
+  background: rgba(61, 139, 96, 0.1);
+  color: var(--ok);
+  border-left: 2px solid var(--ok);
+}
+
+.action-type.expiry {
+  background: rgba(184, 131, 42, 0.1);
+  color: var(--warn);
+  border-left: 2px solid var(--warn);
+}
+
+.action-item.overdue {
+  background: var(--err-bg);
+  border-left: 3px solid var(--err);
+}
+
+.action-item.overdue .action-type {
+  background: rgba(181, 48, 48, 0.15);
+  color: var(--err);
+}
+
+.action-item.warning {
+  background: var(--warn-bg);
+  border-left: 3px solid var(--warn);
+}
+
+.action-item.warning .action-type {
+  background: rgba(184, 131, 42, 0.15);
+  color: var(--warn);
+}
+
+.action-item button {
+  flex-shrink: 0;
+  margin-left: 16px;
+}
+
+/* ─────────────────────────────────────────
    RESPONSIVE
 ───────────────────────────────────────── */
 @media (max-width: 1024px) {
@@ -1826,12 +1943,15 @@ body {
       <div class="sb-nav">
         <div class="sb-section">Overview</div>
         <button class="nav-item active" onclick="switchAdminTab('overview',this)"><i class="fas fa-chart-pie"></i> Pipeline</button>
+         <span class="nb" id="actionBadgeCnt"></span></button>
         <div class="sb-section" style="margin-top:8px;">Management</div>
         <button class="nav-item" onclick="switchAdminTab('clients',this)"><i class="fas fa-users"></i> Clients</button>
         <button class="nav-item" onclick="switchAdminTab('projects-admin',this)"><i class="fas fa-briefcase"></i> Projects</button>
         <button class="nav-item" onclick="switchAdminTab('documents-admin',this)"><i class="fas fa-file-alt"></i> Documents</button>
         <button class="nav-item" onclick="switchAdminTab('brokers',this)"><i class="fas fa-handshake"></i> Brokers <span id="pendBrokCnt" style="margin-left:auto;background:var(--warn);color:white;padding:0 6px;border-radius:10px;font-size:9px;display:none;">0</span></button>
         <button class="nav-item" onclick="switchAdminTab('broker-submissions',this)"><i class="fas fa-inbox"></i> Broker Deals</button>
+        <div class="sb-section" style="margin-top:8px;">Analytics</div>
+        <button class="nav-item" onclick="switchAdminTab('analytics',this)"><i class="fas fa-chart-line"></i> Analytics</button>
         <div class="sb-section" style="margin-top:8px;">Communication</div>
         <button class="nav-item" onclick="switchAdminTab('messages-admin',this)"><i class="fas fa-comments"></i> Messages <span class="nb" id="adminMsgBadge"></span></button>
       </div>
@@ -1927,6 +2047,79 @@ body {
         <div class="pg-header"><div class="pg-title">Messages</div></div>
         <div style="margin-bottom:16px;"><input type="text" id="msgSearch" class="finp" placeholder="Search by client name..." style="max-width:320px;" oninput="renderAdminMsgs()"></div>
         <div id="allMsgsList"></div>
+      </div>
+
+         <!-- ANALYTICS DASHBOARD -->
+      <div id="admin-analytics" class="admin-tab">
+        <div class="pg-header">
+          <div class="pg-title">Deal Pipeline Analytics</div>
+          <div class="pg-sub">Real-time metrics and insights</div>
+        </div>
+        
+        <!-- Key Metrics Cards -->
+        <div class="stats-grid">
+          <div class="stat-card stat-gold">
+            <div class="stat-lbl">Total Capital Deployed</div>
+            <div class="stat-val" id="totalCapitalDeployed">$0</div>
+            <div class="stat-s">Across all active deals</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-lbl">Average Deal Size</div>
+            <div class="stat-val" id="avgDealSize">$0</div>
+            <div class="stat-s">Per facility</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-lbl">Conversion Rate</div>
+            <div class="stat-val" id="conversionRate">0%</div>
+            <div class="stat-s">Step 1 to Funded</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-lbl">Active Deals</div>
+            <div class="stat-val" id="activeDealsCount">0</div>
+            <div class="stat-s">In pipeline</div>
+          </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
+          <div class="card">
+            <div class="card-hd"><div class="card-ttl"><i class="fas fa-chart-line"></i> Average Days Per Step</div></div>
+            <div class="card-bd"><canvas id="avgDaysChart" height="250"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-hd"><div class="card-ttl"><i class="fas fa-chart-pie"></i> Deals by Industry</div></div>
+            <div class="card-bd"><canvas id="industryChart" height="250"></canvas></div>
+          </div>
+        </div>
+
+        <!-- Funnel Chart -->
+        <div class="card">
+          <div class="card-hd"><div class="card-ttl"><i class="fas fa-funnel-dollar"></i> Deal Conversion Funnel</div></div>
+          <div class="card-bd"><canvas id="funnelChart" height="200"></canvas></div>
+        </div>
+
+        <!-- Broker Performance Table -->
+        <div class="card">
+          <div class="card-hd"><div class="card-ttl"><i class="fas fa-trophy"></i> Broker Performance</div></div>
+          <div class="card-bd">
+            <div class="table-wrap">
+              <table class="dt">
+                <thead>
+                  <tr>
+                    <th>Broker</th>
+                    <th>Submissions</th>
+                    <th>Approved</th>
+                    <th>Funded</th>
+                    <th>Total Capital</th>
+                    <th>Conversion %</th>
+                    <th>Avg Days to Fund</th>
+                  </tr>
+                </thead>
+                <tbody id="brokerPerformanceTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
 
     </main>
@@ -2522,6 +2715,42 @@ function setupAdminListeners() {
   db.collection('brokerMessages').orderBy('timestamp','asc').onSnapshot(s => { brokerMsgs = s.docs.map(d => ({id:d.id,...d.data()})); });
 }
 
+function renderCapStack(p) {
+  const canvas = document.getElementById('capChart');
+  if (!canvas) return;
+  
+  const ctx = canvas.getContext('2d');
+  if (capChart) capChart.destroy();
+  
+  // Default capital stack percentages (can be customized per project)
+  const croftShare = 65;  // Croft Capital
+  const sponsorShare = 20; // Sponsor Equity
+  const debtShare = 15;    // Senior Debt
+  
+  capChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: ['Croft Capital', 'Sponsor Equity', 'Senior Debt'],
+      datasets: [{
+        data: [croftShare, sponsorShare, debtShare],
+        backgroundColor: ['#c9a96e', '#1e2a40', '#8fa3b8'],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { font: { size: 10, family: "'Raleway', sans-serif" }, boxWidth: 10 }
+        },
+        tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${ctx.raw}%` } }
+      }
+    }
+  });
+}
+
 function setupClientListeners(uid) {
   db.collection('projects').where('clientId','==',uid).onSnapshot(s => {
     projects = s.docs.map(d => ({id:d.id,...d.data()}));
@@ -2889,6 +3118,7 @@ async function sendMessage() {
 
 /* ─── ADMIN — REFRESH ─── */
 function refreshAdminUI() {
+  if (!clients.length || !projects.length) return; // Wait for data
   updateAdminStats();
   const at = document.querySelector('#view-admin .admin-tab.active');
   if (!at) return;
@@ -2900,6 +3130,7 @@ function refreshAdminUI() {
   if (id==='admin-brokers')           renderBrokerAdminTable();
   if (id==='admin-broker-submissions') renderAdminBrokerSubs();
   if (id==='admin-actions')           renderAdminActions();
+  if (id==='admin-analytics')         renderAnalytics();
 }
 
 function updateAdminStats() {
@@ -2914,7 +3145,12 @@ function updateAdminStats() {
   const block = document.getElementById('pendingRegBlock');
   if (block) { block.style.display = pending.length?'block':'none'; }
   const rtb = document.getElementById('pendingRegTable');
-  if (rtb) rtb.innerHTML = pending.map(c=>`...`).join('');
+  rtb.innerHTML = pending.map(c => `<tr>
+  <td><strong>${esc(c.name)}</strong></td>
+  <td>${esc(c.email)}</td>
+  <td>${fmtDate(c.createdAt)}</td>
+  <td><button class="btn btn-ok" style="padding:4px 12px;font-size:9px;" onclick="approveClient('${c.id}')">Approve</button></td>
+</tr>`).join('');
 
   const pb = clients.filter(b=>b.status==='pending').length;
   const pbc = document.getElementById('pendBrokCnt');
@@ -3425,6 +3661,201 @@ function renderAdminActions() {
       <div><button class="btn btn-outline" style="padding:4px 12px;font-size:10px;" onclick="openEditProject('${a.project.id}')">Manage</button></div>
     </div>
   `).join('');
+}
+
+let avgDaysChart = null;
+let industryChart = null;
+let funnelChart = null;
+
+function calculateStepAverageDays(projects) {
+  const stepDays = {1:[],2:[],3:[],4:[],5:[],6:[],7:[],8:[]};
+  
+  for (const p of projects) {
+    if (p.status !== 'active' && p.status !== 'funded') continue;
+    
+    let prevDate = p.createdAt ? new Date(p.createdAt) : null;
+    
+    for (let i = 1; i <= 8; i++) {
+      if (p[`step${i}CompletedAt`]) {
+        const completedDate = new Date(p[`step${i}CompletedAt`]);
+        if (prevDate) {
+          const days = Math.ceil((completedDate - prevDate) / (1000 * 60 * 60 * 24));
+          if (days > 0 && days < 365) {
+            stepDays[i].push(days);
+          }
+        }
+        prevDate = completedDate;
+      }
+    }
+  }
+  
+  const averages = {};
+  for (let i = 1; i <= 8; i++) {
+    if (stepDays[i].length > 0) {
+      const sum = stepDays[i].reduce((a,b) => a + b, 0);
+      averages[i] = Math.round(sum / stepDays[i].length);
+    } else {
+      averages[i] = 0;
+    }
+  }
+  return averages;
+}
+
+function calculateTotalCapitalDeployed(projects) {
+  let total = 0;
+  for (const p of projects) {
+    if (p.status === 'funded' || p.step === 8) {
+      const amount = parseFloat(String(p.amount || p.fundsNeeded || '0').replace(/[^0-9.]/g, ''));
+      if (!isNaN(amount)) total += amount;
+    }
+  }
+  return total;
+}
+
+function calculateBrokerPerformance(brokers, projects, brokerSubs) {
+  const performance = [];
+  
+  for (const broker of brokers) {
+    if (broker.status !== 'active') continue;
+    
+    const submissions = brokerSubs.filter(s => s.brokerId === broker.id);
+    const brokerProjects = projects.filter(p => p.brokerId === broker.id);
+    const approved = brokerProjects.length;
+    const funded = brokerProjects.filter(p => p.status === 'funded' || p.step === 8).length;
+    
+    let totalCapital = 0;
+    let totalDays = 0;
+    let fundedCount = 0;
+    
+    for (const p of brokerProjects) {
+      if (p.status === 'funded' || p.step === 8) {
+        const amount = parseFloat(String(p.amount || p.fundsNeeded || '0').replace(/[^0-9.]/g, ''));
+        if (!isNaN(amount)) totalCapital += amount;
+        
+        if (p.createdAt && p.fundedDate) {
+          const days = Math.ceil((new Date(p.fundedDate) - new Date(p.createdAt)) / (1000 * 60 * 60 * 24));
+          if (days > 0 && days < 365) {
+            totalDays += days;
+            fundedCount++;
+          }
+        }
+      }
+    }
+    
+    const avgDaysToFund = fundedCount > 0 ? Math.round(totalDays / fundedCount) : 0;
+    const conversionRate = submissions.length > 0 ? Math.round((approved / submissions.length) * 100) : 0;
+    
+    performance.push({
+      broker,
+      submissions: submissions.length,
+      approved,
+      funded,
+      totalCapital,
+      conversionRate,
+      avgDaysToFund
+    });
+  }
+  
+  return performance.sort((a,b) => b.totalCapital - a.totalCapital);
+}
+
+function renderAnalytics() {
+  const activeProjects = projects.filter(p => p.status === 'active' || p.status === 'funded');
+  const fundedProjects = projects.filter(p => p.status === 'funded' || p.step === 8);
+  
+  // Update metrics
+  const totalCapital = calculateTotalCapitalDeployed(projects);
+  setEl('totalCapitalDeployed', '$' + (totalCapital / 1000000).toFixed(1) + 'M');
+  
+  const avgSize = activeProjects.length > 0 ? totalCapital / activeProjects.length : 0;
+  setEl('avgDealSize', '$' + (avgSize / 1000000).toFixed(1) + 'M');
+  
+  const step1Count = projects.filter(p => p.step1Completed === true).length;
+  const step8Count = projects.filter(p => p.step8Completed === true).length;
+  const conversionRate = step1Count > 0 ? Math.round((step8Count / step1Count) * 100) : 0;
+  setEl('conversionRate', conversionRate + '%');
+  setEl('activeDealsCount', activeProjects.length);
+  
+  // Average Days Per Step Chart
+  const avgDays = calculateStepAverageDays(projects);
+  const ctx1 = document.getElementById('avgDaysChart');
+  if (ctx1) {
+    if (avgDaysChart) avgDaysChart.destroy();
+    avgDaysChart = new Chart(ctx1, {
+      type: 'bar',
+      data: {
+        labels: ['Step1', 'Step2', 'Step3', 'Step4', 'Step5', 'Step6', 'Step7', 'Step8'],
+        datasets: [{
+          label: 'Average Days',
+          data: [avgDays[1], avgDays[2], avgDays[3], avgDays[4], avgDays[5], avgDays[6], avgDays[7], avgDays[8]],
+          backgroundColor: '#c9a96e',
+          borderRadius: 4
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: true }
+    });
+  }
+  
+  // Industry Distribution Chart
+  const industries = ['Real Estate', 'Infrastructure', 'Energy & Renewables', 'Mining', 'Oil & Gas'];
+  const industryCounts = industries.map(ind => 
+    projects.filter(p => p.industry === ind && (p.status === 'active' || p.status === 'funded')).length
+  );
+  const ctx2 = document.getElementById('industryChart');
+  if (ctx2) {
+    if (industryChart) industryChart.destroy();
+    industryChart = new Chart(ctx2, {
+      type: 'doughnut',
+      data: {
+        labels: industries,
+        datasets: [{ data: industryCounts, backgroundColor: ['#c9a96e', '#8fa3b8', '#4e4740', '#a07848', '#1e2a40'] }]
+      },
+      options: { responsive: true, maintainAspectRatio: true }
+    });
+  }
+  
+  // Funnel Chart
+  const stepCounts = [1,2,3,4,5,6,7,8].map(step => 
+    projects.filter(p => p[`step${step}Completed`] === true).length
+  );
+  const ctx3 = document.getElementById('funnelChart');
+  if (ctx3) {
+    if (funnelChart) funnelChart.destroy();
+    funnelChart = new Chart(ctx3, {
+      type: 'line',
+      data: {
+        labels: STEP_NAMES.slice(1),
+        datasets: [{
+          label: 'Deals Completed',
+          data: stepCounts,
+          borderColor: '#c9a96e',
+          backgroundColor: 'rgba(201,169,110,0.1)',
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: true }
+    });
+  }
+  
+  // Broker Performance Table
+  const brokerPerf = calculateBrokerPerformance(brokers, projects, brokerSubs);
+  const tbody = document.getElementById('brokerPerformanceTable');
+  if (tbody) {
+    if (brokerPerf.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;">No broker data available. Basque</tr>';
+    } else {
+      tbody.innerHTML = brokerPerf.map(b => `<tr>
+        <td><strong>${esc(b.broker.name)}</strong><br><span style="font-size:11px;color:var(--g400);">${esc(b.broker.firm || 'Independent')}</span></td>
+        <td>${b.submissions}</td>
+        <td><span class="badge ${b.approved > 0 ? 'badge-green' : 'badge-gray'}">${b.approved}</span></td>
+        <td><span class="badge ${b.funded > 0 ? 'badge-gold' : 'badge-gray'}">${b.funded}</span></td>
+        <td>$${(b.totalCapital / 1000000).toFixed(1)}M</td>
+        <td>${b.conversionRate}%</td>
+        <td>${b.avgDaysToFund > 0 ? b.avgDaysToFund + ' days' : '—'}</td>
+      </tr>`).join('');
+    }
+  }
 }
 
 /* Approve Broker Submission - Auto-create client account */
