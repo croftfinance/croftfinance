@@ -33,7 +33,7 @@
   
   .legal-header {
     background: var(--ink);
-    padding: 32px 64px;
+    padding: 24px 60px;
     border-bottom: 1px solid rgba(201,169,110,.2);
   }
   
@@ -90,62 +90,56 @@
   .legal-container {
     max-width: 1000px;
     margin: 0 auto;
-    padding: 64px 32px;
+    padding: 48px 32px;
   }
   
   .legal-title {
     font-family: var(--font-serif);
-    font-size: 48px;
+    font-size: 42px;
     font-weight: 400;
     color: var(--ink);
-    margin-bottom: 16px;
+    margin-bottom: 12px;
   }
   
   .legal-meta {
     color: var(--g400);
-    font-size: 14px;
-    margin-bottom: 48px;
-    padding-bottom: 24px;
+    font-size: 13px;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
     border-bottom: var(--border-light);
   }
   
   .legal-section {
-    margin-bottom: 48px;
+    margin-bottom: 32px;
   }
   
   .legal-section h2 {
     font-family: var(--font-serif);
-    font-size: 28px;
-    font-weight: 400;
-    color: var(--ink);
-    margin-bottom: 20px;
-  }
-  
-  .legal-section h3 {
-    font-family: var(--font-serif);
-    font-size: 20px;
+    font-size: 24px;
     font-weight: 500;
     color: var(--ink);
-    margin: 24px 0 12px;
+    margin-bottom: 12px;
   }
   
   .legal-section p {
-    margin-bottom: 16px;
+    margin-bottom: 12px;
     color: var(--g600);
+    font-size: 14px;
   }
   
-  .legal-section ul, .legal-section ol {
-    margin: 16px 0 16px 32px;
+  .legal-section ul {
+    margin: 12px 0 12px 24px;
     color: var(--g600);
+    font-size: 14px;
   }
   
   .legal-section li {
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
   
   .legal-footer {
     background: var(--ink);
-    padding: 32px 64px;
+    padding: 24px 60px;
     text-align: center;
     border-top: 1px solid rgba(201,169,110,.2);
     color: rgba(255,255,255,.4);
@@ -158,21 +152,12 @@
   }
   
   @media (max-width: 768px) {
-    .legal-header { padding: 20px 24px; }
+    .legal-header { padding: 16px 20px; }
     .legal-header-content { flex-direction: column; text-align: center; }
-    .legal-nav a { margin: 0 16px; }
+    .legal-nav a { margin: 0 12px; }
     .legal-title { font-size: 32px; }
-    .legal-container { padding: 40px 20px; }
-    .legal-section h2 { font-size: 24px; }
-  }
-  
-  .last-updated {
-    background: rgba(201,169,110,.08);
-    padding: 12px 20px;
-    border-radius: 4px;
-    margin-bottom: 32px;
-    font-size: 13px;
-    color: var(--g500);
+    .legal-container { padding: 32px 20px; }
+    .legal-section h2 { font-size: 20px; }
   }
 </style>
 </head>
@@ -186,8 +171,8 @@
     </a>
     <div class="legal-nav">
       <a href="/">Home</a>
-      <a href="/privacy" class="active">Privacy Policy</a>
-      <a href="/terms">Terms & Conditions</a>
+      <a href="/privacy" class="active">Privacy</a>
+      <a href="/terms">Terms</a>
       <a href="/#s-contact">Contact</a>
     </div>
   </div>
@@ -195,136 +180,51 @@
 
 <main class="legal-container">
   <h1 class="legal-title">Privacy Policy</h1>
-  <div class="legal-meta">Effective Date: April 2026</div>
-  
-  <div class="last-updated">
-    <i class="fas fa-info-circle" style="color:var(--gold); margin-right:8px;"></i> 
-    Last Updated: April 9, 2026
-  </div>
+  <div class="legal-meta">Effective: April 2026 | Last Updated: April 9, 2026</div>
 
   <div class="legal-section">
     <h2>1. Data Controller</h2>
-    <p><strong>Croft Finance</strong><br>
-    Represented by: Suzana Aleksić, Principal<br>
+    <p><strong>Croft Finance</strong> — Suzana Aleksić, Principal<br>
     Email: <a href="mailto:suzana.aleksic@croftfinance.com" style="color:var(--gold);">suzana.aleksic@croftfinance.com</a><br>
     Address: Belgrade, Republic of Serbia</p>
   </div>
 
   <div class="legal-section">
     <h2>2. Information We Collect</h2>
-    <p>We collect the following categories of personal information:</p>
-    <ul>
-      <li><strong>Identity Data:</strong> Full name, company name, project name</li>
-      <li><strong>Contact Data:</strong> Email address, phone number, location</li>
-      <li><strong>Financial Data:</strong> Funding requirements, facility amounts, project financials</li>
-      <li><strong>Document Data:</strong> Uploaded documents, due diligence materials, legal agreements</li>
-      <li><strong>Communication Data:</strong> Messages exchanged through the portal, email correspondence</li>
-      <li><strong>Technical Data:</strong> IP address, browser type, access timestamps (via Firebase analytics)</li>
-    </ul>
+    <p>We collect: name, email, project details, financial information, uploaded documents, messages, and technical data (IP address, access logs).</p>
   </div>
 
   <div class="legal-section">
-    <h2>3. How We Collect Your Information</h2>
-    <ul>
-      <li><strong>Direct interactions:</strong> When you register for portal access, submit contact forms, upload documents, or send messages</li>
-      <li><strong>Automated technologies:</strong> Firebase authentication logs and Firestore timestamps</li>
-      <li><strong>Third parties:</strong> Brokers introducing clients to Croft Finance</li>
-    </ul>
+    <h2>3. How We Use Your Information</h2>
+    <p>We use your data to provide portal access, process financing requests, communicate with you, comply with legal obligations, and improve our services.</p>
   </div>
 
   <div class="legal-section">
-    <h2>4. How We Use Your Information</h2>
-    <p>We use your personal information for the following purposes:</p>
-    <ul>
-      <li><strong>Portal Access & Authentication:</strong> To verify your identity and provide secure portal access</li>
-      <li><strong>Deal Management:</strong> To process your financing request, manage the 8-step closing process, and track documents</li>
-      <li><strong>Communication:</strong> To respond to your enquiries, send notifications about deal progress, and facilitate advisor-client messaging</li>
-      <li><strong>Compliance:</strong> To maintain records as required by applicable financial regulations</li>
-      <li><strong>Improvement:</strong> To analyze portal usage and improve our services</li>
-    </ul>
+    <h2>4. Data Sharing</h2>
+    <p>We do not sell your data. We share with: Google (Firebase hosting), and capital partners (under strict confidentiality). The identity of our capital partners is never disclosed.</p>
   </div>
 
   <div class="legal-section">
-    <h2>5. Legal Basis for Processing (GDPR Compliance)</h2>
-    <p>For individuals in the European Economic Area (EEA), we process your personal information based on:</p>
-    <ul>
-      <li><strong>Contractual necessity:</strong> Processing is necessary for the performance of our financing agreement</li>
-      <li><strong>Legitimate interests:</strong> To manage client relationships and communicate about your project</li>
-      <li><strong>Legal obligations:</strong> To comply with financial record-keeping requirements</li>
-      <li><strong>Consent:</strong> Where required, we will obtain your explicit consent</li>
-    </ul>
+    <h2>5. Data Security & Retention</h2>
+    <p>Data is encrypted at rest and in transit. We retain your data for the duration of our relationship plus 5 years as required by financial regulations.</p>
   </div>
 
   <div class="legal-section">
-    <h2>6. Data Sharing and Disclosure</h2>
-    <p>We do not sell your personal information. We may share your information in the following circumstances:</p>
-    <ul>
-      <li><strong>Service Providers:</strong> Google (Firebase for hosting, authentication, database, and storage)</li>
-      <li><strong>Email Services:</strong> EmailJS for sending notifications (encrypted in transit)</li>
-      <li><strong>Capital Partners:</strong> Your project information may be shared with our capital partners under strict confidentiality agreements</li>
-      <li><strong>Legal Requirements:</strong> If required by law or to protect our rights</li>
-    </ul>
-    <p><strong>Important Note:</strong> The identity of Croft Finance's capital partners is never disclosed as a condition of their participation.</p>
+    <h2>6. Your Rights (GDPR/CCPA)</h2>
+    <p>You have the right to access, correct, delete, or export your data. Contact us at <a href="mailto:suzana.aleksic@croftfinance.com" style="color:var(--gold);">suzana.aleksic@croftfinance.com</a> to exercise these rights.</p>
   </div>
 
   <div class="legal-section">
-    <h2>7. Data Storage and Security</h2>
-    <p><strong>Storage Location:</strong> All data is stored on Google Firebase infrastructure, which may process data in the United States, EU, or other regions. By using our portal, you consent to this transfer.</p>
-    <p><strong>Security Measures:</strong></p>
-    <ul>
-      <li>Encryption at rest (Firestore and Storage)</li>
-      <li>Encryption in transit (TLS/SSL)</li>
-      <li>Firebase Authentication with email/password protection</li>
-      <li>Regular security updates and monitoring</li>
-    </ul>
-    <p><strong>Retention Period:</strong> We retain your personal information for the duration of our business relationship plus 5 years, in accordance with applicable financial record-keeping requirements. You may request earlier deletion where permitted by law.</p>
-  </div>
-
-  <div class="legal-section">
-    <h2>8. Your Rights (GDPR, CCPA, and Other Privacy Laws)</h2>
-    <p>Depending on your jurisdiction, you may have the following rights:</p>
-    <ul>
-      <li><strong>Right to Access:</strong> Request a copy of your personal information</li>
-      <li><strong>Right to Rectification:</strong> Correct inaccurate or incomplete information</li>
-      <li><strong>Right to Erasure ("Right to be Forgotten"):</strong> Request deletion of your data</li>
-      <li><strong>Right to Restrict Processing:</strong> Limit how we use your data</li>
-      <li><strong>Right to Data Portability:</strong> Receive your data in a structured format</li>
-      <li><strong>Right to Object:</strong> Object to processing based on legitimate interests</li>
-      <li><strong>Right to Withdraw Consent:</strong> Withdraw consent at any time</li>
-    </ul>
-    <p>To exercise these rights, contact us at <a href="mailto:suzana.aleksic@croftfinance.com" style="color:var(--gold);">suzana.aleksic@croftfinance.com</a>. We will respond within 30 days.</p>
-  </div>
-
-  <div class="legal-section">
-    <h2>9. Cookies and Tracking</h2>
-    <p>Our portal uses essential cookies required for operation (authentication tokens, session management). We do not use marketing or analytics cookies without consent. You can disable cookies in your browser settings, but this may affect portal functionality.</p>
-  </div>
-
-  <div class="legal-section">
-    <h2>10. Children's Privacy</h2>
-    <p>Our services are not directed to individuals under 18. We do not knowingly collect personal information from minors.</p>
-  </div>
-
-  <div class="legal-section">
-    <h2>11. Changes to This Privacy Policy</h2>
-    <p>We may update this Privacy Policy from time to time. The latest version will always be available at <a href="/privacy" style="color:var(--gold);">croftfinance.com/privacy</a>. Material changes will be notified via email or portal notification.</p>
-  </div>
-
-  <div class="legal-section">
-    <h2>12. Contact Information</h2>
-    <p>For privacy-related enquiries, data subject requests, or concerns:</p>
-    <p><strong>Suzana Aleksić, Principal</strong><br>
-    Email: <a href="mailto:suzana.aleksic@croftfinance.com" style="color:var(--gold);">suzana.aleksic@croftfinance.com</a><br>
-    Phone: +381 69 288 0 191</p>
-    <p><strong>For GDPR-related matters in the EU:</strong> You have the right to lodge a complaint with your local supervisory authority.</p>
+    <h2>7. Contact</h2>
+    <p>For privacy questions: <strong>Suzana Aleksić</strong> — <a href="mailto:suzana.aleksic@croftfinance.com" style="color:var(--gold);">suzana.aleksic@croftfinance.com</a> / +381 69 288 0 191</p>
   </div>
 </main>
 
 <footer class="legal-footer">
   <p>© 2026 Croft Finance. All rights reserved.</p>
-  <p style="margin-top:8px;">
-    <a href="/privacy">Privacy Policy</a> &nbsp;|&nbsp;
-    <a href="/terms">Terms & Conditions</a> &nbsp;|&nbsp;
+  <p style="margin-top:6px;">
+    <a href="/privacy">Privacy</a> | 
+    <a href="/terms">Terms</a> | 
     <a href="/">Home</a>
   </p>
 </footer>
