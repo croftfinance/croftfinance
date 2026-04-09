@@ -3233,6 +3233,7 @@ const EMAILJS_CONFIG = {
 const ADMIN_CREDS = { username: "suzana", password: "croft2025" };
 
 // Global state
+let db = null, storage = null, firebaseReady = false;
 let clients = [], projects = [], documents = [], messages = [], meetings = [], auditLog = [], notifications = [];
 let brokers = [], brokerSubmissions = [], brokerMessages = [];
 let clientActivityLog = [];
@@ -3270,14 +3271,15 @@ async function init() {
   
   // Set up auth state listener
 auth.onAuthStateChanged(async (user) => {
+  // Check if admin session exists first - admin doesn't use Firebase Auth
+  const adminSess = localStorage.getItem('croftAdminSession');
+  if (adminSess) {
+    // Admin is logged in, don't process Firebase Auth user
+    document.getElementById('loadingOverlay').style.display = 'none';
+    return;
+  }
+  
   if (user) {
-    // Check if this is an admin user
-    const adminSess = localStorage.getItem('croftAdminSession');
-    if (adminSess) {
-      // Already in admin mode, don't override
-      return;
-    }
-    
     // Check if user is a client
     const clientDoc = await db.collection('clients').doc(user.uid).get();
     if (clientDoc.exists) {
@@ -3286,6 +3288,7 @@ auth.onAuthStateChanged(async (user) => {
       if (clientProjects.length) currentProjectId = clientProjects[0].id;
       showView('portal');
       loadClientPortal();
+      document.getElementById('loadingOverlay').style.display = 'none';
       return;
     }
     
@@ -3298,13 +3301,13 @@ auth.onAuthStateChanged(async (user) => {
         loadBrokerPortal();
       } else {
         showToast('Your broker account is pending approval.', true);
-        auth.signOut();
+        await auth.signOut();
       }
+      document.getElementById('loadingOverlay').style.display = 'none';
       return;
     }
   } else {
-    // User is signed out
-    // Don't clear admin session here - admin doesn't use Firebase Auth
+    // User is signed out - only clear client/broker if not in admin mode
     if (!localStorage.getItem('croftAdminSession')) {
       currentClient = null;
       currentBroker = null;
@@ -3500,8 +3503,10 @@ async function logClientActivity(clientId, projectId, action, description, perfo
   } catch(e) { console.error('Client activity log error:', e); }
 }
 
+// REPLACE the checkSession function with this:
+
 function checkSession() {
-  // Check for admin session first
+  // Check for admin session first (admin doesn't use Firebase Auth)
   const adminSess = localStorage.getItem('croftAdminSession');
   if (adminSess) {
     const s = JSON.parse(adminSess);
@@ -3536,8 +3541,8 @@ function checkSession() {
     return;
   }
   
-  // Firebase Auth will handle client sessions via onAuthStateChanged
-  // No need for client localStorage session anymore
+  // Client sessions are handled by Firebase Auth onAuthStateChanged
+  // No need for client localStorage session
 }
 
 function showView(v) {
@@ -3890,58 +3895,44 @@ async function doAdminLogin() {
   const errEl = document.getElementById('adminLoginError');
   errEl.style.display = 'none';
   
-  // First check if it's the special admin credentials
+  // Check hardcoded admin credentials
   if (u !== ADMIN_CREDS.username || p !== ADMIN_CREDS.password) {
     errEl.textContent = 'Incorrect credentials.';
     errEl.style.display = 'block';
     return;
   }
   
-  try {
-    // Check if admin user exists in Firebase Auth, if not create them
-    try {
-      // Try to sign in with the admin email
-      await auth.signInWithEmailAndPassword('suzana.aleksic@croftfinance.com', p);
-    } catch (signInError) {
-      // If sign-in fails, create the admin user
-      if (signInError.code === 'auth/user-not-found') {
-        await auth.createUserWithEmailAndPassword('suzana.aleksic@croftfinance.com', p);
-      } else {
-        throw signInError;
-      }
-    }
-    
-    // Store admin session info
-    localStorage.setItem('croftAdminSession', JSON.stringify({ 
-      username: u, 
-      ts: Date.now(),
-      isAdmin: true 
-    }));
-    
-    closeModal('loginModal');
-    showView('admin');
-    document.title = 'Croft Finance — Admin';
-    loadAdminNotifications();
-    setTimeout(() => requestBrowserNotificationPermission(), 1000);
-    renderAdminTables();
-    await logAudit('Admin logged in', 'Suzana');
-    resetSessionTimeout();
-    
-  } catch (error) {
-    console.error('Admin login error:', error);
-    errEl.textContent = 'Authentication failed. Please try again.';
-    errEl.style.display = 'block';
-  }
+  // Store admin session info (no Firebase Auth for admin)
+  localStorage.setItem('croftAdminSession', JSON.stringify({ 
+    username: u, 
+    ts: Date.now(),
+    isAdmin: true 
+  }));
+  
+  closeModal('loginModal');
+  showView('admin');
+  document.title = 'Croft Finance — Admin';
+  loadAdminNotifications();
+  setTimeout(() => requestBrowserNotificationPermission(), 1000);
+  renderAdminTables();
+  await logAudit('Admin logged in', 'Suzana');
+  resetSessionTimeout();
+  
+  showToast('Welcome, Suzana');
 }
-
+  
 async function logout() {
   // Check if we're in admin view and have admin session
   const adminSess = localStorage.getItem('croftAdminSession');
   if (adminSess) {
     localStorage.removeItem('croftAdminSession');
+    showView('home');
+    document.title = 'Croft Finance — Structured Finance Solutions';
+    if (sessionTimeout) clearTimeout(sessionTimeout);
+    return;
   }
   
-  // Sign out from Firebase Auth if there's a user
+  // Sign out from Firebase Auth for client/broker
   if (auth.currentUser) {
     await auth.signOut();
   }
@@ -3949,7 +3940,6 @@ async function logout() {
   currentClient = null;
   currentProjectId = null;
   currentBroker = null;
-  localStorage.removeItem('croftSession');
   localStorage.removeItem('croftBrokerSession');
   stopAdminListeners();
   showView('home');
@@ -4242,24 +4232,25 @@ async function clientUploadDocument() {
   try {
     // Upload to Firebase Storage
     const storageRef = storage.ref();
-    const fileRef = storageRef.child(`documents/${currentClient.id}/${currentProjectId}/${Date.now()}_${file.name}`);
+    const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+    const fileRef = storageRef.child(`documents/${currentClient.id}/${currentProjectId}/${fileName}`);
     const snapshot = await fileRef.put(file);
     const downloadUrl = await snapshot.ref.getDownloadURL();
     
     const id = String(Date.now());
-    const doc = {
-      id: id,
-      clientId: String(currentClient.id),
-      projectId: String(currentProjectId),
-      type: docType,
-      name: docType,
-      url: downloadUrl,
-      date: new Date().toISOString().split('T')[0],
-      approved: false
+    const doc = { 
+      id: id, 
+      clientId: String(currentClient.id), 
+      projectId: String(currentProjectId), 
+      type: docType, 
+      name: docType, 
+      url: downloadUrl, 
+      date: new Date().toISOString().split('T')[0], 
+      approved: false 
     };
-    
-    await db.collection('documents').doc(id).set(doc);
     documents.push(doc);
+    if (firebaseReady) await db.collection('documents').doc(id).set(doc);
+    else saveLocal();
     
     await sendEmail(EMAILJS_CONFIG.adminEmail, `📄 Document Uploaded — ${currentClient.name} — ${docType}`, `Client: ${currentClient.name}\nEmail: ${currentClient.email}\nProject: ${proj?.name || 'N/A'}\nDocument Type: ${docType}\nUpload Date: ${doc.date}\n\nPlease log in to the admin portal to review and approve.`);
     
@@ -6213,29 +6204,18 @@ async function uploadDocument() {
   const urlInput = document.getElementById('documentUrl').value;
   const client = clients.find(c => String(c.id) === String(clientId));
   
-  if (!clientId || !projectId) { 
-    showToast('Select client and project', true); 
-    return; 
-  }
-  if (!client) { 
-    showToast('Selected client not found', true); 
-    return; 
-  }
+  if (!clientId || !projectId) { showToast('Select client and project', true); return; }
+  if (!client) { showToast('Selected client not found', true); return; }
   
   if (fileInput.files && fileInput.files[0]) {
     const file = fileInput.files[0];
-    if (file.type !== 'application/pdf') { 
-      showToast('Please upload a PDF', true); 
-      return; 
-    }
-    if (file.size > 10 * 1024 * 1024) { 
-      showToast('File size must be less than 10MB', true); 
-      return; 
-    }
+    if (file.type !== 'application/pdf') { showToast('Please upload a PDF', true); return; }
+    if (file.size > 10 * 1024 * 1024) { showToast('File size must be less than 10MB', true); return; }
     
     try {
       const storageRef = storage.ref();
-      const fileRef = storageRef.child(`documents/${clientId}/${projectId}/${Date.now()}_${file.name}`);
+      const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+      const fileRef = storageRef.child(`documents/${clientId}/${projectId}/${fileName}`);
       const snapshot = await fileRef.put(file);
       const downloadUrl = await snapshot.ref.getDownloadURL();
       await saveDocument(clientId, projectId, docType, downloadUrl);
@@ -6257,33 +6237,36 @@ async function saveDocument(clientId, projectId, docType, url) {
     projectId: String(projectId), 
     type: docType, 
     name: docType, 
-    url: url, 
+    url: url,  // This is now the Firebase Storage download URL
     date: new Date().toISOString().split('T')[0], 
     approved: false 
   };
-  
-  await db.collection('documents').doc(id).set(doc);
   documents.push(doc);
+  if (firebaseReady) await db.collection('documents').doc(id).set(doc);
+  else saveLocal();
   
   const client = clients.find(c => c.id === clientId || c.id === String(clientId));
   const project = projects.find(p => p.id === projectId || p.id === String(projectId));
   
   closeModal('uploadDocumentModal');
   showToast(`${docType} uploaded for ${client?.name || 'client'}.`);
-  await logAudit('Document uploaded', docType, String(clientId), String(projectId));
-  await logClientActivity(clientId, projectId, 'document_uploaded', `Croft Finance uploaded: ${docType}`, 'croft');
-  await loadAllData();
+  logAudit('Document uploaded', docType, String(clientId), String(projectId));
+  logClientActivity(clientId, projectId, 'document_uploaded', `Croft Finance uploaded: ${docType}`, 'croft');
+  fbReload().then(() => {
+    renderAdminDocumentsTable();
+    if (currentClient && String(currentClient.id) === String(clientId)) renderDocuments();
+  });
   
   if (client && client.email && client.status === 'active') {
     const projectName = project ? project.name : 'your project';
-    await sendEmail(client.email, `New Document Available — ${docType} — Croft Finance`, 
+    sendEmail(client.email, `New Document Available — ${docType} — Croft Finance`, 
       `Dear ${client.name},\n\nA new document has been uploaded to your Croft Finance client portal.\n\nDocument Type: ${docType}\nProject: ${projectName}\nUploaded: ${doc.date}\n\nPlease log in to your client portal to view and download this document.\n\nPortal URL: ${window.location.origin}\n\nBest regards,\nSuzana Aleksić\nPrincipal, Croft Finance`);
   }
   
   document.getElementById('pdfFile').value = '';
   document.getElementById('documentUrl').value = '';
 }
-
+  
 function getUserIP() {
   return fetch('https://api.ipify.org?format=json')
     .then(r => r.json())
