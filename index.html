@@ -21,6 +21,9 @@
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
+<!-- EmailJS -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
 <style>
 /* ─────────────────────────────────────────
    DESIGN TOKENS
@@ -1405,7 +1408,6 @@ body {
     </div>
     <div class="hn-links">
       <button class="hn-link" onclick="scrollTo('s-about')">About</button>
-      <button class="hn-link" onclick="scrollTo('s-process')">Process</button>
       <button class="hn-link" onclick="scrollTo('s-terms')">Terms</button>
       <button class="hn-link" onclick="scrollTo('s-contact')">Contact</button>
       <button class="hn-portal" onclick="openLoginModal()">Client Portal</button>
@@ -1483,62 +1485,6 @@ body {
       <div class="about-pillar">
         <div class="pillar-lbl">Sectors</div>
         <p class="pillar-txt">Real estate development, infrastructure, energy &amp; renewables, <em>mining</em>, and oil &amp; gas.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- PROCESS -->
-  <section class="sec process-sec" id="s-process">
-    <div class="sec-tag"><div class="sec-tag-line" style="background:var(--gold-dim)"></div><span class="sec-tag-text">Closing Process</span></div>
-    <h2 class="sec-h2">Eight steps.<br><em>Transparent</em> at every turn.</h2>
-    <div class="process-grid">
-      <div class="process-step">
-        <div class="step-n">01</div>
-        <div class="step-ttl">Term Sheet</div>
-        <p class="step-bdy">Croft Finance issues an indicative term sheet setting out the proposed facility structure, pricing, and timeline.</p>
-        <span class="step-who who-croft">Croft Finance</span>
-      </div>
-      <div class="process-step">
-        <div class="step-n">02</div>
-        <div class="step-ttl">Commitment Fee</div>
-        <p class="step-bdy">Client submits the commitment fee to confirm intent and enable Croft Finance to proceed with formal documentation.</p>
-        <span class="step-who who-client">Client Action</span>
-      </div>
-      <div class="process-step">
-        <div class="step-n">03</div>
-        <div class="step-ttl">Deed of Undertaking</div>
-        <p class="step-bdy">The Deed of Undertaking is executed, setting out the formal obligations of both parties.</p>
-        <span class="step-who who-both">Both Parties</span>
-      </div>
-      <div class="process-step">
-        <div class="step-n">04</div>
-        <div class="step-ttl">Credit Support</div>
-        <p class="step-bdy">Credit support instruments are established as required by the structure and jurisdiction of the capital deployment.</p>
-        <span class="step-who who-both">Both Parties</span>
-      </div>
-      <div class="process-step">
-        <div class="step-n">05</div>
-        <div class="step-ttl">Hard-Copy Submission</div>
-        <p class="step-bdy">Hard-copy closing materials are submitted to Croft Finance for review and final approval.</p>
-        <span class="step-who who-client">Client Action</span>
-      </div>
-      <div class="process-step">
-        <div class="step-n">06</div>
-        <div class="step-ttl">ECF Escrow</div>
-        <p class="step-bdy">The Enhanced Credit Facility escrow is established with the appointed escrow agent to secure the transaction.</p>
-        <span class="step-who who-both">Both Parties</span>
-      </div>
-      <div class="process-step">
-        <div class="step-n">07</div>
-        <div class="step-ttl">Transfer to Agent</div>
-        <p class="step-bdy">Funds are transferred to the designated agent for final processing prior to disbursement.</p>
-        <span class="step-who who-croft">Croft Finance</span>
-      </div>
-      <div class="process-step">
-        <div class="step-n">08</div>
-        <div class="step-ttl">Funded</div>
-        <p class="step-bdy">Facility is fully funded. Disbursement occurs within the agreed timeline. Congratulations.</p>
-        <span class="step-who who-both">Complete</span>
       </div>
     </div>
   </section>
@@ -1697,6 +1643,7 @@ body {
       <!-- DASHBOARD -->
       <div id="tab-dashboard" class="portal-tab active">
         <div id="actionBannerSlot"></div>
+        <div id="expiryWarningSlot"></div>
         <div class="dash-hero">
           <div class="dash-hero-left">
             <div class="welcome-name" id="welcomeTitle">Welcome back.</div>
@@ -2011,8 +1958,9 @@ body {
     </aside>
     <main class="main">
       <div id="broker-tab-dashboard" class="broker-tab active">
-        <div class="pg-header"><div class="pg-title" id="brokerGreeting">Welcome.</div><div class="pg-sub">Track your deal flow and commissions</div></div>
-        <div class="stats-grid">
+  <div class="pg-header"><div class="pg-title" id="brokerGreeting">Welcome.</div><div class="pg-sub">Track your deal flow and commissions</div></div>
+  <div id="brokerActionBanner"></div>
+  <div class="stats-grid">
           <div class="stat-card"><div class="stat-lbl">Total Submissions</div><div class="stat-val" id="bTotSubs">0</div></div>
           <div class="stat-card"><div class="stat-lbl">Active Deals</div><div class="stat-val" id="bActive">0</div></div>
           <div class="stat-card"><div class="stat-lbl">Funded Deals</div><div class="stat-val" id="bFunded">0</div></div>
@@ -2378,6 +2326,51 @@ function showToast(msg, isErr = false) {
 
 function scrollTo(id) { document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }); }
 
+/* ─── EMAIL NOTIFICATIONS ─── */
+async function sendEmail(templateParams) {
+  try {
+    const response = await emailjs.send('service_ri050ye', 'template_s85eg0h', templateParams);
+    console.log('Email sent:', response);
+    return true;
+  } catch (error) {
+    console.error('Email failed:', error);
+    return false;
+  }
+}
+
+async function notifyClient(clientId, subject, message, type = 'general') {
+  const client = clients.find(c => c.id === clientId);
+  if (!client || !client.email) {
+    console.log('No client email found for:', clientId);
+    return false;
+  }
+  
+  return await sendEmail({
+    to_email: client.email,
+    to_name: client.name,
+    from_name: 'Croft Finance',
+    from_email: 'suzana.aleksic@croftfinance.com',
+    subject: subject,
+    message: message,
+    type: type,
+    year: new Date().getFullYear()
+  });
+}
+
+async function notifyAdmin(subject, message, clientName = '', clientEmail = '') {
+  return await sendEmail({
+    to_email: 'suzana.aleksic@croftfinance.com',
+    to_name: 'Suzana Aleksić',
+    from_name: 'Croft Finance Portal',
+    from_email: 'suzana.aleksic@croftfinance.com',
+    subject: subject,
+    message: message,
+    client_name: clientName,
+    client_email: clientEmail,
+    year: new Date().getFullYear()
+  });
+}
+
 /* ─── LOGIN FORM PANELS ─── */
 const allForms = ['loginForm','registerForm','adminLoginForm','forgotPasswordForm','brokerLoginForm','brokerRegisterForm'];
 function hideAllForms() { allForms.forEach(id => { const e = document.getElementById(id); if (e) e.style.display = 'none'; }); }
@@ -2450,6 +2443,10 @@ function switchEditTab(name) {
 async function initFB() {
   if (!firebase.apps.length) firebase.initializeApp(FB_CONFIG);
   db = firebase.firestore(); auth = firebase.auth(); storage = firebase.storage();
+  
+  // Initialize EmailJS
+  emailjs.init("sgayReNOC1AIqBIZb");
+  
   auth.onAuthStateChanged(handleAuth);
 }
 
@@ -2522,10 +2519,14 @@ function setupClientListeners(uid) {
 
 function setupBrokerListeners(uid) {
   db.collection('brokerSubmissions').where('brokerId','==',uid).onSnapshot(s => {
-    brokerSubs = s.docs.map(d => ({id:d.id,...d.data()})); renderBrokerSubs(); updateBrokerStats();
+    brokerSubs = s.docs.map(d => ({id:d.id,...d.data()})); 
+    renderBrokerSubs(); 
+    updateBrokerStats();
+    renderBrokerActionBanner();  // <-- MOVE IT HERE, INSIDE the callback
   });
   db.collection('brokerMessages').where('brokerId','==',uid).orderBy('timestamp','asc').onSnapshot(s => {
-    brokerMsgs = s.docs.map(d => ({id:d.id,...d.data()})); renderBrokerMsgs();
+    brokerMsgs = s.docs.map(d => ({id:d.id,...d.data()})); 
+    renderBrokerMsgs();
   });
   db.collection('clients').onSnapshot(s => { clients = s.docs.map(d => ({id:d.id,...d.data()})); });
 }
@@ -2560,8 +2561,40 @@ async function register() {
       step:1, status:'pending', amount:'TBD', interestRate:'TBD', createdAt:new Date().toISOString()
     });
     showToast('Registration submitted. You will be notified once activated.');
-    closeModal('loginModal');
-    await auth.signOut();
+
+// Send confirmation email to client
+await sendEmail({
+  to_email: email,
+  to_name: name,
+  from_name: 'Croft Finance',
+  from_email: 'suzana.aleksic@croftfinance.com',
+  subject: 'Croft Finance - Registration Received',
+  message: `Thank you for registering with Croft Finance.
+
+Your account is pending review by our team. You will receive another email once your account is activated.
+
+Project: ${project}
+Registration Date: ${new Date().toLocaleDateString()}
+
+If you have any questions, please contact Suzana Aleksić at suzana.aleksic@croftfinance.com`,
+  type: 'registration',
+  year: new Date().getFullYear()
+});
+
+// Notify admin of new registration
+await notifyAdmin('New Client Registration', 
+  `A new client has registered and is awaiting approval.
+
+Name: ${name}
+Email: ${email}
+Project: ${project}
+Industry: ${getVal('rIndustry') || 'Not specified'}
+
+Please log in to the admin portal to review and approve this registration.`,
+  name, email);
+
+closeModal('loginModal');
+await auth.signOut();
   } catch(e) { err.textContent = e.message; err.style.display='block'; }
 }
 
@@ -2642,6 +2675,7 @@ function refreshClientUI() {
   renderCapStack(p);
   renderClientDocs();
   renderProcessTimeline();
+  renderExpiryWarning(p);
 }
 
 function updateClientDash(p) {
@@ -2649,7 +2683,7 @@ function updateClientDash(p) {
   const pct = Math.round(((step-1)/8)*100);
 
   /* Ring */
-  const circ = 2 * Math.PI * 45;
+const circ = 2 * Math.PI * 45;
   const fill = document.getElementById('prFill');
   if (fill) fill.style.strokeDashoffset = circ - (pct/100)*circ;
 
@@ -2672,15 +2706,17 @@ function updateClientDash(p) {
 
   if (p.advisorNote) setEl('advNote', p.advisorNote);
 
-  /* Action banner */
-  const slot = document.getElementById('actionBannerSlot');
-  if (slot) {
-    if (step===2 && !p.step2Completed) {
-      slot.innerHTML = `<div class="action-banner req"><i class="fas fa-exclamation-triangle"></i><div><span class="ab-strong">Action Required: Commitment Fee</span><span class="ab-sub">Please submit the commitment fee to advance to the next step. Contact your advisor for wiring instructions.</span></div></div>`;
-    } else if (step >= 8) {
-      slot.innerHTML = `<div class="action-banner funded"><i class="fas fa-check-circle"></i><div><span class="ab-strong">Congratulations — Funding Arranged</span><span class="ab-sub">Your facility has been funded. Disbursement details will follow from your advisor.</span></div></div>`;
-    } else { slot.innerHTML = ''; }
-  }
+/* Action banner */
+const slot = document.getElementById('actionBannerSlot');
+if (slot) {
+  if (step===2 && !p.step2Completed) {
+    slot.innerHTML = `<div class="action-banner req"><i class="fas fa-exclamation-triangle"></i><div><span class="ab-strong">Action Required: Commitment Fee</span><span class="ab-sub">Please submit the commitment fee to advance to the next step. Contact your advisor for wiring instructions.</span></div></div>`;
+  } else if (step===5 && !p.step5Completed) {
+    slot.innerHTML = `<div class="action-banner req"><i class="fas fa-file-upload"></i><div><span class="ab-strong">Action Required: Hard-Copy Submission</span><span class="ab-sub">Please submit all hard-copy closing materials to Croft Finance for review. Upload them in the Documents tab.</span></div></div>`;
+  } else if (step >= 8) {
+    slot.innerHTML = `<div class="action-banner funded"><i class="fas fa-check-circle"></i><div><span class="ab-strong">Congratulations — Funding Arranged</span><span class="ab-sub">Your facility has been funded. Disbursement details will follow from your advisor.</span></div></div>`;
+  } else { slot.innerHTML = ''; }
+} 
 
   /* Next steps */
   const nsl = document.getElementById('nextStepsList');
@@ -2703,25 +2739,21 @@ function updateClientDash(p) {
   setEl('nxtActionTxt', STEP_NAMES[step] + (step===2?' — Submit commitment fee':' — Awaiting Croft Finance'));
 }
 
-function renderCapStack(p) {
-  const ctx = document.getElementById('capChart'); if (!ctx) return;
-  const eq = parseFloat(String(p.sponsorEquity||'').replace(/[^0-9.]/g,''))||30;
-  const debt = parseFloat(String(p.fundsNeeded||p.amount||'').replace(/[^0-9.]/g,''))||70;
-  capChart?.destroy();
-  capChart = new Chart(ctx, {
-    type:'doughnut',
-    data:{
-      labels:['Sponsor Equity','Croft Finance Facility'],
-      datasets:[{data:[eq,debt],backgroundColor:['#0b0f1a','#c9a96e'],borderWidth:0}]
-    },
-    options:{
-      responsive:true,
-      plugins:{
-        legend:{position:'bottom',labels:{font:{size:11,family:"'Raleway',sans-serif"},padding:16,color:'#4e4740'}},
-        tooltip:{callbacks:{label:c=>` ${c.label}: ${c.raw.toLocaleString()}`}}
-      }
+function renderExpiryWarning(p) {
+  const slot = document.getElementById('expiryWarningSlot');
+  if (!slot) return;
+  
+  if (p.termSheetExpiry) {
+    const expiryDate = new Date(p.termSheetExpiry);
+    const today = new Date();
+    const daysLeft = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
+    
+    if (daysLeft > 0 && daysLeft <= 7) {
+      slot.innerHTML = `<div class="action-banner warning"><i class="fas fa-hourglass-half"></i><div><span class="ab-strong">Term Sheet Expires in ${daysLeft} Day${daysLeft !== 1 ? 's' : ''}</span><span class="ab-sub">Please complete the commitment fee to secure your facility before the term sheet expires.</span></div></div>`;
+      return;
     }
-  });
+  }
+  slot.innerHTML = '';
 }
 
 /* ─── PROCESS TIMELINE (CLIENT) ─── */
@@ -2786,6 +2818,21 @@ async function clientUploadDocument() {
       date:new Date().toISOString().split('T')[0],
       uploadedAt:firebase.firestore.FieldValue.serverTimestamp()
     });
+
+    const project = projects.find(p => p.id === currentProjectId);
+    if (project) {
+      await notifyAdmin('New Document Uploaded', 
+        `A client has uploaded a new document for review.
+
+Client: ${currentClient.name}
+Project: ${project.name}
+Document Type: ${type}
+Date: ${new Date().toLocaleDateString()}
+
+Please log in to the admin portal to review and approve this document.`,
+        currentClient.name, currentClient.email);
+    }
+
     stat.textContent = '✓ Uploaded successfully!';
     document.getElementById('clientUpFile').value = '';
     document.getElementById('clientUpDocType').value = '';
@@ -2907,9 +2954,29 @@ function renderClientsTable() {
 }
 
 async function approveClient(id) {
+  const client = clients.find(c => c.id === id);
   await db.collection('clients').doc(id).update({status:'active'});
   const p = projects.find(x=>x.clientId===id);
   if (p) await db.collection('projects').doc(p.id).update({status:'active'});
+  
+  // Notify client that account is approved
+  if (client && client.email) {
+    await notifyClient(id, 'Your Croft Finance Account is Active', 
+      `Congratulations! Your Croft Finance account has been approved and activated.
+
+You can now log in to the client portal.
+
+Your registered email: ${client.email}
+Project: ${p?.name || 'Your project'}
+
+We look forward to working with you.
+
+Best regards,
+Suzana Aleksić
+Principal, Croft Finance`,
+      'approval');
+  }
+  
   showToast('Client approved and portal activated.');
 }
 
@@ -3025,6 +3092,18 @@ async function saveProjectInfo() {
     termSheetExpiry:getVal('eExpiry'), fundedDate:getVal('eFundedDate'),
     advisorNote:getVal('eAdvNote'), ...su
   });
+const oldStep = p.step;
+  const newStep = parseInt(getVal('eStep'));
+  if (oldStep !== newStep && p.clientId) {
+    await notifyClient(p.clientId, `Deal Progress Update - Step ${newStep} of 8`,
+      `Your project "${p.name}" has advanced to Step ${newStep}: ${STEP_NAMES[newStep]}.
+
+${STEP_DESCS[newStep]}
+
+Log in to your portal to track progress.`,
+      'step_update');
+  }
+
   closeModal('editProjectModal');
   showToast('Project updated successfully.');
 }
@@ -3089,7 +3168,26 @@ function renderAdminDocsTable() {
   }).join('');
 }
 
-async function approveDoc(id) { await db.collection('documents').doc(id).update({approved:true}); showToast('Document approved.'); }
+async function approveDoc(id) { 
+  const doc = documents.find(d => d.id === id);
+  await db.collection('documents').doc(id).update({approved:true}); 
+  
+  if (doc && doc.projectId) {
+    const project = projects.find(p => p.id === doc.projectId);
+    if (project && project.clientId) {
+      await notifyClient(project.clientId, `Document Approved: ${doc.name}`,
+        `Your document "${doc.name}" has been approved.
+
+Project: ${project.name}
+
+You can view it in your client portal.`,
+        'document_approval');
+    }
+  }
+  
+  showToast('Document approved.'); 
+}
+   
 async function deleteDoc(id) {
   if (!confirm('Delete this document permanently?')) return;
   await db.collection('documents').doc(id).delete(); showToast('Document deleted.');
@@ -3168,6 +3266,16 @@ async function sendAdminReply(cid) {
   const inp = document.getElementById('ar_'+cid);
   const val = inp?.value.trim(); if (!val) return;
   await db.collection('messages').add({ clientId:cid, content:val, sender:'admin', timestamp:firebase.firestore.FieldValue.serverTimestamp() });
+  
+  // Notify client
+  await notifyClient(cid, 'New Message from Suzana Aleksić',
+    `You have received a new message from your advisor.
+
+Message: "${val.substring(0, 100)}${val.length > 100 ? '...' : ''}"
+
+Log in to your portal to read and reply.`,
+    'new_message');
+  
   inp.value='';
 }
 
@@ -3209,7 +3317,7 @@ async function deleteBroker(id) {
 
 function renderAdminBrokerSubs() {
   const tbody = document.getElementById('adminBrokerSubsTable'); if (!tbody) return;
-  if (!brokerSubs.length) { tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:40px;">No broker submissions.</td></tr>'; return; }
+  if (!brokerSubs.length) { tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:40px;">No broker submissions. </td></tr>'; return; }
   tbody.innerHTML = brokerSubs.map(s=>`<tr>
     <td>${fmtDate(s.createdAt)}</td>
     <td><strong>${esc(s.brokerName)}</strong></td>
@@ -3217,13 +3325,95 @@ function renderAdminBrokerSubs() {
     <td>${esc(s.projectName)}</td>
     <td>$${esc(s.fundsNeeded||'—')}</td>
     <td><span class="badge ${s.status==='pending'?'badge-warn':'badge-green'}">${s.status==='pending'?'Pending':'Accepted'}</span></td>
-    <td><button class="btn btn-err" style="padding:4px 8px;font-size:9px;" onclick="deleteBrokerSub('${s.id}')">Delete</button></td>
-  </tr>`).join('');
+    <td>
+      ${s.status === 'pending' ? `<button class="btn btn-ok" style="padding:4px 8px;font-size:9px;margin-right:4px;" onclick="approveBrokerSubmission('${s.id}')">Approve & Create</button>` : ''}
+      <button class="btn btn-err" style="padding:4px 8px;font-size:9px;" onclick="deleteBrokerSub('${s.id}')">Delete</button>
+     </td>
+   </tr>`).join('');
 }
 
 async function deleteBrokerSub(id) {
   if (!confirm('Delete this submission?')) return;
   await db.collection('brokerSubmissions').doc(id).delete(); showToast('Submission deleted.');
+}
+
+/* Approve Broker Submission - Auto-create client account */
+async function approveBrokerSubmission(submissionId) {
+  const submission = brokerSubs.find(s => s.id === submissionId);
+  if (!submission) {
+    showToast('Submission not found.', true);
+    return;
+  }
+  
+  if (submission.status !== 'pending') {
+    showToast('This submission has already been processed.', true);
+    return;
+  }
+  
+  // Generate a random password for the new client
+  const tempPassword = Math.random().toString(36).slice(-10) + 'A1!';
+  const email = submission.clientEmail.toLowerCase();
+  const clientName = submission.clientName;
+  const projectName = submission.projectName;
+  
+  try {
+    // 1. Create Firebase Auth user
+    const cred = await auth.createUserWithEmailAndPassword(email, tempPassword);
+    const uid = cred.user.uid;
+    
+    // 2. Create password reset email (so client can set their own password)
+    await auth.sendPasswordResetEmail(email);
+    
+    // 3. Create client document in Firestore
+    await db.collection('clients').doc(uid).set({
+      id: uid,
+      name: clientName,
+      email: email,
+      status: 'active',
+      referredBy: submission.brokerId,
+      referredByName: submission.brokerName,
+      createdAt: new Date().toISOString()
+    });
+    
+    // 4. Create project document
+    const projectId = db.collection('projects').doc().id;
+    await db.collection('projects').doc(projectId).set({
+      id: projectId,
+      clientId: uid,
+      name: projectName,
+      industry: submission.industry || 'Real Estate',
+      location: submission.location || '',
+      fundsNeeded: submission.fundsNeeded,
+      description: submission.description || '',
+      amount: submission.fundsNeeded || 'TBD',
+      step: 1,
+      status: 'active',
+      brokerId: submission.brokerId,
+      createdAt: new Date().toISOString()
+    });
+    
+    // 5. Update submission status to 'accepted'
+    await db.collection('brokerSubmissions').doc(submissionId).update({
+      status: 'accepted',
+      processedAt: new Date().toISOString(),
+      createdClientId: uid,
+      createdProjectId: projectId
+    });
+    
+    // 6. Send a welcome message from the broker to the new client
+    await db.collection('messages').add({
+      clientId: uid,
+      content: `Welcome to Croft Finance! Your account has been set up by ${submission.brokerName}. You can log in using the email ${email}. A password reset link has been sent to your email to set up your password. Please check your spam folder if you don't see it within a few minutes.`,
+      sender: 'admin',
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    
+    showToast(`Client "${clientName}" created successfully! A password reset email has been sent to ${email}.`);
+    
+  } catch (error) {
+    console.error('Error creating client:', error);
+    showToast('Error creating client: ' + error.message, true);
+  }
 }
 
 /* ─── BROKER PORTAL ─── */
@@ -3234,6 +3424,7 @@ function loadBrokerPortalUI() {
   setEl('brokerAvatar', currentBroker.name.charAt(0).toUpperCase());
   setEl('brokerGreeting', 'Welcome, ' + currentBroker.name.split(' ')[0] + '.');
   updateBrokerStats();
+  renderBrokerActionBanner();
 }
 
 function updateBrokerStats() {
@@ -3283,6 +3474,21 @@ function renderBrokerMsgs() {
   cont.scrollTop = cont.scrollHeight;
 }
 
+   /* Broker Action Banner - Shows pending submissions */
+function renderBrokerActionBanner() {
+  const slot = document.getElementById('brokerActionBanner');
+  if (!slot || !currentBroker) return;
+  
+  const pendingSubmissions = brokerSubs.filter(s => s.brokerId === currentBroker.id && s.status === 'pending');
+  const pendingCount = pendingSubmissions.length;
+  
+  if (pendingCount > 0) {
+    slot.innerHTML = `<div class="action-banner req"><i class="fas fa-clock"></i><div><span class="ab-strong">${pendingCount} Pending Submission${pendingCount !== 1 ? 's' : ''}</span><span class="ab-sub">Your deal submission${pendingCount !== 1 ? 's are' : ' is'} awaiting review by Croft Finance. You will be notified once approved.</span></div></div>`;
+  } else {
+    slot.innerHTML = '';
+  }
+}
+   
 async function sendBrokerMsg() {
   const inp=document.getElementById('brokerMsgInput'), val=inp.value.trim();
   if (!val||!currentBroker) return;
