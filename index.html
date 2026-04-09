@@ -1701,16 +1701,17 @@ body {
   <!-- FOOTER -->
   <footer class="home-footer">
     <div>
-      <div class="hf-brand">
-        <div class="hf-mark">CF</div>
-        <span class="hf-name">Croft Finance</span>
-      </div>
-      <div class="hf-copy" style="margin-top:8px;margin-left:40px;">© 2026 Croft Finance. All rights reserved.</div>
+        <div class="hf-brand">
+            <div class="hf-mark">CF</div>
+            <span class="hf-name">Croft Finance</span>
+        </div>
+        <div class="hf-copy" style="margin-top:8px;margin-left:40px;">© 2026 Croft Finance. All rights reserved.</div>
     </div>
-   <div class="footer-links">
-    <a href="/privacy" target="_blank" class="footer-link">Privacy Policy</a>
-    <a href="/terms" target="_blank" class="footer-link">Terms & Conditions</a>
-</div>
+    <div class="footer-links">
+        <a href="/privacy" target="_blank" class="footer-link">Privacy Policy</a>
+        <a href="/terms" target="_blank" class="footer-link">Terms & Conditions</a>
+    </div>
+</footer>
 
 <!-- ════════════════════════════════════════════════════════════
      CLIENT PORTAL VIEW
@@ -1940,7 +1941,7 @@ body {
       <div class="sb-nav">
         <div class="sb-section">Overview</div>
         <button class="nav-item active" onclick="switchAdminTab('overview',this)"><i class="fas fa-chart-pie"></i> Pipeline</button>
-         <span class="nb" id="actionBadgeCnt"></span></button>
+        <span class="nb" id="actionBadgeCnt"></span>
         <div class="sb-section" style="margin-top:8px;">Management</div>
         <button class="nav-item" onclick="switchAdminTab('clients',this)"><i class="fas fa-users"></i> Clients</button>
         <button class="nav-item" onclick="switchAdminTab('projects-admin',this)"><i class="fas fa-briefcase"></i> Projects</button>
@@ -2022,22 +2023,22 @@ body {
       </div>
 
       <!-- ADMIN ACTIONS DASHBOARD -->
-<div id="admin-actions" class="admin-tab">
-  <div class="pg-header">
-    <div class="pg-title">Action Required Dashboard</div>
-    <div class="pg-sub">Clients needing attention — commitment fees, submissions, expiring term sheets</div>
-  </div>
-  <div class="action-dashboard">
-    <div class="action-filter-bar">
-      <span style="font-size:12px;font-weight:600;">Filter:</span>
-      <button class="btn-sm btn-outline" onclick="filterAdminActions('all')">All</button>
-      <button class="btn-sm btn-outline" onclick="filterAdminActions('commitment')">Commitment Fee</button>
-      <button class="btn-sm btn-outline" onclick="filterAdminActions('submission')">Hard-Copy Submission</button>
-      <button class="btn-sm btn-outline" onclick="filterAdminActions('expiry')">Expiring Soon</button>
-    </div>
-    <div id="adminActionsList"></div>
-  </div>
-</div>
+      <div id="admin-actions" class="admin-tab">
+        <div class="pg-header">
+          <div class="pg-title">Action Required Dashboard</div>
+          <div class="pg-sub">Clients needing attention — commitment fees, submissions, expiring term sheets</div>
+        </div>
+        <div class="action-dashboard">
+          <div class="action-filter-bar">
+            <span style="font-size:12px;font-weight:600;">Filter:</span>
+            <button class="btn-sm btn-outline" onclick="filterAdminActions('all')">All</button>
+            <button class="btn-sm btn-outline" onclick="filterAdminActions('commitment')">Commitment Fee</button>
+            <button class="btn-sm btn-outline" onclick="filterAdminActions('submission')">Hard-Copy Submission</button>
+            <button class="btn-sm btn-outline" onclick="filterAdminActions('expiry')">Expiring Soon</button>
+          </div>
+          <div id="adminActionsList"></div>
+        </div>
+      </div>
 
       <!-- MESSAGES -->
       <div id="admin-messages-admin" class="admin-tab">
@@ -2046,14 +2047,13 @@ body {
         <div id="allMsgsList"></div>
       </div>
 
-         <!-- ANALYTICS DASHBOARD -->
+      <!-- ANALYTICS DASHBOARD -->
       <div id="admin-analytics" class="admin-tab">
         <div class="pg-header">
           <div class="pg-title">Deal Pipeline Analytics</div>
           <div class="pg-sub">Real-time metrics and insights</div>
         </div>
         
-        <!-- Key Metrics Cards -->
         <div class="stats-grid">
           <div class="stat-card stat-gold">
             <div class="stat-lbl">Total Capital Deployed</div>
@@ -2077,7 +2077,6 @@ body {
           </div>
         </div>
 
-        <!-- Charts Row -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
           <div class="card">
             <div class="card-hd"><div class="card-ttl"><i class="fas fa-chart-line"></i> Average Days Per Step</div></div>
@@ -2089,13 +2088,11 @@ body {
           </div>
         </div>
 
-        <!-- Funnel Chart -->
         <div class="card">
           <div class="card-hd"><div class="card-ttl"><i class="fas fa-funnel-dollar"></i> Deal Conversion Funnel</div></div>
           <div class="card-bd"><canvas id="funnelChart" height="200"></canvas></div>
         </div>
 
-        <!-- Broker Performance Table -->
         <div class="card">
           <div class="card-hd"><div class="card-ttl"><i class="fas fa-trophy"></i> Broker Performance</div></div>
           <div class="card-bd">
@@ -2166,9 +2163,9 @@ body {
     </aside>
     <main class="main">
       <div id="broker-tab-dashboard" class="broker-tab active">
-  <div class="pg-header"><div class="pg-title" id="brokerGreeting">Welcome.</div><div class="pg-sub">Track your deal flow and commissions</div></div>
-  <div id="brokerActionBanner"></div>
-  <div class="stats-grid">
+        <div class="pg-header"><div class="pg-title" id="brokerGreeting">Welcome.</div><div class="pg-sub">Track your deal flow and commissions</div></div>
+        <div id="brokerActionBanner"></div>
+        <div class="stats-grid">
           <div class="stat-card"><div class="stat-lbl">Total Submissions</div><div class="stat-val" id="bTotSubs">0</div></div>
           <div class="stat-card"><div class="stat-lbl">Active Deals</div><div class="stat-val" id="bActive">0</div></div>
           <div class="stat-card"><div class="stat-lbl">Funded Deals</div><div class="stat-val" id="bFunded">0</div></div>
@@ -2217,7 +2214,6 @@ body {
   <div class="modal" style="max-width:480px;">
     <div class="modal-hd"><h3 id="loginModalTitle">Client Portal</h3><button class="modal-x" onclick="closeModal('loginModal')">✕</button></div>
     <div class="modal-bd">
-      <!-- LOGIN -->
       <div id="loginForm">
         <div class="fg"><label class="flbl">Email Address</label><input type="email" id="loginEmail" class="finp" onkeypress="if(event.key==='Enter')login()"></div>
         <div class="fg"><label class="flbl">Password</label><input type="password" id="loginPassword" class="finp" onkeypress="if(event.key==='Enter')login()"></div>
@@ -2232,7 +2228,6 @@ body {
           <a href="#" onclick="showAdminLoginForm();return false;" style="color:var(--g400);">Admin</a>
         </div>
       </div>
-      <!-- REGISTER -->
       <div id="registerForm" style="display:none;">
         <div style="max-height:60vh;overflow-y:auto;padding-right:8px;">
           <div class="fg2">
@@ -2260,7 +2255,6 @@ body {
         </div>
         <div style="text-align:center;margin-top:14px;font-size:13px;"><a href="#" onclick="showLoginFormP();return false;" style="color:var(--g400);">← Back to sign in</a></div>
       </div>
-      <!-- ADMIN LOGIN -->
       <div id="adminLoginForm" style="display:none;">
         <div class="fg"><label class="flbl">Email</label><input type="email" id="aEmail" class="finp" onkeypress="if(event.key==='Enter')doAdminLogin()"></div>
         <div class="fg"><label class="flbl">Password</label><input type="password" id="aPass" class="finp" onkeypress="if(event.key==='Enter')doAdminLogin()"></div>
@@ -2268,14 +2262,12 @@ body {
         <button class="btn btn-primary" onclick="doAdminLogin()" style="width:100%;padding:14px;">Admin Sign In</button>
         <div style="text-align:center;margin-top:14px;font-size:13px;"><a href="#" onclick="showLoginFormP();return false;" style="color:var(--g400);">← Back</a></div>
       </div>
-      <!-- FORGOT PASSWORD -->
       <div id="forgotPasswordForm" style="display:none;">
         <div class="fg"><label class="flbl">Email Address</label><input type="email" id="fpEmail" class="finp"></div>
         <p id="fpError" style="color:var(--err);font-size:12px;margin-bottom:12px;display:none;"></p>
         <button class="btn btn-primary" onclick="requestReset()" style="width:100%;padding:14px;">Send Reset Link</button>
         <div style="text-align:center;margin-top:14px;font-size:13px;"><a href="#" onclick="showLoginFormP();return false;" style="color:var(--g400);">← Back to sign in</a></div>
       </div>
-      <!-- BROKER LOGIN -->
       <div id="brokerLoginForm" style="display:none;">
         <div class="fg"><label class="flbl">Email Address</label><input type="email" id="blEmail" class="finp"></div>
         <div class="fg"><label class="flbl">Password</label><input type="password" id="blPass" class="finp"></div>
@@ -2286,7 +2278,6 @@ body {
           <a href="#" onclick="showLoginFormP();return false;" style="color:var(--g400);">Client Portal</a>
         </div>
       </div>
-      <!-- BROKER REGISTER -->
       <div id="brokerRegisterForm" style="display:none;">
         <div style="max-height:60vh;overflow-y:auto;padding-right:8px;">
           <div class="fg2">
@@ -2767,7 +2758,7 @@ function setupBrokerListeners(uid) {
     brokerSubs = s.docs.map(d => ({id:d.id,...d.data()})); 
     renderBrokerSubs(); 
     updateBrokerStats();
-    renderBrokerActionBanner();  // <-- MOVE IT HERE, INSIDE the callback
+    renderBrokerActionBanner();
   });
   db.collection('brokerMessages').where('brokerId','==',uid).orderBy('timestamp','asc').onSnapshot(s => {
     brokerMsgs = s.docs.map(d => ({id:d.id,...d.data()})); 
@@ -3034,7 +3025,7 @@ function renderProcessTimeline() {
 function renderClientDocs() {
   const tbody = document.getElementById('clientDocsBody'); if (!tbody||!currentProjectId) return;
   const d = documents.filter(x => x.projectId === currentProjectId);
-  if (!d.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--g400);">No documents yet.</td></tr>'; return; }
+  if (!d.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--g400);">No documents yet. Neutrino</td></tr>'; return; }
   tbody.innerHTML = d.map(doc => `<tr>
     <td><strong>${esc(doc.name)}</strong></td>
     <td><span class="doc-status ${doc.approved?'ds-apr':'ds-upl'}">${doc.approved?'Approved ✓':'Pending Review'}</span></td>
@@ -3197,7 +3188,7 @@ function renderClientsTable() {
   const tbody = document.getElementById('adminClientsTable'); if (!tbody) return;
   const search = (getVal('clientSearch')).toLowerCase();
   const f = clients.filter(c => !search || c.name?.toLowerCase().includes(search) || c.email?.toLowerCase().includes(search));
-  if (!f.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;">No clients found.</td></tr>'; return; }
+  if (!f.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;">No clients found. Neutrino</td></tr>'; return; }
   tbody.innerHTML = f.map(c => {
     const p = projects.find(x=>x.clientId===c.id);
     return `<tr>
@@ -3258,7 +3249,7 @@ async function deleteClient(id) {
 /* ─── ADMIN — PROJECTS TABLE ─── */
 function renderAdminProjectsTable() {
   const tbody = document.getElementById('adminProjectsTable'); if (!tbody) return;
-  if (!projects.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;">No projects yet.</td></tr>'; return; }
+  if (!projects.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;">No projects yet. Neutrino</td></tr>'; return; }
   tbody.innerHTML = projects.map(p => {
     const c = clients.find(cl=>cl.id===p.clientId);
     return `<tr>
@@ -3413,7 +3404,7 @@ function renderAdminDocsTable() {
   }
   const fc = fsel?.value||'';
   const filtered = fc ? documents.filter(d=>d.clientId===fc) : documents;
-  if (!filtered.length) { tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:20px;">No documents.</td></tr>'; return; }
+  if (!filtered.length) { tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:20px;">No documents. Neutrino</td></tr>'; return; }
   tbody.innerHTML = filtered.map(d => {
     const c=clients.find(x=>x.id===d.clientId), p=projects.find(x=>x.id===d.projectId);
     return `<tr>
@@ -3545,8 +3536,8 @@ Log in to your portal to read and reply.`,
 /* ─── ADMIN — BROKERS ─── */
 function renderBrokerAdminTable() {
   const tbody = document.getElementById('adminBrokersTable'); if (!tbody) return;
-  if (!brokers.length) { tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:40px;">No brokers registered.</td></tr>'; return; }
-  tbody.innerHTML = brokers.map(b=>`<tr>
+  if (!brokers.length) { tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:40px;">No brokers registered. Neutrino</td></tr>'; return; }
+  tbody.innerHTML = brokers.map(b=>`<td>
     <td><strong>${esc(b.name)}</strong><br><span style="font-size:11px;color:var(--g400);">${esc(b.email)}</span></td>
     <td>${esc(b.firm||'—')}</td>
     <td><strong>${b.commissionRate||0}%</strong></td>
@@ -3589,7 +3580,7 @@ function renderAdminBrokerSubs() {
   console.log('Broker subs:', brokerSubs);
   
   if (!brokerSubs.length) { 
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;">No broker submissions.</td></tr>'; 
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;">No broker submissions. Neutrino</td></tr>'; 
     return; 
   }
   
@@ -3840,7 +3831,7 @@ function renderAnalytics() {
   const tbody = document.getElementById('brokerPerformanceTable');
   if (tbody) {
     if (brokerPerf.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;">No broker data available. Basque</tr>';
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;">No broker data available. Basque</td>';
     } else {
       tbody.innerHTML = brokerPerf.map(b => `<tr>
         <td><strong>${esc(b.broker.name)}</strong><br><span style="font-size:11px;color:var(--g400);">${esc(b.broker.firm || 'Independent')}</span></td>
@@ -4016,7 +4007,7 @@ Please log in to the admin portal to review and approve this submission.`,
 function renderBrokerSubs() {
   const tbody = document.getElementById('brokerSubsList'); if (!tbody||!currentBroker) return;
   const subs = brokerSubs.filter(s=>s.brokerId===currentBroker.id).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
-  if (!subs.length) { tbody.innerHTML='<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--g400);">No submissions yet.</td></tr>'; return; }
+  if (!subs.length) { tbody.innerHTML='<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--g400);">No submissions yet. Neutrino</td></tr>'; return; }
   tbody.innerHTML = subs.map(s=>`<tr>
     <td>${fmtDate(s.createdAt)}</td>
     <td><strong>${esc(s.clientName)}</strong></td>
@@ -4093,3 +4084,4 @@ document.addEventListener('DOMContentLoaded', initFB);
 </script>
 </body>
 </html>
+
