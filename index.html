@@ -3219,9 +3219,7 @@ const firebaseConfig = {
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
 const auth = firebase.auth();
-const storage = firebase.storage();
 
 const EMAILJS_CONFIG = {
   publicKey: "sgayReNOC1AIqBIZb",
@@ -3272,9 +3270,8 @@ function init() {
   setupSessionTimeout();
   setTimeout(() => { if (!firebaseReady) document.getElementById('connectionBanner').style.display = 'block'; }, 6000);
   try {
-    firebase.initializeApp(FIREBASE_CONFIG);
-    db = firebase.firestore();
-    storage = firebase.storage();  // ADD THIS LINE
+    db = firebase.firestore();    // Assign here, not declare
+    storage = firebase.storage(); // Assign here, not declare
     loadFromFirebase();
   } catch(e) { loadFromLocalStorage(); }
 }
