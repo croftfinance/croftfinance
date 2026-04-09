@@ -3269,18 +3269,52 @@ async function init() {
   setupNavScroll();
   
   // Set up auth state listener
-  auth.onAuthStateChanged(async (user) => {
-    if (user) {
-      // User is signed in
-      await loadUserData(user);
-    } else {
-      // User is signed out
+auth.onAuthStateChanged(async (user) => {
+  if (user) {
+    // Check if this is an admin user
+    const adminSess = localStorage.getItem('croftAdminSession');
+    if (adminSess) {
+      // Already in admin mode, don't override
+      return;
+    }
+    
+    // Check if user is a client
+    const clientDoc = await db.collection('clients').doc(user.uid).get();
+    if (clientDoc.exists) {
+      currentClient = { id: clientDoc.id, ...clientDoc.data() };
+      const clientProjects = projects.filter(p => p.clientId === currentClient.id);
+      if (clientProjects.length) currentProjectId = clientProjects[0].id;
+      showView('portal');
+      loadClientPortal();
+      return;
+    }
+    
+    // Check if user is a broker
+    const brokerQuery = await db.collection('brokers').where('email', '==', user.email).get();
+    if (!brokerQuery.empty) {
+      currentBroker = { id: brokerQuery.docs[0].id, ...brokerQuery.docs[0].data() };
+      if (currentBroker.status === 'active') {
+        showView('broker');
+        loadBrokerPortal();
+      } else {
+        showToast('Your broker account is pending approval.', true);
+        auth.signOut();
+      }
+      return;
+    }
+  } else {
+    // User is signed out
+    // Don't clear admin session here - admin doesn't use Firebase Auth
+    if (!localStorage.getItem('croftAdminSession')) {
       currentClient = null;
       currentBroker = null;
-      showView('home');
+      if (document.getElementById('view-home')) {
+        showView('home');
+      }
     }
-    document.getElementById('loadingOverlay').style.display = 'none';
-  });
+  }
+  document.getElementById('loadingOverlay').style.display = 'none';
+});
   
   // Load data from Firestore
   await loadAllData();
@@ -3467,13 +3501,43 @@ async function logClientActivity(clientId, projectId, action, description, perfo
 }
 
 function checkSession() {
-  // Session is now handled by Firebase Auth
-  // Check if there's a stored session from previous version
-  const sess = localStorage.getItem('croftSession');
-  if (sess && !auth.currentUser) {
-    // Migrate old session - this would need to be handled carefully
-    localStorage.removeItem('croftSession');
+  // Check for admin session first
+  const adminSess = localStorage.getItem('croftAdminSession');
+  if (adminSess) {
+    const s = JSON.parse(adminSess);
+    if (Date.now() - s.ts < 7 * 24 * 60 * 60 * 1000) {
+      setTimeout(() => { 
+        showView('admin'); 
+        loadAdminNotifications();
+        renderAdminTables(); 
+      }, 800);
+    } else { 
+      localStorage.removeItem('croftAdminSession'); 
+    }
+    return;
   }
+  
+  // Check for broker session
+  const brokerSess = localStorage.getItem('croftBrokerSession');
+  if (brokerSess) {
+    const s = JSON.parse(brokerSess);
+    if (Date.now() - s.ts < 7 * 24 * 60 * 60 * 1000) {
+      setTimeout(() => {
+        const broker = brokers.find(b => b.id === s.brokerId);
+        if (broker && broker.status === 'active') {
+          currentBroker = broker;
+          showView('broker');
+          loadBrokerPortal();
+        }
+      }, 800);
+    } else { 
+      localStorage.removeItem('croftBrokerSession'); 
+    }
+    return;
+  }
+  
+  // Firebase Auth will handle client sessions via onAuthStateChanged
+  // No need for client localStorage session anymore
 }
 
 function showView(v) {
@@ -3820,28 +3884,74 @@ async function requestPasswordReset() {
   }
 }
 
-function doAdminLogin() {
+async function doAdminLogin() {
   const u = document.getElementById('adminUsername').value.trim();
   const p = document.getElementById('adminPassword').value;
-  if (u === ADMIN_CREDS.username && p === ADMIN_CREDS.password) {
+  const errEl = document.getElementById('adminLoginError');
+  errEl.style.display = 'none';
+  
+  // First check if it's the special admin credentials
+  if (u !== ADMIN_CREDS.username || p !== ADMIN_CREDS.password) {
+    errEl.textContent = 'Incorrect credentials.';
+    errEl.style.display = 'block';
+    return;
+  }
+  
+  try {
+    // Check if admin user exists in Firebase Auth, if not create them
+    try {
+      // Try to sign in with the admin email
+      await auth.signInWithEmailAndPassword('suzana.aleksic@croftfinance.com', p);
+    } catch (signInError) {
+      // If sign-in fails, create the admin user
+      if (signInError.code === 'auth/user-not-found') {
+        await auth.createUserWithEmailAndPassword('suzana.aleksic@croftfinance.com', p);
+      } else {
+        throw signInError;
+      }
+    }
+    
+    // Store admin session info
+    localStorage.setItem('croftAdminSession', JSON.stringify({ 
+      username: u, 
+      ts: Date.now(),
+      isAdmin: true 
+    }));
+    
     closeModal('loginModal');
     showView('admin');
     document.title = 'Croft Finance — Admin';
     loadAdminNotifications();
     setTimeout(() => requestBrowserNotificationPermission(), 1000);
     renderAdminTables();
-    logAudit('Admin logged in', 'Suzana');
+    await logAudit('Admin logged in', 'Suzana');
     resetSessionTimeout();
-  } else {
-    document.getElementById('adminLoginError').style.display = 'block';
+    
+  } catch (error) {
+    console.error('Admin login error:', error);
+    errEl.textContent = 'Authentication failed. Please try again.';
+    errEl.style.display = 'block';
   }
 }
 
 async function logout() {
-  await auth.signOut();
+  // Check if we're in admin view and have admin session
+  const adminSess = localStorage.getItem('croftAdminSession');
+  if (adminSess) {
+    localStorage.removeItem('croftAdminSession');
+  }
+  
+  // Sign out from Firebase Auth if there's a user
+  if (auth.currentUser) {
+    await auth.signOut();
+  }
+  
   currentClient = null;
   currentProjectId = null;
   currentBroker = null;
+  localStorage.removeItem('croftSession');
+  localStorage.removeItem('croftBrokerSession');
+  stopAdminListeners();
   showView('home');
   document.title = 'Croft Finance — Structured Finance Solutions';
   if (sessionTimeout) clearTimeout(sessionTimeout);
