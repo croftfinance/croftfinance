@@ -3512,17 +3512,62 @@ function updateBrokerStats() {
 }
 
 async function submitBrokerDeal() {
-  const cn=getVal('dClientName'), ce=getVal('dClientEmail'), pn=getVal('dProjectName'), fn=getVal('dFunds');
-  if (!cn||!pn||!ce||!fn) { showToast('Please fill all required fields.', true); return; }
-  const id=db.collection('brokerSubmissions').doc().id;
-  await db.collection('brokerSubmissions').doc(id).set({
-    id, brokerId:currentBroker.id, brokerName:currentBroker.name,
-    clientName:cn, clientEmail:ce, projectName:pn, fundsNeeded:fn,
-    industry:getVal('dIndustry'), location:getVal('dLocation'), description:getVal('dDesc'),
-    status:'pending', createdAt:new Date().toISOString()
-  });
-  showToast('Deal submitted successfully!');
-  ['dClientName','dClientEmail','dProjectName','dFunds','dLocation','dDesc'].forEach(id => setVal(id,''));
+  const cn = getVal('dClientName');
+  const ce = getVal('dClientEmail');
+  const pn = getVal('dProjectName');
+  const fn = getVal('dFunds');
+  
+  if (!cn || !pn || !ce || !fn) { 
+    showToast('Please fill all required fields.', true); 
+    return; 
+  }
+  
+  // Make sure currentBroker exists
+  if (!currentBroker || !currentBroker.id) {
+    showToast('You must be logged in as a broker.', true);
+    return;
+  }
+  
+  const id = db.collection('brokerSubmissions').doc().id;
+  
+  try {
+    await db.collection('brokerSubmissions').doc(id).set({
+      id: id,
+      brokerId: currentBroker.id,
+      brokerName: currentBroker.name,
+      clientName: cn,
+      clientEmail: ce,
+      projectName: pn,
+      fundsNeeded: fn,
+      industry: getVal('dIndustry'),
+      location: getVal('dLocation'),
+      description: getVal('dDesc'),
+      status: 'pending',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    
+    showToast('Deal submitted successfully!');
+    
+    // Clear form
+    ['dClientName', 'dClientEmail', 'dProjectName', 'dFunds', 'dLocation', 'dDesc'].forEach(id => setVal(id, ''));
+    
+    // Notify admin via email
+    await notifyAdmin('New Broker Submission', 
+      `A new deal has been submitted by broker ${currentBroker.name}.
+
+Client: ${cn}
+Email: ${ce}
+Project: ${pn}
+Funds Needed: $${fn}
+Industry: ${getVal('dIndustry')}
+
+Please log in to the admin portal to review and approve this submission.`,
+      cn, ce);
+      
+  } catch (error) {
+    console.error('Error submitting deal:', error);
+    showToast('Error submitting deal: ' + error.message, true);
+  }
 }
 
 function renderBrokerSubs() {
