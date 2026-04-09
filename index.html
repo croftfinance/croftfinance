@@ -3346,20 +3346,35 @@ async function deleteBroker(id) {
 }
 
 function renderAdminBrokerSubs() {
-  const tbody = document.getElementById('adminBrokerSubsTable'); if (!tbody) return;
-  if (!brokerSubs.length) { tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:40px;">No broker submissions. </td></tr>'; return; }
-  tbody.innerHTML = brokerSubs.map(s=>`<tr>
-    <td>${fmtDate(s.createdAt)}</td>
-    <td><strong>${esc(s.brokerName)}</strong></td>
-    <td>${esc(s.clientName)}</td>
-    <td>${esc(s.projectName)}</td>
-    <td>$${esc(s.fundsNeeded||'—')}</td>
-    <td><span class="badge ${s.status==='pending'?'badge-warn':'badge-green'}">${s.status==='pending'?'Pending':'Accepted'}</span></td>
-    <td>
-      ${s.status === 'pending' ? `<button class="btn btn-ok" style="padding:4px 8px;font-size:9px;margin-right:4px;" onclick="approveBrokerSubmission('${s.id}')">Approve & Create</button>` : ''}
-      <button class="btn btn-err" style="padding:4px 8px;font-size:9px;" onclick="deleteBrokerSub('${s.id}')">Delete</button>
-     </td>
-   </tr>`).join('');
+  const tbody = document.getElementById('adminBrokerSubsTable'); 
+  if (!tbody) {
+    console.log('adminBrokerSubsTable not found');
+    return;
+  }
+  
+  console.log('Broker subs count:', brokerSubs.length);
+  console.log('Broker subs:', brokerSubs);
+  
+  if (!brokerSubs.length) { 
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;">No broker submissions.</td></tr>'; 
+    return; 
+  }
+  
+  tbody.innerHTML = brokerSubs.map(s => {
+    console.log('Rendering submission:', s);
+    return `<tr>
+      <td>${fmtDate(s.createdAt)}</td>
+      <td><strong>${esc(s.brokerName)}</strong></td>
+      <td>${esc(s.clientName)}</td>
+      <td>${esc(s.projectName)}</td>
+      <td>$${esc(s.fundsNeeded || '—')}</td>
+      <td><span class="badge ${s.status === 'pending' ? 'badge-warn' : 'badge-green'}">${s.status === 'pending' ? 'Pending' : 'Accepted'}</span></td>
+      <td>
+        ${s.status === 'pending' ? `<button class="btn btn-ok" style="padding:4px 8px;font-size:9px;margin-right:4px;" onclick="approveBrokerSubmission('${s.id}')">Approve & Create</button>` : ''}
+        <button class="btn btn-err" style="padding:4px 8px;font-size:9px;" onclick="deleteBrokerSub('${s.id}')">Delete</button>
+      </td>
+    </tr>`;
+  }).join('');
 }
 
 async function deleteBrokerSub(id) {
