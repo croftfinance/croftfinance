@@ -2895,11 +2895,16 @@ function logout() {
 
 /* ─── CLIENT PORTAL ─── */
 function loadClientPortalUI() {
+  if (!currentClient || !currentClient.name) {
+    console.log('No client data available yet');
+    return;
+  }
   setEl('portalNavUser', currentClient.name);
   setEl('portalUserName', currentClient.name);
-  setEl('portalUserEmail', currentClient.email);
+  setEl('portalUserEmail', currentClient.email || '');
   setEl('clientAvatar', currentClient.name.charAt(0).toUpperCase());
-  setEl('welcomeTitle', 'Welcome back, ' + currentClient.name.split(' ')[0] + '.');
+  const firstName = currentClient.name.split(' ')[0] || 'User';
+  setEl('welcomeTitle', 'Welcome back, ' + firstName + '.');
   setEl('dashDate', new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'}));
 }
 
