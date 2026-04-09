@@ -172,285 +172,464 @@ body {
 /* ─────────────────────────────────────────
    HOME NAVIGATION
 ───────────────────────────────────────── */
-<nav class="hn" id="homeNav">
-    <div class="hn-logo">
-      <div class="hn-logo-mark">CF</div>
-      <span class="hn-logo-text">Croft Finance</span>
-    </div>
-    <div class="hn-links">
-      <button class="hn-link" onclick="scrollTo('s-about')">About</button>
-      <button class="hn-link" onclick="scrollTo('s-terms')">Terms</button>
-      <button class="hn-link" onclick="scrollTo('s-contact')">Contact</button>
-      <button class="hn-portal" onclick="openLoginModal()">Client Portal</button>
-    </div>
-  </nav>
+.hn {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  height: 76px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 64px;
+  transition: background .4s, border .4s, backdrop-filter .4s;
+}
+.hn.scrolled {
+  background: rgba(250,247,242,.96);
+  border-bottom: var(--border-light);
+  backdrop-filter: blur(16px);
+}
+.hn-logo {
+  display: flex; align-items: center; gap: 12px;
+}
+.hn-logo-mark {
+  width: 36px; height: 36px;
+  border: 1px solid var(--gold-dim);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-serif); font-size: 14px; font-weight: 600;
+  color: var(--gold);
+}
+.hn-logo-text {
+  font-family: var(--font-body); font-size: 12px; font-weight: 600;
+  letter-spacing: 4px; text-transform: uppercase; color: var(--ink);
+}
+.hn-links {
+  display: flex; align-items: center; gap: 40px;
+}
+.hn-link {
+  font-family: var(--font-body); font-size: 10px; font-weight: 500;
+  letter-spacing: 2.5px; text-transform: uppercase; color: var(--g500);
+  background: none; border: none; cursor: pointer;
+  transition: color .2s; padding: 4px 0; position: relative;
+}
+.hn-link::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 100%;
+  height: 1px; background: var(--gold);
+  transition: right .25s ease;
+}
+.hn-link:hover { color: var(--ink); }
+.hn-link:hover::after { right: 0; }
+.hn-portal {
+  font-family: var(--font-body); font-size: 10px; font-weight: 600;
+  letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--ink); background: none;
+  border: 1px solid var(--gold-dim); padding: 11px 28px;
+  cursor: pointer; transition: all .25s;
+}
+.hn-portal:hover {
+  background: var(--gold); border-color: var(--gold); color: var(--ink);
+}
 
 /* ─────────────────────────────────────────
    HERO
 ───────────────────────────────────────── */
 .hero {
   min-height: 100vh;
-  background: #f7f5f1;
+  background: var(--ink);
   position: relative; overflow: hidden;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  padding-top: 72px;
+  display: flex; align-items: center;
+  padding: 76px 0 0;
 }
-.hero-left {
-  display: flex; flex-direction: column; justify-content: center;
-  padding: 80px 60px 80px 60px;
-  border-right: 1px solid #e0dcd6;
+
+/* Decorative background elements */
+.hero-bg {
+  position: absolute; inset: 0; pointer-events: none; overflow: hidden;
 }
-.hero-right {
-  display: flex; flex-direction: column; justify-content: space-between;
-  padding: 80px 60px;
+.hero-bg-line {
+  position: absolute; background: rgba(201,169,110,.06);
+}
+.hero-bg-line-1 { top: 0; bottom: 0; left: 52%; width: 1px; }
+.hero-bg-line-2 { top: 0; bottom: 0; left: 72%; width: 1px; }
+.hero-bg-line-3 { left: 0; right: 0; top: 33%; height: 1px; }
+
+.hero-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: .4;
+}
+.hero-orb-1 {
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(201,169,110,.15), transparent 70%);
+  top: -100px; right: -100px;
+}
+.hero-orb-2 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(30,42,64,.8), transparent 70%);
+  bottom: 0; left: 0;
+}
+
+.hero-content {
+  position: relative; z-index: 2;
+  padding: 0 64px;
+  max-width: 780px;
 }
 .hero-eyebrow {
-  display: flex; align-items: center; gap: 14px;
-  margin-bottom: 40px;
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 36px;
 }
-.hero-eyebrow-line { width: 36px; height: 1px; background: #1a1a1a; }
+.hero-eyebrow-line {
+  width: 40px; height: 1px; background: var(--gold);
+}
 .hero-eyebrow-text {
-  font-size: 9px; font-weight: 600; letter-spacing: 3.5px;
-  text-transform: uppercase; color: #1a1a1a;
+  font-size: 10px; font-weight: 500; letter-spacing: 3.5px;
+  text-transform: uppercase; color: var(--gold);
 }
+
 .hero-h1 {
   font-family: var(--font-serif);
-  font-size: 72px; font-weight: 400; line-height: 1.06;
-  color: #1a1a1a; margin-bottom: 36px;
-  letter-spacing: -1.5px;
+  font-size: 82px; font-weight: 400; line-height: 1.04;
+  color: var(--white); margin-bottom: 32px;
+  letter-spacing: -1px;
 }
 .hero-h1 em {
-  font-style: italic; color: #5a5550;
+  font-style: italic; color: var(--gold);
+  font-weight: 400;
 }
+.hero-h1 .hero-h1-second {
+  display: block;
+  padding-left: 80px; /* offset */
+}
+
 .hero-p {
-  font-size: 15px; line-height: 1.9; font-weight: 300;
-  color: #6b6560; max-width: 440px;
+  font-size: 15px; line-height: 1.95; font-weight: 300;
+  color: rgba(255,255,255,.45); max-width: 480px;
   margin-bottom: 52px;
 }
+
 .hero-actions {
-  display: flex; align-items: center; gap: 24px;
+  display: flex; align-items: center; gap: 32px;
 }
 .btn-hero-primary {
   font-family: var(--font-body); font-size: 10px; font-weight: 600;
-  letter-spacing: 2px; text-transform: uppercase;
-  color: #fff; background: #1a1a1a;
-  border: none; padding: 16px 40px; cursor: pointer;
-  transition: all .25s;
+  letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--ink); background: var(--gold);
+  border: none; padding: 16px 44px; cursor: pointer;
+  transition: all .25s; position: relative; overflow: hidden;
 }
-.btn-hero-primary:hover { background: #333; transform: translateY(-1px); }
+.btn-hero-primary::after {
+  content: ''; position: absolute; inset: 0;
+  background: rgba(255,255,255,0);
+  transition: background .2s;
+}
+.btn-hero-primary:hover::after { background: rgba(255,255,255,.12); }
+.btn-hero-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,169,110,.35); }
 .btn-hero-ghost {
   font-family: var(--font-body); font-size: 10px; font-weight: 500;
-  letter-spacing: 2px; text-transform: uppercase; color: #9a9088;
+  letter-spacing: 2px; color: rgba(255,255,255,.5);
   background: none; border: none; cursor: pointer;
-  transition: color .2s; display: flex; align-items: center; gap: 8px;
-  text-decoration: underline; text-underline-offset: 4px;
+  transition: color .2s;
+  display: flex; align-items: center; gap: 8px;
 }
-.btn-hero-ghost:hover { color: #1a1a1a; }
+.btn-hero-ghost:hover { color: var(--gold); }
 
-/* Right side — stats block */
-.hero-right-top {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 0;
-  border: 1px solid #e0dcd6;
+/* Hero stats panel */
+.hero-stats {
+  position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+  z-index: 2;
+  padding: 40px 48px;
+  border-left: var(--border);
+  display: flex; flex-direction: column; gap: 0;
 }
-.hero-stat-block {
-  padding: 36px 32px;
-  border-right: 1px solid #e0dcd6;
-  border-bottom: 1px solid #e0dcd6;
-}
-.hero-stat-block:nth-child(2n) { border-right: none; }
-.hero-stat-block:nth-child(3), .hero-stat-block:nth-child(4) { border-bottom: none; }
+.hero-stat { padding: 28px 0; border-bottom: var(--border); }
+.hero-stat:last-child { border-bottom: none; }
 .hero-stat-num {
   font-family: var(--font-serif);
-  font-size: 42px; font-weight: 400; color: #1a1a1a; line-height: 1;
-  margin-bottom: 8px;
+  font-size: 48px; font-weight: 400; color: var(--white); line-height: 1;
 }
-.hero-stat-num sup { font-size: 18px; vertical-align: top; margin-top: 6px; }
+.hero-stat-num sup { font-size: 22px; vertical-align: top; margin-top: 8px; }
 .hero-stat-label {
-  font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase;
-  color: #9a9088;
+  font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--gold); margin-top: 8px;
 }
 
-.hero-right-bottom {
-  margin-top: auto;
-  padding-top: 40px;
+/* Hero scroll cue */
+.hero-scroll-cue {
+  position: absolute; bottom: 36px; left: 64px; z-index: 2;
+  display: flex; align-items: center; gap: 12px;
+  font-size: 9px; letter-spacing: 3px; color: rgba(255,255,255,.3);
+  text-transform: uppercase;
 }
-.hero-sectors {
-  display: flex; flex-wrap: wrap; gap: 8px;
+.hero-scroll-line {
+  width: 1px; height: 40px; background: rgba(201,169,110,.3);
+  animation: scrollPulse 2s ease-in-out infinite;
 }
-.hero-sector-tag {
-  font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase;
-  color: #6b6560; padding: 6px 14px;
-  border: 1px solid #d0ccc6;
-  background: transparent;
-}
-.hero-lede {
-  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
-  color: #b0aaa4; margin-bottom: 16px;
+@keyframes scrollPulse {
+  0%, 100% { opacity: .3; transform: scaleY(1); }
+  50% { opacity: 1; transform: scaleY(1.2); }
 }
 
 /* ─────────────────────────────────────────
    HOME SECTIONS — ABOUT
 ───────────────────────────────────────── */
-<section class="about-sec" id="s-about">
-    <div class="about-left">
-      <div class="sec-tag"><div class="sec-tag-line"></div><span class="sec-tag-text">Who We Are</span></div>
-      <h2 class="sec-h2">Quiet capital.<br><em>Decisive</em> execution.</h2>
-      <p class="about-p">Croft Finance operates at the intersection of private capital and structured finance. We work with developers, project sponsors, and owners who require the speed, discretion, and structural flexibility that institutional lenders cannot provide.<br><br>Every mandate is handled personally by Suzana Aleksić, Principal. From first conversation to funding disbursement, you work with one person who understands your project completely — not a team of analysts.</p>
-      <button class="btn-hero-primary" onclick="scrollTo('s-contact')">Start a Conversation</button>
-    </div>
-    <div class="about-right">
-      <div class="about-pillar">
-        <div class="pillar-lbl">Speed</div>
-        <p class="pillar-txt">14 to 21 business days from executed term sheet to <em>funding disbursement</em>.</p>
-      </div>
-      <div class="about-pillar">
-        <div class="pillar-lbl">Discretion</div>
-        <p class="pillar-txt">Our capital partners operate with complete confidentiality — standard practice for <em>private markets</em> of this nature.</p>
-      </div>
-      <div class="about-pillar">
-        <div class="pillar-lbl">Flexibility</div>
-        <p class="pillar-txt">No prepayment penalty. Structures tailored to each project's capital stack, <em>timeline</em>, and jurisdiction.</p>
-      </div>
-      <div class="about-pillar">
-        <div class="pillar-lbl">Sectors</div>
-        <p class="pillar-txt">Real estate development, infrastructure, energy &amp; renewables, <em>mining</em>, and oil &amp; gas.</p>
-      </div>
-    </div>
-  </section>
+.sec { padding: 128px 64px; }
+
+.sec-tag {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 20px;
+}
+.sec-tag-line { width: 32px; height: 1px; background: var(--gold); flex-shrink: 0; }
+.sec-tag-text {
+  font-size: 9px; font-weight: 600; letter-spacing: 3.5px;
+  text-transform: uppercase; color: var(--gold);
+}
+
+.sec-h2 {
+  font-family: var(--font-serif);
+  font-size: 54px; font-weight: 400; line-height: 1.1;
+  margin-bottom: 28px; letter-spacing: -.5px;
+}
+.sec-h2 em { font-style: italic; }
+
+/* About section */
+.about-sec {
+  background: var(--ink);
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+}
+.about-left {
+  padding: 128px 72px 128px 64px;
+  border-right: var(--border);
+}
+.about-h2 { color: var(--white); }
+.about-h2 em { color: var(--gold); }
+.about-p {
+  font-size: 15px; line-height: 1.95; color: rgba(255,255,255,.4);
+  margin-bottom: 48px;
+}
+.about-right {
+  padding: 128px 64px 128px 72px;
+}
+.about-pillar {
+  padding: 28px 0;
+  border-bottom: var(--border);
+}
+.about-pillar:first-child { padding-top: 0; }
+.about-pillar:last-child { border-bottom: none; padding-bottom: 0; }
+.pillar-lbl {
+  font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 10px;
+}
+.pillar-txt {
+  font-family: var(--font-italic);
+  font-size: 18px; color: rgba(255,255,255,.75); line-height: 1.6;
+}
+.pillar-txt em { color: var(--gold); font-style: normal; }
 
 /* ─────────────────────────────────────────
    HOME SECTIONS — PROCESS
 ───────────────────────────────────────── */
-<section class="process-sec">
-    <div class="sec-tag"><div class="sec-tag-line"></div><span class="sec-tag-text">How It Works</span></div>
-    <h2 class="sec-h2" style="max-width:600px;">A clear, eight-step<br><em>closing process</em>.</h2>
-    <div class="process-grid">
-      <div class="process-step"><div class="step-n">01</div><div class="step-ttl">Term Sheet</div><p class="step-bdy">Croft Finance issues an indicative term sheet setting out the proposed facility structure.</p><span class="step-who who-croft">Croft Finance</span></div>
-      <div class="process-step"><div class="step-n">02</div><div class="step-ttl">Commitment Fee</div><p class="step-bdy">Client submits the commitment fee to confirm intent and enable formal documentation.</p><span class="step-who who-client">Client</span></div>
-      <div class="process-step"><div class="step-n">03</div><div class="step-ttl">Deed of Undertaking</div><p class="step-bdy">The Deed of Undertaking is executed, setting out the formal obligations of both parties.</p><span class="step-who who-both">Both Parties</span></div>
-      <div class="process-step"><div class="step-n">04</div><div class="step-ttl">Credit Support</div><p class="step-bdy">Credit support instruments are established as required by the capital structure.</p><span class="step-who who-croft">Croft Finance</span></div>
-      <div class="process-step"><div class="step-n">05</div><div class="step-ttl">Hard-Copy Submission</div><p class="step-bdy">Hard-copy closing materials are submitted to Croft Finance for formal review.</p><span class="step-who who-client">Client</span></div>
-      <div class="process-step"><div class="step-n">06</div><div class="step-ttl">ECF Escrow</div><p class="step-bdy">The Enhanced Credit Facility escrow is established with the appointed escrow agent.</p><span class="step-who who-both">Both Parties</span></div>
-      <div class="process-step"><div class="step-n">07</div><div class="step-ttl">Transfer to Agent</div><p class="step-bdy">Funds are transferred to the designated agent for final processing and release.</p><span class="step-who who-croft">Croft Finance</span></div>
-      <div class="process-step"><div class="step-n">08</div><div class="step-ttl">Funded</div><p class="step-bdy">Facility is fully funded and disbursement is confirmed to the borrower.</p><span class="step-who who-both">Complete</span></div>
-    </div>
-  </section>
+.process-sec { background: var(--parchment); }
+.process-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--g200);
+  margin-top: 64px;
+}
+.process-step {
+  padding: 36px 28px;
+  border-right: 1px solid var(--g200);
+  position: relative;
+  transition: background .2s;
+}
+.process-step:last-child { border-right: none; }
+.process-step:nth-child(n+5) { border-top: 1px solid var(--g200); }
+.process-step:hover { background: var(--white); }
+.step-n {
+  font-family: var(--font-serif);
+  font-size: 56px; font-weight: 400;
+  color: rgba(201,169,110,.18); line-height: 1; margin-bottom: 16px;
+}
+.step-ttl {
+  font-size: 10px; font-weight: 600; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--ink); margin-bottom: 10px;
+}
+.step-bdy { font-size: 13px; line-height: 1.75; color: var(--g500); }
+.step-who {
+  display: inline-block; margin-top: 16px;
+  padding: 3px 10px; border-radius: 2px;
+  font-size: 9px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+}
+.who-client { background: rgba(201,169,110,.12); color: var(--gold-dim); }
+.who-croft  { background: rgba(11,15,26,.06);    color: var(--g600); }
+.who-both   { background: rgba(61,139,96,.1);     color: var(--ok); }
+
 /* ─────────────────────────────────────────
    HOME SECTIONS — TERMS
 ───────────────────────────────────────── */
-<section class="terms-sec" id="s-terms">
-    <div class="terms-left">
-      <div class="sec-tag"><div class="sec-tag-line" style="background:rgba(255,255,255,.3)"></div><span class="sec-tag-text" style="color:rgba(255,255,255,.5);">Principal Terms</span></div>
-      <h2 class="sec-h2 terms-h2">Transparent terms.<br><em>Structured</em> for your project.</h2>
-      <p class="terms-intro">All terms are indicative and subject to final due diligence and mutual agreement. We work with each sponsor to structure the facility around the specific requirements of the project.</p>
-    </div>
-    <div class="terms-right">
-      <div class="t-row"><span class="t-key">Facility Size</span><span class="t-val">USD 30M – 500M</span></div>
-      <div class="t-row"><span class="t-key">Facility Type</span><span class="t-val t-val-light">Structured Equity / Debt</span></div>
-      <div class="t-row"><span class="t-key">Interest Rate</span><span class="t-val">6% – 8% per annum</span></div>
-      <div class="t-row"><span class="t-key">Term</span><span class="t-val t-val-light">5 years and above</span></div>
-      <div class="t-row"><span class="t-key">Grace Period</span><span class="t-val t-val-light">6 months and above</span></div>
-      <div class="t-row"><span class="t-key">Prepayment Penalty</span><span class="t-val">None</span></div>
-      <div class="t-row"><span class="t-key">Sectors</span><span class="t-val t-val-light">RE, Infrastructure, Energy, Mining, O&amp;G</span></div>
-      <div class="t-row"><span class="t-key">Closing Timeline</span><span class="t-val">14–21 Business Days</span></div>
-    </div>
-  </section>
+.terms-sec {
+  background: var(--ink-mid);
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+}
+.terms-left {
+  padding: 128px 72px 128px 64px;
+  border-right: var(--border);
+}
+.terms-h2 { color: var(--white); }
+.terms-h2 em { color: var(--gold); }
+.terms-intro { font-size: 15px; line-height: 1.9; color: rgba(255,255,255,.38); margin-top: 24px; }
+.terms-right {
+  padding: 128px 64px 128px 72px;
+}
+.terms-table {}
+.t-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 18px 0;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+}
+.t-row:last-child { border-bottom: none; }
+.t-key {
+  font-size: 9px; font-weight: 600; letter-spacing: 2.5px;
+  text-transform: uppercase; color: rgba(255,255,255,.3);
+}
+.t-val {
+  font-family: var(--font-italic);
+  font-size: 17px; color: var(--white); text-align: right;
+}
+.t-val-gold { color: var(--gold); }
+
 /* ─────────────────────────────────────────
    HOME SECTIONS — PRINCIPAL
 ───────────────────────────────────────── */
-<section class="principal-sec">
-    <div class="principal-left">
-      <div class="sec-tag"><div class="sec-tag-line"></div><span class="sec-tag-text">Principal</span></div>
-      <h2 class="sec-h2">Every mandate.<br><em>Personally</em> handled.</h2>
-      <p style="font-size:15px;line-height:1.95;color:#6b6560;margin-top:20px;">Suzana Aleksić is the principal and sole point of contact at Croft Finance. Every client relationship, every deal negotiation, and every closing is managed directly — not delegated to analysts.<br><br>If you are considering a project that may require structured private capital, the first step is a direct conversation. There is no obligation, no fee for an initial discussion, and no intermediary.</p>
-      <button class="btn-hero-primary" style="margin-top:36px;" onclick="openLoginModal()">Request Portal Access</button>
-    </div>
-    <div class="principal-right">
-      <div class="principal-card">
-        <div class="pc-monogram">SA</div>
-        <div class="pc-name">Suzana Aleksić</div>
-        <div class="pc-title">Principal, Croft Finance</div>
-        <div class="pc-divider"></div>
-        <div class="pc-item"><i class="fas fa-envelope"></i> suzana.aleksic@croftfinance.com</div>
-        <div class="pc-item"><i class="fas fa-phone"></i> +381 69 288 0 191</div>
-        <div class="pc-item"><i class="fas fa-map-marker-alt"></i> Belgrade, Serbia</div>
-        <div class="pc-item" style="margin-top:20px;"><i class="fas fa-clock"></i> Response within 24 hours</div>
-      </div>
-    </div>
-  </section>
+.principal-sec {
+  background: var(--cream);
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+}
+.principal-left { padding: 128px 72px 128px 64px; }
+.principal-right {
+  padding: 128px 64px 128px 72px;
+  border-left: var(--border-light);
+  display: flex; flex-direction: column; justify-content: center;
+}
+.principal-card {
+  background: var(--ink);
+  padding: 48px;
+  position: relative; overflow: hidden;
+}
+.principal-card::before {
+  content: '';
+  position: absolute; top: 0; right: 0;
+  width: 200px; height: 200px;
+  background: radial-gradient(circle at top right, rgba(201,169,110,.08), transparent 70%);
+}
+.pc-monogram {
+  width: 64px; height: 64px;
+  border: 1px solid var(--gold-dim);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-serif); font-size: 20px; font-weight: 600;
+  color: var(--gold); margin-bottom: 24px;
+}
+.pc-name {
+  font-family: var(--font-serif); font-size: 26px; font-weight: 500;
+  color: var(--white); margin-bottom: 4px;
+}
+.pc-title {
+  font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 32px;
+}
+.pc-item {
+  display: flex; align-items: center; gap: 14px;
+  font-size: 13px; color: rgba(255,255,255,.45); margin-bottom: 12px;
+}
+.pc-item i { color: var(--gold); width: 14px; font-size: 12px; }
+.pc-divider {
+  width: 40px; height: 1px; background: rgba(201,169,110,.25);
+  margin: 24px 0;
+}
 
 /* ─────────────────────────────────────────
    HOME — CONTACT FORM SECTION
 ───────────────────────────────────────── */
-<section id="s-contact" class="contact-sec">
-    <div class="contact-left">
-      <div class="sec-tag"><div class="sec-tag-line" style="background:rgba(255,255,255,.3)"></div><span class="sec-tag-text" style="color:rgba(255,255,255,.5);">Get in Touch</span></div>
-      <h2 class="sec-h2">Request a<br><em>Conversation</em></h2>
-      <p>Complete the form and Suzana Aleksić will respond within 24 hours. All enquiries are treated with complete confidentiality.</p>
-      <div class="contact-detail" style="margin-top:36px;"><i class="fas fa-envelope"></i> suzana.aleksic@croftfinance.com</div>
-      <div class="contact-detail"><i class="fas fa-phone"></i> +381 69 288 0 191</div>
-      <div class="contact-detail"><i class="fas fa-map-marker-alt"></i> Belgrade, Serbia</div>
-      <div style="margin-top:48px;padding-top:32px;border-top:1px solid rgba(255,255,255,.08);">
-        <p style="font-size:12px;color:rgba(255,255,255,.2);line-height:1.8;">All information shared in connection with a financing enquiry is subject to the confidentiality terms of Croft Finance. The identity of capital partners is not disclosed as a condition of their participation.</p>
-      </div>
-    </div>
-    <div class="contact-right">
-      <div class="contact-form-wrap">
-        <div id="cfContent">
-          <div class="cf-title">Begin a Discussion</div>
-          <div class="cf-sub">Direct channel to Suzana Aleksić, Principal</div>
-          <form onsubmit="submitContactForm(event)">
-            <div class="fg"><label class="flbl">Full Name *</label><input type="text" id="cName" class="finp" required></div>
-            <div class="fg"><label class="flbl">Email Address *</label><input type="email" id="cEmail" class="finp" required></div>
-            <div class="fg"><label class="flbl">Company / Project *</label><input type="text" id="cProject" class="finp" required></div>
-            <div class="fg"><label class="flbl">Your Message *</label><textarea id="cMsg" class="fta" rows="4" required placeholder="Project overview, funding requirement, timeline..."></textarea></div>
-            <div class="fg" style="display:flex;align-items:flex-start;gap:10px;">
-              <input type="checkbox" id="cNda" style="margin-top:3px;flex-shrink:0;" required>
-              <label for="cNda" style="font-size:12px;color:#6b6560;line-height:1.5;">I confirm I have read and agree to the <a href="#" onclick="openModal('termsModal');return false;" style="color:#1a1a1a;">Confidentiality Terms</a> *</label>
-            </div>
-            <button type="submit" class="btn btn-primary" style="width:100%;padding:14px;background:#1a1a1a;border:none;color:#fff;font-family:var(--font-body);font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;cursor:pointer;">Send Request</button>
-          </form>
-        </div>
-        <div id="cfSuccess" style="display:none;">
-          <div class="contact-success">
-            <div class="contact-success-icon" style="background:#f0f0ed;"><i class="fas fa-check" style="color:#1a1a1a;font-size:24px;"></i></div>
-            <h4 style="font-family:var(--font-serif);font-size:22px;color:#1a1a1a;margin-bottom:8px;">Request Received</h4>
-            <p style="font-size:13px;color:#6b6560;margin-bottom:24px;">Suzana Aleksić will respond to your enquiry within 24 hours.</p>
-            <button class="btn btn-outline" onclick="resetContactForm()">Send Another Request</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+.contact-sec {
+  background: var(--ink);
+  padding: 128px 64px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+  align-items: start;
+}
+.contact-form-wrap {
+  background: var(--white);
+  padding: 48px;
+}
+.cf-title {
+  font-family: var(--font-serif); font-size: 28px; font-weight: 400;
+  color: var(--ink); margin-bottom: 6px;
+}
+.cf-sub { font-size: 13px; color: var(--g400); margin-bottom: 32px; }
+
+.contact-left { color: var(--white); }
+.contact-left .sec-h2 { color: var(--white); }
+.contact-left .sec-h2 em { color: var(--gold); }
+.contact-left p {
+  font-size: 15px; line-height: 1.9;
+  color: rgba(255,255,255,.4); margin-top: 20px;
+}
+.contact-detail {
+  display: flex; align-items: center; gap: 14px;
+  font-size: 13px; color: rgba(255,255,255,.5); margin-top: 20px;
+}
+.contact-detail i { color: var(--gold); width: 14px; }
 
 /* ─────────────────────────────────────────
    HOME — CTA BANNER
 ───────────────────────────────────────── */
-<div class="cta-banner">
-    <div class="cta-left">
-      <h2 class="cta-h2">Ready to discuss<br>your <em>project</em>?</h2>
-      <p class="cta-p">Register for secure portal access and receive an indicative term sheet within 48 hours.</p>
-    </div>
-    <button class="btn-hero-primary" onclick="openLoginModal()">Access Client Portal</button>
-  </div>
+.cta-banner {
+  background: var(--ink);
+  padding: 120px 64px;
+  text-align: center;
+  position: relative; overflow: hidden;
+}
+.cta-banner::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at center, rgba(201,169,110,.06), transparent 70%);
+}
+.cta-h2 {
+  font-family: var(--font-serif);
+  font-size: 60px; font-weight: 400; line-height: 1.1;
+  color: var(--white); position: relative; z-index: 1; margin-bottom: 20px;
+}
+.cta-h2 em { color: var(--gold); font-style: italic; }
+.cta-p {
+  font-size: 15px; color: rgba(255,255,255,.4); margin-bottom: 48px;
+  position: relative; z-index: 1;
+}
+
 /* ─────────────────────────────────────────
    HOME — FOOTER
 ───────────────────────────────────────── */
-<footer class="home-footer">
-    <div>
-      <div class="hf-brand">
-        <div class="hf-mark">CF</div>
-        <span class="hf-name">Croft Finance</span>
-      </div>
-      <div class="hf-copy">© 2026 Croft Finance. All rights reserved.</div>
-    </div>
-    <div class="hf-links">
-      <a href="/privacy" target="_blank" class="hf-link footer-link">Privacy Policy</a>
-      <a href="/terms" target="_blank" class="hf-link footer-link">Terms &amp; Conditions</a>
-    </div>
-  </footer>
+.home-footer {
+  background: var(--ink);
+  border-top: var(--border);
+  padding: 48px 64px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.hf-brand {
+  display: flex; align-items: center; gap: 12px;
+}
+.hf-mark {
+  width: 28px; height: 28px;
+  border: 1px solid var(--gold-dim);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-serif); font-size: 11px; color: var(--gold);
+}
+.hf-name {
+  font-family: var(--font-body); font-size: 11px; font-weight: 500;
+  letter-spacing: 4px; text-transform: uppercase; color: rgba(255,255,255,.6);
+}
+.hf-copy {
+  font-size: 11px; color: rgba(255,255,255,.2); margin-top: 6px;
+}
+.hf-links { display: flex; gap: 24px; }
+.hf-link {
+  font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: rgba(255,255,255,.3); background: none; border: none;
+  cursor: pointer; transition: color .2s; font-family: var(--font-body);
+}
+.hf-link:hover { color: var(--gold); }
 
 /* ─────────────────────────────────────────
    PORTAL NAV
@@ -3967,4 +4146,3 @@ document.addEventListener('DOMContentLoaded', initFB);
 </script>
 </body>
 </html>
-
