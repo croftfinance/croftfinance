@@ -863,6 +863,34 @@ body {
   .funnel-step-label { width: 100%; }
   .pipeline-board { grid-template-columns: 1fr; }
 }
+/* Missing CSS classes */
+.form-group { margin-bottom: 16px; }
+
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 0.5px solid var(--gray-200);
+  border-radius: 6px;
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  outline: none;
+  background: white;
+  color: var(--gray-700);
+  transition: border-color 0.15s;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(44,95,138,0.08);
+}
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 768px) {
+  .form-grid-2 { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
@@ -1158,7 +1186,7 @@ body {
       <div id="admin-documents-admin" class="admin-tab"><div class="admin-page-title">Documents</div><div class="table-wrap"><table class="documents-table"><thead><tr><th>Client</th><th>Document</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="adminDocumentsTableBody"></tbody></table></div></div>
 
       <!-- Brokers Tab -->
-      <div id="admin-brokers" class="admin-tab"><div class="admin-page-title">Brokers</div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Broker</th><th>Firm</th><th>Commission</th><th>Submitted</th><th>Funded</th><th>Est. Commission</th><th>Status</th><th>Engagement</th><th>Actions</th></tr></thead><tbody id="adminBrokersTable"></tbody></table></div><div class="card" style="margin-top:20px;"><div class="card-header"><div class="card-title">Broker Update Requests</div></div><div class="card-body"><div id="brokerUpdateRequestsList"></div></div></div></div>
+      <div id="admin-brokers" class="admin-tab"><div class="admin-page-title">Brokers</div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Broker</th><th>Firm</th><th>Commission</th><th>Submitted</th><th>Funded</th><th>Est. Commission</th><th>Status</th><th>Engagement</th><th>Actions</th><tr></thead><tbody id="adminBrokersTable"></tbody></table></div><div class="card" style="margin-top:20px;"><div class="card-header"><div class="card-title">Broker Update Requests</div></div><div class="card-body"><div id="brokerUpdateRequestsList"></div></div></div></div>
 
       <!-- Inbox Tab -->
       <div id="admin-inbox" class="admin-tab"><div class="admin-page-title">Inbox</div><div class="inbox-filter"><button class="filter-chip active" data-filter="all">All</button><button class="filter-chip" data-filter="client">Clients</button><button class="filter-chip" data-filter="broker">Brokers</button><button class="filter-chip" data-filter="unread">Unread</button></div><div id="inboxContainer"></div></div>
@@ -1243,6 +1271,39 @@ body {
 
 <div id="termsModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Confidentiality & Portal Access Terms</h3><button class="modal-close" onclick="closeModal('termsModal')">✕</button></div><div class="modal-body" style="font-size:13px;line-height:1.8;color:var(--gray-700);"><p><strong>1. Confidentiality.</strong> All information shared through this portal is strictly confidential. You agree not to disclose any information to third parties without the prior written consent of Croft Finance.</p><p style="margin-top:12px;"><strong>2. Permitted Use.</strong> Access is granted solely for the purpose of managing your financing mandate with Croft Finance.</p><p style="margin-top:12px;"><strong>3. Investor Confidentiality.</strong> The identity of Croft Finance's capital partners is not disclosed as a condition of their participation.</p><p style="margin-top:12px;"><strong>4. Governing Law.</strong> These terms are governed by the laws of the Republic of Serbia.</p><p style="margin-top:12px;"><strong>5. Acceptance.</strong> By registering for portal access, you confirm that you have read, understood, and agree to be bound by these terms.</p></div></div></div>
 
+<!-- Fixed Modals for Commitment Fee and ECF -->
+<div id="commitmentFeeModal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Confirm Commitment Fee</h3>
+      <button class="modal-close" onclick="closeModal('commitmentFeeModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Amount (USD)</label><input type="text" id="feeAmount" class="form-input"></div>
+      <div class="form-group"><label class="form-label">Reference</label><input type="text" id="feeReference" class="form-input"></div>
+      <div class="form-group"><label class="form-label">Date</label><input type="date" id="feeDate" class="form-input"></div>
+      <div class="form-group"><label class="form-label">Method</label><select id="feeMethod" class="form-select"><option>Wire</option><option>SWIFT</option></select></div>
+      <button class="btn btn-primary btn-md" id="feeConfirmBtn" style="width:100%">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div id="ecfEscrowModal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Confirm ECF Escrow</h3>
+      <button class="modal-close" onclick="closeModal('ecfEscrowModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">ECF Amount (USD)</label><input type="text" id="ecfAmount" class="form-input"></div>
+      <div class="form-group"><label class="form-label">Institution</label><input type="text" id="ecfInstitution" class="form-input"></div>
+      <div class="form-group"><label class="form-label">Reference</label><input type="text" id="ecfReference" class="form-input"></div>
+      <div class="form-group"><label class="form-label">Date</label><input type="date" id="ecfDate" class="form-input"></div>
+      <button class="btn btn-primary btn-md" id="ecfConfirmBtn" style="width:100%">Confirm</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ============================================================
 // FIREBASE CONFIG & GLOBAL STATE
@@ -1302,6 +1363,24 @@ Chart.defaults.font.size = 11;
 Chart.defaults.color = '#6c757d';
 Chart.defaults.plugins.legend.labels.boxWidth = 10;
 Chart.defaults.plugins.legend.labels.padding = 16;
+
+// ============================================================
+// EMAILJS HELPER
+// ============================================================
+const EMAILJS_CONFIG = {
+  publicKey: "sgayReNOC1AIqBIZb",
+  serviceId: "service_ri050ye",
+  templateId: "template_s85eg0h",
+  adminEmail: "suzana.aleksic@croftfinance.com"
+};
+
+async function sendEmailNotification(params) {
+  try {
+    await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, params);
+  } catch (error) {
+    console.warn('EmailJS notification failed:', error);
+  }
+}
 
 // ============================================================
 // UTILITY FUNCTIONS
@@ -1378,6 +1457,9 @@ async function initFirebase() {
   db = firebase.firestore();
   auth = firebase.auth();
   storage = firebase.storage();
+  
+  // Initialize EmailJS with public key
+  emailjs.init(EMAILJS_CONFIG.publicKey);
   
   // Session ID
   if(!sessionStorage.getItem('croftSessionId')) {
@@ -1597,6 +1679,17 @@ window.register = async function() {
     await db.collection('clients').doc(cred.user.uid).set({ id:cred.user.uid, name, email, status:'pending', createdAt: new Date().toISOString() });
     await db.collection('projects').doc(String(Date.now())).set({ id:String(Date.now()), clientId:cred.user.uid, name:project, step:1, status:'pending', amount:'TBD', interestRate:'TBD' });
     await logActivity(cred.user.uid, name, 'client', 'register', null, `Registered new account`);
+    
+    // EMAILJS: New client registration
+    await sendEmailNotification({
+      to_name: 'Croft Finance Team',
+      to_email: EMAILJS_CONFIG.adminEmail,
+      from_name: 'Croft Finance',
+      subject: `New Client Registration: ${name}`,
+      message: `Name: ${name}\nEmail: ${email}\nProject: ${project}\n\nPlease review and approve this client account.`,
+      project_name: project
+    });
+    
     showToast('Registration submitted for review.');
     logout();
   } catch(e) { showToast(e.message, true); }
@@ -1734,14 +1827,14 @@ function renderCapitalStack() {
 
 function renderDocuments() {
   const tbody = document.getElementById('closingDocumentsBody');
-  if(!currentProjectId) { tbody.innerHTML = '<tr><td colspan="4">No project attached. </div></div>'; return; }
+  if(!currentProjectId) { tbody.innerHTML = '<tr><td colspan="4">No project attached. </td></tr>'; return; }
   const projDocs = documents.filter(d => d.projectId === currentProjectId);
   tbody.innerHTML = projDocs.map(d => `<tr>
       <td><strong>${escapeHtml(d.name)}</strong></td>
       <td><span class="badge ${d.approved ? 'badge-success' : 'badge-warning'}">${d.approved ? 'Approved' : 'Pending'}</span></td>
-      <td>${d.date || '—'}</div></div>
+      <td>${d.date || '—'}</td>
       <td><button class="doc-action-btn" onclick="openPDFWithWatermark('${d.url}', '${d.name}')">View</button><a href="${d.url}" download class="doc-action-btn">Download</a></td>
-    </tr>`).join('') || '<tr><td colspan="4">No documents.</div></div>';
+    </tr>`).join('') || '<tr><td colspan="4">No documents.</td></tr>';
   const drop = document.getElementById('clientUploadDocType');
   if(drop) drop.innerHTML = '<option value="">Select Type</option><option>Term Sheet</option><option>Financial Statement</option><option>Due Diligence</option><option>Commitment Fee Receipt</option><option>Other</option>';
 }
@@ -1759,6 +1852,17 @@ window.clientUploadDocument = async function() {
     const url = await ref.getDownloadURL();
     await db.collection('documents').add({ clientId: currentClient.id, projectId: currentProjectId, name: type, url: url, approved: false, date: new Date().toISOString().split('T')[0] });
     await logActivity(currentClient.id, currentClient.name, 'client', 'upload_document', currentProjectId, `Uploaded: ${type}`);
+    
+    // EMAILJS: Client uploads document
+    await sendEmailNotification({
+      to_name: 'Croft Finance Team',
+      to_email: EMAILJS_CONFIG.adminEmail,
+      from_name: 'Croft Finance',
+      subject: `Document Uploaded: ${type}`,
+      message: `Client ${currentClient.name} uploaded a document: ${type}. Please review.`,
+      project_name: projects.find(p => p.id === currentProjectId)?.name || 'N/A'
+    });
+    
     statusDiv.innerText = 'Uploaded!';
     showToast('Document uploaded');
     setTimeout(() => statusDiv.style.display = 'none', 2000);
@@ -1779,6 +1883,17 @@ window.sendMessage = async function() {
   if(!val) return;
   await db.collection('messages').add({ clientId: currentClient.id, content: val, sender: 'client', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
   await logActivity(currentClient.id, currentClient.name, 'client', 'send_message', currentProjectId, `Message sent`);
+  
+  // EMAILJS: Client sends message
+  await sendEmailNotification({
+    to_name: 'Croft Finance Team',
+    to_email: EMAILJS_CONFIG.adminEmail,
+    from_name: 'Croft Finance',
+    subject: `New Message from ${currentClient.name}`,
+    message: val,
+    project_name: projects.find(p => p.id === currentProjectId)?.name || 'N/A'
+  });
+  
   input.value = '';
 };
 
@@ -1896,6 +2011,16 @@ window.requestClientMeeting = async function() {
   document.getElementById('meetingRequestForm').style.display = 'none';
   document.getElementById('meetingSuccessMessage').style.display = 'block';
   showToast('Meeting request sent');
+  
+  // EMAILJS: Meeting requested
+  await sendEmailNotification({
+    to_name: 'Croft Finance Team',
+    to_email: EMAILJS_CONFIG.adminEmail,
+    from_name: 'Croft Finance',
+    subject: `Meeting Request from ${currentClient.name}`,
+    message: `Client requested a ${type} meeting on ${date} at ${time}.\nNotes: ${notes}`,
+    project_name: projects.find(p => p.id === currentProjectId)?.name || 'N/A'
+  });
 };
 
 window.resetMeetingForm = function() {
@@ -1963,7 +2088,7 @@ function updateBrokerDashboard() {
       <td>${formatCurrency(amt * rate / 100)}</strong></td>
     </tr>`;
   }).join('');
-  document.getElementById('brokerCommissionHistory').innerHTML = historyHtml || '<tr><td colspan="6">No funded deals yet.</div></div>';
+  document.getElementById('brokerCommissionHistory').innerHTML = historyHtml || '<tr><td colspan="6">No funded deals yet. </div>';
 }
 
 window.submitDeal = async function() {
@@ -2045,6 +2170,17 @@ window.sendBrokerMessage = async function() {
   const val = input.value.trim();
   if(!val) return;
   await db.collection('brokerMessages').add({ brokerId: currentBroker.id, content: val, sender: 'broker', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+  
+  // EMAILJS: Broker sends message
+  await sendEmailNotification({
+    to_name: 'Croft Finance Team',
+    to_email: EMAILJS_CONFIG.adminEmail,
+    from_name: 'Croft Finance',
+    subject: `New Message from Broker ${currentBroker.name}`,
+    message: val,
+    project_name: 'Broker Communication'
+  });
+  
   input.value = '';
 };
 
@@ -2105,6 +2241,19 @@ window.approveClient = async function(id) {
   const p = projects.find(x => x.clientId === id);
   if(p) await db.collection('projects').doc(p.id).update({ status: 'active' });
   showToast('Client approved and activated');
+  
+  // EMAILJS: Client approved → email the client
+  const client = clients.find(c => c.id === id);
+  if(client) {
+    await sendEmailNotification({
+      to_name: client.name,
+      to_email: client.email,
+      from_name: 'Croft Finance',
+      subject: `Your Croft Finance account has been approved`,
+      message: `Dear ${client.name},\n\nYour client portal account has been approved. You may now log in and access your deal dashboard.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
+      project_name: p?.name || 'N/A'
+    });
+  }
 };
 
 function renderAdminTables() {
@@ -2114,15 +2263,15 @@ function renderAdminTables() {
       const projectCount = projects.filter(p => p.clientId === c.id).length;
       return `<tr>
         <td><strong>${escapeHtml(c.name)}</strong></td>
-        <td>${escapeHtml(c.email)}</div></div>
-        <td>${projectCount}</div></div>
+        <td>${escapeHtml(c.email)}</div></td>
+        <td>${projectCount}</div></td>
         <td><span class="badge ${c.status === 'active' ? 'badge-success' : 'badge-warning'}">${c.status}</span></td>
-        <td>${c.createdAt ? c.createdAt.split('T')[0] : '—'}</div></div>
+        <td>${c.createdAt ? c.createdAt.split('T')[0] : '—'}</div></td>
         <td>
           ${c.status === 'pending' ? `<button class="btn btn-ghost btn-sm" onclick="approveClient('${c.id}')">Approve</button>` : ''}
           <button class="btn btn-ghost btn-sm" onclick="editClientProject('${c.id}')">Edit</button>
           <button class="btn btn-ghost btn-sm" onclick="deleteClient('${c.id}')">Delete</button>
-         </div></div>
+         </div></td>
       </tr>`;
     }).join('');
   }
@@ -2132,15 +2281,15 @@ function renderAdminTables() {
       const c = clients.find(cl => cl.id === p.clientId);
       const broker = brokers.find(b => b.id === p.brokerId);
       return `<tr>
-        <td>${escapeHtml(c?.name || 'Unknown')}</div></div>
-        <td><strong>${escapeHtml(p.name)}</strong></div></div>
-        <td>${escapeHtml(p.industry || '—')}</div></div>
-        <td>${formatCurrency(p.fundsNeeded || p.amount)}</div></div>
-        <td><span class="badge badge-info">${p.step||1}</span></div></div>
-        <td>${broker ? escapeHtml(broker.name) : 'Direct'}</div></div>
-        <td><span class="badge ${p.commitmentFeeStatus === 'paid' ? 'badge-success' : 'badge-warning'}">${p.commitmentFeeStatus === 'paid' ? 'Paid' : 'Pending'}</span></div></div>
-        <td><span class="badge ${p.ecfStatus === 'escrowed' ? 'badge-success' : 'badge-warning'}">${p.ecfStatus === 'escrowed' ? 'Escrowed' : 'Pending'}</span></div></div>
-        <td><button class="btn btn-ghost btn-sm" onclick="editProject('${p.id}')">Edit</button><button class="btn btn-ghost btn-sm btn-danger" onclick="deleteProject('${p.id}')">Delete</button></div></div>
+        <td>${escapeHtml(c?.name || 'Unknown')}</div></td>
+        <td><strong>${escapeHtml(p.name)}</strong></div></td>
+        <td>${escapeHtml(p.industry || '—')}</div></td>
+        <td>${formatCurrency(p.fundsNeeded || p.amount)}</div></td>
+        <td><span class="badge badge-info">${p.step||1}</span></div></td>
+        <td>${broker ? escapeHtml(broker.name) : 'Direct'}</div></td>
+        <td><span class="badge ${p.commitmentFeeStatus === 'paid' ? 'badge-success' : 'badge-warning'}">${p.commitmentFeeStatus === 'paid' ? 'Paid' : 'Pending'}</span></div></td>
+        <td><span class="badge ${p.ecfStatus === 'escrowed' ? 'badge-success' : 'badge-warning'}">${p.ecfStatus === 'escrowed' ? 'Escrowed' : 'Pending'}</span></div></td>
+        <td><button class="btn btn-ghost btn-sm" onclick="editProject('${p.id}')">Edit</button><button class="btn btn-ghost btn-sm btn-danger" onclick="deleteProject('${p.id}')">Delete</button></div></td>
       </tr>`;
     }).join('');
   }
@@ -2196,13 +2345,13 @@ function renderPipeline() {
         <td>${escapeHtml(p.name)}</strong></td>
         <td>${p.step <=2 ? 'Origination' : (p.step <=4 ? 'Structuring' : (p.step <=7 ? 'Execution' : 'Closed'))}</td>
         <td>${STEP_NAMES[p.step||1]}</td>
-        <td>${formatCurrency(p.amount)}</div></div>
-        <td>${daysInStep}</div></div>
-        <td>${p.closeDate || '—'}</div></div>
-        <td>${daysToClose}</div></div>
-        <td>${broker ? escapeHtml(broker.name) : 'Direct'}</div></div>
-        <td><span class="badge ${p.commitmentFeeStatus === 'paid' ? 'badge-success' : 'badge-warning'}">${p.commitmentFeeStatus === 'paid' ? 'Paid' : 'Pending'}</span></div></div>
-        <td><span class="badge ${p.ecfStatus === 'escrowed' ? 'badge-success' : 'badge-warning'}">${p.ecfStatus === 'escrowed' ? 'Escrowed' : 'Pending'}</span></div></div>
+        <td>${formatCurrency(p.amount)}</div></td>
+        <td>${daysInStep}</div></td>
+        <td>${p.closeDate || '—'}</div></td>
+        <td>${daysToClose}</div></td>
+        <td>${broker ? escapeHtml(broker.name) : 'Direct'}</div></td>
+        <td><span class="badge ${p.commitmentFeeStatus === 'paid' ? 'badge-success' : 'badge-warning'}">${p.commitmentFeeStatus === 'paid' ? 'Paid' : 'Pending'}</span></div></td>
+        <td><span class="badge ${p.ecfStatus === 'escrowed' ? 'badge-success' : 'badge-warning'}">${p.ecfStatus === 'escrowed' ? 'Escrowed' : 'Pending'}</span></div></td>
       </tr>`;
     }).join('')}</tbody></table></div>`;
   }
@@ -2218,16 +2367,16 @@ function renderBrokerAdminTable() {
     let estCommission = 0;
     fundedProjects.forEach(p => { let amt = parseFloat(String(p.amount || '0').replace(/[^0-9.-]+/g,"")) || 0; estCommission += amt * ((b.commissionRate || 0) / 100); });
     const pendingRequests = brokerUpdateRequests.filter(r => r.brokerId === b.id && r.status === 'pending').length;
-    return `<td>
-        <td><strong>${escapeHtml(b.name)}</strong><br><span class="data-label">${escapeHtml(b.email)}</span></div></div>
-        <td>${escapeHtml(b.firm)}</div></div>
-        <td><strong>${b.commissionRate || 0}%</strong></div></div>
-        <td>${submissions.length}</div></div>
-        <td>${fundedProjects.length}</div></div>
-        <td>${formatCurrency(estCommission)}</div></div>
-        <td><span class="badge ${b.status === 'active' ? 'badge-success' : 'badge-warning'}">${b.status}</span></div></div>
-        <td><select class="form-select" style="width:100px;" onchange="updateBrokerEngagement('${b.id}', this.value)"><option value="none" ${b.engagementStatus === 'none' ? 'selected' : ''}>None</option><option value="pending" ${b.engagementStatus === 'pending' ? 'selected' : ''}>Pending</option><option value="active" ${b.engagementStatus === 'active' ? 'selected' : ''}>Active</option></select></div></div>
-        <td><button class="btn btn-ghost btn-sm" onclick="setBrokerCommission('${b.id}')">Set Rate</button><button class="btn btn-ghost btn-sm btn-danger" onclick="deleteBroker('${b.id}')">Delete</button>${pendingRequests ? `<span class="badge badge-warning" style="margin-left:8px;">${pendingRequests} updates</span>` : ''}</div></div>
+    return `<tr>
+        <td><strong>${escapeHtml(b.name)}</strong><br><span class="data-label">${escapeHtml(b.email)}</span></div></td>
+        <td>${escapeHtml(b.firm)}</div></td>
+        <td><strong>${b.commissionRate || 0}%</strong></div></td>
+        <td>${submissions.length}</div></td>
+        <td>${fundedProjects.length}</div></td>
+        <td>${formatCurrency(estCommission)}</div></td>
+        <td><span class="badge ${b.status === 'active' ? 'badge-success' : 'badge-warning'}">${b.status}</span></div></td>
+        <td><select class="form-select" style="width:100px;" onchange="updateBrokerEngagement('${b.id}', this.value)"><option value="none" ${b.engagementStatus === 'none' ? 'selected' : ''}>None</option><option value="pending" ${b.engagementStatus === 'pending' ? 'selected' : ''}>Pending</option><option value="active" ${b.engagementStatus === 'active' ? 'selected' : ''}>Active</option></select></div></td>
+        <td><button class="btn btn-ghost btn-sm" onclick="setBrokerCommission('${b.id}')">Set Rate</button><button class="btn btn-ghost btn-sm btn-danger" onclick="deleteBroker('${b.id}')">Delete</button>${pendingRequests ? `<span class="badge badge-warning" style="margin-left:8px;">${pendingRequests} updates</span>` : ''}</div></td>
       </tr>`;
   }).join('');
   const requestsDiv = document.getElementById('brokerUpdateRequestsList');
@@ -2266,11 +2415,11 @@ function renderAdminDocumentsTable() {
   tbody.innerHTML = documents.map(d => {
     const client = clients.find(c => c.id === d.clientId);
     return `<tr>
-        <td><strong>${escapeHtml(client?.name || 'Unknown')}</strong></div></div>
-        <td>${escapeHtml(d.name)}</strong></div></div>
-        <td><span class="badge ${d.approved ? 'badge-success' : 'badge-warning'}">${d.approved ? 'Approved' : 'Pending'}</span></div></div>
-        <td>${d.date || '—'}</div></div>
-        <td><a href="${d.url}" target="_blank" class="btn btn-ghost btn-sm">View</a><button class="btn btn-ghost btn-sm btn-danger" onclick="deleteDoc('${d.id}')">Delete</button></div></div>
+        <td><strong>${escapeHtml(client?.name || 'Unknown')}</strong></div></td>
+        <td>${escapeHtml(d.name)}</strong></div></td>
+        <td><span class="badge ${d.approved ? 'badge-success' : 'badge-warning'}">${d.approved ? 'Approved' : 'Pending'}</span></div></td>
+        <td>${d.date || '—'}</div></td>
+        <td><a href="${d.url}" target="_blank" class="btn btn-ghost btn-sm">View</a><button class="btn btn-ghost btn-sm btn-danger" onclick="deleteDoc('${d.id}')">Delete</button></div></td>
       </tr>`;
   }).join('');
 }
@@ -2283,12 +2432,12 @@ function renderMeetings() {
   const tbody = document.getElementById('meetingsTableBody');
   if(!tbody) return;
   tbody.innerHTML = meetings.map(m => `<tr>
-      <td>${formatDate(m.date)} at ${m.time}</div></div>
-      <td><strong>${escapeHtml(m.clientName)}</strong></div></div>
-      <td>${escapeHtml(m.type)}</div></div>
-      <td><span class="badge ${m.status === 'confirmed' ? 'badge-success' : (m.status === 'cancelled' ? 'badge-danger' : 'badge-warning')}">${m.status}</span></div></div>
-      <td><button class="btn btn-ghost btn-sm" onclick="updateMeetingStatus('${m.id}', 'confirmed')">Confirm</button><button class="btn btn-ghost btn-sm btn-danger" onclick="updateMeetingStatus('${m.id}', 'cancelled')">Cancel</button><button class="btn btn-ghost btn-sm btn-danger" onclick="deleteMeeting('${m.id}')">Del</button></div></div>
-    </tr>`).join('') || '<td><td colspan="5">No meetings</div>' + '';
+      <td>${formatDate(m.date)} at ${m.time}</div></td>
+      <td><strong>${escapeHtml(m.clientName)}</strong></div></td>
+      <td>${escapeHtml(m.type)}</div></td>
+      <td><span class="badge ${m.status === 'confirmed' ? 'badge-success' : (m.status === 'cancelled' ? 'badge-danger' : 'badge-warning')}">${m.status}</span></div></td>
+      <td><button class="btn btn-ghost btn-sm" onclick="updateMeetingStatus('${m.id}', 'confirmed')">Confirm</button><button class="btn btn-ghost btn-sm btn-danger" onclick="updateMeetingStatus('${m.id}', 'cancelled')">Cancel</button><button class="btn btn-ghost btn-sm btn-danger" onclick="deleteMeeting('${m.id}')">Del</button></div></td>
+    </tr>`).join('') || '<tr><td colspan="5">No meetings</div>';
 }
 
 window.updateMeetingStatus = async function(id, status) { await db.collection('meetings').doc(id).update({ status }); showToast(`Meeting ${status}`); };
@@ -2424,15 +2573,15 @@ function renderAnalytics() {
         <td>${escapeHtml(p.name)}</strong></td>
         <td>${escapeHtml(p.industry || '—')}</td>
         <td>${escapeHtml(p.location || '—')}</td>
-        <td>${formatCurrency(amount)}</div></div>
-        <td>${formatCurrency(brokerComm)}</div></div>
-        <td>${formatCurrency(amount * ADMIN_ONLY_COMMISSION_RATE)}</div></div>
-        <td>${p.closeDate ? Math.ceil((new Date(p.fundedDate || p.closeDate) - new Date(p.createdAt)) / (1000*60*60*24)) : '—'}</div></div>
-        <td>${p.fundedDate || formatDate(p.fundedDate) || '—'}</div></div>
+        <td>${formatCurrency(amount)}</div></td>
+        <td>${formatCurrency(brokerComm)}</div></td>
+        <td>${formatCurrency(amount * ADMIN_ONLY_COMMISSION_RATE)}</div></td>
+        <td>${p.closeDate ? Math.ceil((new Date(p.fundedDate || p.closeDate) - new Date(p.createdAt)) / (1000*60*60*24)) : '—'}</div></td>
+        <td>${p.fundedDate || formatDate(p.fundedDate) || '—'}</div></td>
       </tr>`;
   }).join('');
-  document.getElementById('commissionTableBody').innerHTML = commissionHtml || '<td><td colspan="9">No funded projects</div>' + '';
-  document.getElementById('commissionTotalRow').innerHTML = `<td colspan="4"><strong>Total</strong></div></div><td>${formatCurrency(fundedProjects.reduce((s,p)=> s + (parseFloat(String(p.amount||'0').replace(/[^0-9.-]/g,''))||0),0))}</td><td>${formatCurrency(totalCommission)}</td><td>${formatCurrency(fundedProjects.reduce((s,p)=> s + ((parseFloat(String(p.amount||'0').replace(/[^0-9.-]/g,''))||0)*ADMIN_ONLY_COMMISSION_RATE),0))}</td><td colspan="2"></td>`;
+  document.getElementById('commissionTableBody').innerHTML = commissionHtml || '<tr><td colspan="9">No funded projects</div>';
+  document.getElementById('commissionTotalRow').innerHTML = `<td colspan="4"><strong>Total</strong></div><td>${formatCurrency(fundedProjects.reduce((s,p)=> s + (parseFloat(String(p.amount||'0').replace(/[^0-9.-]/g,''))||0),0))}</td><td>${formatCurrency(totalCommission)}</div><td>${formatCurrency(fundedProjects.reduce((s,p)=> s + ((parseFloat(String(p.amount||'0').replace(/[^0-9.-]/g,''))||0)*ADMIN_ONLY_COMMISSION_RATE),0))}</td><td colspan="2">`;
 }
 
 function animateStatValues() {
@@ -2473,15 +2622,15 @@ function renderBrokerPerformance() {
   brokerStats.sort((a,b) => brokerSortDesc ? b[brokerSortField] - a[brokerSortField] : a[brokerSortField] - b[brokerSortField]);
   document.getElementById('brokerPerformanceBody').innerHTML = brokerStats.map(s => {
     return `<tr>
-        <td><strong>${escapeHtml(s.name)}</strong><br><span class="data-label">${escapeHtml(s.firm)}</span></div></div>
-        <td>${escapeHtml(s.country || '—')}</div></div>
-        <td>${s.submissions}</div></div>
-        <td>${s.accepted}</div></div>
-        <td>${s.funded}</div></div>
-        <td>${s.conversion}%</div></div>
-        <td>${formatCurrency(s.volume)}</div></div>
-        <td>${formatCurrency(s.commission)}</div></div>
-      </table>`;
+        <td><strong>${escapeHtml(s.name)}</strong><br><span class="data-label">${escapeHtml(s.firm)}</span></div></td>
+        <td>${escapeHtml(s.country || '—')}</div></td>
+        <td>${s.submissions}</div></td>
+        <td>${s.accepted}</div></td>
+        <td>${s.funded}</div></td>
+        <td>${s.conversion}%</div></td>
+        <td>${formatCurrency(s.volume)}</div></td>
+        <td>${formatCurrency(s.commission)}</div></td>
+      </tr>`;
   }).join('');
   // Add sorting listeners
   document.querySelectorAll('#brokerPerformanceTable th[data-sort]').forEach(th => {
@@ -2637,13 +2786,23 @@ window.revertStepStatus = async function(projectId, stepNumber) {
 };
 
 window.showCommitmentFeeModal = function(projectId) {
-  const modalHtml = `<div id="feeModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:10001;"><div class="modal"><div class="modal-header"><h3>Confirm Commitment Fee</h3><button class="modal-close" onclick="closeFeeModal()">×</button></div><div class="modal-body"><div class="form-group"><label class="form-label">Amount (USD)</label><input type="text" id="feeAmount" class="form-input"></div><div class="form-group"><label class="form-label">Reference</label><input type="text" id="feeReference" class="form-input"></div><div class="form-group"><label class="form-label">Date</label><input type="date" id="feeDate" class="form-input" value="${new Date().toISOString().split('T')[0]}"></div><div class="form-group"><label class="form-label">Method</label><select id="feeMethod" class="form-select"><option>Wire</option><option>SWIFT</option></select></div><button class="btn btn-primary btn-md" onclick="confirmCommitmentFee('${projectId}')">Confirm</button></div></div></div>`;
-  document.body.insertAdjacentHTML('beforeend', modalHtml);
-  openModal('feeModal');
+  document.getElementById('feeDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('feeAmount').value = '';
+  document.getElementById('feeReference').value = '';
+  document.getElementById('feeConfirmBtn').onclick = () => confirmCommitmentFee(projectId);
+  openModal('commitmentFeeModal');
 };
+window.closeFeeModal = function() { closeModal('commitmentFeeModal'); };
 
-window.closeFeeModal = function() { const modal = document.getElementById('feeModal'); if(modal) modal.remove(); };
-window.closeECFModal = function() { const modal = document.getElementById('ecfModal'); if(modal) modal.remove(); };
+window.showECFEscrowModal = function(projectId) {
+  document.getElementById('ecfDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('ecfAmount').value = '';
+  document.getElementById('ecfInstitution').value = '';
+  document.getElementById('ecfReference').value = '';
+  document.getElementById('ecfConfirmBtn').onclick = () => confirmECFEscrow(projectId);
+  openModal('ecfEscrowModal');
+};
+window.closeECFModal = function() { closeModal('ecfEscrowModal'); };
 
 window.confirmCommitmentFee = async function(projectId) {
   const amount = document.getElementById('feeAmount')?.value;
@@ -2656,15 +2815,23 @@ window.confirmCommitmentFee = async function(projectId) {
   });
   await logActivity('admin', 'Suzana Aleksić', 'croft', 'cf_confirmed', projectId, `Amount: $${amount}`);
   showToast(`Fee confirmed: $${amount}`);
-  closeFeeModal();
+  closeModal('commitmentFeeModal');
   renderAdminTables();
   if(editProjectId === projectId) document.getElementById('stepStatusContainer').innerHTML = renderStepDashboard(projects.find(p=>p.id===projectId));
-};
-
-window.showECFEscrowModal = function(projectId) {
-  const modalHtml = `<div id="ecfModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:10001;"><div class="modal"><div class="modal-header"><h3>Confirm ECF Escrow</h3><button class="modal-close" onclick="closeECFModal()">×</button></div><div class="modal-body"><div class="form-group"><label class="form-label">ECF Amount (USD)</label><input type="text" id="ecfAmount" class="form-input"></div><div class="form-group"><label class="form-label">Institution</label><input type="text" id="ecfInstitution" class="form-input"></div><div class="form-group"><label class="form-label">Reference</label><input type="text" id="ecfReference" class="form-input"></div><div class="form-group"><label class="form-label">Date</label><input type="date" id="ecfDate" class="form-input" value="${new Date().toISOString().split('T')[0]}"></div><button class="btn btn-primary btn-md" onclick="confirmECFEscrow('${projectId}')">Confirm</button></div></div></div>`;
-  document.body.insertAdjacentHTML('beforeend', modalHtml);
-  openModal('ecfModal');
+  
+  // EMAILJS: Commitment fee confirmed → email the client
+  const project = projects.find(p => p.id === projectId);
+  const client = clients.find(c => c.id === project?.clientId);
+  if(client) {
+    await sendEmailNotification({
+      to_name: client.name,
+      to_email: client.email,
+      from_name: 'Croft Finance',
+      subject: `Commitment Fee Confirmed for ${project?.name}`,
+      message: `Dear ${client.name},\n\nThe commitment fee for your project (${project?.name}) has been confirmed. Your deal is now advancing to Step 3: Deed of Undertaking.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
+      project_name: project?.name || 'N/A'
+    });
+  }
 };
 
 window.confirmECFEscrow = async function(projectId) {
@@ -2678,9 +2845,23 @@ window.confirmECFEscrow = async function(projectId) {
   });
   await logActivity('admin', 'Suzana Aleksić', 'croft', 'ecf_confirmed', projectId, `Amount: $${amount}`);
   showToast(`ECF escrow confirmed: $${amount}`);
-  closeECFModal();
+  closeModal('ecfEscrowModal');
   renderAdminTables();
   if(editProjectId === projectId) document.getElementById('stepStatusContainer').innerHTML = renderStepDashboard(projects.find(p=>p.id===projectId));
+  
+  // EMAILJS: ECF escrow confirmed → email the client
+  const project = projects.find(p => p.id === projectId);
+  const client = clients.find(c => c.id === project?.clientId);
+  if(client) {
+    await sendEmailNotification({
+      to_name: client.name,
+      to_email: client.email,
+      from_name: 'Croft Finance',
+      subject: `ECF Escrow Confirmed for ${project?.name}`,
+      message: `Dear ${client.name},\n\nThe ECF escrow for your project (${project?.name}) has been confirmed. Your deal is now advancing to Step 7: Transfer to Agent.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
+      project_name: project?.name || 'N/A'
+    });
+  }
 };
 
 window.saveProjectInfo = async function() {
@@ -2779,6 +2960,17 @@ window.submitContactForm = async function(e) {
     project: document.getElementById('contactProject').value, message: document.getElementById('contactMessage').value,
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
+  
+  // EMAILJS: Contact form submitted
+  await sendEmailNotification({
+    to_name: 'Croft Finance Team',
+    to_email: EMAILJS_CONFIG.adminEmail,
+    from_name: 'Croft Finance',
+    subject: `New Contact Request from ${document.getElementById('contactName').value}`,
+    message: `Name: ${document.getElementById('contactName').value}\nEmail: ${document.getElementById('contactEmail').value}\nProject: ${document.getElementById('contactProject').value}\nMessage: ${document.getElementById('contactMessage').value}`,
+    project_name: document.getElementById('contactProject').value
+  });
+  
   showToast('Request sent');
   document.getElementById('homepageContactForm').reset();
 };
