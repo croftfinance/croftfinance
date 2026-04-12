@@ -322,52 +322,113 @@ body {
 
 /* ===== DASHBOARD HERO ===== */
 .dashboard-hero {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 32px;
-  flex-wrap: wrap;
-  gap: 24px;
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+  border-radius: 12px;
+  padding: 32px;
+  margin-bottom: 28px;
+  color: white;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 32px;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
 }
-.dashboard-hero-left { flex: 2; }
-.dashboard-hero-right { flex: 1; text-align: right; }
-.welcome-title { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 400; color: var(--navy); margin-bottom: 4px; }
-.welcome-date { font-size: 13px; color: var(--gray-500); margin-bottom: 20px; }
-.progress-circle-container { display: inline-flex; flex-direction: column; align-items: center; }
-.progress-circle { width: 120px; height: 120px; position: relative; }
-.progress-circle svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-.progress-circle-bg { stroke: var(--gray-200); stroke-width: 8; fill: none; }
-.progress-circle-fill { stroke: var(--navy); stroke-width: 8; fill: none; stroke-dasharray: 314; stroke-dashoffset: 314; transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1); }
-.progress-circle-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
-.progress-percentage { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 600; color: var(--navy); }
-.progress-label { font-size: 10px; color: var(--gray-500); letter-spacing: 1px; }
-.step-info { margin-top: 12px; text-align: center; }
-.step-number { font-size: 13px; font-weight: 600; color: var(--navy); }
-.step-name { font-size: 12px; color: var(--gray-500); }
-.estimated-closing { font-size: 11px; color: var(--gray-500); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-.closing-date { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 500; color: var(--navy); }
-.days-remaining { font-size: 36px; font-weight: 600; color: var(--blue); line-height: 1; }
-.days-label { font-size: 11px; color: var(--gray-500); letter-spacing: 1px; }
-.next-action { margin-top: 12px; padding: 8px 12px; background: var(--gray-50); border-radius: 8px; }
-.next-action-label { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--gray-500); }
-.next-action-text { font-size: 12px; font-weight: 500; color: var(--navy); }
-.next-action-text.client { color: var(--blue); }
+.dashboard-hero::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: rgba(44,95,138,0.15);
+}
+.welcome-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 300; color: white; margin-bottom: 4px; }
+.welcome-date { font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 20px; letter-spacing: 1px; }
+.progress-circle-bg { stroke: rgba(255,255,255,0.15); stroke-width: 8; fill: none; }
+.progress-circle-fill { stroke: white; stroke-width: 8; fill: none; stroke-dasharray: 314; stroke-dashoffset: 314; transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1); }
+.progress-percentage { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 600; color: white; }
+.progress-label { font-size: 10px; color: rgba(255,255,255,0.6); letter-spacing: 1px; }
+.step-number { font-size: 13px; font-weight: 600; color: white; }
+.step-name { font-size: 12px; color: rgba(255,255,255,0.6); }
+.estimated-closing { font-size: 9px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 4px; }
+.closing-date { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 500; color: white; }
+.days-remaining { font-size: 48px; font-weight: 600; color: white; line-height: 1; }
+.days-label { font-size: 10px; color: rgba(255,255,255,0.5); letter-spacing: 1px; }
+.next-action { margin-top: 16px; padding: 10px 14px; background: rgba(255,255,255,0.08); border-radius: 8px; border: 0.5px solid rgba(255,255,255,0.12); }
+.next-action-label { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+.next-action-text { font-size: 12px; font-weight: 500; color: white; margin-top: 2px; }
+@media (max-width: 768px) { .dashboard-hero { grid-template-columns: 1fr; } }
 
 /* ===== PIPELINE BOARD ===== */
 .view-toggle { display: flex; gap: 8px; margin-bottom: 16px; }
 .view-toggle-btn { padding: 6px 16px; font-size: 11px; background: white; border: 0.5px solid var(--gray-200); cursor: pointer; border-radius: 4px; }
 .view-toggle-btn.active { background: var(--navy); color: white; border-color: var(--navy); }
-.pipeline-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-.pipeline-col { background: var(--gray-50); border: 0.5px solid var(--gray-200); border-radius: 8px; padding: 16px; }
-.pipeline-col-title { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--gray-500); margin-bottom: 12px; font-weight: 600; }
-.pipeline-card { background: white; border: 0.5px solid var(--gray-200); border-radius: 6px; padding: 14px; margin-bottom: 10px; cursor: pointer; border-left: 3px solid var(--blue); }
-.pipeline-card-name { font-size: 13px; font-weight: 600; color: var(--navy); }
-.pipeline-card-project { font-size: 11px; color: var(--gray-500); }
-.pipeline-card-step { font-size: 10px; color: var(--gray-400); }
-.pipeline-card-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--gray-500); margin-top: 8px; }
-.mini-progress { display: flex; gap: 3px; margin-top: 8px; }
-.mini-progress-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gray-200); }
+.pipeline-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.pipeline-col {
+  background: var(--white);
+  border: 0.5px solid var(--gray-200);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.pipeline-col-header {
+  padding: 12px 16px;
+  background: var(--navy);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.pipeline-col-title {
+  font-size: 9px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+  font-weight: 500;
+}
+.pipeline-col-count {
+  background: rgba(255,255,255,0.1);
+  color: white;
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.pipeline-col-body { padding: 12px; }
+.pipeline-card {
+  background: var(--gray-50);
+  border: 0.5px solid var(--gray-200);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  border-left: 3px solid var(--blue);
+  position: relative;
+}
+.pipeline-card:hover { background: var(--white); border-color: var(--gray-300); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.pipeline-card.urgent { border-left-color: var(--error); }
+.pipeline-card.warning { border-left-color: var(--warning); }
+.pipeline-card.funded { border-left-color: var(--success); }
+.pipeline-card-initials {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+.pipeline-card-name { font-size: 13px; font-weight: 600; color: var(--navy); margin-bottom: 2px; }
+.pipeline-card-project { font-size: 11px; color: var(--gray-500); margin-bottom: 8px; }
+.pipeline-card-amount { font-size: 18px; font-weight: 600; color: var(--navy); font-variant-numeric: tabular-nums; margin-bottom: 8px; }
+.pipeline-card-step { font-size: 10px; color: var(--gray-400); margin-bottom: 8px; letter-spacing: 0.5px; }
+.mini-progress { display: flex; gap: 3px; margin-bottom: 8px; }
+.mini-progress-dot { flex: 1; height: 3px; border-radius: 2px; background: var(--gray-200); }
 .mini-progress-dot.completed { background: var(--navy); }
+.pipeline-card-footer { display: flex; justify-content: space-between; align-items: center; }
+.pipeline-card-days { font-size: 10px; color: var(--gray-400); }
+.pipeline-card-days.urgent { color: var(--error); font-weight: 600; }
+.pipeline-card-days.warning { color: var(--warning); font-weight: 600; }
 
 /* ===== DEADLINE BANNERS ===== */
 .expiry-alert-critical { background: rgba(185,28,28,0.06); border-left: 3px solid var(--error); padding: 14px 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-radius: 0; }
@@ -408,6 +469,24 @@ body {
   padding: 16px 24px;
   border-top: 0.5px solid var(--gray-200);
   background: var(--white);
+}
+#editProjectModal .modal {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+}
+#editProjectModal .modal-body {
+  flex: 1;
+  overflow-y: auto;
+  max-height: none;
+}
+#editProjectModal .modal-footer {
+  flex-shrink: 0;
+  padding: 16px 24px;
+  border-top: 0.5px solid var(--gray-200);
+  background: var(--white);
+  display: flex;
+  gap: 12px;
 }
 
 /* ===== TOAST ===== */
@@ -544,6 +623,16 @@ body {
   display: flex; align-items: center;
   height: 100%;
   border-right: 0.5px solid var(--gray-100);
+  position: relative;
+}
+.portal-nav-brand::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #c9a96e;
 }
 .portal-nav-brand span { color: var(--blue); }
 .portal-nav-right { display: flex; align-items: center; gap: 16px; position: relative; }
@@ -599,15 +688,20 @@ body {
   min-width: 100px;
   background: var(--white);
   border: 0.5px solid var(--gray-200);
-  border-radius: 12px;
-  padding: 14px 8px;
+  border-radius: 10px;
+  padding: 16px 8px;
   text-align: center;
   cursor: pointer;
   transition: all 0.2s;
 }
-.quick-action-btn:hover { border-color: var(--gray-300); }
-.quick-action-icon { font-size: 22px; color: var(--blue); margin-bottom: 8px; display: block; }
-.quick-action-label { font-size: 10px; letter-spacing: 0.5px; text-transform: uppercase; color: var(--gray-600); }
+.quick-action-btn:hover {
+  border-color: var(--navy);
+  background: var(--navy);
+}
+.quick-action-btn:hover .quick-action-icon { color: white; }
+.quick-action-btn:hover .quick-action-label { color: rgba(255,255,255,0.8); }
+.quick-action-icon { font-size: 20px; color: var(--blue); margin-bottom: 8px; display: block; transition: color 0.2s; }
+.quick-action-label { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gray-600); transition: color 0.2s; }
 
 /* Advisor Card */
 .advisor-card {
@@ -891,6 +985,39 @@ body {
 @media (max-width: 768px) {
   .form-grid-2 { grid-template-columns: 1fr; }
 }
+
+/* Analytics KPI Cards */
+.kpi-card {
+  background: var(--white);
+  border: 0.5px solid var(--gray-200);
+  border-radius: 10px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+.kpi-card.blue::before { background: var(--blue); }
+.kpi-card.navy::before { background: var(--navy); }
+.kpi-card.success::before { background: var(--success); }
+.kpi-card.warning::before { background: var(--warning); }
+.kpi-label { font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--gray-400); margin-bottom: 12px; display: block; }
+.kpi-value { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 500; color: var(--navy); line-height: 1; margin-bottom: 4px; font-variant-numeric: tabular-nums; }
+.kpi-sub { font-size: 11px; color: var(--gray-500); }
+
+.commission-rate-card {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+  border-radius: 10px;
+  padding: 20px;
+  color: white;
+  text-align: center;
+}
+.commission-rate-card .data-label { color: rgba(255,255,255,0.5); }
+.commission-rate-card .stat-value { color: #c9a96e; font-size: 40px; }
 </style>
 </head>
 <body>
@@ -1031,7 +1158,15 @@ body {
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
   <div class="portal-layout">
     <aside class="sidebar" id="clientSidebar">
-      <div class="sidebar-user"><div class="sidebar-avatar" id="clientAvatar">—</div><div class="sidebar-name" id="portalUserName">—</div><div class="sidebar-email" id="portalUserEmail">—</div></div>
+      <div class="sidebar-user">
+        <div class="sidebar-avatar" id="clientAvatar">—</div>
+        <div class="sidebar-name" id="portalUserName">—</div>
+        <div class="sidebar-email" id="portalUserEmail">—</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+          <div id="dealHealthDot" style="width:8px;height:8px;border-radius:50%;background:var(--gray-300);flex-shrink:0;"></div>
+          <span style="font-size:10px;color:var(--gray-400);letter-spacing:1px;text-transform:uppercase;">Deal Health</span>
+        </div>
+      </div>
       <div class="sidebar-nav">
         <button class="nav-item active" data-tab="dashboard"><i class="fas fa-chart-line"></i> Dashboard</button>
         <button class="nav-item" data-tab="process"><i class="fas fa-tasks"></i> Closing Process</button>
@@ -1073,6 +1208,7 @@ body {
           <div class="stat-card"><div class="data-label">Facility Amount</div><div class="stat-value" id="dashAmount">—</div></div>
           <div class="stat-card"><div class="data-label">Interest Rate</div><div class="stat-value" id="dashRate">—</div></div>
           <div class="stat-card"><div class="data-label">Target Closing</div><div class="stat-value" id="dashCountdown">—</div></div>
+          <div class="stat-card"><div class="data-label">Funds Needed</div><div class="stat-value" id="dashFundsNeeded">—</div></div>
         </div>
         <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-chart-pie"></i> Capital Stack</div></div><div class="card-body"><canvas id="capitalStackChart" height="300" style="max-height:300px;"></canvas></div></div>
         <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-clock"></i> Recent Activity</div></div><div class="card-body"><div id="recentActivity"><p class="data-label" style="text-align:center;">No recent activity.</p></div></div></div>
@@ -1180,13 +1316,13 @@ body {
       <div id="admin-clients" class="admin-tab"><div class="admin-page-title">Clients</div><div style="display:flex;justify-content:space-between;margin-bottom:16px;"><input type="text" id="clientSearch" class="form-input" placeholder="Search clients..." style="max-width:300px;"><button class="btn btn-primary btn-sm" onclick="showAddClientModal()">+ Add Client</button></div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Email</th><th>Projects</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="adminClientsTable"></tbody></table></div></div>
 
       <!-- Projects Tab -->
-      <div id="admin-projects-admin" class="admin-tab"><div class="admin-page-title">Projects</div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Project</th><th>Industry</th><th>Funds Needed</th><th>Step</th><th>Broker</th><th>CF</th><th>ECF</th><th>Actions</th></tr></thead><tbody id="adminProjectsTable"></tbody></table></div></div>
+      <div id="admin-projects-admin" class="admin-tab"><div class="admin-page-title">Projects</div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Project</th><th>Industry</th><th>Funds Needed</th><th>Step</th><th>Broker</th><th>CF</th><th>ECF</th><th>Actions</th></tr></thead><tbody id="adminProjectsTable"></tbody>｜DSML｜</div></div>
 
       <!-- Documents Tab -->
       <div id="admin-documents-admin" class="admin-tab"><div class="admin-page-title">Documents</div><div class="table-wrap"><table class="documents-table"><thead><tr><th>Client</th><th>Document</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="adminDocumentsTableBody"></tbody></table></div></div>
 
       <!-- Brokers Tab -->
-      <div id="admin-brokers" class="admin-tab"><div class="admin-page-title">Brokers</div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Broker</th><th>Firm</th><th>Commission</th><th>Submitted</th><th>Funded</th><th>Est. Commission</th><th>Status</th><th>Engagement</th><th>Actions</th><tr></thead><tbody id="adminBrokersTable"></tbody></table></div><div class="card" style="margin-top:20px;"><div class="card-header"><div class="card-title">Broker Update Requests</div></div><div class="card-body"><div id="brokerUpdateRequestsList"></div></div></div></div>
+      <div id="admin-brokers" class="admin-tab"><div class="admin-page-title">Brokers</div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Broker</th><th>Firm</th><th>Commission</th><th>Submitted</th><th>Funded</th><th>Est. Commission</th><th>Status</th><th>Engagement</th><th>Actions</th></tr></thead><tbody id="adminBrokersTable"></tbody></table></div><div class="card" style="margin-top:20px;"><div class="card-header"><div class="card-title">Broker Update Requests</div></div><div class="card-body"><div id="brokerUpdateRequestsList"></div></div></div></div>
 
       <!-- Inbox Tab -->
       <div id="admin-inbox" class="admin-tab"><div class="admin-page-title">Inbox</div><div class="inbox-filter"><button class="filter-chip active" data-filter="all">All</button><button class="filter-chip" data-filter="client">Clients</button><button class="filter-chip" data-filter="broker">Brokers</button><button class="filter-chip" data-filter="unread">Unread</button></div><div id="inboxContainer"></div></div>
@@ -1232,7 +1368,7 @@ body {
           <div class="stat-card"><div class="data-label">Pipeline Commission</div><div class="stat-value" id="brokerPipelineCommission">$0</div></div>
           <div class="stat-card"><div class="data-label">Earned Commission</div><div class="stat-value" id="brokerEarnedCommission">$0</div></div>
           <div class="stat-card"><div class="data-label">Active Deals</div><div class="stat-value" id="brokerActiveDeals">0</div></div>
-          <div class="stat-card"><div class="data-label">Commission Rate</div><div class="stat-value" id="brokerCommRate">0%</div></div>
+          <div class="stat-card commission-rate-card"><div class="data-label">Your Commission Rate</div><div class="stat-value" id="brokerCommRate">0%</div><div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:4px;">Per funded facility</div></div>
         </div>
         <div class="card"><div class="card-header"><div class="card-title">Commission History</div></div><div class="card-body"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Project</th><th>Client</th><th>Funded Date</th><th>Facility Amount</th><th>Commission Rate</th><th>Commission Amount</th></tr></thead><tbody id="brokerCommissionHistory"></tbody></table></div></div></div>
       </div>
@@ -1256,7 +1392,10 @@ body {
 
 <div id="scheduleMeetingModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Schedule Meeting</h3><button class="modal-close" onclick="closeModal('scheduleMeetingModal')">✕</button></div><div class="modal-body"><div class="form-group"><label class="form-label">Client</label><select id="meetingClientId" class="form-select"></select></div><div class="form-group"><label class="form-label">Date</label><input type="date" id="meetingDate" class="form-input"></div><div class="form-group"><label class="form-label">Time</label><input type="time" id="meetingTime" class="form-input"></div><div class="form-group"><label class="form-label">Type</label><select id="meetingType" class="form-select"><option>Video Call</option><option>Phone Call</option></select></div><div class="form-group"><label class="form-label">Notes</label><textarea id="meetingNotes" rows="3" class="form-textarea"></textarea></div><button class="btn btn-primary btn-md" onclick="createMeeting()" style="width:100%">Schedule</button></div></div></div>
 
-<div id="editProjectModal" class="modal-overlay"><div class="modal modal-lg"><div class="modal-header"><h3>Edit Project</h3><button class="modal-close" onclick="closeModal('editProjectModal')">✕</button></div><div class="modal-tabs"><button id="tabBtn-project" class="modal-tab-btn active" onclick="switchEditTab('project')">Details</button><button id="tabBtn-process" class="modal-tab-btn" onclick="switchEditTab('process')">Process</button></div><div class="modal-body"><div id="edit-tab-project" class="modal-tab-pane active"><div class="form-grid-2"><div class="form-group"><label class="form-label">Client Name</label><input type="text" id="editClientName" class="form-input"></div><div class="form-group"><label class="form-label">Client Email</label><input type="email" id="editClientEmail" class="form-input"></div><div class="form-group"><label class="form-label">Project Name</label><input type="text" id="editProjectName" class="form-input"></div><div class="form-group"><label class="form-label">Industry</label><select id="editIndustry" class="form-select"><option>Real Estate</option><option>Infrastructure</option><option>Energy</option><option>Mining</option><option>Oil & Gas</option></select></div><div class="form-group"><label class="form-label">Location</label><input type="text" id="editLocation" class="form-input"></div><div class="form-group"><label class="form-label">Facility Amount</label><input type="text" id="editAmount" class="form-input"></div><div class="form-group"><label class="form-label">Interest Rate</label><input type="text" id="editRate" class="form-input"></div><div class="form-group"><label class="form-label">Funds Needed</label><input type="text" id="editFundsNeeded" class="form-input"></div><div class="form-group"><label class="form-label">Sponsor Equity</label><input type="text" id="editSponsorEquity" class="form-input"></div><div class="form-group"><label class="form-label">Target Close Date</label><input type="date" id="editCloseDate" class="form-input"></div><div class="form-group"><label class="form-label">Assign Broker</label><select id="editBrokerAssign" class="form-select"></select></div><div class="form-group"><label class="form-label">Broker Engagement Status</label><select id="editBrokerEngagement" class="form-select"><option value="none">None</option><option value="pending">Pending</option><option value="active">Active</option></select></div></div></div><div id="edit-tab-process" class="modal-tab-pane"><div class="form-grid-2"><div class="form-group"><label class="form-label">Current Step</label><select id="editStep" class="form-select"><option value="1">Step 1: Term Sheet</option><option value="2">Step 2: Commitment Fee</option><option value="3">Step 3: Deed of Undertaking</option><option value="4">Step 4: Credit Support</option><option value="5">Step 5: Hard-Copy Submission</option><option value="6">Step 6: ECF Escrow</option><option value="7">Step 7: Transfer to Agent</option><option value="8">Step 8: Funded</option></select></div><div class="form-group"><label class="form-label">CF Status</label><select id="editCommitFee" class="form-select"><option value="pending">Pending</option><option value="paid">Paid</option></select></div><div class="form-group"><label class="form-label">ECF Status</label><select id="editECFStatus" class="form-select"><option value="pending">Pending</option><option value="escrowed">Escrowed</option></select></div><div class="form-group"><label class="form-label">Advisor Note</label><textarea id="editAdvisorNote" rows="2" class="form-textarea"></textarea></div></div><div id="stepStatusContainer"></div></div></div><div class="modal-footer"><button class="btn btn-primary btn-md" onclick="saveProjectInfo()" style="width:100%">Save Changes</button></div></div></div>
+<div id="editProjectModal" class="modal-overlay"><div class="modal modal-lg"><div class="modal-header"><h3>Edit Project</h3><button class="modal-close" onclick="closeModal('editProjectModal')">✕</button></div><div class="modal-tabs"><button id="tabBtn-project" class="modal-tab-btn active" onclick="switchEditTab('project')">Details</button><button id="tabBtn-process" class="modal-tab-btn" onclick="switchEditTab('process')">Process</button></div><div class="modal-body"><div id="edit-tab-project" class="modal-tab-pane active"><div class="form-grid-2"><div class="form-group"><label class="form-label">Client Name</label><input type="text" id="editClientName" class="form-input"></div><div class="form-group"><label class="form-label">Client Email</label><input type="email" id="editClientEmail" class="form-input"></div><div class="form-group"><label class="form-label">Project Name</label><input type="text" id="editProjectName" class="form-input"></div><div class="form-group"><label class="form-label">Industry</label><select id="editIndustry" class="form-select"><option>Real Estate</option><option>Infrastructure</option><option>Energy</option><option>Mining</option><option>Oil & Gas</option></select></div><div class="form-group"><label class="form-label">Location</label><input type="text" id="editLocation" class="form-input"></div><div class="form-group"><label class="form-label">Facility Amount</label><input type="text" id="editAmount" class="form-input"></div><div class="form-group"><label class="form-label">Interest Rate</label><input type="text" id="editRate" class="form-input"></div><div class="form-group"><label class="form-label">Funds Needed</label><input type="text" id="editFundsNeeded" class="form-input"></div><div class="form-group"><label class="form-label">Sponsor Equity</label><input type="text" id="editSponsorEquity" class="form-input"></div><div class="form-group"><label class="form-label">Target Close Date</label><input type="date" id="editCloseDate" class="form-input"></div><div class="form-group"><label class="form-label">Assign Broker</label><select id="editBrokerAssign" class="form-select"></select></div><div class="form-group"><label class="form-label">Broker Engagement Status</label><select id="editBrokerEngagement" class="form-select"><option value="none">None</option><option value="pending">Pending</option><option value="active">Active</option></select></div></div></div><div id="edit-tab-process" class="modal-tab-pane"><div class="form-grid-2"><div class="form-group"><label class="form-label">Current Step</label><select id="editStep" class="form-select"><option value="1">Step 1: Term Sheet</option><option value="2">Step 2: Commitment Fee</option><option value="3">Step 3: Deed of Undertaking</option><option value="4">Step 4: Credit Support</option><option value="5">Step 5: Hard-Copy Submission</option><option value="6">Step 6: ECF Escrow</option><option value="7">Step 7: Transfer to Agent</option><option value="8">Step 8: Funded</option></select></div><div class="form-group"><label class="form-label">CF Status</label><select id="editCommitFee" class="form-select"><option value="pending">Pending</option><option value="paid">Paid</option></select></div><div class="form-group"><label class="form-label">ECF Status</label><select id="editECFStatus" class="form-select"><option value="pending">Pending</option><option value="escrowed">Escrowed</option></select></div><div class="form-group"><label class="form-label">Advisor Note</label><textarea id="editAdvisorNote" rows="2" class="form-textarea"></textarea></div></div><div id="stepStatusContainer"></div></div></div><div class="modal-footer">
+  <button class="btn btn-secondary btn-md" onclick="closeModal('editProjectModal')" style="flex:1">Cancel</button>
+  <button class="btn btn-primary btn-md" onclick="saveProjectInfo()" style="flex:2">Save Changes</button>
+</div></div></div>
 
 <div id="addClientModal" class="modal-overlay"><div class="modal modal-lg"><div class="modal-header"><h3>Add Client</h3><button class="modal-close" onclick="closeModal('addClientModal')">✕</button></div><div class="modal-body"><div class="form-grid-2"><div class="form-group"><label class="form-label">Full Name</label><input type="text" id="ncName" class="form-input"></div><div class="form-group"><label class="form-label">Email</label><input type="email" id="ncEmail" class="form-input"></div><div class="form-group"><label class="form-label">Password</label><input type="password" id="ncPassword" class="form-input"></div><div class="form-group"><label class="form-label">Project Name</label><input type="text" id="ncProject" class="form-input"></div></div><button class="btn btn-primary btn-md" onclick="createClient()" style="width:100%">Create Client</button></div></div></div>
 
@@ -1802,6 +1941,7 @@ function loadCurrentProjectData() {
   document.getElementById('dashAmount').innerHTML = formatCurrency(p.amount);
   document.getElementById('dashRate').innerHTML = p.interestRate ? p.interestRate + '%' : '—';
   document.getElementById('dashCountdown').innerHTML = p.closeDate ? formatDate(p.closeDate) : '—';
+  document.getElementById('dashFundsNeeded').innerHTML = formatCurrency(p.fundsNeeded);
   const percent = Math.round((step / 8) * 100);
   document.getElementById('progressPercentage').innerHTML = percent + '%';
   const circle = document.querySelector('.progress-circle-fill');
@@ -1810,6 +1950,19 @@ function loadCurrentProjectData() {
   if(step === 2 && p.commitmentFeeStatus !== 'paid') bannerDiv.innerHTML = `<div class="action-banner client-action"><i class="fas fa-exclamation-triangle"></i><div><strong>Action Required: Commitment Fee</strong><br>Please submit the commitment fee to advance to Step 3.</div><button class="btn btn-primary btn-sm" style="margin-top:8px;" onclick="showWiringInstructions()">Wiring Instructions</button></div>`;
   else if(step === 6 && p.ecfStatus !== 'escrowed') bannerDiv.innerHTML = `<div class="action-banner client-action"><i class="fas fa-exclamation-triangle"></i><div><strong>Action Required: ECF Escrow</strong><br>Please fund the ECF escrow account to proceed to Step 7.</div></div>`;
   else bannerDiv.innerHTML = '';
+  
+  const statCards = document.querySelectorAll('#tab-dashboard .stat-card');
+  statCards.forEach(card => {
+    card.style.borderLeft = step === 8 ? '3px solid var(--success)' : (step >= 5 ? '3px solid var(--blue)' : '3px solid var(--gray-200)');
+  });
+  const healthDot = document.getElementById('dealHealthDot');
+  if(healthDot) {
+    const daysLeft = p.closeDate ? Math.ceil((new Date(p.closeDate) - new Date()) / (1000*60*60*24)) : 999;
+    if(step === 8) healthDot.style.background = 'var(--success)';
+    else if(daysLeft < 14) healthDot.style.background = 'var(--error)';
+    else if(daysLeft < 30) healthDot.style.background = 'var(--warning)';
+    else healthDot.style.background = 'var(--success)';
+  }
 }
 
 window.showWiringInstructions = function() { showToast('Wiring instructions will be sent to your email'); };
@@ -1827,7 +1980,7 @@ function renderCapitalStack() {
 
 function renderDocuments() {
   const tbody = document.getElementById('closingDocumentsBody');
-  if(!currentProjectId) { tbody.innerHTML = '<tr><td colspan="4">No project attached. </td></tr>'; return; }
+  if(!currentProjectId) { tbody.innerHTML = '<tr><td colspan="4">No project attached. <tr>'; return; }
   const projDocs = documents.filter(d => d.projectId === currentProjectId);
   tbody.innerHTML = projDocs.map(d => `<tr>
       <td><strong>${escapeHtml(d.name)}</strong></td>
@@ -1900,7 +2053,7 @@ window.sendMessage = async function() {
 function renderProjectsList() {
   const cont = document.getElementById('projectsList');
   if(!cont) return;
-  cont.innerHTML = projects.map(p => `<div class="card"><div class="card-body"><div style="display:flex;justify-content:space-between;margin-bottom:16px;"><h3 style="font-family:Cormorant Garamond;font-size:20px;">${escapeHtml(p.name)}</h3><span class="badge badge-info">Step ${p.step||1}</span></div><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;"><div><div class="data-label">Facility Amount</div><div class="data-value" style="font-size:18px;">${formatCurrency(p.amount)}</div></div><div><div class="data-label">Interest Rate</div><div>${p.interestRate || '—'}%</div></div><div><div class="data-label">Term</div><div>${p.term || '—'} years</div></div><div><div class="data-label">Grace Period</div><div>${p.gracePeriod || '—'} months</div></div></div></div></div>`).join('') || '<div class="card"><div class="card-body">No projects</div></div>';
+  cont.innerHTML = projects.map(p => `<div class="card"><div class="card-body"><div style="display:flex;justify-content:space-between;margin-bottom:16px;"><h3 style="font-family:Cormorant Garamond;font-size:20px;">${escapeHtml(p.name)}</h3><span class="badge badge-info">Step ${p.step||1}</span></div><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;"><div><div class="data-label">Facility Amount</div><div class="data-value" style="font-size:18px;">${formatCurrency(p.amount)}</div></div><div><div class="data-label">Funds Needed</div><div class="data-value" style="font-size:18px;">${formatCurrency(p.fundsNeeded)}</div></div><div><div class="data-label">Interest Rate</div><div>${p.interestRate || '—'}%</div></div><div><div class="data-label">Term</div><div>${p.term || '—'} years</div></div><div><div class="data-label">Grace Period</div><div>${p.gracePeriod || '—'} months</div></div></div></div></div>`).join('') || '<div class="card"><div class="card-body">No projects</div></div>';
 }
 
 function renderStepAccordion() {
@@ -1991,7 +2144,7 @@ window.dismissDeadline = function(field) {
 window.printDealSummary = function() {
   const p = projects.find(x => x.id === currentProjectId);
   if(!p) return;
-  const printHtml = `<div style="max-width:800px;margin:0 auto;padding:40px;font-family:'Jost',sans-serif;"><div style="text-align:center;margin-bottom:40px;"><h1 style="font-family:'Cormorant Garamond',serif;font-size:36px;">CROFT FINANCE</h1><p style="color:var(--gray-500);">Private Structured Finance</p></div><div style="margin-bottom:30px;"><h2 style="font-family:'Cormorant Garamond',serif;font-size:24px;">Deal Summary</h2><p>Date: ${formatDate(new Date().toISOString())}</p></div><div class="form-grid-2"><div><strong>Borrower:</strong><br>${escapeHtml(currentClient.name)}<br>${escapeHtml(currentClient.email)}</div><div><strong>Project:</strong><br>${escapeHtml(p.name)}<br>${escapeHtml(p.industry)} | ${escapeHtml(p.location)}</div></div><hr style="margin:20px 0;"><div class="form-grid-2"><div><strong>Facility Amount:</strong><br>${formatCurrency(p.amount)}</div><div><strong>Interest Rate:</strong><br>${p.interestRate || '—'}%</div><div><strong>Term:</strong><br>${p.term || '—'} years</div><div><strong>Grace Period:</strong><br>${p.gracePeriod || '—'} months</div><div><strong>Closing Timeline:</strong><br>14–21 business days</div><div><strong>Governing Law:</strong><br>${p.governingLaw || 'England and Wales'}</div></div><hr style="margin:20px 0;"><div><strong>Capital Stack:</strong><br>Sponsor Equity: ${formatCurrency(p.sponsorEquity)}<br>Croft Finance: ${formatCurrency(p.amount)}</div><hr style="margin:20px 0;"><div><strong>Key Milestones:</strong><br>Target Close: ${formatDate(p.closeDate)}<br>Current Step: ${STEP_NAMES[p.step || 1]}</div><hr style="margin:20px 0;"><div style="text-align:center;margin-top:40px;"><p>For any questions, contact:</p><p><strong>Suzana Aleksić</strong><br>suzana.aleksic@croftfinance.com<br>+381 69 288 0 191</p></div></div>`;
+  const printHtml = `<div style="max-width:800px;margin:0 auto;padding:40px;font-family:'Jost',sans-serif;"><div style="text-align:center;margin-bottom:40px;"><h1 style="font-family:'Cormorant Garamond',serif;font-size:36px;">CROFT FINANCE</h1><p style="color:var(--gray-500);">Private Structured Finance</p></div><div style="margin-bottom:30px;"><h2 style="font-family:'Cormorant Garamond',serif;font-size:24px;">Deal Summary</h2><p>Date: ${formatDate(new Date().toISOString())}</p></div><div class="form-grid-2"><div><strong>Borrower:</strong><br>${escapeHtml(currentClient.name)}<br>${escapeHtml(currentClient.email)}</div><div><strong>Project:</strong><br>${escapeHtml(p.name)}<br>${escapeHtml(p.industry)} | ${escapeHtml(p.location)}</div></div><hr style="margin:20px 0;"><div class="form-grid-2"><div><strong>Facility Amount:</strong><br>${formatCurrency(p.amount)}</div><div><strong>Funds Needed:</strong><br>${formatCurrency(p.fundsNeeded)}</div><div><strong>Interest Rate:</strong><br>${p.interestRate || '—'}%</div><div><strong>Term:</strong><br>${p.term || '—'} years</div><div><strong>Grace Period:</strong><br>${p.gracePeriod || '—'} months</div><div><strong>Closing Timeline:</strong><br>14–21 business days</div><div><strong>Governing Law:</strong><br>${p.governingLaw || 'England and Wales'}</div></div><hr style="margin:20px 0;"><div><strong>Capital Stack:</strong><br>Sponsor Equity: ${formatCurrency(p.sponsorEquity)}<br>Croft Finance: ${formatCurrency(p.amount)}</div><hr style="margin:20px 0;"><div><strong>Key Milestones:</strong><br>Target Close: ${formatDate(p.closeDate)}<br>Current Step: ${STEP_NAMES[p.step || 1]}</div><hr style="margin:20px 0;"><div style="text-align:center;margin-top:40px;"><p>For any questions, contact:</p><p><strong>Suzana Aleksić</strong><br>suzana.aleksic@croftfinance.com<br>+381 69 288 0 191</p></div></div>`;
   const printWindow = window.open('', '_blank');
   printWindow.document.write(`<html><head><title>Deal Summary - ${escapeHtml(p.name)}</title><style>body{font-family:'Jost',sans-serif;padding:40px;}.form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}hr{border:none;border-top:0.5px solid #ccc;}</style></head><body>${printHtml}</body></html>`);
   printWindow.document.close();
@@ -2088,7 +2241,7 @@ function updateBrokerDashboard() {
       <td>${formatCurrency(amt * rate / 100)}</strong></td>
     </tr>`;
   }).join('');
-  document.getElementById('brokerCommissionHistory').innerHTML = historyHtml || '<tr><td colspan="6">No funded deals yet. </div>';
+  document.getElementById('brokerCommissionHistory').innerHTML = historyHtml || '<tr><td colspan="6">No funded deals yet.</div>';
 }
 
 window.submitDeal = async function() {
@@ -2133,7 +2286,28 @@ function renderBrokerPortfolio() {
     const percent = Math.round(((p.step||1)/8)*100);
     const amt = parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g,"")) || 0;
     const commission = amt * ((currentBroker.commissionRate || 0) / 100);
-    return `<div class="card" style="margin-bottom:12px;"><div class="card-body"><div style="display:flex;justify-content:space-between;"><div><strong>${escapeHtml(p.name)}</strong><br><span class="data-label">${escapeHtml(client?.name)}<br>${escapeHtml(client?.email)}</span></div><span class="badge badge-info">Step ${p.step||1}: ${STEP_NAMES[p.step||1]}</span></div><div class="progress-bar-wrap" style="margin:12px 0;"><div class="progress-bar-fill" style="width:${percent}%;height:4px;background:var(--blue);border-radius:2px;"></div></div><div class="form-grid-2" style="margin:12px 0;"><div><div class="data-label">Facility Amount</div><div>${formatCurrency(p.amount)}</div></div><div><div class="data-label">Est. Commission</div><div>${formatCurrency(commission)}</div></div><div><div class="data-label">Target Close</div><div>${p.closeDate ? formatDate(p.closeDate) : '—'}</div></div><div><div class="data-label">Next Action</div><div>${p.step >= 8 ? 'Funded' : (p.step === 2 && p.commitmentFeeStatus !== 'paid' ? 'Client: Pay Fee' : (p.step === 6 && p.ecfStatus !== 'escrowed' ? 'Client: Fund ECF' : 'Croft: Process'))}</div></div></div><button class="btn btn-secondary btn-sm" style="width:100%;" onclick="showBrokerUpdateRequest('${p.id}')">Request Update</button></div></div>`;
+    return `<div class="card" style="margin-bottom:16px;border-left:3px solid ${(p.step||1) === 8 ? 'var(--success)' : 'var(--blue)'};">
+      <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div style="font-size:16px;font-weight:600;color:var(--navy);">${escapeHtml(p.name)}</div>
+          <div style="font-size:11px;color:var(--gray-500);margin-top:2px;">${escapeHtml(client?.name)} · ${escapeHtml(client?.email)}</div>
+        </div>
+        <span class="badge ${(p.step||1) === 8 ? 'badge-success' : 'badge-info'}">Step ${p.step||1} of 8 · ${STEP_NAMES[p.step||1]}</span>
+      </div>
+      <div class="card-body">
+        <div class="progress-bar-wrap" style="margin-bottom:16px;"><div class="progress-bar-fill" style="width:${percent}%;"></div></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px;">
+          <div><div class="data-label">Facility Amount</div><div style="font-size:18px;font-weight:600;color:var(--navy);">${formatCurrency(p.amount)}</div></div>
+          <div><div class="data-label">Your Commission</div><div style="font-size:18px;font-weight:600;color:var(--success);">${formatCurrency(commission)}</div></div>
+          <div><div class="data-label">Target Close</div><div style="font-size:14px;font-weight:500;color:var(--navy);">${p.closeDate ? formatDate(p.closeDate) : '—'}</div></div>
+        </div>
+        <div style="background:var(--gray-50);border-radius:8px;padding:12px;margin-bottom:12px;">
+          <div class="data-label" style="margin-bottom:4px;">Next Required Action</div>
+          <div style="font-size:13px;font-weight:500;color:var(--navy);">${(p.step||1) >= 8 ? '✓ Deal funded successfully' : (p.step === 2 && p.commitmentFeeStatus !== 'paid' ? '⚠ Client must pay commitment fee' : (p.step === 6 && p.ecfStatus !== 'escrowed' ? '⚠ Client must fund ECF escrow' : 'Croft Finance is processing this step'))}</div>
+        </div>
+        <button class="btn btn-secondary btn-sm" style="width:100%;" onclick="showBrokerUpdateRequest('${p.id}')"><i class="fas fa-edit"></i> Request Update from Croft Finance</button>
+      </div>
+    </div>`;
   }).join('');
 }
 
@@ -2284,7 +2458,7 @@ function renderAdminTables() {
         <td>${escapeHtml(c?.name || 'Unknown')}</div></td>
         <td><strong>${escapeHtml(p.name)}</strong></div></td>
         <td>${escapeHtml(p.industry || '—')}</div></td>
-        <td>${formatCurrency(p.fundsNeeded || p.amount)}</div></td>
+        <td>${formatCurrency(p.fundsNeeded)}</div></td>
         <td><span class="badge badge-info">${p.step||1}</span></div></td>
         <td>${broker ? escapeHtml(broker.name) : 'Direct'}</div></td>
         <td><span class="badge ${p.commitmentFeeStatus === 'paid' ? 'badge-success' : 'badge-warning'}">${p.commitmentFeeStatus === 'paid' ? 'Paid' : 'Pending'}</span></div></td>
@@ -2319,11 +2493,39 @@ function renderPipeline() {
     ];
     boardDiv.innerHTML = stages.map(stage => {
       const stageProjects = projects.filter(p => stage.steps.includes(p.step || 1) && p.status === 'active');
-      return `<div class="pipeline-col"><div class="pipeline-col-title">${stage.name}</div>${stageProjects.map(p => {
-        const c = clients.find(cl => cl.id === p.clientId);
-        const percent = Math.round(((p.step||1)/8)*100);
-        return `<div class="pipeline-card" onclick="editProject('${p.id}')"><div class="pipeline-card-name">${escapeHtml(c?.name || 'Unknown')}</div><div class="pipeline-card-project">${escapeHtml(p.name)}</div><div class="pipeline-card-step">${STEP_NAMES[p.step || 1]}</div><div class="mini-progress" style="margin-top:8px;">${Array(8).fill(0).map((_,i) => `<div class="mini-progress-dot ${i+1 <= (p.step||1) ? 'completed' : ''}"></div>`).join('')}</div><div class="pipeline-card-meta"><span>${formatCurrency(p.amount)}</span><span>${percent}%</span></div></div>`;
-      }).join('')}</div>`;
+      return `<div class="pipeline-col">
+        <div class="pipeline-col-header">
+          <div class="pipeline-col-title">${stage.name}</div>
+          <div class="pipeline-col-count">${stageProjects.length}</div>
+        </div>
+        <div class="pipeline-col-body">
+          ${stageProjects.map(p => {
+            const c = clients.find(cl => cl.id === p.clientId);
+            const initials = (c?.name || 'U').split(' ').map(w => w[0]).join('').substring(0,2).toUpperCase();
+            const percent = Math.round(((p.step||1)/8)*100);
+            let daysToClose = null, urgencyClass = '';
+            if(p.closeDate) {
+              daysToClose = Math.ceil((new Date(p.closeDate) - new Date()) / (1000*60*60*24));
+              if(daysToClose <= 14) urgencyClass = 'urgent';
+              else if(daysToClose <= 30) urgencyClass = 'warning';
+            }
+            const isFunded = (p.step||1) === 8;
+            return `<div class="pipeline-card ${urgencyClass} ${isFunded ? 'funded' : ''}" onclick="editProject('${p.id}')">
+              <div class="pipeline-card-initials">${initials}</div>
+              <div class="pipeline-card-name">${escapeHtml(c?.name || 'Unknown')}</div>
+              <div class="pipeline-card-project">${escapeHtml(p.name)}</div>
+              <div class="pipeline-card-amount">${formatCurrency(p.amount)}</div>
+              <div class="pipeline-card-step">${STEP_NAMES[p.step || 1]}</div>
+              <div class="mini-progress">${Array(8).fill(0).map((_,i) => `<div class="mini-progress-dot ${i+1 <= (p.step||1) ? 'completed' : ''}"></div>`).join('')}</div>
+              <div class="pipeline-card-footer">
+                <span class="pipeline-card-days ${urgencyClass}">${daysToClose !== null ? (daysToClose < 0 ? 'Past due' : daysToClose + ' days to close') : 'No close date'}</span>
+                <span style="font-size:10px;color:var(--gray-400);">${percent}%</span>
+              </div>
+            </div>`;
+          }).join('')}
+          ${stageProjects.length === 0 ? '<div style="text-align:center;padding:24px;font-size:12px;color:var(--gray-400);">No deals</div>' : ''}
+        </div>
+      </div>`;
     }).join('');
   } else {
     boardDiv.style.display = 'none';
@@ -2524,7 +2726,16 @@ function renderAnalytics() {
   const brokerPercent = directVolume + brokerVolume > 0 ? Math.round((brokerVolume / (directVolume + brokerVolume)) * 100) : 0;
   const activeBrokers = brokers.filter(b => b.status === 'active' && b.engagementStatus === 'active').length;
   const pendingActions = clients.filter(c => c.status === 'pending').length + meetings.filter(m => m.status === 'pending').length + brokerSubmissions.filter(s => s.status === 'pending').length;
-  document.getElementById('analyticsKPI').innerHTML = `<div class="stat-card"><div class="data-label">Pipeline Projects</div><div class="stat-value stat-value-animate" id="kpiPipeline">${pipelineCount}</div><svg class="stat-sparkline" width="60" height="28" viewBox="0 0 60 28"><polyline points="0,20 15,15 30,18 45,10 60,12" fill="none" stroke="var(--blue)" stroke-width="1.5"/></svg></div><div class="stat-card"><div class="data-label">Funded Projects</div><div class="stat-value stat-value-animate" id="kpiFunded">${fundedCount}</div><svg class="stat-sparkline" width="60" height="28" viewBox="0 0 60 28"><polyline points="0,18 15,20 30,14 45,8 60,6" fill="none" stroke="var(--success)" stroke-width="1.5"/></svg></div><div class="stat-card"><div class="data-label">Total Capital Raised</div><div class="stat-value stat-value-animate" id="kpiCapital">${formatCurrency(totalCapital)}</div></div><div class="stat-card"><div class="data-label">Suzana's Commission (2%)</div><div class="stat-value stat-value-animate" id="kpiCommission">${formatCurrency(commission2pc)}</div></div><div class="stat-card"><div class="data-label">Average Facility Size</div><div class="stat-value stat-value-animate" id="kpiAvgFacility">${formatCurrency(avgFacility)}</div></div><div class="stat-card"><div class="data-label">Broker vs Direct</div><div class="stat-value stat-value-animate" id="kpiBrokerSplit">${brokerPercent}% Broker / ${100-brokerPercent}% Direct</div></div><div class="stat-card"><div class="data-label">Active Brokers</div><div class="stat-value stat-value-animate" id="kpiActiveBrokers">${activeBrokers}</div></div><div class="stat-card"><div class="data-label">Pending Actions</div><div class="stat-value stat-value-animate" id="kpiPending">${pendingActions}</div></div>`;
+  document.getElementById('analyticsKPI').innerHTML = `
+    <div class="kpi-card navy"><span class="kpi-label">Pipeline Projects</span><div class="kpi-value" id="kpiPipeline">${pipelineCount}</div><div class="kpi-sub">Active deals in progress</div></div>
+    <div class="kpi-card success"><span class="kpi-label">Funded Projects</span><div class="kpi-value" id="kpiFunded">${fundedCount}</div><div class="kpi-sub">Successfully closed</div></div>
+    <div class="kpi-card blue"><span class="kpi-label">Total Capital Raised</span><div class="kpi-value" id="kpiCapital">${formatCurrency(totalCapital)}</div><div class="kpi-sub">Across all funded deals</div></div>
+    <div class="kpi-card warning"><span class="kpi-label">Suzana's Commission (2%)</span><div class="kpi-value" id="kpiCommission">${formatCurrency(commission2pc)}</div><div class="kpi-sub">Net of broker fees</div></div>
+    <div class="kpi-card navy"><span class="kpi-label">Average Facility Size</span><div class="kpi-value" id="kpiAvgFacility">${formatCurrency(avgFacility)}</div><div class="kpi-sub">Per funded project</div></div>
+    <div class="kpi-card blue"><span class="kpi-label">Broker vs Direct</span><div class="kpi-value" id="kpiBrokerSplit">${brokerPercent}%</div><div class="kpi-sub">Broker-originated volume</div></div>
+    <div class="kpi-card success"><span class="kpi-label">Active Brokers</span><div class="kpi-value" id="kpiActiveBrokers">${activeBrokers}</div><div class="kpi-sub">With signed engagement</div></div>
+    <div class="kpi-card warning"><span class="kpi-label">Pending Actions</span><div class="kpi-value" id="kpiPending">${pendingActions}</div><div class="kpi-sub">Require your attention</div></div>
+  `;
   animateStatValues();
   // Pipeline funnel
   const stepCounts = [0,0,0,0,0,0,0,0];
