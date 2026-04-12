@@ -99,6 +99,19 @@ body {
 }
 #cookieBanner a { color: var(--blue); }
 
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 99;
+}
+.sidebar-overlay.show { display: block; }
+
+.hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
 .home-nav {
   position: fixed; top: 0; left: 0; right: 0;
   z-index: 1000; height: 72px;
@@ -2721,16 +2734,16 @@ body {
       <div class="sidebar-user"><div class="sidebar-avatar" id="clientAvatar">—</div><div class="sidebar-name" id="portalUserName">—</div><div class="sidebar-email" id="portalUserEmail">—</div></div>
       <div class="sidebar-nav">
         <div class="sidebar-section-label">Deal Room</div>
-        <button class="nav-item active" onclick="switchPortalTab('dashboard',this)"><i class="fas fa-chart-line"></i> Dashboard</button>
-        <button class="nav-item" onclick="switchPortalTab('process',this)"><i class="fas fa-tasks"></i> Closing Process</button>
-        <button class="nav-item" onclick="switchPortalTab('checklist',this)"><i class="fas fa-clipboard-check"></i> Closing Checklist</button>
-        <button class="nav-item" onclick="switchPortalTab('documents',this)"><i class="fas fa-folder-open"></i> Documents</button>
-        <button class="nav-item" onclick="switchPortalTab('activity',this)"><i class="fas fa-history"></i> Activity Log</button>
+        <button class="nav-item active" data-tab="dashboard"><i class="fas fa-chart-line"></i> Dashboard</button>
+        <button class="nav-item" data-tab="process"><i class="fas fa-tasks"></i> Closing Process</button>
+        <button class="nav-item" data-tab="checklist"><i class="fas fa-clipboard-check"></i> Closing Checklist</button>
+        <button class="nav-item" data-tab="documents"><i class="fas fa-folder-open"></i> Documents</button>
+        <button class="nav-item" data-tab="activity"><i class="fas fa-history"></i> Activity Log</button>
         <div class="sidebar-section-label" style="margin-top:8px;">Communication</div>
-        <button class="nav-item" onclick="switchPortalTab('messages',this)"><i class="fas fa-comments"></i> Messages<span class="nav-badge" id="msgBadge"></span></button>
-        <button class="nav-item" onclick="switchPortalTab('schedule',this)"><i class="fas fa-calendar"></i> Schedule Meeting</button>
+        <button class="nav-item" data-tab="messages"><i class="fas fa-comments"></i> Messages<span class="nav-badge" id="msgBadge"></span></button>
+        <button class="nav-item" data-tab="schedule"><i class="fas fa-calendar"></i> Schedule Meeting</button>
         <div class="sidebar-section-label" style="margin-top:8px;">Projects</div>
-        <button class="nav-item" onclick="switchPortalTab('projects',this)"><i class="fas fa-briefcase"></i> My Projects</button>
+        <button class="nav-item" data-tab="projects"><i class="fas fa-briefcase"></i> My Projects</button>
       </div>
       <div class="sidebar-advisor">
         <div class="advisor-label">Your Advisor</div>
@@ -2738,7 +2751,7 @@ body {
         <div class="advisor-title">Principal, Croft Finance</div>
         <div class="advisor-contact"><i class="fas fa-envelope" style="width:14px;color:var(--blue);margin-right:4px;"></i> suzana.aleksic@croftfinance.com</div>
         <div class="advisor-contact"><i class="fas fa-phone" style="width:14px;color:var(--blue);margin-right:4px;"></i> +381 69 288 0 191</div>
-        <button class="btn-msg-advisor" onclick="switchPortalTab('messages', document.querySelector('.nav-item'))">Message Suzana</button>
+        <button class="btn-msg-advisor" onclick="switchPortalTab('messages')">Message Suzana</button>
       </div>
     </aside>
     <main class="main-content">
@@ -2752,11 +2765,11 @@ body {
           <div class="dashboard-hero-right"><div class="estimated-closing">Estimated Closing</div><div class="closing-date" id="closingDateDisplay">—</div><div class="days-remaining" id="daysRemainingDisplay">—</div><div class="days-label">days remaining</div><div class="next-action"><div class="next-action-label">Next Action</div><div class="next-action-text" id="nextActionText">—</div></div></div>
         </div>
         <div class="quick-actions-bar">
-          <div class="quick-action-btn" onclick="switchPortalTab('documents',null)"><i class="fas fa-upload quick-action-icon"></i><div class="quick-action-label">Upload Document</div></div>
-          <div class="quick-action-btn" onclick="switchPortalTab('messages',null)"><i class="fas fa-comment quick-action-icon"></i><div class="quick-action-label">Message Suzana</div></div>
-          <div class="quick-action-btn" onclick="switchPortalTab('schedule',null)"><i class="fas fa-calendar-alt quick-action-icon"></i><div class="quick-action-label">Schedule Meeting</div></div>
+          <div class="quick-action-btn" data-tab="documents"><i class="fas fa-upload quick-action-icon"></i><div class="quick-action-label">Upload Document</div></div>
+          <div class="quick-action-btn" data-tab="messages"><i class="fas fa-comment quick-action-icon"></i><div class="quick-action-label">Message Suzana</div></div>
+          <div class="quick-action-btn" data-tab="schedule"><i class="fas fa-calendar-alt quick-action-icon"></i><div class="quick-action-label">Schedule Meeting</div></div>
           <div class="quick-action-btn" onclick="downloadTermSheet()"><i class="fas fa-file-pdf quick-action-icon"></i><div class="quick-action-label">View Term Sheet</div></div>
-          <div class="quick-action-btn" onclick="switchPortalTab('projects',null)"><i class="fas fa-chart-simple quick-action-icon"></i><div class="quick-action-label">Deal Sheet</div></div>
+          <div class="quick-action-btn" data-tab="projects"><i class="fas fa-chart-simple quick-action-icon"></i><div class="quick-action-label">Deal Sheet</div></div>
         </div>
         <div class="stats-grid">
           <div class="stat-card"><div class="stat-label">Deal Stage</div><div class="stat-value" id="dashStage" style="font-size:20px;margin-top:4px;">—</div><div class="stat-sub" id="dashStep">Step — of 8</div></div>
@@ -2769,7 +2782,7 @@ body {
         <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-chart-pie"></i> Capital Stack</div></div><div class="card-body"><canvas id="capitalStackChart" width="400" height="400" style="max-width:100%; height:auto;"></canvas></div></div>
         <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-clock"></i> Recent Activity</div></div><div class="card-body"><div id="recentActivity"><p style="color:var(--gray-400);font-size:13px;">No recent activity.</p></div></div></div>
         <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-clipboard-list"></i> Your Next Steps</div></div><div class="card-body"><div class="next-steps-list" id="nextStepsList"></div></div></div>
-        <div class="advisor-card"><div class="advisor-header"><div class="advisor-avatar">SA</div><div class="advisor-info"><h4>Suzana Aleksić</h4><p>Principal, Croft Finance</p></div></div><div class="advisor-details"><div class="advisor-detail"><div class="advisor-detail-label">Availability</div><div class="advisor-detail-value">Mon–Fri, 9:00–18:00 CET</div></div><div class="advisor-detail"><div class="advisor-detail-label">Response Time</div><div class="advisor-detail-value">Typically within 4 hours</div></div></div><div class="advisor-note" id="advisorNote">Looking forward to helping you close your deal successfully.</div><div class="advisor-actions"><div class="advisor-btn" onclick="switchPortalTab('messages',null)">Send Message</div><div class="advisor-btn" onclick="switchPortalTab('schedule',null)">Schedule Call</div></div></div>
+        <div class="advisor-card"><div class="advisor-header"><div class="advisor-avatar">SA</div><div class="advisor-info"><h4>Suzana Aleksić</h4><p>Principal, Croft Finance</p></div></div><div class="advisor-details"><div class="advisor-detail"><div class="advisor-detail-label">Availability</div><div class="advisor-detail-value">Mon–Fri, 9:00–18:00 CET</div></div><div class="advisor-detail"><div class="advisor-detail-label">Response Time</div><div class="advisor-detail-value">Typically within 4 hours</div></div></div><div class="advisor-note" id="advisorNote">Looking forward to helping you close your deal successfully.</div><div class="advisor-actions"><div class="advisor-btn" data-tab="messages">Send Message</div><div class="advisor-btn" data-tab="schedule">Schedule Call</div></div></div>
       </div>
 
       <div id="tab-process" class="portal-tab"><div class="page-header"><div class="page-title">Closing Process</div><div class="page-subtitle">Step <span id="currentStepNum">1</span> of 8 — <span id="currentStepName">Term Sheet</span></div></div><div class="card"><div class="card-body"><div class="timeline" id="timeline"></div></div></div></div>
@@ -2824,10 +2837,10 @@ body {
     <aside class="sidebar" id="adminSidebar">
       <div class="sidebar-user"><div class="sidebar-avatar">SA</div><div class="sidebar-name">Suzana Aleksić</div><div class="sidebar-email">Administrator</div></div>
       <div class="sidebar-nav">
-        <div class="sidebar-section-label">Overview</div><button class="nav-item active" onclick="switchAdminTab('overview',this)"><i class="fas fa-chart-pie"></i> Pipeline</button>
-        <div class="sidebar-section-label" style="margin-top:8px;">Management</div><button class="nav-item" onclick="switchAdminTab('clients',this)"><i class="fas fa-users"></i> Clients</button><button class="nav-item" onclick="switchAdminTab('projects-admin',this)"><i class="fas fa-briefcase"></i> Projects</button><button class="nav-item" onclick="switchAdminTab('documents-admin',this)"><i class="fas fa-file-alt"></i> Documents</button><button class="nav-item" onclick="switchAdminTab('brokers',this)"><i class="fas fa-handshake"></i> Brokers<span id="pendingBrokersCount" style="margin-left:auto;background:var(--warning);color:white;padding:0 6px;border-radius:10px;font-size:10px;">0</span></button><button class="nav-item" onclick="switchAdminTab('broker-submissions',this)"><i class="fas fa-inbox"></i> Broker Deals</button>
-        <div class="sidebar-section-label" style="margin-top:8px;">Communication</div><button class="nav-item" onclick="switchAdminTab('messages-admin',this)"><i class="fas fa-comments"></i> Messages</button><button class="nav-item" onclick="switchAdminTab('meetings',this)"><i class="fas fa-calendar"></i> Meetings</button>
-        <div class="sidebar-section-label" style="margin-top:8px;">System</div><button class="nav-item" onclick="switchAdminTab('audit',this)"><i class="fas fa-history"></i> Audit Log</button>
+        <div class="sidebar-section-label">Overview</div><button class="nav-item active" data-admin-tab="overview"><i class="fas fa-chart-pie"></i> Pipeline</button>
+        <div class="sidebar-section-label" style="margin-top:8px;">Management</div><button class="nav-item" data-admin-tab="clients"><i class="fas fa-users"></i> Clients</button><button class="nav-item" data-admin-tab="projects-admin"><i class="fas fa-briefcase"></i> Projects</button><button class="nav-item" data-admin-tab="documents-admin"><i class="fas fa-file-alt"></i> Documents</button><button class="nav-item" data-admin-tab="brokers"><i class="fas fa-handshake"></i> Brokers<span id="pendingBrokersCount" style="margin-left:auto;background:var(--warning);color:white;padding:0 6px;border-radius:10px;font-size:10px;">0</span></button><button class="nav-item" data-admin-tab="broker-submissions"><i class="fas fa-inbox"></i> Broker Deals</button>
+        <div class="sidebar-section-label" style="margin-top:8px;">Communication</div><button class="nav-item" data-admin-tab="messages-admin"><i class="fas fa-comments"></i> Messages</button><button class="nav-item" data-admin-tab="meetings"><i class="fas fa-calendar"></i> Meetings</button>
+        <div class="sidebar-section-label" style="margin-top:8px;">System</div><button class="nav-item" data-admin-tab="audit"><i class="fas fa-history"></i> Audit Log</button>
       </div>
       <div style="margin-top: 20px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1);">
         <button class="nav-item" onclick="switchToAdminLogin()" style="color: var(--blue);">
@@ -2852,19 +2865,19 @@ body {
         <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-columns"></i> Active Deal Board</div></div><div class="card-body"><div class="pipeline-board" id="pipelineBoard"></div></div></div>
       </div>
 
-      <div id="admin-clients" class="admin-tab"><div class="page-header"><div class="page-title">Clients</div><div class="page-subtitle" id="clientCount"></div></div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap;"><input type="text" id="clientSearch" class="form-input" placeholder="Search by name or email..." style="max-width:320px;" oninput="renderClientsTable()"><button class="btn btn-primary" onclick="showAddClientModal()">+ Add Client</button></div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Email</th><th>Projects</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="adminClientsTable"></tbody></table></div></div>
+      <div id="admin-clients" class="admin-tab"><div class="page-header"><div class="page-title">Clients</div><div class="page-subtitle" id="clientCount"></div></div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap;"><input type="text" id="clientSearch" class="form-input" placeholder="Search by name or email..." style="max-width:320px;"><button class="btn btn-primary" onclick="showAddClientModal()">+ Add Client</button></div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Email</th><th>Projects</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="adminClientsTable"></tbody></table></div></div>
 
-      <div id="admin-projects-admin" class="admin-tab"><div class="page-header"><div class="page-title">Projects</div></div><div style="display:flex;justify-content:flex-end;margin-bottom:16px;"><button class="btn btn-primary" onclick="showAddClientModal()">+ Add Client & Project</button></div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Project</th><th>Industry</th><th>Location</th><th>Funds Needed</th><th>Current Step</th><th>CF</th><th>ECF</th><th>Actions</th></tr></thead><tbody id="adminProjectsTable"></tbody></table></div></div>
+      <div id="admin-projects-admin" class="admin-tab"><div class="page-header"><div class="page-title">Projects</div></div><div style="display:flex;justify-content:flex-end;margin-bottom:16px;"><button class="btn btn-primary" onclick="showAddClientModal()">+ Add Client & Project</button></div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Project</th><th>Industry</th><th>Location</th><th>Funds Needed</th><th>Current Step</th><th>CF Status</th><th>ECF Status</th><th>Actions</th></tr></thead><tbody id="adminProjectsTable"></tbody></table></div></div>
 
       <div id="admin-projects" class="admin-tab" style="display:none;"><div id="allProjectsAdmin"></div></div>
 
-      <div id="admin-documents-admin" class="admin-tab"><div class="page-header"><div class="page-title">Documents</div><div class="page-subtitle" id="docCount"></div></div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap;"><select id="adminDocFilterClient" class="form-select" style="max-width:250px;" onchange="renderAdminDocumentsTable()"><option value="">All Clients</option></select><button class="btn btn-primary" onclick="showUploadDocumentModal()">+ Upload Document</button></div><div class="table-wrap"><table class="documents-table" id="adminDocumentsTable"><thead><tr><th>Client</th><th>Project</th><th>Document Name</th><th>Step</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="adminDocumentsTableBody"></tbody></table></div></div>
+      <div id="admin-documents-admin" class="admin-tab"><div class="page-header"><div class="page-title">Documents</div><div class="page-subtitle" id="docCount"></div></div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap;"><select id="adminDocFilterClient" class="form-select" style="max-width:250px;"><option value="">All Clients</option></select><button class="btn btn-primary" onclick="showUploadDocumentModal()">+ Upload Document</button></div><div class="table-wrap"><table class="documents-table" id="adminDocumentsTable"><thead><tr><th>Client</th><th>Project</th><th>Document Name</th><th>Step</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="adminDocumentsTableBody"></tbody></table></div></div>
 
       <div id="admin-brokers" class="admin-tab"><div class="page-header"><div class="page-title">Brokers & Introducers</div><div class="page-subtitle">Manage broker registrations and view their submissions</div></div><div class="card"><div class="card-body"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Broker</th><th>Firm</th><th>Country</th><th>Commission</th><th>Status</th><th>Registered</th><th>Actions</th></tr></thead><tbody id="adminBrokersTable"></tbody></table></div></div></div></div>
 
-      <div id="admin-broker-submissions" class="admin-tab"><div class="page-header"><div class="page-title">Broker Submissions</div><div class="page-subtitle">All deals submitted by brokers</div></div><div class="card"><div class="card-body"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Date</th><th>Broker</th><th>Client</th><th>Project</th><th>Funds Needed</th><th>Status</th><th>Action</th></tr></thead><tbody id="adminBrokerSubmissionsTable"></tbody></table></div></div></div></div>
+      <div id="admin-broker-submissions" class="admin-tab"><div class="page-header"><div class="page-title">Broker Submissions</div><div class="page-subtitle">All deals submitted by brokers</div></div><div class="card"><div class="card-body"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Date</th><th>Broker</th><th>Client</th><th>Project</th><th>Funds Needed</th><th>Status</th><th>Action</th></tr></thead><tbody id="adminBrokerSubmissionsTable"></tbody><tr></div></div></div></div>
 
-      <div id="admin-messages-admin" class="admin-tab"><div class="page-header"><div class="page-title">Messages</div></div><div style="margin-bottom:16px;"><input type="text" id="messageSearch" class="form-input" placeholder="Search by client name..." style="max-width:320px;" oninput="renderAdminMessages()"></div><div id="allMessagesList"></div></div>
+      <div id="admin-messages-admin" class="admin-tab"><div class="page-header"><div class="page-title">Messages</div></div><div style="margin-bottom:16px;"><input type="text" id="messageSearch" class="form-input" placeholder="Search by client name..." style="max-width:320px;"></div><div id="allMessagesList"></div></div>
 
       <div id="admin-meetings" class="admin-tab"><div class="page-header"><div class="page-title">Meeting Requests</div></div><div id="meetingsList"></div></div>
 
@@ -2884,12 +2897,12 @@ body {
       <div class="sidebar-user"><div class="sidebar-avatar" id="brokerAvatar">—</div><div class="sidebar-name" id="brokerUserName">—</div><div class="sidebar-email" id="brokerUserEmail">—</div></div>
       <div class="sidebar-nav">
         <div class="sidebar-section-label">Broker Dashboard</div>
-        <button class="nav-item active" onclick="switchBrokerTab('dashboard',this)"><i class="fas fa-chart-line"></i> Dashboard</button>
-        <button class="nav-item" onclick="switchBrokerTab('submit-deal',this)"><i class="fas fa-file-contract"></i> Submit a Deal</button>
-        <button class="nav-item" onclick="switchBrokerTab('submissions',this)"><i class="fas fa-list-ul"></i> My Submissions</button>
-        <button class="nav-item" onclick="switchBrokerTab('portfolio',this)"><i class="fas fa-briefcase"></i> Client Progress</button>
+        <button class="nav-item active" data-broker-tab="dashboard"><i class="fas fa-chart-line"></i> Dashboard</button>
+        <button class="nav-item" data-broker-tab="submit-deal"><i class="fas fa-file-contract"></i> Submit a Deal</button>
+        <button class="nav-item" data-broker-tab="submissions"><i class="fas fa-list-ul"></i> My Submissions</button>
+        <button class="nav-item" data-broker-tab="portfolio"><i class="fas fa-briefcase"></i> Client Progress</button>
         <div class="sidebar-section-label" style="margin-top:8px;">Communication</div>
-        <button class="nav-item" onclick="switchBrokerTab('messages',this)"><i class="fas fa-comments"></i> Messages<span class="nav-badge" id="brokerMsgBadge"></span></button>
+        <button class="nav-item" data-broker-tab="messages"><i class="fas fa-comments"></i> Messages<span class="nav-badge" id="brokerMsgBadge"></span></button>
       </div>
       <div class="sidebar-advisor"><div class="advisor-label">Croft Finance</div><div class="advisor-name">Suzana Aleksić</div><div class="advisor-title">Principal</div><div class="advisor-contact"><i class="fas fa-envelope" style="width:14px;color:var(--blue);margin-right:4px;"></i> suzana.aleksic@croftfinance.com</div></div>
     </aside>
@@ -2941,7 +2954,7 @@ body {
   <div id="brokerRegisterForm" style="display:none;"><div style="max-height:60vh;overflow-y:auto;padding-right:10px;"><div class="form-grid-2"><div class="form-group"><label class="form-label">Full Name *</label><input type="text" id="brokerRegName" class="form-input"></div><div class="form-group"><label class="form-label">Email *</label><input type="email" id="brokerRegEmail" class="form-input"></div><div class="form-group"><label class="form-label">Password *</label><input type="password" id="brokerRegPassword" class="form-input"></div><div class="form-group"><label class="form-label">Confirm Password *</label><input type="password" id="brokerRegConfirmPassword" class="form-input"></div><div class="form-group"><label class="form-label">Brokerage Firm Name *</label><input type="text" id="brokerRegFirm" class="form-input"></div><div class="form-group"><label class="form-label">Country of Operation *</label><input type="text" id="brokerRegCountry" class="form-input"></div><div class="form-group"><label class="form-label">License Number</label><input type="text" id="brokerRegLicense" class="form-input" placeholder="Optional"></div><div class="form-group"><label class="form-label">How did you hear about us?</label><select id="brokerRegHear" class="form-select"><option>Search Engine</option><option>LinkedIn</option><option>Referral</option><option>Conference</option><option>Other</option></select></div></div><div class="form-group" style="display:flex;align-items:flex-start;gap:10px;"><input type="checkbox" id="brokerNdaCheckbox" style="margin-top:3px;"><label style="font-size:12px;">I agree to the <a href="#" onclick="openModal('termsModal')">Confidentiality and Broker Terms</a></label></div><p id="brokerRegError" style="color:var(--error);font-size:12px;display:none;"></p><button class="btn btn-primary" onclick="brokerRegister()" style="width:100%">Register as Broker</button></div><div style="text-align:center;margin-top:14px;"><a href="#" onclick="showBrokerLoginForm()" style="color:var(--gray-500);">← Back to Broker Sign In</a></div></div>
 </div></div></div>
 
-<div id="uploadDocumentModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Upload Document</h3><button class="modal-close" onclick="closeModal('uploadDocumentModal')">✕</button></div><div class="modal-body"><div class="form-group"><label class="form-label">Client</label><select id="uploadClientId" class="form-select" onchange="updateProjectSelectForUpload(this.value)"><option value="">Select Client</option></select></div><div class="form-group"><label class="form-label">Project</label><select id="uploadProjectId" class="form-select"><option value="">Select Project</option></select></div><div class="form-group"><label class="form-label">Document Type</label><select id="documentType" class="form-select"><option>Indicative Term Sheet (Non-Binding)</option><option>Executed Term Sheet (Binding)</option><option>Commitment Fee Confirmation</option><option>Deed of Undertaking</option><option>ECF Guarantee Policy</option><option>Hard-Copy Closing Materials</option><option>ECF Escrow Confirmation</option><option>Transfer Confirmation</option><option>Funding Disbursement Confirmation</option><option>Other</option></select></div><div class="form-group"><label class="form-label">PDF File</label><input type="file" id="pdfFile" class="form-input" accept=".pdf"></div><div class="form-group"><label class="form-label">Or Document URL</label><input type="url" id="documentUrl" class="form-input" placeholder="https://..."></div><button class="btn btn-primary" onclick="adminUploadDocument()" style="width:100%">Upload</button></div></div></div>
+<div id="uploadDocumentModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Upload Document</h3><button class="modal-close" onclick="closeModal('uploadDocumentModal')">✕</button></div><div class="modal-body"><div class="form-group"><label class="form-label">Client</label><select id="uploadClientId" class="form-select"><option value="">Select Client</option></select></div><div class="form-group"><label class="form-label">Project</label><select id="uploadProjectId" class="form-select"><option value="">Select Project</option></select></div><div class="form-group"><label class="form-label">Document Type</label><select id="documentType" class="form-select"><option>Indicative Term Sheet (Non-Binding)</option><option>Executed Term Sheet (Binding)</option><option>Commitment Fee Confirmation</option><option>Deed of Undertaking</option><option>ECF Guarantee Policy</option><option>Hard-Copy Closing Materials</option><option>ECF Escrow Confirmation</option><option>Transfer Confirmation</option><option>Funding Disbursement Confirmation</option><option>Other</option></select></div><div class="form-group"><label class="form-label">PDF File</label><input type="file" id="pdfFile" class="form-input" accept=".pdf"></div><div class="form-group"><label class="form-label">Or Document URL</label><input type="url" id="documentUrl" class="form-input" placeholder="https://..."></div><button class="btn btn-primary" onclick="adminUploadDocument()" style="width:100%">Upload</button></div></div></div>
 
 <div id="editProjectModal" class="modal-overlay"><div class="modal modal-lg">
   <div class="modal-header"><h3>Manage Client & Project</h3><button class="modal-close" onclick="closeModal('editProjectModal')">✕</button></div>
@@ -3004,30 +3017,25 @@ body {
       <div class="form-group"><label class="form-label">Advisor Note (Shown to Client)</label><textarea id="editAdvisorNote" class="form-textarea" rows="2" placeholder="Personal note to client..."></textarea></div>
       <div class="form-group"><label class="form-label">Admin Note (Private)</label><textarea id="editAdminNote" class="form-textarea" rows="2"></textarea></div>
       <div id="editAckInfo"></div>
-            <div class="form-group" style="background: var(--gray-50); padding: 16px; border-radius: 8px; margin-top: 16px;">
+      <div class="form-group" style="background: var(--gray-50); padding: 16px; border-radius: 8px; margin-top: 16px;">
         <label class="form-label"><i class="fas fa-shield-alt"></i> Investor Verification Letter</label>
         <div id="ivlAdminInfo"></div>
         <div style="display: flex; gap: 12px; margin-top: 12px;">
           <button type="button" class="btn btn-outline" onclick="previewIVLFromAdmin()">Preview Letter</button>
           <button type="button" class="btn btn-outline" onclick="regenerateIVL()">Regenerate Letter</button>
-          <button type="button" class="btn btn-outline" onclick="printInvestorVerificationLetter(window.editProjectId)">Print / Download</button>
+          <button type="button" class="btn btn-outline" onclick="printInvestorVerificationLetter(editProjectId)">Print / Download</button>
         </div>
       </div>
-
-    </div>  <!-- closes edit-tab-process -->
-
-  </div>  <!-- closes modal-body -->
-
+    </div>
+  </div>
   <button class="btn btn-primary" onclick="saveProjectInfo()" style="width:100%; margin-top:15px;">Save All Changes</button>
-
- </div>  <!-- closes modal -->
-</div>  <!-- closes modal-overlay -->
+</div></div>
 
 <div id="addClientModal" class="modal-overlay"><div class="modal modal-lg"><div class="modal-header"><h3>Add New Client & Project</h3><button class="modal-close" onclick="closeModal('addClientModal')">✕</button></div><div class="modal-body" style="max-height:70vh;overflow-y:auto;">
   <div class="form-grid-2">
     <div class="form-group"><label class="form-label">Full Name *</label><input type="text" id="ncName" class="form-input"></div>
     <div class="form-group"><label class="form-label">Email *</label><input type="email" id="ncEmail" class="form-input"></div>
-    <div class="form-group"><label class="form-label">Password *</label><input type="text" id="ncPassword" class="form-input"></div>
+    <div class="form-group"><label class="form-label">Password *</label><input type="password" id="ncPassword" class="form-input" autocomplete="new-password"></div>
     <div class="form-group"><label class="form-label">Project Name *</label><input type="text" id="ncProject" class="form-input"></div>
     <div class="form-group"><label class="form-label">Industry</label><select id="ncIndustry" class="form-select"><option>Real Estate</option><option>Infrastructure</option><option>Energy & Renewables</option><option>Mining</option><option>Oil & Gas</option></select></div>
     <div class="form-group"><label class="form-label">Location</label><input type="text" id="ncLocation" class="form-input"></div>
@@ -3098,22 +3106,58 @@ const FIREBASE_CONFIG = {
 
 const STEP_NAMES = ['', 'Term Sheet', 'Commitment Fee', 'Deed of Undertaking', 'Credit Support', 'Hard-Copy Submission', 'ECF Escrow', 'Transfer to Agent', 'Funded'];
 
-let db, auth, storage, currentClient, currentProjectId, currentBroker;
+let db, auth, storage, currentClient, editProjectId = null, currentBroker;
 let clients = [], projects = [], documents = [], messages = [], brokers = [], brokerSubmissions = [], brokerMessages = [];
 let capitalChart = null;
 let pdfDoc = null;
+let unsubscribers = [];
+let DEBUG = false;
 
-// ============================================================
-// PDF.JS INIT
-// ============================================================
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+function log(...args) { if(DEBUG) console.log('[CF]', ...args); }
 
-// ============================================================
-// UTILITY / UI FUNCTIONS (Global Scope)
-// ============================================================
-window.openLoginModal = function() { showLoginForm(); openModal('loginModal'); };
-window.closeModal = function(id) { document.getElementById(id).classList.remove('active'); };
-window.openModal = function(id) { document.getElementById(id).classList.add('active'); };
+function formatDate(isoString) {
+  if(!isoString) return '—';
+  return new Date(isoString).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function formatCurrency(value) {
+  const num = parseFloat(String(value || 0).replace(/[^0-9.-]/g, ''));
+  if(isNaN(num)) return '—';
+  return '$' + num.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+}
+
+function setLoading(buttonId, isLoading) {
+  const btn = document.getElementById(buttonId);
+  if(!btn) return;
+  btn.disabled = isLoading;
+  if(isLoading) {
+    btn.dataset.originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Please wait...';
+  } else {
+    btn.innerHTML = btn.dataset.originalText || btn.innerHTML;
+  }
+}
+
+function debounce(fn, delay) {
+  let timer;
+  return function(...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn.apply(this, args), delay);
+  };
+}
+
+function clearListeners() { unsubscribers.forEach(fn => fn()); unsubscribers = []; }
+
+window.escapeHtml = function(str) {
+  if(!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+};
+
 window.showToast = function(msg, isError = false) {
   const t = document.createElement('div');
   t.className = 'toast';
@@ -3122,17 +3166,17 @@ window.showToast = function(msg, isError = false) {
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 3500);
 };
+
 window.showView = function(v) {
   document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
   document.getElementById('view-' + v).classList.add('active');
   if (v === 'home') document.title = 'Croft Finance — Structured Finance Solutions';
 };
-window.escapeHtml = function(str) { 
-  if (!str) return ''; 
-  return String(str).replace(/[&<>]/g, function(m) { return m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'; }); 
-};
 
-// Form toggles
+window.openLoginModal = function() { showLoginForm(); openModal('loginModal'); };
+window.closeModal = function(id) { document.getElementById(id).classList.remove('active'); };
+window.openModal = function(id) { document.getElementById(id).classList.add('active'); };
+
 window.showLoginForm = function() {
   document.getElementById('loginForm').style.display = 'block';
   document.getElementById('registerForm').style.display = 'none';
@@ -3141,6 +3185,7 @@ window.showLoginForm = function() {
   document.getElementById('brokerLoginForm').style.display = 'none';
   document.getElementById('brokerRegisterForm').style.display = 'none';
 };
+
 window.showRegisterForm = function() {
   document.getElementById('loginForm').style.display = 'none';
   document.getElementById('registerForm').style.display = 'block';
@@ -3149,6 +3194,7 @@ window.showRegisterForm = function() {
   document.getElementById('brokerLoginForm').style.display = 'none';
   document.getElementById('brokerRegisterForm').style.display = 'none';
 };
+
 window.showAdminLogin = function() {
   document.getElementById('loginForm').style.display = 'none';
   document.getElementById('registerForm').style.display = 'none';
@@ -3157,6 +3203,7 @@ window.showAdminLogin = function() {
   document.getElementById('brokerLoginForm').style.display = 'none';
   document.getElementById('brokerRegisterForm').style.display = 'none';
 };
+
 window.showForgotPassword = function() {
   document.getElementById('loginForm').style.display = 'none';
   document.getElementById('registerForm').style.display = 'none';
@@ -3165,6 +3212,7 @@ window.showForgotPassword = function() {
   document.getElementById('brokerLoginForm').style.display = 'none';
   document.getElementById('brokerRegisterForm').style.display = 'none';
 };
+
 window.showBrokerLoginForm = function() {
   document.getElementById('loginForm').style.display = 'none';
   document.getElementById('registerForm').style.display = 'none';
@@ -3173,6 +3221,7 @@ window.showBrokerLoginForm = function() {
   document.getElementById('brokerLoginForm').style.display = 'block';
   document.getElementById('brokerRegisterForm').style.display = 'none';
 };
+
 window.showBrokerRegisterForm = function() {
   document.getElementById('loginForm').style.display = 'none';
   document.getElementById('registerForm').style.display = 'none';
@@ -3182,62 +3231,111 @@ window.showBrokerRegisterForm = function() {
   document.getElementById('brokerRegisterForm').style.display = 'block';
 };
 
-// Sidebar toggles
 window.toggleSidebar = function() {
   document.getElementById('clientSidebar').classList.toggle('open');
   document.getElementById('sidebarOverlay').classList.toggle('show');
+  const hamburger = document.getElementById('hamburgerBtn');
+  if(hamburger) hamburger.classList.toggle('open');
 };
+
 window.toggleAdminSidebar = function() {
   document.getElementById('adminSidebar').classList.toggle('open');
   document.getElementById('adminSidebarOverlay').classList.toggle('show');
 };
+
 window.toggleBrokerSidebar = function() {
   document.getElementById('brokerSidebar').classList.toggle('open');
   document.getElementById('brokerSidebarOverlay').classList.toggle('show');
 };
+
 window.toggleNotifications = function() {
   const center = document.getElementById('notificationCenter');
   center.classList.toggle('open');
 };
+
 window.closeNotifications = function() { document.getElementById('notificationCenter').classList.remove('open'); };
 
-// Tab switchers
-window.switchPortalTab = function(tabName, el) {
+// Event delegation for portal tabs
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('[data-tab]');
+  if(btn && btn.closest('#view-portal')) {
+    e.preventDefault();
+    const tabName = btn.dataset.tab;
+    switchPortalTab(tabName);
+  }
+  const adminBtn = e.target.closest('[data-admin-tab]');
+  if(adminBtn && adminBtn.closest('#view-admin')) {
+    e.preventDefault();
+    const tabName = adminBtn.dataset.adminTab;
+    switchAdminTab(tabName);
+  }
+  const brokerBtn = e.target.closest('[data-broker-tab]');
+  if(brokerBtn && brokerBtn.closest('#view-broker')) {
+    e.preventDefault();
+    const tabName = brokerBtn.dataset.brokerTab;
+    switchBrokerTab(tabName);
+  }
+  const deleteBtn = e.target.closest('[data-delete-project]');
+  if(deleteBtn) {
+    e.preventDefault();
+    const projectId = deleteBtn.dataset.deleteProject;
+    deleteProject(projectId, e);
+  }
+  const deleteClientBtn = e.target.closest('[data-delete-client]');
+  if(deleteClientBtn) {
+    e.preventDefault();
+    const clientId = deleteClientBtn.dataset.deleteClient;
+    deleteClient(clientId, e);
+  }
+  const editBtn = e.target.closest('[data-edit-project]');
+  if(editBtn) {
+    e.preventDefault();
+    const projectId = editBtn.dataset.editProject;
+    editProject(projectId);
+  }
+});
+
+function switchPortalTab(tabName) {
   document.querySelectorAll('#view-portal .portal-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-' + tabName).classList.add('active');
   document.querySelectorAll('#view-portal .nav-item').forEach(i => i.classList.remove('active'));
-  if (el) el.classList.add('active');
-  if (tabName === 'messages') loadMessages();
-  if (tabName === 'documents') renderDocuments();
-  if (window.innerWidth <= 768) {
+  const activeNav = document.querySelector(`#view-portal .nav-item[data-tab="${tabName}"]`);
+  if(activeNav) activeNav.classList.add('active');
+  if(tabName === 'messages') loadMessages();
+  if(tabName === 'documents') renderDocuments();
+  if(window.innerWidth <= 768) {
     document.getElementById('clientSidebar').classList.remove('open');
     document.getElementById('sidebarOverlay').classList.remove('show');
   }
-};
-window.switchAdminTab = function(tabName, el) {
+}
+
+function switchAdminTab(tabName) {
   document.querySelectorAll('#view-admin .admin-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('admin-' + tabName).classList.add('active');
   document.querySelectorAll('#view-admin .nav-item').forEach(i => i.classList.remove('active'));
-  if (el) el.classList.add('active');
-  if (tabName === 'messages-admin') renderAdminMessages();
-  if (tabName === 'brokers') renderBrokerAdminTable();
-  if (tabName === 'broker-submissions') renderAdminBrokerSubmissionsTable();
-  if (window.innerWidth <= 768) {
+  const activeNav = document.querySelector(`#view-admin .nav-item[data-admin-tab="${tabName}"]`);
+  if(activeNav) activeNav.classList.add('active');
+  if(tabName === 'messages-admin') renderAdminMessages();
+  if(tabName === 'brokers') renderBrokerAdminTable();
+  if(tabName === 'broker-submissions') renderAdminBrokerSubmissionsTable();
+  if(window.innerWidth <= 768) {
     document.getElementById('adminSidebar').classList.remove('open');
     document.getElementById('adminSidebarOverlay').classList.remove('show');
   }
-};
-window.switchBrokerTab = function(tabName, el) {
+}
+
+function switchBrokerTab(tabName) {
   document.querySelectorAll('#view-broker .portal-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('broker-tab-' + tabName).classList.add('active');
   document.querySelectorAll('#view-broker .nav-item').forEach(i => i.classList.remove('active'));
-  if (el) el.classList.add('active');
-  if (tabName === 'messages') loadBrokerMessages();
-  if (window.innerWidth <= 768) {
+  const activeNav = document.querySelector(`#view-broker .nav-item[data-broker-tab="${tabName}"]`);
+  if(activeNav) activeNav.classList.add('active');
+  if(tabName === 'messages') loadBrokerMessages();
+  if(window.innerWidth <= 768) {
     document.getElementById('brokerSidebar').classList.remove('open');
     document.getElementById('brokerSidebarOverlay').classList.remove('show');
   }
-};
+}
 
 window.switchEditTab = function(tabName) {
   document.querySelectorAll('.modal-tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -3252,166 +3350,188 @@ window.scrollToSection = function(id) { document.getElementById(id)?.scrollIntoV
 // FIREBASE INIT & LISTENERS
 // ============================================================
 async function initFirebase() {
-    if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
-    db = firebase.firestore();
-    auth = firebase.auth();
-    storage = firebase.storage();
-    
-    // Explicitly disabling local persistence to remove the multiTab warning
-    // and ensure real-time accuracy across devices without cache issues.
-    try {
-        await db.clearPersistence();
-    } catch(e) { }
-
-    setupListeners();
-    document.getElementById('loadingOverlay').style.display = 'none';
+  if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+  db = firebase.firestore();
+  auth = firebase.auth();
+  storage = firebase.storage();
+  
+  setupListeners();
+  document.getElementById('loadingOverlay').style.display = 'none';
+  
+  // Connection monitor
+  window.addEventListener('online', () => {
+    const banner = document.getElementById('connectionBanner');
+    banner.style.display = 'none';
+    showToast('Connection restored');
+  });
+  window.addEventListener('offline', () => {
+    const banner = document.getElementById('connectionBanner');
+    banner.style.display = 'block';
+    banner.innerHTML = '⚠️ You are offline. Some features may be unavailable.';
+  });
+  
+  // Escape key to close modals
+  document.addEventListener('keydown', function(e) {
+    if(e.key === 'Escape') {
+      document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+    }
+  });
 }
 
 function setupListeners() {
-    auth.onAuthStateChanged(async (user) => {
-        if (!user) return showView('home');
+  auth.onAuthStateChanged(async (user) => {
+    clearListeners();
+    if (!user) return showView('home');
+    
+    const email = user.email.toLowerCase();
+    
+    // Admin detection using Firestore admins collection
+    const adminDoc = await db.collection('admins').doc(user.uid).get();
+    if(adminDoc.exists) {
+      unsubscribers.push(db.collection('clients').limit(200).onSnapshot(s => { clients = s.docs.map(d => ({id:d.id, ...d.data()})); renderAdminTables(); }));
+      unsubscribers.push(db.collection('projects').limit(200).onSnapshot(s => { projects = s.docs.map(d => ({id:d.id, ...d.data()})); renderAdminTables(); }));
+      unsubscribers.push(db.collection('brokers').limit(200).onSnapshot(s => { brokers = s.docs.map(d => ({id:d.id, ...d.data()})); renderBrokerAdminTable(); }));
+      unsubscribers.push(db.collection('brokerSubmissions').limit(200).onSnapshot(s => { brokerSubmissions = s.docs.map(d => ({id:d.id, ...d.data()})); renderAdminBrokerSubmissionsTable(); }));
+      unsubscribers.push(db.collection('documents').limit(200).onSnapshot(s => { documents = s.docs.map(d => ({id:d.id, ...d.data()})); renderAdminDocumentsTable(); }));
+      unsubscribers.push(db.collection('messages').orderBy('timestamp','asc').limit(500).onSnapshot(s => { messages = s.docs.map(d => ({id:d.id, ...d.data()})); renderAdminMessages(); }));
+      showView('admin');
+    } else {
+      const cDoc = await db.collection('clients').doc(user.uid).get();
+      if (cDoc.exists) {
+        currentClient = {id:user.uid, ...cDoc.data()};
+        if(currentClient.status === 'pending') { showToast('Your account is currently under review by Croft Finance.', true); return logout(); }
         
-        const email = user.email.toLowerCase();
+        unsubscribers.push(db.collection('projects').where('clientId','==',user.uid).limit(10).onSnapshot(s => { 
+          projects = s.docs.map(d => ({id:d.id, ...d.data()})); 
+          if(projects.length) { currentProjectId = projects[0].id; loadCurrentProjectData(); renderCapitalStack(); }
+        }));
+        unsubscribers.push(db.collection('documents').where('clientId','==',user.uid).limit(200).onSnapshot(s => { documents = s.docs.map(d => ({id:d.id, ...d.data()})); renderDocuments(); }));
+        unsubscribers.push(db.collection('messages').where('clientId','==',user.uid).orderBy('timestamp','asc').limit(500).onSnapshot(s => { messages = s.docs.map(d => ({id:d.id, ...d.data()})); loadMessages(); }));
         
-        // ---------------- ADMIN DETECT ----------------
-        if (email === 'suzana.aleksic@croftfinance.com' || email === 'suzana@croftfinance.com') {
-            db.collection('clients').onSnapshot(s => { clients = s.docs.map(d => ({id:d.id, ...d.data()})); renderAdminTables(); });
-            db.collection('projects').onSnapshot(s => { projects = s.docs.map(d => ({id:d.id, ...d.data()})); renderAdminTables(); });
-            db.collection('brokers').onSnapshot(s => { brokers = s.docs.map(d => ({id:d.id, ...d.data()})); renderBrokerAdminTable(); });
-            db.collection('brokerSubmissions').onSnapshot(s => { brokerSubmissions = s.docs.map(d => ({id:d.id, ...d.data()})); renderAdminBrokerSubmissionsTable(); });
-            db.collection('documents').onSnapshot(s => { documents = s.docs.map(d => ({id:d.id, ...d.data()})); renderAdminDocumentsTable(); });
-            db.collection('messages').orderBy('timestamp','asc').onSnapshot(s => { messages = s.docs.map(d => ({id:d.id, ...d.data()})); renderAdminMessages(); });
-            showView('admin');
-        } else {
-            // ---------------- CLIENT DETECT ----------------
-            const cDoc = await db.collection('clients').doc(user.uid).get();
-            if (cDoc.exists) {
-                currentClient = {id:user.uid, ...cDoc.data()};
-                if(currentClient.status === 'pending') { alert('Your account is currently under review by Croft Finance.'); return logout(); }
-                
-                db.collection('projects').where('clientId','==',user.uid).onSnapshot(s => { 
-                    projects = s.docs.map(d => ({id:d.id, ...d.data()})); 
-                    if(projects.length) { currentProjectId = projects[0].id; loadCurrentProjectData(); renderCapitalStack(); }
-                });
-                db.collection('documents').where('clientId','==',user.uid).onSnapshot(s => { documents = s.docs.map(d => ({id:d.id, ...d.data()})); renderDocuments(); });
-                db.collection('messages').where('clientId','==',user.uid).orderBy('timestamp','asc').onSnapshot(s => { messages = s.docs.map(d => ({id:d.id, ...d.data()})); loadMessages(); });
-                
-                showView('portal');
-                loadClientPortal();
-            } else {
-                // ---------------- BROKER DETECT ----------------
-                const bDoc = await db.collection('brokers').doc(user.uid).get();
-                if (bDoc.exists) {
-                    currentBroker = {id:user.uid, ...bDoc.data()};
-                    if(currentBroker.status === 'pending') { alert('Your broker account is currently under review by Croft Finance.'); return logout(); }
-                    
-                    db.collection('brokerSubmissions').where('brokerId','==',user.uid).onSnapshot(s => { brokerSubmissions = s.docs.map(d => ({id:d.id, ...d.data()})); renderBrokerSubmissions(); updateBrokerDashboard(); });
-                    db.collection('projects').where('brokerId','==',user.uid).onSnapshot(s => { projects = s.docs.map(d => ({id:d.id, ...d.data()})); renderBrokerPortfolio(); updateBrokerDashboard(); });
-                    db.collection('brokerMessages').where('brokerId','==',user.uid).orderBy('timestamp','asc').onSnapshot(s => { brokerMessages = s.docs.map(d => ({id:d.id, ...d.data()})); loadBrokerMessages(); });
-                    
-                    // Fetch clients linked to these projects for portfolio rendering
-                    db.collection('clients').onSnapshot(s => { clients = s.docs.map(d => ({id:d.id, ...d.data()})); renderBrokerPortfolio(); });
+        showView('portal');
+        loadClientPortal();
+      } else {
+        const bDoc = await db.collection('brokers').doc(user.uid).get();
+        if (bDoc.exists) {
+          currentBroker = {id:user.uid, ...bDoc.data()};
+          if(currentBroker.status === 'pending') { showToast('Your broker account is currently under review by Croft Finance.', true); return logout(); }
+          
+          unsubscribers.push(db.collection('brokerSubmissions').where('brokerId','==',user.uid).limit(200).onSnapshot(s => { brokerSubmissions = s.docs.map(d => ({id:d.id, ...d.data()})); renderBrokerSubmissions(); updateBrokerDashboard(); }));
+          unsubscribers.push(db.collection('projects').where('brokerId','==',user.uid).limit(100).onSnapshot(s => { projects = s.docs.map(d => ({id:d.id, ...d.data()})); renderBrokerPortfolio(); updateBrokerDashboard(); }));
+          unsubscribers.push(db.collection('brokerMessages').where('brokerId','==',user.uid).orderBy('timestamp','asc').limit(500).onSnapshot(s => { brokerMessages = s.docs.map(d => ({id:d.id, ...d.data()})); loadBrokerMessages(); }));
+          unsubscribers.push(db.collection('clients').limit(200).onSnapshot(s => { clients = s.docs.map(d => ({id:d.id, ...d.data()})); renderBrokerPortfolio(); }));
 
-                    showView('broker');
-                    loadBrokerPortal();
-                } else {
-                    logout(); // Unknown user
-                }
-            }
+          showView('broker');
+          loadBrokerPortal();
+        } else {
+          logout();
         }
-    });
+      }
+    }
+  });
 }
 
 // ============================================================
 // AUTHENTICATION LOGIC
 // ============================================================
 window.login = async function() {
-    const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-    const pass = document.getElementById('loginPassword').value;
-    const errEl = document.getElementById('loginError');
-    errEl.style.display = 'none';
-
-    try { 
-        await auth.signInWithEmailAndPassword(email, pass); 
-        closeModal('loginModal'); 
-    } catch(e) { 
-        errEl.innerText = 'Invalid credentials or user not found.';
-        errEl.style.display = 'block'; 
-    }
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const pass = document.getElementById('loginPassword').value;
+  const errEl = document.getElementById('loginError');
+  errEl.style.display = 'none';
+  try { 
+    await auth.signInWithEmailAndPassword(email, pass); 
+    closeModal('loginModal'); 
+  } catch(e) { 
+    errEl.innerText = 'Invalid credentials or user not found.';
+    errEl.style.display = 'block'; 
+  }
 };
 
-window.logout = function() { auth.signOut().then(() => location.reload()); };
+window.logout = function() { 
+  if(capitalChart) { capitalChart.destroy(); capitalChart = null; }
+  auth.signOut().then(() => location.reload()); 
+};
 
 window.register = async function() {
-    const name = document.getElementById('regName').value.trim();
-    const email = document.getElementById('regEmail').value.trim().toLowerCase();
-    const pass = document.getElementById('regPassword').value;
-    const confirm = document.getElementById('regConfirmPassword').value;
-    const project = document.getElementById('regProject').value.trim();
+  const name = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim().toLowerCase();
+  const pass = document.getElementById('regPassword').value;
+  const confirm = document.getElementById('regConfirmPassword').value;
+  const project = document.getElementById('regProject').value.trim();
+  
+  if(!name || !email || !pass || !project) return showToast('Please fill all required fields', true);
+  if(pass !== confirm) return showToast('Passwords do not match', true);
+  
+  try {
+    const cred = await auth.createUserWithEmailAndPassword(email, pass);
+    const uid = cred.user.uid;
+    const pid = String(Date.now());
     
-    if(!name || !email || !pass || !project) return alert('Please fill all required fields');
-    if(pass !== confirm) return alert('Passwords do not match');
+    await db.collection('clients').doc(uid).set({ id:uid, name, email, status:'pending', createdAt: new Date().toISOString() });
+    await db.collection('projects').doc(pid).set({ id:pid, clientId:uid, name:project, step:1, status:'pending', amount:'TBD', interestRate:'TBD' });
     
-    try {
-        const cred = await auth.createUserWithEmailAndPassword(email, pass);
-        const uid = cred.user.uid;
-        const pid = String(Date.now());
-        
-        await db.collection('clients').doc(uid).set({ id:uid, name, email, status:'pending', createdAt: new Date().toISOString() });
-        await db.collection('projects').doc(pid).set({ id:pid, clientId:uid, name:project, step:1, status:'pending', amount:'TBD', interestRate:'TBD' });
-        
-        showToast('Registration submitted for review.');
-        logout();
-    } catch(e) { alert(e.message); }
+    await logActivity(uid, name, 'client', 'register', null, `Registered new account with project: ${project}`);
+    
+    showToast('Registration submitted for review.');
+    logout();
+  } catch(e) { showToast(e.message, true); }
+};
+
+window.brokerLogin = async function() {
+  const email = document.getElementById('brokerLoginEmail').value.trim().toLowerCase();
+  const pass = document.getElementById('brokerLoginPassword').value;
+  const errEl = document.getElementById('brokerLoginError');
+  errEl.style.display = 'none';
+  try {
+    await auth.signInWithEmailAndPassword(email, pass);
+    closeModal('loginModal');
+  } catch(e) {
+    errEl.innerText = 'Invalid credentials.';
+    errEl.style.display = 'block';
+  }
 };
 
 window.brokerRegister = async function() {
-    const name = document.getElementById('brokerRegName').value.trim();
-    const firm = document.getElementById('brokerRegFirm').value.trim();
-    const email = document.getElementById('brokerRegEmail').value.trim().toLowerCase();
-    const pass = document.getElementById('brokerRegPassword').value;
-    const confirm = document.getElementById('brokerRegConfirmPassword').value;
+  const name = document.getElementById('brokerRegName').value.trim();
+  const firm = document.getElementById('brokerRegFirm').value.trim();
+  const email = document.getElementById('brokerRegEmail').value.trim().toLowerCase();
+  const pass = document.getElementById('brokerRegPassword').value;
+  const confirm = document.getElementById('brokerRegConfirmPassword').value;
 
-    if(!name || !email || !pass || !firm) return alert('Please fill all required fields');
-    if(pass !== confirm) return alert('Passwords do not match');
-    
-    try {
-        const cred = await auth.createUserWithEmailAndPassword(email, pass);
-        await db.collection('brokers').doc(cred.user.uid).set({ 
-            id: cred.user.uid, name, email, firm, commissionRate: 0, status: 'pending', createdAt: new Date().toISOString() 
-        });
-        showToast('Broker application sent to Admin for approval.');
-        logout();
-    } catch(e) { alert(e.message); }
+  if(!name || !email || !pass || !firm) return showToast('Please fill all required fields', true);
+  if(pass !== confirm) return showToast('Passwords do not match', true);
+  
+  try {
+    const cred = await auth.createUserWithEmailAndPassword(email, pass);
+    await db.collection('brokers').doc(cred.user.uid).set({ 
+      id: cred.user.uid, name, email, firm, commissionRate: 0, status: 'pending', createdAt: new Date().toISOString() 
+    });
+    showToast('Broker application sent to Admin for approval.');
+    logout();
+  } catch(e) { showToast(e.message, true); }
 };
 
 window.doAdminLogin = async function() {
-    const email = document.getElementById('adminUsername').value.trim(); 
-    const pass = document.getElementById('adminPassword').value; 
-    const errEl = document.getElementById('adminLoginError'); 
-    errEl.style.display = 'none';
-    
-    try {
-        const cred = await auth.signInWithEmailAndPassword(email, pass);
-        const adminEmails = ['suzana.aleksic@croftfinance.com', 'suzana@croftfinance.com'];
-        if (!adminEmails.includes(cred.user.email.toLowerCase())) { 
-            await auth.signOut(); 
-            errEl.textContent = 'Access denied. Admin privileges required.'; 
-            errEl.style.display = 'block'; 
-            return; 
-        }
-        closeModal('loginModal'); 
-    } catch(e) {
-        errEl.textContent = 'Incorrect credentials.'; 
-        errEl.style.display = 'block';
+  const email = document.getElementById('adminUsername').value.trim(); 
+  const pass = document.getElementById('adminPassword').value; 
+  const errEl = document.getElementById('adminLoginError'); 
+  errEl.style.display = 'none';
+  
+  try {
+    const cred = await auth.signInWithEmailAndPassword(email, pass);
+    const adminCheck = await db.collection('admins').doc(cred.user.uid).get();
+    if (!adminCheck.exists) { 
+      await auth.signOut(); 
+      errEl.textContent = 'Access denied. Admin privileges required.'; 
+      errEl.style.display = 'block'; 
+      return; 
     }
-};
-
-window.brokerLogin = function() {
-    // Just trigger standard login. The auth listener will detect it's a broker.
-    document.getElementById('loginEmail').value = document.getElementById('brokerLoginEmail').value;
-    document.getElementById('loginPassword').value = document.getElementById('brokerLoginPassword').value;
-    window.login();
+    closeModal('loginModal'); 
+  } catch(e) {
+    errEl.textContent = 'Incorrect credentials.'; 
+    errEl.style.display = 'block';
+  }
 };
 
 window.requestPasswordReset = function() {
@@ -3419,618 +3539,246 @@ window.requestPasswordReset = function() {
   if(!email) return;
   auth.sendPasswordResetEmail(email)
     .then(() => { showToast('Password reset email sent.'); showLoginForm(); })
-    .catch((e) => { alert(e.message); });
+    .catch((e) => { showToast(e.message, true); });
 };
+
+async function logActivity(actorId, actorName, actorRole, action, projectId, details) {
+  try {
+    await db.collection('activityLog').add({
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      actorId, actorName, actorRole, action, projectId, details
+    });
+  } catch(e) { log('Activity log error:', e); }
+}
 
 // ============================================================
 // CLIENT PORTAL LOGIC
 // ============================================================
 function loadClientPortal() {
-    document.getElementById('portalNavUser').innerText = currentClient.name;
-    document.getElementById('portalUserName').innerText = currentClient.name;
-    document.getElementById('portalUserEmail').innerText = currentClient.email;
-    document.getElementById('clientAvatar').innerText = currentClient.name.charAt(0).toUpperCase();
+  document.getElementById('portalNavUser').innerText = currentClient.name;
+  document.getElementById('portalUserName').innerText = currentClient.name;
+  document.getElementById('portalUserEmail').innerText = currentClient.email;
+  document.getElementById('clientAvatar').innerText = currentClient.name.charAt(0).toUpperCase();
 }
 
 function loadCurrentProjectData() {
-    const p = projects.find(x => x.id === currentProjectId);
-    if (!p) return;
-    
-    const step = p.step || 1;
-    document.getElementById('dashStage').innerHTML = STEP_NAMES[step];
-    document.getElementById('dashAmount').innerHTML = p.amount || 'TBD';
-    document.getElementById('dashRate').innerHTML = p.interestRate || 'TBD';
-    
-    const percent = Math.round((step / 8) * 100);
-    document.getElementById('progressPercentage').innerHTML = percent + '%';
-    const circle = document.querySelector('.progress-circle-fill');
-    if(circle) {
-        const circ = 2 * Math.PI * 45;
-        circle.style.strokeDashoffset = circ - (percent/100)*circ;
-    }
-    
-    // Action Banner
-    const bannerDiv = document.getElementById('actionBannerDisplay');
-    if(step === 2 && p.commitmentFeeStatus !== 'paid') {
-        bannerDiv.innerHTML = `<div class="action-banner client-action"><i class="fas fa-exclamation-triangle"></i><div class="action-banner-text"><strong>Action Required: Commitment Fee</strong><span>Please submit the commitment fee to proceed to Step 3. <a href="#" onclick="alert('Wiring instructions will be sent to your email')">Click for instructions</a></span></div></div>`;
-        bannerDiv.style.display = 'block';
-    } else if(step === 1 && !p.termSheetAck) {
-        bannerDiv.innerHTML = `<div class="action-banner client-action"><i class="fas fa-file-signature"></i><div class="action-banner-text"><strong>Action Required: Review Term Sheet</strong><span>Please review and sign your term sheet. <button class="btn-primary" style="padding:4px 12px;" onclick="openPDFWithWatermark(null, 'Term Sheet')">Review Now</button></span></div></div>`;
-        bannerDiv.style.display = 'block';
+  const p = projects.find(x => x.id === currentProjectId);
+  if (!p) return;
+  
+  const step = p.step || 1;
+  document.getElementById('dashStage').innerHTML = STEP_NAMES[step];
+  document.getElementById('dashAmount').innerHTML = p.amount || 'TBD';
+  document.getElementById('dashRate').innerHTML = p.interestRate || 'TBD';
+  
+  const percent = Math.round((step / 8) * 100);
+  document.getElementById('progressPercentage').innerHTML = percent + '%';
+  const circle = document.querySelector('.progress-circle-fill');
+  if(circle) {
+    const circ = 2 * Math.PI * 45;
+    circle.style.strokeDashoffset = circ - (percent/100)*circ;
+  }
+  
+  const bannerDiv = document.getElementById('actionBannerDisplay');
+  if(step === 2) {
+    if(p.commitmentFeeStatus === 'paid') {
+      bannerDiv.innerHTML = `<div class="action-banner funded"><i class="fas fa-check-circle"></i><div class="action-banner-text"><strong>Commitment Fee Received — Thank You</strong><span>Amount: ${p.commitmentFeeAmount || '—'} | Date: ${p.commitmentFeeDate || '—'} | Ref: ${p.commitmentFeeReference || '—'}</span></div></div>`;
     } else {
-        bannerDiv.style.display = 'none';
+      bannerDiv.innerHTML = `<div class="action-banner client-action"><i class="fas fa-exclamation-triangle"></i><div class="action-banner-text"><strong>Action Required: Commitment Fee Payment</strong><span>Please submit the commitment fee to advance to Step 3. Contact Suzana for wiring instructions.</span><button class="btn btn-primary" style="margin-top:8px;padding:4px 12px;" onclick="showWiringInstructions()">Copy Wiring Instructions</button></div></div>`;
     }
+    bannerDiv.style.display = 'block';
+  } else if(step === 6) {
+    if(p.ecfStatus === 'escrowed') {
+      bannerDiv.innerHTML = `<div class="action-banner funded"><i class="fas fa-lock"></i><div class="action-banner-text"><strong>ECF Escrowed — Confirmed</strong><span>ECF Amount: ${p.ecfAmount || '—'} | Escrow Date: ${p.ecfEscrowDate || '—'}</span></div></div>`;
+    } else {
+      bannerDiv.innerHTML = `<div class="action-banner client-action"><i class="fas fa-exclamation-triangle"></i><div class="action-banner-text"><strong>Action Required: ECF Escrow Funding</strong><span>Please fund the ECF escrow account to proceed to Step 7. Contact Suzana for escrow account details.</span></div></div>`;
+    }
+    bannerDiv.style.display = 'block';
+  } else {
+    bannerDiv.style.display = 'none';
+  }
 }
 
-// Client Document Engine
+window.showWiringInstructions = function() {
+  showToast('Wiring instructions: Bank: Croft Finance Account | SWIFT: CROFRSBG | Account: 123-456-789 | Reference: Your Project Name');
+};
+
 window.clientUploadDocument = async function() {
-    const file = document.getElementById('clientUploadFile').files[0];
-    const type = document.getElementById('clientUploadDocType').value;
-    if(!file || !type) return showToast('Please select a file and type', true);
+  const file = document.getElementById('clientUploadFile').files[0];
+  const type = document.getElementById('clientUploadDocType').value;
+  if(!file || !type) return showToast('Please select a file and type', true);
+  
+  const statusDiv = document.getElementById('clientUploadStatus');
+  statusDiv.style.display = 'block'; 
+  statusDiv.innerText = 'Uploading to secure vault...';
+  
+  try {
+    const filename = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+    const ref = storage.ref(`documents/${currentClient.id}/${currentProjectId}/${filename}`);
+    await ref.put(file);
     
-    const statusDiv = document.getElementById('clientUploadStatus');
-    statusDiv.style.display = 'block'; 
-    statusDiv.innerText = 'Uploading to secure vault...';
+    const url = await ref.getDownloadURL();
     
-    try {
-        const filename = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
-        const ref = storage.ref(`documents/${currentClient.id}/${currentProjectId}/${filename}`);
-        await ref.put(file);
-        
-        const url = await ref.getDownloadURL();
-        
-        const docId = db.collection('documents').doc().id;
-        await db.collection('documents').doc(docId).set({
-            id: docId, 
-            clientId: currentClient.id, 
-            projectId: currentProjectId, 
-            name: type, 
-            type: type, 
-            url: url, 
-            approved: false, 
-            date: new Date().toISOString().split('T')[0]
-        });
-        
-        statusDiv.innerText = 'Upload Successful!';
-        showToast('Document uploaded successfully');
-        setTimeout(() => { 
-            statusDiv.style.display = 'none'; 
-            document.getElementById('clientUploadFile').value = ''; 
-        }, 2000);
-    } catch(e) { 
-        statusDiv.innerText = 'Upload Failed'; 
-        showToast(e.message, true); 
-    }
+    const docId = db.collection('documents').doc().id;
+    await db.collection('documents').doc(docId).set({
+      id: docId, 
+      clientId: currentClient.id, 
+      projectId: currentProjectId, 
+      name: type, 
+      type: type, 
+      url: url, 
+      approved: false, 
+      date: new Date().toISOString().split('T')[0]
+    });
+    
+    await logActivity(currentClient.id, currentClient.name, 'client', 'upload_document', currentProjectId, `Uploaded: ${type}`);
+    
+    statusDiv.innerText = 'Upload Successful!';
+    showToast('Document uploaded successfully');
+    setTimeout(() => { 
+      statusDiv.style.display = 'none'; 
+      document.getElementById('clientUploadFile').value = ''; 
+    }, 2000);
+  } catch(e) { 
+    statusDiv.innerText = 'Upload Failed'; 
+    showToast(e.message, true); 
+  }
 };
 
 function renderDocuments() {
-    const tbody = document.getElementById('closingDocumentsBody');
-    if(!tbody) return;
-    const projDocs = documents.filter(d => d.projectId === currentProjectId);
-    
-    tbody.innerHTML = projDocs.map(d => `
-        <tr>
-            <td><strong>${escapeHtml(d.name)}</strong></td>
-            <td>—</td>
-            <td><span class="doc-status-badge ${d.approved?'doc-status-approved':'doc-status-uploaded'}">${d.approved?'Approved ✓':'Pending Review'}</span></td>
-            <td>${d.date || '—'}</td>
-            <td>
-                <button class="doc-action-btn doc-action-view" onclick="openPDFWithWatermark('${d.url}', '${d.name}')">View</button>
-                <a href="${d.url}" download class="doc-action-btn doc-action-download">Download</a>
-            </td>
-        </tr>
-    `).join('') || '<tr><td colspan="5" style="text-align:center; padding:20px; color:#666;">No documents uploaded yet.</td></tr>';
+  const tbody = document.getElementById('closingDocumentsBody');
+  if(!currentProjectId) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:#666;">No project attached to your account yet.</td></tr>';
+    return;
+  }
+  const projDocs = documents.filter(d => d.projectId === currentProjectId);
+  
+  tbody.innerHTML = projDocs.map(d => `
+    <tr>
+      <td><strong>${escapeHtml(d.name)}</strong></td>
+      <td>—</td>
+      <td><span class="doc-status-badge ${d.approved?'doc-status-approved':'doc-status-uploaded'}">${d.approved?'Approved ✓':'Pending Review'}</span></td>
+      <td>${d.date || '—'}</td>
+      <td>
+        <button class="doc-action-btn doc-action-view" onclick="openPDFWithWatermark('${d.url}', '${d.name}')">View</button>
+        <a href="${d.url}" download class="doc-action-btn doc-action-download">Download</a>
+      </td>
+    </tr>
+  `).join('') || '<tr><td colspan="5" style="text-align:center; padding:20px; color:#666;">No documents uploaded yet.</td></tr>';
 
-    const drop = document.getElementById('clientUploadDocType');
-    if(drop) {
-        const REQUIRED_DOCS = { closing: ['Term Sheet', 'Financial Statement', 'Due Diligence', 'Commitment Fee Receipt'] };
-        drop.innerHTML = '<option value="">Select Document Type...</option>' + 
-        Object.values(REQUIRED_DOCS).flat().map(s => `<option value="${s}">${s}</option>`).join('') + '<option value="Other">Other</option>';
-    }
+  const drop = document.getElementById('clientUploadDocType');
+  if(drop) {
+    const REQUIRED_DOCS = { closing: ['Term Sheet', 'Financial Statement', 'Due Diligence', 'Commitment Fee Receipt'] };
+    drop.innerHTML = '<option value="">Select Document Type...</option>' + 
+    Object.values(REQUIRED_DOCS).flat().map(s => `<option value="${s}">${s}</option>`).join('') + '<option value="Other">Other</option>';
+  }
 }
 
-// Client Messages Engine
 function loadMessages() {
-    const cont = document.getElementById('messagesList');
-    if(!cont || !currentClient) return;
-    
-    const clientMsgs = messages.filter(m => m.clientId === currentClient.id).sort((a,b) => (a.timestamp?.seconds||0) - (b.timestamp?.seconds||0));
-    cont.innerHTML = clientMsgs.map(m => `
-        <div class="message ${m.sender === 'client' ? 'client' : 'admin'}">
-            <div class="message-bubble">${escapeHtml(m.content)}</div>
-            <div class="message-meta">${m.sender==='admin' ? 'Suzana Aleksić' : 'You'} · ${m.timestamp ? new Date(m.timestamp.seconds * 1000).toLocaleTimeString() : ''}</div>
-        </div>
-    `).join('') || '<div style="text-align:center; color:#888; margin-top:20px;">No messages yet. Say hello!</div>';
-    
-    cont.scrollTop = cont.scrollHeight;
+  const cont = document.getElementById('messagesList');
+  if(!cont || !currentClient) return;
+  
+  const clientMsgs = messages.filter(m => m.clientId === currentClient.id).sort((a,b) => (a.timestamp?.seconds||0) - (b.timestamp?.seconds||0));
+  cont.innerHTML = clientMsgs.map(m => `
+    <div class="message ${m.sender === 'client' ? 'client' : 'admin'}">
+      <div class="message-bubble">${escapeHtml(m.content)}</div>
+      <div class="message-meta">${m.sender==='admin' ? 'Suzana Aleksić' : 'You'} · ${m.timestamp ? new Date(m.timestamp.seconds * 1000).toLocaleTimeString() : ''}</div>
+    </div>
+  `).join('') || '<div style="text-align:center; color:#888; margin-top:20px;">No messages yet. Say hello!</div>';
+  
+  cont.scrollTop = cont.scrollHeight;
 }
 
 window.sendMessage = async function() {
-    const input = document.getElementById('messageInput');
-    const val = input.value.trim();
-    if(!val) return;
+  const input = document.getElementById('messageInput');
+  const val = input.value.trim();
+  if(!val) return;
+  try {
     await db.collection('messages').add({ 
-        clientId: currentClient.id, 
-        content: val, 
-        sender: 'client', 
-        timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+      clientId: currentClient.id, 
+      content: val, 
+      sender: 'client', 
+      timestamp: firebase.firestore.FieldValue.serverTimestamp() 
     });
+    await logActivity(currentClient.id, currentClient.name, 'client', 'send_message', currentProjectId, `Message: ${val.substring(0,50)}`);
     input.value = '';
+  } catch(e) { showToast(e.message, true); }
 };
 
 // ============================================================
 // CAPITAL STACK VISUALIZATION (Chart.js)
 // ============================================================
 function renderCapitalStack() {
-    const p = projects.find(x => x.id === currentProjectId);
-    if(!p) return;
-    
-    const sponsorEquity = parseFloat(p.sponsorEquity) || 30;
-    const croftDebt = parseFloat(p.amount?.replace(/[^0-9.-]/g, '')) || 70;
-    
-    const ctx = document.getElementById('capitalStackChart')?.getContext('2d');
-    if(!ctx) return;
-    
-    if(capitalChart) capitalChart.destroy();
-    
-    capitalChart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: ['Sponsor Equity', 'Croft Finance Debt'],
-            datasets: [{
-                data: [sponsorEquity, croftDebt],
-                backgroundColor: ['#0a1628', '#2c5f8a'],
-                borderWidth: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: { position: 'bottom', labels: { font: { size: 12 } } },
-                tooltip: { callbacks: { label: (ctx) => `${ctx.label}: $${ctx.raw.toLocaleString()}M` } }
-            }
-        }
-    });
+  const p = projects.find(x => x.id === currentProjectId);
+  if(!p || !currentProjectId) return;
+  
+  const sponsorEquity = parseFloat(String(p.sponsorEquity || '0').replace(/,/g, '')) || 0;
+  const croftDebt = parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g, '')) || 0;
+  
+  const ctx = document.getElementById('capitalStackChart')?.getContext('2d');
+  if(!ctx) return;
+  
+  if(capitalChart) capitalChart.destroy();
+  
+  capitalChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: ['Sponsor Equity', 'Croft Finance Debt'],
+      datasets: [{
+        data: [sponsorEquity, croftDebt],
+        backgroundColor: ['#0a1628', '#2c5f8a'],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { size: 12 } } },
+        tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${formatCurrency(ctx.raw)}` } }
+      }
+    }
+  });
 }
 
 // ============================================================
-// COMPLETE STEP MANAGEMENT SYSTEM
-// ============================================================
-
-// Step definitions
-const STEP_CONFIG = {
-    1: { name: 'Term Sheet', requiredDocs: ['term_sheet.pdf'], clientAction: 'Review & Sign', adminAction: 'Upload Signed Copy' },
-    2: { name: 'Commitment Fee', requiredDocs: ['commitment_fee_receipt.pdf'], clientAction: 'Pay Fee', adminAction: 'Verify & Confirm' },
-    3: { name: 'Deed of Undertaking', requiredDocs: ['deed_signed.pdf'], clientAction: 'Sign Deed', adminAction: 'Review & Approve' },
-    4: { name: 'Credit Support', requiredDocs: ['credit_support.pdf'], clientAction: 'Provide Documents', adminAction: 'Verify Credit' },
-    5: { name: 'Hard-Copy Submission', requiredDocs: ['hard_copies.pdf'], clientAction: 'Submit Copies', adminAction: 'Review Submission' },
-    6: { name: 'ECF Escrow', requiredDocs: ['ecf_confirmation.pdf'], clientAction: 'Fund ECF', adminAction: 'Confirm Receipt' },
-    7: { name: 'Transfer to Agent', requiredDocs: ['transfer_confirmation.pdf'], clientAction: 'Await Transfer', adminAction: 'Execute Transfer' },
-    8: { name: 'Funded', requiredDocs: ['funding_confirmation.pdf'], clientAction: 'Complete', adminAction: 'Mark Funded' }
-};
-
-// Render the complete step status dashboard for admin
-function renderStepDashboard(project) {
-    if(!project) return '<div>No project data</div>';
-    
-    let html = `
-        <div style="background: white; border-radius: 12px; overflow: hidden; margin-top: 20px;">
-            <div style="background: var(--navy); color: white; padding: 16px 20px;">
-                <h3 style="margin: 0; font-size: 16px;"><i class="fas fa-chart-line"></i> Closing Process Dashboard</h3>
-                <p style="margin: 5px 0 0; opacity: 0.7; font-size: 12px;">Track each step of the closing process</p>
-            </div>
-            <div style="padding: 20px;">
-                <!-- Progress Bar -->
-                <div style="margin-bottom: 30px;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                        <span style="font-size: 13px; font-weight: 500;">Overall Progress</span>
-                        <span style="font-size: 13px; font-weight: 500;" id="overallProgress">${project.overallProgress || 0}%</span>
-                    </div>
-                    <div style="background: var(--gray-200); height: 8px; border-radius: 10px; overflow: hidden;">
-                        <div style="background: var(--success); height: 100%; width: ${project.overallProgress || 0}%; transition: width 0.3s;"></div>
-                    </div>
-                </div>
-                
-                <!-- Steps Grid -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;">
-    `;
-    
-    for(let i = 1; i <= 8; i++) {
-        const step = STEP_CONFIG[i];
-        const isCompleted = project[`step${i}Completed`] === true;
-        const isCurrent = (project.step || 1) === i;
-        const completedAt = project[`step${i}CompletedAt`];
-        const stepData = project[`step${i}Data`] || {};
-        
-        html += `
-            <div style="border: 1px solid ${isCompleted ? 'var(--success)' : (isCurrent ? 'var(--blue)' : 'var(--gray-200)')}; border-radius: 12px; overflow: hidden; background: ${isCompleted ? 'var(--success-light)' : 'white'}; transition: all 0.2s;">
-                <div style="padding: 16px; background: ${isCompleted ? 'var(--success)' : (isCurrent ? 'var(--navy)' : 'var(--gray-50)')}; color: ${(isCompleted || isCurrent) ? 'white' : 'var(--gray-600)'};">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <span style="font-size: 11px; opacity: 0.8;">STEP ${i}</span>
-                            <h4 style="margin: 5px 0 0; font-size: 16px;">${step.name}</h4>
-                        </div>
-                        <div style="text-align: right;">
-                            ${isCompleted ? 
-                                '<span style="background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 20px; font-size: 11px;"><i class="fas fa-check"></i> COMPLETE</span>' : 
-                                (isCurrent ? '<span style="background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 20px; font-size: 11px;"><i class="fas fa-spinner fa-pulse"></i> IN PROGRESS</span>' : 
-                                '<span style="background: rgba(0,0,0,0.1); padding: 4px 10px; border-radius: 20px; font-size: 11px;">PENDING</span>')}
-                        </div>
-                    </div>
-                </div>
-                <div style="padding: 16px;">
-                    <div style="margin-bottom: 12px;">
-                        <div style="font-size: 11px; color: var(--gray-500); margin-bottom: 4px;">Required Action</div>
-                        <div style="font-size: 13px;"><i class="fas fa-user-check"></i> ${step.clientAction}</div>
-                        <div style="font-size: 13px; margin-top: 4px;"><i class="fas fa-shield-alt"></i> ${step.adminAction}</div>
-                    </div>
-                    
-                    ${completedAt ? `<div style="font-size: 11px; color: var(--gray-500); margin-bottom: 12px;"><i class="fas fa-calendar-check"></i> Completed: ${new Date(completedAt).toLocaleString()}</div>` : ''}
-                    
-                    ${i === 2 && !isCompleted ? `
-                        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--gray-200);">
-                            <div style="background: var(--warning-light); padding: 10px; border-radius: 8px; margin-bottom: 10px;">
-                                <div style="font-size: 12px; font-weight: 500;">Commitment Fee Details</div>
-                                <div style="font-size: 11px; margin-top: 5px;">
-                                    <div><strong>Amount:</strong> ${project.commitmentFeeAmount || 'Not recorded'} ${project.commitmentFeeAmount ? `(Paid: ${project.commitmentFeePaidAt ? new Date(project.commitmentFeePaidAt).toLocaleDateString() : 'N/A'})` : ''}</div>
-                                    <div><strong>Reference:</strong> ${project.commitmentFeeReference || 'None'}</div>
-                                </div>
-                            </div>
-                            <div style="display: flex; gap: 8px;">
-                                <button class="btn btn-primary" style="padding: 8px 12px; font-size: 12px; flex: 1;" onclick="showCommitmentFeeModal('${project.id}')">
-                                    <i class="fas fa-dollar-sign"></i> Confirm Fee Receipt
-                                </button>
-                            </div>
-                        </div>
-                    ` : ''}
-                    
-                    <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--gray-200); display: flex; gap: 8px;">
-                        ${!isCompleted ? 
-                            `<button class="btn btn-success" style="padding: 6px 12px; font-size: 11px; flex: 1;" onclick="markStepCompleted('${project.id}', ${i})">
-                                <i class="fas fa-check"></i> Mark Complete
-                            </button>` : ''
-                        }
-                        <button class="btn btn-outline" style="padding: 6px 12px; font-size: 11px; flex: 1;" onclick="revertStepStatus('${project.id}', ${i})">
-                            <i class="fas fa-undo"></i> ${isCompleted ? 'Revert' : 'Skip / Revert'}
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-    
-    // Add Documents Section
-    const uploadedDocs = documents.filter(d => d.projectId === project.id);
-    html += `
-                </div>
-                
-                <!-- Documents Summary -->
-                <div style="margin-top: 30px; background: var(--gray-50); border-radius: 12px; padding: 16px;">
-                    <h4 style="margin: 0 0 12px 0; font-size: 14px;"><i class="fas fa-file-alt"></i> Document Status</h4>
-                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-                        ${STEP_CONFIG[project.step || 1]?.requiredDocs.map(doc => {
-                            const isUploaded = uploadedDocs.some(d => d.name === doc || d.url.includes(doc));
-                            return `
-                                <div style="display: flex; align-items: center; gap: 6px; padding: 4px 10px; background: ${isUploaded ? 'var(--success-light)' : 'var(--warning-light)'}; border-radius: 20px;">
-                                    <i class="fas ${isUploaded ? 'fa-check-circle' : 'fa-clock'}" style="color: ${isUploaded ? 'var(--success)' : 'var(--warning)'}; font-size: 11px;"></i>
-                                    <span style="font-size: 11px;">${doc}</span>
-                                </div>
-                            `;
-                        }).join('')}
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    return html;
-}
-
-// Show modal for commitment fee confirmation
-window.showCommitmentFeeModal = function(projectId) {
-    const project = projects.find(p => p.id === projectId);
-    const modalHtml = `
-        <div id="feeModal" style="position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 10001;">
-            <div style="background: white; border-radius: 16px; max-width: 450px; width: 90%; padding: 24px;">
-                <h3 style="margin: 0 0 8px 0;">Confirm Commitment Fee</h3>
-                <p style="color: var(--gray-500); font-size: 13px; margin-bottom: 20px;">Enter the fee details received from ${project.clientName || 'client'}</p>
-                <div class="form-group">
-                    <label class="form-label">Amount Received (USD)</label>
-                    <input type="text" id="feeAmount" class="form-input" placeholder="e.g., 50,000">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Transaction Reference</label>
-                    <input type="text" id="feeReference" class="form-input" placeholder="Wire/Transfer Reference #">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Payment Date</label>
-                    <input type="date" id="feeDate" class="form-input" value="${new Date().toISOString().split('T')[0]}">
-                </div>
-                <div style="display: flex; gap: 12px; margin-top: 20px;">
-                    <button class="btn btn-primary" style="flex: 1;" onclick="confirmCommitmentFeeWithDetails('${projectId}')">Confirm Payment</button>
-                    <button class="btn btn-outline" style="flex: 1;" onclick="closeFeeModal()">Cancel</button>
-                </div>
-            </div>
-        </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-};
-
-window.closeFeeModal = function() {
-    const modal = document.getElementById('feeModal');
-    if(modal) modal.remove();
-};
-
-window.confirmCommitmentFeeWithDetails = async function(projectId) {
-    const amount = document.getElementById('feeAmount')?.value;
-    const reference = document.getElementById('feeReference')?.value;
-    const date = document.getElementById('feeDate')?.value;
-    
-    if(!amount || !reference) {
-        showToast('Please enter amount and reference number', true);
-        return;
-    }
-    
-    const project = projects.find(p => p.id === projectId);
-    
-    await db.collection('projects').doc(projectId).update({
-        commitmentFeePaid: true,
-        commitmentFeeAmount: amount,
-        commitmentFeeReference: reference,
-        commitmentFeePaidAt: date || new Date().toISOString(),
-        step2Completed: true,
-        step2CompletedAt: new Date().toISOString(),
-        step: 3,
-        overallProgress: 25
-    });
-    
-    const client = clients.find(c => c.id === project.clientId);
-    if(client) {
-        try {
-            await emailjs.send('service_croft', 'template_step_update', {
-                to_name: client.name,
-                to_email: client.email,
-                step_name: 'Commitment Fee',
-                next_action: 'Proceed to Deed of Undertaking'
-            });
-        } catch(e) {}
-    }
-    
-    showToast(`Commitment Fee of $${amount} confirmed for ${client?.name}`);
-    closeFeeModal();
-    renderAdminTables();
-    // Refresh the edit modal if open
-    if(window.editProjectId === projectId) {
-        const stepContainer = document.getElementById('stepStatusContainer');
-        if(stepContainer) {
-            const updatedProject = projects.find(p => p.id === projectId);
-            stepContainer.innerHTML = renderStepDashboard(updatedProject);
-        }
-    }
-};
-
-// Mark step as completed
-window.markStepCompleted = async function(projectId, stepNumber) {
-    const project = projects.find(p => p.id === projectId);
-    if(!project) return;
-    
-    const step = STEP_CONFIG[stepNumber];
-    
-    // For Step 2, use the fee modal instead
-    if(stepNumber === 2) {
-        showCommitmentFeeModal(projectId);
-        return;
-    }
-    
-    const confirmMsg = `Mark Step ${stepNumber} (${step.name}) as complete?\n\nThis will move the deal to the next step.`;
-    if(!confirm(confirmMsg)) return;
-    
-    const updateData = {
-        [`step${stepNumber}Completed`]: true,
-        [`step${stepNumber}CompletedAt`]: new Date().toISOString()
-    };
-    
-    if(project.step === stepNumber) {
-        updateData.step = stepNumber + 1;
-    }
-    
-    // Calculate overall progress
-    let completedCount = 0;
-    for(let i = 1; i <= stepNumber; i++) {
-        if(i === stepNumber) {
-            completedCount++;
-        } else if(project[`step${i}Completed`]) {
-            completedCount++;
-        }
-    }
-    updateData.overallProgress = Math.round((completedCount / 8) * 100);
-    
-    await db.collection('projects').doc(projectId).update(updateData);
-    
-    const client = clients.find(c => c.id === project.clientId);
-    showToast(`Step ${stepNumber} (${step.name}) marked complete for ${client?.name}`);
-    renderAdminTables();
-    
-    // Refresh the edit modal if open
-    if(window.editProjectId === projectId) {
-        const stepContainer = document.getElementById('stepStatusContainer');
-        if(stepContainer) {
-            const updatedProject = projects.find(p => p.id === projectId);
-            stepContainer.innerHTML = renderStepDashboard(updatedProject);
-        }
-    }
-};
-
-// Revert step status
-window.revertStepStatus = async function(projectId, stepNumber) {
-    const project = projects.find(p => p.id === projectId);
-    if(!project) return;
-    
-    const step = STEP_CONFIG[stepNumber];
-    const isCurrentlyCompleted = project[`step${stepNumber}Completed`];
-    
-    let confirmMsg;
-    if(isCurrentlyCompleted) {
-        confirmMsg = `Revert Step ${stepNumber} (${step.name}) to incomplete?\n\nThis will require the client to re-complete this step.`;
-    } else {
-        confirmMsg = `Skip/Mark as complete without verification?\n\nUse this only if the step was completed outside the system.`;
-    }
-    
-    if(!confirm(confirmMsg)) return;
-    
-    const updateData = {};
-    
-    if(isCurrentlyCompleted) {
-        updateData[`step${stepNumber}Completed`] = false;
-        updateData[`step${stepNumber}CompletedAt`] = null;
-        if(project.step > stepNumber) {
-            updateData.step = stepNumber;
-        }
-    } else {
-        updateData[`step${stepNumber}Completed`] = true;
-        updateData[`step${stepNumber}CompletedAt`] = new Date().toISOString();
-        if(project.step === stepNumber) {
-            updateData.step = stepNumber + 1;
-        }
-    }
-    
-    // Recalculate progress
-    let completedCount = 0;
-    for(let i = 1; i <= 8; i++) {
-        if(i === stepNumber) {
-            if(updateData[`step${stepNumber}Completed`] === true) completedCount++;
-            else if(isCurrentlyCompleted && updateData[`step${stepNumber}Completed`] === false) {}
-            else if(project[`step${i}Completed`]) completedCount++;
-        } else if(project[`step${i}Completed`]) {
-            completedCount++;
-        }
-    }
-    updateData.overallProgress = Math.round((completedCount / 8) * 100);
-    
-    await db.collection('projects').doc(projectId).update(updateData);
-    showToast(`Step ${stepNumber} status updated`);
-    renderAdminTables();
-    
-    if(window.editProjectId === projectId) {
-        const stepContainer = document.getElementById('stepStatusContainer');
-        if(stepContainer) {
-            const updatedProject = projects.find(p => p.id === projectId);
-            stepContainer.innerHTML = renderStepDashboard(updatedProject);
-        }
-    }
-};
-
-// Override the editProject function to use the new dashboard
-const originalEditProject = window.editProject;
-window.editProject = function(pid) {
-    if(!pid) return showToast('No project selected', true);
-    const p = projects.find(x => x.id === pid);
-    if(!p) return;
-    window.editProjectId = pid;
-    const c = clients.find(cl => cl.id === p.clientId);
-    
-    // Fill all form fields (same as before)
-    document.getElementById('editClientName').value = c?.name || '';
-    document.getElementById('editClientEmail').value = c?.email || '';
-    document.getElementById('editProjectName').value = p.name || '';
-    document.getElementById('editIndustry').value = p.industry || 'Real Estate';
-    document.getElementById('editLocation').value = p.location || '';
-    document.getElementById('editTotalCost').value = p.totalCost || '';
-    document.getElementById('editSponsorEquity').value = p.sponsorEquity || '';
-    document.getElementById('editFundsNeeded').value = p.fundsNeeded || '';
-    document.getElementById('editCurrentStage').value = p.currentStage || 'Development';
-    document.getElementById('editUseOfFunds').value = p.useOfFunds || '';
-    document.getElementById('editTargetIRR').value = p.targetIRR || '';
-    document.getElementById('editCloseDate').value = p.closeDate || '';
-    document.getElementById('editMOIC').value = p.moic || '';
-    document.getElementById('editCapRate').value = p.capRate || '';
-    document.getElementById('editExitStrategy').value = p.exitStrategy || 'Sale';
-    document.getElementById('editExitCapRate').value = p.exitCapRate || '';
-    document.getElementById('editPermits').value = p.permits || 'No';
-    document.getElementById('editRevenue').value = p.revenue || '';
-    document.getElementById('editAssetClass').value = p.assetClass || '';
-    document.getElementById('editInfraType').value = p.infraType || '';
-    document.getElementById('editCommodity').value = p.commodity || '';
-    document.getElementById('editMiningStage').value = p.miningStage || 'Development';
-    document.getElementById('editReserveLife').value = p.reserveLife || '';
-    document.getElementById('editDataRoom').value = p.dataRoom || '';
-    document.getElementById('editGovLaw').value = p.governingLaw || '';
-    
-    document.getElementById('editStep').value = p.step || 1;
-    document.getElementById('editAmount').value = p.amount || '';
-    document.getElementById('editRate').value = p.interestRate || '';
-    document.getElementById('editTerm').value = p.term || '';
-    document.getElementById('editGrace').value = p.gracePeriod || '';
-    document.getElementById('editECF').value = p.ecfAmount || '';
-    document.getElementById('editAdvisorNote').value = p.advisorNote || '';
-    document.getElementById('editAdminNote').value = p.adminNote || '';
-    
-    // Render the new step dashboard
-    const stepContainer = document.getElementById('stepStatusContainer');
-    if(stepContainer) {
-        stepContainer.innerHTML = renderStepDashboard(p);
-    }
-    
-    const brokerSelect = document.getElementById('editBrokerAssign');
-    if(brokerSelect) {
-        brokerSelect.innerHTML = '<option value="">Direct Client (No Broker)</option>' + 
-            brokers.map(b => `<option value="${b.id}" ${p.brokerId === b.id ? 'selected' : ''}>${escapeHtml(b.name)} (${b.commissionRate || 0}%)</option>`).join('');
-    }
-    
-    switchEditTab('project');
-    openModal('editProjectModal');
-};
-
-// ============================================================
-// IN-APP PDF VIEWER WITH DYNAMIC WATERMARKING
+// IN-APP PDF VIEWER WITH WATERMARK (No IP fetch)
 // ============================================================
 window.openPDFWithWatermark = async function(url, docName) {
-    if(!url && docName === 'Term Sheet') {
-        // Demo: generate a sample term sheet
-        url = 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf';
-    }
-    if(!url) { showToast('Document not available yet', true); return; }
-    
-    // Fetch client IP (for watermark)
-    let clientIP = 'Secure Session';
-    try {
-        const ipRes = await fetch('https://api.ipify.org?format=json');
-        const ipData = await ipRes.json();
-        clientIP = ipData.ip;
-    } catch(e) { console.warn('Could not fetch IP'); }
-    
-    const watermarkText = `${currentClient.email} | ${clientIP} | ${new Date().toLocaleString()}`;
-    
-    // Create modal
-    const modal = document.createElement('div');
-    modal.className = 'pdf-viewer-modal';
-    modal.style.position = 'fixed';
-    modal.style.top = '0';
-    modal.style.left = '0';
-    modal.style.right = '0';
-    modal.style.bottom = '0';
-    modal.style.backgroundColor = 'rgba(0,0,0,0.95)';
-    modal.style.zIndex = '10000';
-    modal.style.display = 'flex';
-    modal.style.flexDirection = 'column';
-    
-    modal.innerHTML = `
-        <div style="background: var(--navy); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; color: white;">
-            <span><i class="fas fa-file-pdf"></i> ${escapeHtml(docName)} — Confidential</span>
-            <button onclick="this.closest('.pdf-viewer-modal').remove()" style="background: none; border: none; color: white; font-size: 20px; cursor: pointer;">&times;</button>
-        </div>
-        <div style="flex: 1; overflow: auto; position: relative; background: #525659;">
-            <canvas id="pdfCanvas" style="margin: 20px auto; display: block; box-shadow: 0 4px 20px rgba(0,0,0,0.3); background: white;"></canvas>
-            <div style="position: fixed; bottom: 20px; right: 20px; background: rgba(0,0,0,0.6); color: rgba(255,255,255,0.4); padding: 4px 12px; border-radius: 20px; font-size: 10px; font-family: monospace;">
-                ${watermarkText}
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    // Load PDF
+  if(!url) {
+    showToast('This document has not been uploaded yet by Croft Finance.', true);
+    return;
+  }
+  
+  const watermarkText = `${currentClient.email} | ${new Date().toLocaleString()} | CONFIDENTIAL`;
+  
+  const modal = document.createElement('div');
+  modal.className = 'pdf-viewer-modal';
+  modal.style.position = 'fixed';
+  modal.style.top = '0';
+  modal.style.left = '0';
+  modal.style.right = '0';
+  modal.style.bottom = '0';
+  modal.style.backgroundColor = 'rgba(0,0,0,0.95)';
+  modal.style.zIndex = '10000';
+  modal.style.display = 'flex';
+  modal.style.flexDirection = 'column';
+  
+  modal.innerHTML = `
+    <div style="background: var(--navy); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; color: white;">
+      <span><i class="fas fa-file-pdf"></i> ${escapeHtml(docName)} — Confidential</span>
+      <button onclick="this.closest('.pdf-viewer-modal').remove()" style="background: none; border: none; color: white; font-size: 20px; cursor: pointer;">&times;</button>
+    </div>
+    <div style="flex: 1; overflow: auto; position: relative; background: #525659;">
+      <canvas id="pdfCanvas" style="margin: 20px auto; display: block; box-shadow: 0 4px 20px rgba(0,0,0,0.3); background: white;"></canvas>
+      <div style="position: fixed; bottom: 20px; right: 20px; background: rgba(0,0,0,0.6); color: rgba(255,255,255,0.4); padding: 4px 12px; border-radius: 20px; font-size: 10px; font-family: monospace;">
+        ${watermarkText}
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  try {
     const loadingTask = pdfjsLib.getDocument(url);
     const pdf = await loadingTask.promise;
     const page = await pdf.getPage(1);
@@ -4042,7 +3790,6 @@ window.openPDFWithWatermark = async function(url, docName) {
     
     await page.render({ canvasContext: ctx, viewport: viewport }).promise;
     
-    // Add visible watermark overlay on canvas
     ctx.globalAlpha = 0.08;
     ctx.font = 'bold 24px Arial';
     ctx.fillStyle = '#000000';
@@ -4055,73 +3802,74 @@ window.openPDFWithWatermark = async function(url, docName) {
     ctx.restore();
     ctx.globalAlpha = 1.0;
     
-    // Log access for security center
     await db.collection('docAccessLogs').add({
-        clientId: currentClient.id,
-        documentName: docName,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        viewer: currentClient.name,
-        ipAddress: clientIP
+      clientId: currentClient.id,
+      documentName: docName,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      viewer: currentClient.name
     });
+  } catch(e) { showToast('Error loading PDF', true); }
 };
 
 // ============================================================
 // BROKER PORTAL LOGIC
 // ============================================================
 function loadBrokerPortal() {
-    document.getElementById('brokerDashGreeting').innerText = 'Welcome, ' + currentBroker.name.split(' ')[0] + '.';
-    document.getElementById('brokerNavUser').innerText = currentBroker.name;
-    document.getElementById('brokerUserName').innerText = currentBroker.name;
-    document.getElementById('brokerAvatar').innerText = currentBroker.name.charAt(0).toUpperCase();
-    
-    updateBrokerDashboard();
+  document.getElementById('brokerDashGreeting').innerText = 'Welcome, ' + currentBroker.name.split(' ')[0] + '.';
+  document.getElementById('brokerNavUser').innerText = currentBroker.name;
+  document.getElementById('brokerUserName').innerText = currentBroker.name;
+  document.getElementById('brokerAvatar').innerText = currentBroker.name.charAt(0).toUpperCase();
+  updateBrokerDashboard();
 }
 
 function updateBrokerDashboard() {
-    if(!currentBroker) return;
-    const rate = currentBroker.commissionRate || 0;
-    document.getElementById('brokerCommRate').innerText = rate + '%';
-    
-    const mySubmissions = brokerSubmissions.filter(s => s.brokerId === currentBroker.id);
-    document.getElementById('brokerTotalSubmissions').innerText = mySubmissions.length;
-    
-    const active = projects.filter(p => p.brokerId === currentBroker.id && p.status === 'active');
-    document.getElementById('brokerActiveDeals').innerText = active.length;
-    
-    const funded = active.filter(p => p.step >= 8);
-    document.getElementById('brokerFundedDeals').innerText = funded.length;
-    
-    let est = 0;
-    funded.forEach(f => {
-        let amt = String(f.amount || '0').replace(/[^0-9.-]+/g,"");
-        est += (parseFloat(amt) || 0) * (rate / 100);
-    });
-    document.getElementById('brokerEstCommission').innerText = '$' + est.toLocaleString();
+  if(!currentBroker) return;
+  const rate = currentBroker.commissionRate || 0;
+  document.getElementById('brokerCommRate').innerText = rate + '%';
+  
+  const mySubmissions = brokerSubmissions.filter(s => s.brokerId === currentBroker.id);
+  document.getElementById('brokerTotalSubmissions').innerText = mySubmissions.length;
+  
+  const active = projects.filter(p => p.brokerId === currentBroker.id && p.status === 'active');
+  document.getElementById('brokerActiveDeals').innerText = active.length;
+  
+  const funded = active.filter(p => p.step >= 8);
+  document.getElementById('brokerFundedDeals').innerText = funded.length;
+  
+  let est = 0;
+  funded.forEach(f => {
+    let amt = parseFloat(String(f.amount || '0').replace(/[^0-9.-]+/g,"")) || 0;
+    est += amt * (rate / 100);
+  });
+  document.getElementById('brokerEstCommission').innerText = formatCurrency(est);
 }
 
 window.submitDeal = async function() {
-    const cName = document.getElementById('dealClientName').value.trim();
-    const cEmail = document.getElementById('dealClientEmail').value.trim();
-    const pName = document.getElementById('dealProjectName').value.trim();
-    const fNeeded = document.getElementById('dealFundsNeeded').value.trim();
-    
-    if(!cName || !pName || !cEmail || !fNeeded) return showToast('Please fill all required fields (*)', true);
-    
+  const cName = document.getElementById('dealClientName').value.trim();
+  const cEmail = document.getElementById('dealClientEmail').value.trim();
+  const pName = document.getElementById('dealProjectName').value.trim();
+  const fNeeded = document.getElementById('dealFundsNeeded').value.trim();
+  
+  if(!cName || !pName || !cEmail || !fNeeded) return showToast('Please fill all required fields (*)', true);
+  
+  try {
     const id = db.collection('brokerSubmissions').doc().id;
     await db.collection('brokerSubmissions').doc(id).set({
-        id, 
-        brokerId: currentBroker.id, 
-        brokerName: currentBroker.name,
-        clientName: cName, 
-        clientEmail: cEmail, 
-        projectName: pName, 
-        fundsNeeded: fNeeded,
-        industry: document.getElementById('dealIndustry').value,
-        location: document.getElementById('dealLocation').value,
-        description: document.getElementById('dealDescription').value,
-        status: 'pending', 
-        createdAt: new Date().toISOString()
+      id, 
+      brokerId: currentBroker.id, 
+      brokerName: currentBroker.name,
+      clientName: cName, 
+      clientEmail: cEmail, 
+      projectName: pName, 
+      fundsNeeded: fNeeded,
+      industry: document.getElementById('dealIndustry').value,
+      location: document.getElementById('dealLocation').value,
+      description: document.getElementById('dealDescription').value,
+      status: 'pending', 
+      createdAt: new Date().toISOString()
     });
+    
+    await logActivity(currentBroker.id, currentBroker.name, 'broker', 'submit_deal', null, `Submitted deal for ${cName}: ${pName}`);
     
     showToast('Deal submitted successfully!');
     document.getElementById('dealClientName').value = '';
@@ -4130,1013 +3878,835 @@ window.submitDeal = async function() {
     document.getElementById('dealFundsNeeded').value = '';
     document.getElementById('dealLocation').value = '';
     document.getElementById('dealDescription').value = '';
+  } catch(e) { showToast(e.message, true); }
 };
 
 function renderBrokerSubmissions() {
-    const tbody = document.getElementById('brokerSubmissionsList');
-    if(!tbody) return;
-    const subs = brokerSubmissions.filter(s => s.brokerId === currentBroker.id).sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
-    tbody.innerHTML = subs.map(s => `
-        <tr>
-            <td>${s.createdAt ? s.createdAt.split('T')[0] : '—'}</td>
-            <td><strong>${escapeHtml(s.clientName)}</strong></td>
-            <td>${escapeHtml(s.projectName)}</td>
-            <td>$${escapeHtml(s.fundsNeeded)}</td>
-            <td><span class="status-badge-${s.status==='pending'?'pending':'active'}">${s.status==='pending'?'Pending Review':'Accepted'}</span></td>
-        </tr>
-    `).join('') || '<tr><td colspan="5" style="text-align:center; padding:20px; color:#666;">No submissions yet.</td></tr>';
+  const tbody = document.getElementById('brokerSubmissionsList');
+  if(!tbody) return;
+  const subs = brokerSubmissions.filter(s => s.brokerId === currentBroker.id).sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+  tbody.innerHTML = subs.map(s => `
+    <tr>
+      <td>${s.createdAt ? s.createdAt.split('T')[0] : '—'}</td>
+      <td><strong>${escapeHtml(s.clientName)}</strong></td>
+      <td>${escapeHtml(s.projectName)}</td>
+      <td>${formatCurrency(s.fundsNeeded)}</td>
+      <td><span class="status-badge-${s.status==='pending'?'pending':'active'}">${s.status==='pending'?'Pending Review':'Accepted'}</span></td>
+    </tr>
+  `).join('') || '<tr><td colspan="5" style="text-align:center; padding:20px; color:#666;">No submissions yet.</td></tr>';
 }
 
 function renderBrokerPortfolio() {
-    const cont = document.getElementById('brokerPortfolioContainer');
-    if(!cont) return;
-    
-    const myClients = projects.filter(p => p.brokerId === currentBroker.id && p.status === 'active');
-    
-    if(!myClients.length) { 
-        cont.innerHTML = '<div style="padding:20px; color:#666; text-align:center;">No active clients in portfolio yet.</div>'; 
-        return; 
-    }
-    
-    cont.innerHTML = myClients.map(p => {
-        const client = clients.find(c => c.id === p.clientId);
-        const percent = Math.round(((p.step||1)/8)*100);
-        return `
-        <div class="card" style="border-left: 3px solid var(--blue);">
-            <div class="card-body">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <div style="font-weight:bold; font-size:16px; color:var(--navy);">${escapeHtml(p.name)}</div>
-                        <div style="font-size:12px; color:var(--gray-500); margin-top:4px;"><i class="fas fa-user"></i> ${escapeHtml(client?.name||'Client')} | Facility: ${escapeHtml(p.amount||'TBD')}</div>
-                    </div>
-                    <div style="text-align:right;">
-                        <span class="badge badge-navy">Step ${p.step||1}: ${STEP_NAMES[p.step||1]}</span>
-                        <div style="font-size:11px; margin-top:5px; color:var(--gray-500);">Progress: ${percent}%</div>
-                    </div>
-                </div>
-                <div class="progress-bar-wrap" style="margin-top:15px; background:var(--gray-100); height:8px; border-radius:4px; overflow:hidden;">
-                    <div class="progress-bar-fill" style="background:var(--blue); height:100%; width:${percent}%; border-radius:4px;"></div>
-                </div>
-            </div>
+  const cont = document.getElementById('brokerPortfolioContainer');
+  if(!cont) return;
+  
+  const myClients = projects.filter(p => p.brokerId === currentBroker.id && p.status === 'active');
+  
+  if(!myClients.length) { 
+    cont.innerHTML = '<div style="padding:20px; color:#666; text-align:center;">No active clients in portfolio yet.</div>'; 
+    return; 
+  }
+  
+  cont.innerHTML = myClients.map(p => {
+    const client = clients.find(c => c.id === p.clientId);
+    const percent = Math.round(((p.step||1)/8)*100);
+    return `
+    <div class="card" style="border-left: 3px solid var(--blue);">
+      <div class="card-body">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-weight:bold; font-size:16px; color:var(--navy);">${escapeHtml(p.name)}</div>
+            <div style="font-size:12px; color:var(--gray-500); margin-top:4px;"><i class="fas fa-user"></i> ${escapeHtml(client?.name||'Client')} | Facility: ${escapeHtml(p.amount||'TBD')}</div>
+          </div>
+          <div style="text-align:right;">
+            <span class="badge badge-navy">Step ${p.step||1}: ${STEP_NAMES[p.step||1]}</span>
+            <div style="font-size:11px; margin-top:5px; color:var(--gray-500);">Progress: ${percent}%</div>
+          </div>
         </div>
-        `;
-    }).join('');
+        <div class="progress-bar-wrap" style="margin-top:15px; background:var(--gray-100); height:8px; border-radius:4px; overflow:hidden;">
+          <div class="progress-bar-fill" style="background:var(--blue); height:100%; width:${percent}%; border-radius:4px;"></div>
+        </div>
+      </div>
+    </div>
+    `;
+  }).join('');
 }
 
-// Broker Messages
 function loadBrokerMessages() {
-    const cont = document.getElementById('brokerMessagesList');
-    if(!cont || !currentBroker) return;
-    const msgs = brokerMessages.filter(m => m.brokerId === currentBroker.id).sort((a,b) => (a.timestamp?.seconds||0) - (b.timestamp?.seconds||0));
-    cont.innerHTML = msgs.map(m => `
-        <div class="message ${m.sender === 'broker' ? 'client' : 'admin'}">
-            <div class="message-bubble">${escapeHtml(m.content)}</div>
-            <div class="message-meta">${m.sender==='admin'?'Suzana Aleksić':'You'}</div>
-        </div>
-    `).join('') || '<div style="text-align:center; color:#888; margin-top:20px;">No messages yet.</div>';
-    cont.scrollTop = cont.scrollHeight;
+  const cont = document.getElementById('brokerMessagesList');
+  if(!cont || !currentBroker) return;
+  const msgs = brokerMessages.filter(m => m.brokerId === currentBroker.id).sort((a,b) => (a.timestamp?.seconds||0) - (b.timestamp?.seconds||0));
+  cont.innerHTML = msgs.map(m => `
+    <div class="message ${m.sender === 'broker' ? 'client' : 'admin'}">
+      <div class="message-bubble">${escapeHtml(m.content)}</div>
+      <div class="message-meta">${m.sender==='admin'?'Suzana Aleksić':'You'}</div>
+    </div>
+  `).join('') || '<div style="text-align:center; color:#888; margin-top:20px;">No messages yet.</div>';
+  cont.scrollTop = cont.scrollHeight;
 }
 
 window.sendBrokerMessage = async function() {
-    const input = document.getElementById('brokerMessageInput');
-    const val = input.value.trim();
-    if(!val) return;
+  const input = document.getElementById('brokerMessageInput');
+  const val = input.value.trim();
+  if(!val) return;
+  try {
     await db.collection('brokerMessages').add({ 
-        brokerId: currentBroker.id, 
-        content: val, 
-        sender: 'broker', 
-        timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+      brokerId: currentBroker.id, 
+      content: val, 
+      sender: 'broker', 
+      timestamp: firebase.firestore.FieldValue.serverTimestamp() 
     });
     input.value = '';
+  } catch(e) { showToast(e.message, true); }
 };
 
 // ============================================================
 // ADMIN PORTAL LOGIC
 // ============================================================
 function renderAdminTables() {
-    // Clients Table
-    const cTbody = document.getElementById('adminClientsTable');
-    if(cTbody) {
-        cTbody.innerHTML = clients.map(c => {
-            const p = projects.find(x => x.clientId === c.id);
-            return `
-            <tr>
-                <td><strong>${escapeHtml(c.name)}</strong><br><span style="font-size:11px;color:var(--gray-500);">${escapeHtml(c.email)}</span></td>
-                <td>${escapeHtml(p?.name || '—')}</td>
-                <td><span style="color:${c.status==='active'?'var(--success)':'var(--warning)'};">${c.status}</span></td>
-                <td>${c.createdAt ? c.createdAt.split('T')[0] : '—'}</td>
-                <td>
-                    ${c.status==='pending' ? `<button class="btn btn-success" style="padding:4px 8px;font-size:10px;margin-right:4px;" onclick="approveClient('${c.id}')">Approve</button>` : ''}
-                    <button class="btn btn-outline" style="padding:4px 8px;font-size:10px;margin-right:4px;" onclick="editProject('${p?.id}')">Edit</button>
-                    <button class="btn btn-danger" style="padding:4px 8px;font-size:10px;" onclick="deleteClient('${c.id}', event)">Delete</button>
-                </td>
-            </tr>
-            `;
-        }).join('');
-    }
+  const cTbody = document.getElementById('adminClientsTable');
+  if(cTbody) {
+    cTbody.innerHTML = clients.map(c => {
+      const p = projects.find(x => x.clientId === c.id);
+      return `
+      <tr>
+        <td><strong>${escapeHtml(c.name)}</strong><br><span style="font-size:11px;color:var(--gray-500);">${escapeHtml(c.email)}</span></td>
+        <td>${escapeHtml(p?.name || '—')}</td>
+        <td><span style="color:${c.status==='active'?'var(--success)':'var(--warning)'};">${c.status}</span></td>
+        <td>${c.createdAt ? c.createdAt.split('T')[0] : '—'}</td>
+        <td>
+          ${c.status==='pending' ? `<button class="btn btn-success" style="padding:4px 8px;font-size:10px;margin-right:4px;" onclick="approveClient('${c.id}')">Approve</button>` : ''}
+          <button class="btn btn-outline" style="padding:4px 8px;font-size:10px;margin-right:4px;" onclick="editProject('${p?.id}')">Edit</button>
+          <button class="btn btn-danger" style="padding:4px 8px;font-size:10px;" data-delete-client="${c.id}">Delete</button>
+        </td>
+      </tr>
+      `;
+    }).join('');
+  }
 
-    // Projects Table with Delete button
-    const pTbody = document.getElementById('adminProjectsTable');
-    if(pTbody) {
-        pTbody.innerHTML = projects.map(p => {
-            const c = clients.find(cl => cl.id === p.clientId);
-            return `
-            <tr>
-                <td>${escapeHtml(c?.name || 'Unknown')}</td>
-                <td><strong>${escapeHtml(p.name)}</strong></td>
-                <td>${escapeHtml(p.industry || '—')}</td>
-                <td>${escapeHtml(p.location || '—')}</td>
-                <td>${escapeHtml(p.fundsNeeded || p.amount || 'TBD')}</td>
-                <td><span class="badge badge-navy">Step ${p.step||1}</span></td>
-                <td>—</td><td>—</td>
-                <td>
-                    <button class="btn btn-outline" style="padding:4px 8px;font-size:10px;margin-right:4px;" onclick="editProject('${p.id}')">Edit</button>
-                    <button class="btn btn-danger" style="padding:4px 8px;font-size:10px;" onclick="deleteProject('${p.id}', event)">Delete</button>
-                </td>
-            </tr>
-            `;
-        }).join('');
-    }
-    
-    // Pipeline Board with Delete buttons
-    const board = document.getElementById('pipelineBoard');
-    if(board) {
-        board.innerHTML = [1,2,3,4,5,6,7,8].map(step => {
-            const ps = projects.filter(x => (x.step||1) === step && x.status==='active');
-            return `
-            <div class="pipeline-col">
-                <div class="pipeline-col-title">${STEP_NAMES[step]}</div>
-                ${ps.map(p => `
-                    <div class="pipeline-card" onclick="editProject('${p.id}')">
-                        <div class="pipeline-card-name">${escapeHtml(clients.find(c=>c.id===p.clientId)?.name||'Unknown')}</div>
-                        <div class="pipeline-card-project">${escapeHtml(p.name)}</div>
-                        <div style="margin-top:8px;">
-                            <button class="btn btn-danger" style="padding:2px 6px;font-size:8px;" onclick="event.stopPropagation(); deleteProject('${p.id}', event)">Delete</button>
-                        </div>
-                    </div>
-                `).join('')}
+  const pTbody = document.getElementById('adminProjectsTable');
+  if(pTbody) {
+    pTbody.innerHTML = projects.map(p => {
+      const c = clients.find(cl => cl.id === p.clientId);
+      return `
+      <tr>
+        <td>${escapeHtml(c?.name || 'Unknown')}</td>
+        <td><strong>${escapeHtml(p.name)}</strong></td>
+        <td>${escapeHtml(p.industry || '—')}</td>
+        <td>${escapeHtml(p.location || '—')}</td>
+        <td>${escapeHtml(p.fundsNeeded || p.amount || 'TBD')}</td>
+        <td><span class="badge badge-navy">Step ${p.step||1}</span></td>
+        <td><span class="badge ${p.commitmentFeeStatus === 'paid' ? 'badge-green' : 'badge-gray'}">${p.commitmentFeeStatus === 'paid' ? 'Paid ✓' : 'Pending'}</span></td>
+        <td><span class="badge ${p.ecfStatus === 'escrowed' ? 'badge-green' : 'badge-gray'}">${p.ecfStatus === 'escrowed' ? 'Escrowed ✓' : 'Pending'}</span></td>
+        <td>
+          <button class="btn btn-outline" style="padding:4px 8px;font-size:10px;margin-right:4px;" onclick="editProject('${p.id}')">Edit</button>
+          <button class="btn btn-danger" style="padding:4px 8px;font-size:10px;" data-delete-project="${p.id}">Delete</button>
+        </td>
+      </tr>
+      `;
+    }).join('');
+  }
+  
+  const board = document.getElementById('pipelineBoard');
+  if(board) {
+    board.innerHTML = [1,2,3,4,5,6,7,8].map(step => {
+      const ps = projects.filter(x => (x.step||1) === step && x.status==='active');
+      return `
+      <div class="pipeline-col">
+        <div class="pipeline-col-title">${STEP_NAMES[step]}</div>
+        ${ps.map(p => `
+          <div class="pipeline-card" onclick="editProject('${p.id}')">
+            <div class="pipeline-card-name">${escapeHtml(clients.find(c=>c.id===p.clientId)?.name||'Unknown')}</div>
+            <div class="pipeline-card-project">${escapeHtml(p.name)}</div>
+            <div style="margin-top:8px;">
+              <button class="btn btn-danger" style="padding:2px 6px;font-size:8px;" onclick="event.stopPropagation(); deleteProject('${p.id}', event)">Delete</button>
             </div>
-            `;
-        }).join('');
-    }
-    
-    // Update stats
-    document.getElementById('totalClients').innerHTML = clients.filter(c=>c.status==='active').length;
-    document.getElementById('totalProjects').innerHTML = projects.filter(p=>p.status==='active').length;
-    document.getElementById('totalDocuments').innerHTML = documents.length;
-    document.getElementById('pendingClientsCount').innerHTML = clients.filter(c=>c.status==='pending').length;
-}
+          </div>
+        `).join('')}
+      </div>
+      `;
+    }).join('');
+  }
   
-function renderBrokerAdminTable() {
-    const tbody = document.getElementById('adminBrokersTable');
-    if(!tbody) return;
-    tbody.innerHTML = brokers.map(b => `
-        <tr>
-            <td><strong>${escapeHtml(b.name)}</strong><br><span style="font-size:11px;color:var(--gray-500);">${escapeHtml(b.email)}</span></td>
-            <td>${escapeHtml(b.firm)}</td>
-            <td><strong>${b.commissionRate || 0}%</strong></td>
-            <td><span style="color:${b.status==='active'?'var(--success)':'var(--warning)'};">${b.status}</span></td>
-            <td>
-                ${b.status==='pending' ? `<button class="btn btn-success" style="padding:4px 8px;font-size:10px;margin-right:4px;" onclick="approveBroker('${b.id}')">Approve</button>` : ''}
-                <button class="btn btn-outline" style="padding:4px 8px;font-size:10px;margin-right:4px;" onclick="setBrokerCommission('${b.id}')">Set Rate</button>
-                <button class="btn btn-danger" style="padding:4px 8px;font-size:10px;" onclick="deleteBroker('${b.id}', event)">Delete</button>
-            </td>
-        </tr>
-    `).join('');
-}
-  
-function renderAdminBrokerSubmissionsTable() {
-    const tbody = document.getElementById('adminBrokerSubmissionsTable');
-    if(!tbody) return;
-    tbody.innerHTML = brokerSubmissions.map(s => `
-        <tr>
-            <td>${s.createdAt ? s.createdAt.split('T')[0] : '—'}</td>
-            <td><strong>${escapeHtml(s.brokerName)}</strong></td>
-            <td>${escapeHtml(s.clientName)}</td>
-            <td>${escapeHtml(s.projectName)}</td>
-            <td>$${escapeHtml(s.fundsNeeded||'—')}</td>
-            <td><span class="status-badge-${s.status==='pending'?'pending':'active'}">${s.status==='pending'?'Pending':'Accepted'}</span></td>
-            <td>
-                <button class="btn btn-danger" style="padding:4px 8px;font-size:10px;" onclick="deleteBrokerSubmission('${s.id}', event)">Delete</button>
-            </td>
-        </tr>
-    `).join('');
+  document.getElementById('totalClients').innerHTML = clients.filter(c=>c.status==='active').length;
+  document.getElementById('totalProjects').innerHTML = projects.filter(p=>p.status==='active').length;
+  document.getElementById('totalDocuments').innerHTML = documents.length;
+  document.getElementById('pendingClientsCount').innerHTML = clients.filter(c=>c.status==='pending').length;
 }
 
-// Add this function to delete broker submissions
+function renderBrokerAdminTable() {
+  const tbody = document.getElementById('adminBrokersTable');
+  if(!tbody) return;
+  tbody.innerHTML = brokers.map(b => `
+    <tr>
+      <td><strong>${escapeHtml(b.name)}</strong><br><span style="font-size:11px;color:var(--gray-500);">${escapeHtml(b.email)}</span></td>
+      <td>${escapeHtml(b.firm)}</td>
+      <td><strong>${b.commissionRate || 0}%</strong></td>
+      <td><span style="color:${b.status==='active'?'var(--success)':'var(--warning)'};">${b.status}</span></td>
+      <td>
+        ${b.status==='pending' ? `<button class="btn btn-success" style="padding:4px 8px;font-size:10px;margin-right:4px;" onclick="approveBroker('${b.id}')">Approve</button>` : ''}
+        <button class="btn btn-outline" style="padding:4px 8px;font-size:10px;margin-right:4px;" onclick="setBrokerCommission('${b.id}')">Set Rate</button>
+        <button class="btn btn-danger" style="padding:4px 8px;font-size:10px;" onclick="deleteBroker('${b.id}', event)">Delete</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderAdminBrokerSubmissionsTable() {
+  const tbody = document.getElementById('adminBrokerSubmissionsTable');
+  if(!tbody) return;
+  tbody.innerHTML = brokerSubmissions.map(s => `
+    <tr>
+      <td>${s.createdAt ? s.createdAt.split('T')[0] : '—'}</td>
+      <td><strong>${escapeHtml(s.brokerName)}</strong></td>
+      <td>${escapeHtml(s.clientName)}</td>
+      <td>${escapeHtml(s.projectName)}</td>
+      <td>${formatCurrency(s.fundsNeeded||'—')}</td>
+      <td><span class="status-badge-${s.status==='pending'?'pending':'active'}">${s.status==='pending'?'Pending':'Accepted'}</span></td>
+      <td><button class="btn btn-danger" style="padding:4px 8px;font-size:10px;" onclick="deleteBrokerSubmission('${s.id}', event)">Delete</button></td>
+    </tr>
+  `).join('');
+}
+
 window.deleteBrokerSubmission = async function(id, event) {
-    if(event) event.stopPropagation();
-    if(confirm('Delete this broker submission?')) {
-        await db.collection('brokerSubmissions').doc(id).delete();
-        showToast('Submission deleted');
-    }
+  if(event) event.stopPropagation();
+  if(confirm('Delete this broker submission?')) {
+    await db.collection('brokerSubmissions').doc(id).delete();
+    showToast('Submission deleted');
+  }
 };
 
 function renderAdminDocumentsTable() {
-    const tbody = document.getElementById('adminDocumentsTableBody');
-    if(!tbody) return;
-    tbody.innerHTML = documents.map(d => {
-        const client = clients.find(c=>c.id===d.clientId);
-        const proj = projects.find(p=>p.id===d.projectId);
-        return `
-        <tr>
-            <td><strong>${escapeHtml(client?.name||'Unknown')}</strong><br><span style="font-size:10px;color:var(--gray-500)">${escapeHtml(proj?.name||'')}</span></td>
-            <td><strong>${escapeHtml(d.name)}</strong></td>
-            <td>${d.approved?'<span class="doc-status-badge doc-status-approved">Approved ✓</span>':'<span class="doc-status-badge doc-status-uploaded">Pending</span>'}</td>
-            <td>${d.date||'—'}</td>
-            <td>
-                <a href="${d.url}" target="_blank" class="doc-action-btn doc-action-view">View</a>
-                ${!d.approved ? `<button class="doc-action-btn doc-action-approve" onclick="approveAdminDoc('${d.id}')">Approve</button>` : ''}
-                <button class="doc-action-btn doc-action-delete" onclick="deleteAdminDoc('${d.id}')">Delete</button>
-            </td>
-        </tr>
-        `;
-    }).join('');
+  const tbody = document.getElementById('adminDocumentsTableBody');
+  if(!tbody) return;
+  tbody.innerHTML = documents.map(d => {
+    const client = clients.find(c=>c.id===d.clientId);
+    const proj = projects.find(p=>p.id===d.projectId);
+    return `
+    <tr>
+      <td><strong>${escapeHtml(client?.name||'Unknown')}</strong><br><span style="font-size:10px;color:var(--gray-500)">${escapeHtml(proj?.name||'')}</span></td>
+      <td><strong>${escapeHtml(d.name)}</strong></td>
+      <td>${d.approved?'<span class="doc-status-badge doc-status-approved">Approved ✓</span>':'<span class="doc-status-badge doc-status-uploaded">Pending</span>'}</td>
+      <td>${d.date||'—'}</td>
+      <td>
+        <a href="${d.url}" target="_blank" class="doc-action-btn doc-action-view">View</a>
+        ${!d.approved ? `<button class="doc-action-btn doc-action-approve" onclick="approveAdminDoc('${d.id}')">Approve</button>` : ''}
+        <button class="doc-action-btn doc-action-delete" onclick="deleteAdminDoc('${d.id}')">Delete</button>
+      </td>
+    </tr>
+    `;
+  }).join('');
 }
+
 window.approveAdminDoc = async function(id) { await db.collection('documents').doc(id).update({approved:true}); showToast('Document Approved'); };
 window.deleteAdminDoc = async function(id) { 
-    if(confirm('Delete document permanently?')) { 
-        await db.collection('documents').doc(id).delete(); 
-        showToast('Document Deleted'); 
-    }
+  if(confirm('Delete document permanently?')) { 
+    await db.collection('documents').doc(id).delete(); 
+    showToast('Document Deleted'); 
+  }
 };
 
 function renderAdminMessages() {
-    const cont = document.getElementById('allMessagesList');
-    if(!cont) return;
+  const cont = document.getElementById('allMessagesList');
+  if(!cont) return;
+  
+  const threads = {};
+  messages.forEach(m => { if(!threads[m.clientId]) threads[m.clientId] = []; threads[m.clientId].push(m); });
+  
+  let html = '';
+  for(const [cid, msgs] of Object.entries(threads)) {
+    const c = clients.find(x=>x.id===cid);
+    const sorted = msgs.sort((a,b) => (a.timestamp?.seconds||0) - (b.timestamp?.seconds||0));
     
-    const threads = {};
-    messages.forEach(m => { if(!threads[m.clientId]) threads[m.clientId] = []; threads[m.clientId].push(m); });
-    
-    let html = '';
-    for(const [cid, msgs] of Object.entries(threads)) {
-        const c = clients.find(x=>x.id===cid);
-        const sorted = msgs.sort((a,b) => (a.timestamp?.seconds||0) - (b.timestamp?.seconds||0));
-        
-        html += `
-        <div class="admin-thread">
-            <div class="admin-thread-header">
-                <div>
-                    <div class="admin-thread-client">${escapeHtml(c?.name||cid)}</div>
-                    <div class="admin-thread-project">${escapeHtml(c?.email||'')}</div>
-                </div>
+    html += `
+    <div class="admin-thread">
+      <div class="admin-thread-header">
+        <div>
+          <div class="admin-thread-client">${escapeHtml(c?.name||cid)}</div>
+          <div class="admin-thread-project">${escapeHtml(c?.email||'')}</div>
+        </div>
+      </div>
+      <div class="admin-thread-body">
+        <div class="admin-thread-msgs" id="admin-thread-${cid}">
+          ${sorted.map(m => `
+            <div class="message ${m.sender === 'admin' ? 'client' : 'admin'}" style="margin-bottom:10px;">
+              <div class="message-bubble" style="${m.sender === 'admin' ? 'background:var(--navy);color:white;border-bottom-right-radius:2px;' : 'background:var(--gray-100);color:var(--navy);border-bottom-left-radius:2px;'}">
+                ${escapeHtml(m.content)}
+              </div>
+              <div class="message-meta">${m.sender === 'admin' ? 'You' : (c?.name || 'Client')}</div>
             </div>
-            <div class="admin-thread-body">
-                <div class="admin-thread-msgs" id="admin-thread-${cid}">
-                    ${sorted.map(m => `
-                        <div class="message ${m.sender === 'admin' ? 'client' : 'admin'}" style="margin-bottom:10px;">
-                            <div class="message-bubble" style="${m.sender === 'admin' ? 'background:var(--navy);color:white;border-bottom-right-radius:2px;' : 'background:var(--gray-100);color:var(--navy);border-bottom-left-radius:2px;'}">
-                                ${escapeHtml(m.content)}
-                            </div>
-                            <div class="message-meta">${m.sender === 'admin' ? 'You' : (c?.name || 'Client')}</div>
-                        </div>
-                    `).join('')}
-                </div>
-                <div class="admin-reply-box">
-                    <textarea id="adminReply_${cid}" placeholder="Type reply..."></textarea>
-                    <button class="btn btn-primary" onclick="sendAdminReply('${cid}')">Reply</button>
-                </div>
-            </div>
-        </div>`;
-    }
-    cont.innerHTML = html || '<div style="padding:20px; color:#666;">No messages yet.</div>';
-    
-    Object.keys(threads).forEach(cid => {
-        const threadBox = document.getElementById('admin-thread-' + cid);
-        if(threadBox) threadBox.scrollTop = threadBox.scrollHeight;
-    });
+          `).join('')}
+        </div>
+        <div class="admin-reply-box">
+          <textarea id="adminReply_${cid}" placeholder="Type reply..."></textarea>
+          <button class="btn btn-primary" onclick="sendAdminReply('${cid}')">Reply</button>
+        </div>
+      </div>
+    </div>`;
+  }
+  cont.innerHTML = html || '<div style="padding:20px; color:#666;">No messages yet.</div>';
+  
+  Object.keys(threads).forEach(cid => {
+    const threadBox = document.getElementById('admin-thread-' + cid);
+    if(threadBox) threadBox.scrollTop = threadBox.scrollHeight;
+  });
 }
 
 window.sendAdminReply = async function(cid) {
-    const input = document.getElementById('adminReply_'+cid);
-    const val = input.value.trim();
-    if(!val) return;
+  const input = document.getElementById('adminReply_'+cid);
+  const val = input.value.trim();
+  if(!val) return;
+  try {
     await db.collection('messages').add({ 
-        clientId: cid, 
-        content: val, 
-        sender: 'admin', 
-        timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+      clientId: cid, 
+      content: val, 
+      sender: 'admin', 
+      timestamp: firebase.firestore.FieldValue.serverTimestamp() 
     });
     input.value = '';
+  } catch(e) { showToast(e.message, true); }
 };
 
 // ============================================================
-// ADMIN EDIT PROJECT & CLIENT SPLIT TAB LOGIC
+// ADMIN EDIT PROJECT & CLIENT FUNCTIONS
 // ============================================================
 window.editProject = function(pid) {
-    if(!pid) return showToast('No project attached to client yet.', true);
-    const p = projects.find(x => x.id === pid);
-    if(!p) return;
-    window.editProjectId = pid;
-    const c = clients.find(cl => cl.id === p.clientId);
+  if(!pid) return showToast('No project attached to client yet.', true);
+  const p = projects.find(x => x.id === pid);
+  if(!p) return;
+  editProjectId = pid;
+  const c = clients.find(cl => cl.id === p.clientId);
+  
+  document.getElementById('editClientName').value = c?.name || '';
+  document.getElementById('editClientEmail').value = c?.email || '';
+  document.getElementById('editProjectName').value = p.name || '';
+  document.getElementById('editIndustry').value = p.industry || 'Real Estate';
+  document.getElementById('editLocation').value = p.location || '';
+  document.getElementById('editFundsNeeded').value = p.fundsNeeded || '';
+  document.getElementById('editTotalCost').value = p.totalCost || '';
+  document.getElementById('editSponsorEquity').value = p.sponsorEquity || '';
+  document.getElementById('editAmount').value = p.amount || '';
+  document.getElementById('editRate').value = p.interestRate || '';
+  document.getElementById('editStep').value = p.step || 1;
+  
+  const brokerSelect = document.getElementById('editBrokerAssign');
+  if(brokerSelect) {
+    brokerSelect.innerHTML = '<option value="">Direct Client (No Broker)</option>' + brokers.map(b => `<option value="${b.id}" ${p.brokerId===b.id?'selected':''}>${escapeHtml(b.name)} (${b.commissionRate||0}%)</option>`).join('');
+  }
+  
+  const stepContainer = document.getElementById('stepStatusContainer');
+  if(stepContainer) {
+    stepContainer.innerHTML = renderStepDashboard(p);
+  }
+  
+  switchEditTab('project');
+  openModal('editProjectModal');
+};
+
+function renderStepDashboard(project) {
+  if(!project) return '<div>No project data</div>';
+  let html = `<div style="background: white; border-radius: 12px; overflow: hidden; margin-top: 20px;"><div style="background: var(--navy); color: white; padding: 16px 20px;"><h3 style="margin: 0; font-size: 16px;"><i class="fas fa-chart-line"></i> Closing Process Dashboard</h3></div><div style="padding: 20px;"><div style="margin-bottom: 30px;"><div style="display: flex; justify-content: space-between; margin-bottom: 8px;"><span style="font-size: 13px; font-weight: 500;">Overall Progress</span><span style="font-size: 13px; font-weight: 500;">${project.overallProgress || Math.round(((project.step||1)/8)*100)}%</span></div><div style="background: var(--gray-200); height: 8px; border-radius: 10px; overflow: hidden;"><div style="background: var(--success); height: 100%; width: ${project.overallProgress || Math.round(((project.step||1)/8)*100)}%; transition: width 0.3s;"></div></div></div><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;">`;
+  
+  for(let i = 1; i <= 8; i++) {
+    const stepName = STEP_NAMES[i];
+    const isCompleted = project[`step${i}Completed`] === true;
+    const isCurrent = (project.step || 1) === i;
+    const completedAt = project[`step${i}CompletedAt`];
     
-    document.getElementById('editClientName').value = c?.name || '';
-    document.getElementById('editClientEmail').value = c?.email || '';
-    document.getElementById('editProjectName').value = p.name || '';
-    document.getElementById('editIndustry').value = p.industry || 'Real Estate';
-    document.getElementById('editLocation').value = p.location || '';
-    document.getElementById('editFundsNeeded').value = p.fundsNeeded || '';
-    document.getElementById('editTotalCost').value = p.totalCost || '';
-    document.getElementById('editSponsorEquity').value = p.sponsorEquity || '';
-    document.getElementById('editAmount').value = p.amount || '';
-    document.getElementById('editRate').value = p.interestRate || '';
-    document.getElementById('editStep').value = p.step || 1;
+    html += `<div style="border: 1px solid ${isCompleted ? 'var(--success)' : (isCurrent ? 'var(--blue)' : 'var(--gray-200)')}; border-radius: 12px; overflow: hidden;"><div style="padding: 16px; background: ${isCompleted ? 'var(--success)' : (isCurrent ? 'var(--navy)' : 'var(--gray-50)')}; color: ${(isCompleted || isCurrent) ? 'white' : 'var(--gray-600)'};"><div style="display: flex; justify-content: space-between; align-items: center;"><div><span style="font-size: 11px; opacity: 0.8;">STEP ${i}</span><h4 style="margin: 5px 0 0; font-size: 16px;">${stepName}</h4></div><div>${isCompleted ? '<span style="background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 20px; font-size: 11px;"><i class="fas fa-check"></i> COMPLETE</span>' : (isCurrent ? '<span style="background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 20px; font-size: 11px;"><i class="fas fa-spinner fa-pulse"></i> IN PROGRESS</span>' : '<span style="background: rgba(0,0,0,0.1); padding: 4px 10px; border-radius: 20px; font-size: 11px;">PENDING</span>')}</div></div></div><div style="padding: 16px;">${completedAt ? `<div style="font-size: 11px; color: var(--gray-500); margin-bottom: 12px;"><i class="fas fa-calendar-check"></i> Completed: ${formatDate(completedAt)}</div>` : ''}<div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--gray-200); display: flex; gap: 8px;">${!isCompleted ? `<button class="btn btn-success" style="padding: 6px 12px; font-size: 11px; flex: 1;" onclick="markStepCompleted('${project.id}', ${i})"><i class="fas fa-check"></i> Mark Complete</button>` : ''}<button class="btn btn-outline" style="padding: 6px 12px; font-size: 11px; flex: 1;" onclick="revertStepStatus('${project.id}', ${i})"><i class="fas fa-undo"></i> ${isCompleted ? 'Revert' : 'Skip / Revert'}</button></div></div></div>`;
+  }
+  html += `</div></div></div>`;
+  return html;
+}
+
+window.markStepCompleted = async function(projectId, stepNumber) {
+  const project = projects.find(p => p.id === projectId);
+  if(!project) return;
+  
+  if(stepNumber === 2) {
+    showCommitmentFeeModal(projectId);
+    return;
+  }
+  if(stepNumber === 6) {
+    showECFEscrowModal(projectId);
+    return;
+  }
+  
+  const confirmMsg = `Mark Step ${stepNumber} (${STEP_NAMES[stepNumber]}) as complete?`;
+  if(!confirm(confirmMsg)) return;
+  
+  try {
+    const updateData = {
+      [`step${stepNumber}Completed`]: true,
+      [`step${stepNumber}CompletedAt`]: new Date().toISOString()
+    };
+    if(project.step === stepNumber) updateData.step = stepNumber + 1;
     
-    document.getElementById('editBrokerAssign').innerHTML = '<option value="">Direct Client (No Broker)</option>' + brokers.map(b => `<option value="${b.id}" ${p.brokerId===b.id?'selected':''}>${b.name}</option>`).join('');
+    let completedCount = 0;
+    for(let i = 1; i <= stepNumber; i++) {
+      if(i === stepNumber || project[`step${i}Completed`]) completedCount++;
+    }
+    updateData.overallProgress = Math.round((completedCount / 8) * 100);
     
-    switchEditTab('project');
-    openModal('editProjectModal');
+    await db.collection('projects').doc(projectId).update(updateData);
+    const client = clients.find(c => c.id === project.clientId);
+    await logActivity('admin', 'Suzana Aleksić', 'croft', 'step_completed', projectId, `Step ${stepNumber}: ${STEP_NAMES[stepNumber]}`);
+    showToast(`Step ${stepNumber} marked complete`);
+    renderAdminTables();
+    if(editProjectId === projectId) {
+      const stepContainer = document.getElementById('stepStatusContainer');
+      if(stepContainer) {
+        const updatedProject = projects.find(p => p.id === projectId);
+        stepContainer.innerHTML = renderStepDashboard(updatedProject);
+      }
+    }
+  } catch(e) { showToast(e.message, true); }
+};
+
+window.revertStepStatus = async function(projectId, stepNumber) {
+  const project = projects.find(p => p.id === projectId);
+  if(!project) return;
+  const isCurrentlyCompleted = project[`step${stepNumber}Completed`];
+  if(!confirm(`Revert Step ${stepNumber} (${STEP_NAMES[stepNumber]}) to incomplete?`)) return;
+  
+  try {
+    const updateData = {};
+    if(isCurrentlyCompleted) {
+      updateData[`step${stepNumber}Completed`] = false;
+      updateData[`step${stepNumber}CompletedAt`] = null;
+      if(project.step > stepNumber) updateData.step = stepNumber;
+    } else {
+      updateData[`step${stepNumber}Completed`] = true;
+      updateData[`step${stepNumber}CompletedAt`] = new Date().toISOString();
+      if(project.step === stepNumber) updateData.step = stepNumber + 1;
+    }
+    let completedCount = 0;
+    for(let i = 1; i <= 8; i++) {
+      if(i === stepNumber) {
+        if(updateData[`step${stepNumber}Completed`] === true) completedCount++;
+        else if(isCurrentlyCompleted && updateData[`step${stepNumber}Completed`] === false) {}
+        else if(project[`step${i}Completed`]) completedCount++;
+      } else if(project[`step${i}Completed`]) completedCount++;
+    }
+    updateData.overallProgress = Math.round((completedCount / 8) * 100);
+    await db.collection('projects').doc(projectId).update(updateData);
+    showToast(`Step ${stepNumber} status updated`);
+    renderAdminTables();
+    if(editProjectId === projectId) {
+      const stepContainer = document.getElementById('stepStatusContainer');
+      if(stepContainer) {
+        const updatedProject = projects.find(p => p.id === projectId);
+        stepContainer.innerHTML = renderStepDashboard(updatedProject);
+      }
+    }
+  } catch(e) { showToast(e.message, true); }
+};
+
+window.showCommitmentFeeModal = function(projectId) {
+  const modalHtml = `<div id="feeModal" style="position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 10001;"><div style="background: white; border-radius: 16px; max-width: 450px; width: 90%; padding: 24px;"><h3 style="margin: 0 0 8px 0;">Confirm Commitment Fee</h3><p style="color: var(--gray-500); font-size: 13px; margin-bottom: 20px;">Enter the fee details received</p><div class="form-group"><label class="form-label">Amount Received (USD)</label><input type="text" id="feeAmount" class="form-input" placeholder="e.g., 50,000"></div><div class="form-group"><label class="form-label">Transaction Reference</label><input type="text" id="feeReference" class="form-input" placeholder="Wire/Transfer Reference #"></div><div class="form-group"><label class="form-label">Payment Date</label><input type="date" id="feeDate" class="form-input" value="${new Date().toISOString().split('T')[0]}"></div><div class="form-group"><label class="form-label">Payment Method</label><select id="feeMethod" class="form-select"><option>Wire Transfer</option><option>SWIFT</option><option>Local Transfer</option><option>Other</option></select></div><div style="display: flex; gap: 12px; margin-top: 20px;"><button class="btn btn-primary" style="flex: 1;" onclick="confirmCommitmentFee('${projectId}')">Confirm Payment</button><button class="btn btn-outline" style="flex: 1;" onclick="closeFeeModal()">Cancel</button></div></div></div>`;
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+};
+
+window.closeFeeModal = function() { const modal = document.getElementById('feeModal'); if(modal) modal.remove(); };
+window.closeECFModal = function() { const modal = document.getElementById('ecfModal'); if(modal) modal.remove(); };
+
+window.confirmCommitmentFee = async function(projectId) {
+  const amount = document.getElementById('feeAmount')?.value;
+  const reference = document.getElementById('feeReference')?.value;
+  const date = document.getElementById('feeDate')?.value;
+  const method = document.getElementById('feeMethod')?.value;
+  if(!amount || !reference) return showToast('Please enter amount and reference number', true);
+  
+  const project = projects.find(p => p.id === projectId);
+  await db.collection('projects').doc(projectId).update({
+    commitmentFeeStatus: 'paid',
+    commitmentFeeAmount: amount,
+    commitmentFeeReference: reference,
+    commitmentFeeDate: date,
+    commitmentFeeMethod: method,
+    commitmentFeePaidAt: new Date().toISOString(),
+    step2Completed: true,
+    step2CompletedAt: new Date().toISOString(),
+    step: 3
+  });
+  const client = clients.find(c => c.id === project.clientId);
+  await logActivity('admin', 'Suzana Aleksić', 'croft', 'cf_confirmed', projectId, `Amount: $${amount}, Ref: ${reference}`);
+  showToast(`Commitment Fee of $${amount} confirmed`);
+  closeFeeModal();
+  renderAdminTables();
+  if(editProjectId === projectId) {
+    const stepContainer = document.getElementById('stepStatusContainer');
+    if(stepContainer) {
+      const updatedProject = projects.find(p => p.id === projectId);
+      stepContainer.innerHTML = renderStepDashboard(updatedProject);
+    }
+  }
+};
+
+window.showECFEscrowModal = function(projectId) {
+  const modalHtml = `<div id="ecfModal" style="position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 10001;"><div style="background: white; border-radius: 16px; max-width: 450px; width: 90%; padding: 24px;"><h3 style="margin: 0 0 8px 0;">Confirm ECF Escrow</h3><p style="color: var(--gray-500); font-size: 13px; margin-bottom: 20px;">Enter the ECF escrow details</p><div class="form-group"><label class="form-label">ECF Amount (USD)</label><input type="text" id="ecfAmount" class="form-input" placeholder="e.g., 10,000,000"></div><div class="form-group"><label class="form-label">Escrow Bank / Institution</label><input type="text" id="ecfInstitution" class="form-input"></div><div class="form-group"><label class="form-label">Escrow Account Reference</label><input type="text" id="ecfReference" class="form-input"></div><div class="form-group"><label class="form-label">Escrow Date</label><input type="date" id="ecfDate" class="form-input" value="${new Date().toISOString().split('T')[0]}"></div><div class="form-group"><label class="form-label">Policy Number</label><input type="text" id="ecfPolicyNumber" class="form-input"></div><div style="display: flex; gap: 12px; margin-top: 20px;"><button class="btn btn-primary" style="flex: 1;" onclick="confirmECFEscrow('${projectId}')">Confirm Escrow</button><button class="btn btn-outline" style="flex: 1;" onclick="closeECFModal()">Cancel</button></div></div></div>`;
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+};
+
+window.confirmECFEscrow = async function(projectId) {
+  const amount = document.getElementById('ecfAmount')?.value;
+  const institution = document.getElementById('ecfInstitution')?.value;
+  const reference = document.getElementById('ecfReference')?.value;
+  const date = document.getElementById('ecfDate')?.value;
+  const policyNumber = document.getElementById('ecfPolicyNumber')?.value;
+  if(!amount || !institution || !reference) return showToast('Please fill all required fields', true);
+  
+  const project = projects.find(p => p.id === projectId);
+  await db.collection('projects').doc(projectId).update({
+    ecfStatus: 'escrowed',
+    ecfAmount: amount,
+    ecfInstitution: institution,
+    ecfReference: reference,
+    ecfEscrowDate: date,
+    ecfPolicyNumber: policyNumber,
+    ecfEscrowedAt: new Date().toISOString(),
+    step6Completed: true,
+    step6CompletedAt: new Date().toISOString(),
+    step: 7
+  });
+  const client = clients.find(c => c.id === project.clientId);
+  await logActivity('admin', 'Suzana Aleksić', 'croft', 'ecf_confirmed', projectId, `Amount: $${amount}, Institution: ${institution}`);
+  showToast(`ECF Escrow of $${amount} confirmed`);
+  closeECFModal();
+  renderAdminTables();
+  if(editProjectId === projectId) {
+    const stepContainer = document.getElementById('stepStatusContainer');
+    if(stepContainer) {
+      const updatedProject = projects.find(p => p.id === projectId);
+      stepContainer.innerHTML = renderStepDashboard(updatedProject);
+    }
+  }
 };
 
 window.saveProjectInfo = async function() {
-    const pid = window.editProjectId;
-    const p = projects.find(x => x.id === pid);
-    if(!p) return;
-    
-    const clientName = document.getElementById('editClientName').value.trim();
-    const clientEmail = document.getElementById('editClientEmail').value.trim();
-    const oldStep = p.step || 1;
-    const newStep = parseInt(document.getElementById('editStep').value);
-    
-    if(p.clientId) {
-        await db.collection('clients').doc(p.clientId).update({ name: clientName, email: clientEmail });
+  const pid = editProjectId;
+  const p = projects.find(x => x.id === pid);
+  if(!p) return;
+  
+  const clientName = document.getElementById('editClientName').value.trim();
+  const clientEmail = document.getElementById('editClientEmail').value.trim();
+  const oldStep = p.step || 1;
+  const newStep = parseInt(document.getElementById('editStep').value);
+  
+  if(p.clientId && clientName) {
+    await db.collection('clients').doc(p.clientId).update({ name: clientName, email: clientEmail });
+  }
+  
+  const updates = {
+    name: document.getElementById('editProjectName').value,
+    industry: document.getElementById('editIndustry').value,
+    location: document.getElementById('editLocation').value,
+    fundsNeeded: document.getElementById('editFundsNeeded').value,
+    totalCost: document.getElementById('editTotalCost').value,
+    sponsorEquity: document.getElementById('editSponsorEquity').value,
+    step: newStep,
+    amount: document.getElementById('editAmount').value,
+    interestRate: document.getElementById('editRate').value,
+    brokerId: document.getElementById('editBrokerAssign').value || null,
+    advisorNote: document.getElementById('editAdvisorNote').value,
+    adminNote: document.getElementById('editAdminNote').value
+  };
+  
+  await db.collection('projects').doc(pid).update(updates);
+  
+  if(newStep !== oldStep && newStep > oldStep) {
+    const client = clients.find(c => c.id === p.clientId);
+    if(client) {
+      await logActivity('admin', 'Suzana Aleksić', 'croft', 'step_advanced', pid, `From step ${oldStep} to ${newStep}`);
     }
+  }
+  
+  closeModal('editProjectModal');
+  showToast('Client and Project updated successfully.');
+  renderAdminTables();
+};
+
+window.showAddClientModal = function() {
+  const fields = ['ncName', 'ncEmail', 'ncPassword', 'ncProject', 'ncIndustry', 'ncLocation', 
+                  'ncTotalCost', 'ncSponsorEquity', 'ncFundsNeeded', 'ncCurrentStage', 'ncUseOfFunds',
+                  'ncTargetIRR', 'ncCloseDate', 'ncMOIC', 'ncCapRate', 'ncExitStrategy', 'ncExitCapRate',
+                  'ncPermits', 'ncRevenue', 'ncAssetClass', 'ncInfraType', 'ncCommodity', 'ncMiningStage',
+                  'ncReserveLife', 'ncDataRoom', 'ncAmount', 'ncRate', 'ncTerm', 'ncGrace', 'ncECF', 
+                  'ncGovLaw', 'ncExpiry'];
+  fields.forEach(f => { const el = document.getElementById(f); if(el) el.value = ''; });
+  openModal('addClientModal');
+};
+
+window.createClient = async function() {
+  const name = document.getElementById('ncName').value.trim();
+  const email = document.getElementById('ncEmail').value.trim().toLowerCase();
+  const password = document.getElementById('ncPassword').value;
+  const projectName = document.getElementById('ncProject').value.trim();
+  
+  if(!name || !email || !password || !projectName) return showToast('Please fill in Name, Email, Password, and Project Name', true);
+  if(password.length < 6) return showToast('Password must be at least 6 characters', true);
+  
+  try {
+    const userCred = await auth.createUserWithEmailAndPassword(email, password);
+    const uid = userCred.user.uid;
     
-    const updates = {
-        name: document.getElementById('editProjectName').value,
-        industry: document.getElementById('editIndustry').value,
-        location: document.getElementById('editLocation').value,
-        fundsNeeded: document.getElementById('editFundsNeeded').value,
-        totalCost: document.getElementById('editTotalCost').value,
-        sponsorEquity: document.getElementById('editSponsorEquity').value,
-        step: newStep,
-        amount: document.getElementById('editAmount').value,
-        interestRate: document.getElementById('editRate').value,
-        brokerId: document.getElementById('editBrokerAssign').value
-    };
+    await db.collection('clients').doc(uid).set({
+      id: uid, name: name, email: email, status: 'active', createdAt: new Date().toISOString()
+    });
     
-    await db.collection('projects').doc(pid).update(updates);
+    const projectId = db.collection('projects').doc().id;
+    await db.collection('projects').doc(projectId).set({
+      id: projectId, clientId: uid, name: projectName,
+      industry: document.getElementById('ncIndustry').value,
+      location: document.getElementById('ncLocation').value,
+      totalCost: document.getElementById('ncTotalCost').value,
+      sponsorEquity: document.getElementById('ncSponsorEquity').value,
+      fundsNeeded: document.getElementById('ncFundsNeeded').value,
+      currentStage: document.getElementById('ncCurrentStage').value,
+      useOfFunds: document.getElementById('ncUseOfFunds').value,
+      targetIRR: document.getElementById('ncTargetIRR').value,
+      closeDate: document.getElementById('ncCloseDate').value,
+      amount: document.getElementById('ncAmount').value || 'TBD',
+      interestRate: document.getElementById('ncRate').value || 'TBD',
+      step: 1, status: 'active', createdAt: new Date().toISOString()
+    });
     
-    // Send automated email if step changed
-    if(newStep !== oldStep && newStep > oldStep) {
-        const client = clients.find(c => c.id === p.clientId);
-        if(client) {
-            try {
-                await emailjs.send('service_croft', 'template_step_update', {
-                    to_name: client.name,
-                    to_email: client.email,
-                    step_name: STEP_NAMES[newStep],
-                    next_action: newStep === 2 ? 'Submit Commitment Fee' : 'Continue with next steps in portal'
-                });
-                console.log('Step update email sent');
-            } catch(e) { console.warn('EmailJS not configured', e); }
-        }
+    await logActivity(uid, name, 'client', 'client_created', projectId, `Client created by admin`);
+    
+    showToast(`Client ${name} created successfully!`);
+    closeModal('addClientModal');
+  } catch(error) { showToast(error.message, true); }
+};
+
+window.deleteProject = async function(projectId, event) {
+  if(event) event.stopPropagation();
+  const userInput = prompt(`Type "DELETE" to confirm deletion of this project and all its documents:`);
+  if(userInput !== 'DELETE') { showToast('Deletion cancelled'); return; }
+  
+  try {
+    const projectDocs = documents.filter(d => d.projectId === projectId);
+    for(const doc of projectDocs) await db.collection('documents').doc(doc.id).delete();
+    await db.collection('projects').doc(projectId).delete();
+    showToast('Project deleted successfully');
+    if(currentProjectId === projectId) currentProjectId = null;
+  } catch(error) { showToast(error.message, true); }
+};
+
+window.deleteClient = async function(clientId, event) {
+  if(event) event.stopPropagation();
+  const client = clients.find(c => c.id === clientId);
+  if(!client) return;
+  const userInput = prompt(`⚠️ WARNING: This will delete "${client.name}" and ALL associated data. Type "DELETE" to confirm:`);
+  if(userInput !== 'DELETE') { showToast('Deletion cancelled'); return; }
+  
+  try {
+    const clientProjects = projects.filter(p => p.clientId === clientId);
+    for(const project of clientProjects) {
+      const projectDocs = documents.filter(d => d.projectId === project.id);
+      for(const doc of projectDocs) await db.collection('documents').doc(doc.id).delete();
+      await db.collection('projects').doc(project.id).delete();
     }
+    const clientMessages = messages.filter(m => m.clientId === clientId);
+    for(const msg of clientMessages) await db.collection('messages').doc(msg.id).delete();
+    await db.collection('clients').doc(clientId).delete();
+    showToast(`Client "${client.name}" and all associated data deleted successfully`);
+  } catch(error) { showToast(error.message, true); }
+};
+
+window.deleteBroker = async function(brokerId, event) {
+  if(event) event.stopPropagation();
+  const broker = brokers.find(b => b.id === brokerId);
+  if(!broker) return;
+  const userInput = prompt(`Type "DELETE" to confirm deletion of broker "${broker.name}":`);
+  if(userInput !== 'DELETE') { showToast('Deletion cancelled'); return; }
+  
+  try {
+    const submissions = brokerSubmissions.filter(s => s.brokerId === brokerId);
+    for(const sub of submissions) await db.collection('brokerSubmissions').doc(sub.id).delete();
+    const bMessages = brokerMessages.filter(m => m.brokerId === brokerId);
+    for(const msg of bMessages) await db.collection('brokerMessages').doc(msg.id).delete();
+    await db.collection('brokers').doc(brokerId).delete();
+    showToast(`Broker "${broker.name}" deleted`);
+  } catch(error) { showToast(error.message, true); }
+};
+
+window.approveClient = async function(id) {
+  await db.collection('clients').doc(id).update({status: 'active'});
+  const p = projects.find(x => x.clientId === id);
+  if(p) await db.collection('projects').doc(p.id).update({status: 'active'});
+  showToast('Client approved and activated');
+};
+
+window.approveBroker = async function(id) {
+  await db.collection('brokers').doc(id).update({status: 'active'});
+  showToast('Broker approved');
+};
+
+window.setBrokerCommission = async function(id) {
+  const rate = prompt('Enter commission percentage (e.g., 5 for 5%):');
+  if(rate !== null && !isNaN(parseFloat(rate))) {
+    await db.collection('brokers').doc(id).update({commissionRate: parseFloat(rate)});
+    showToast(`Commission rate set to ${rate}%`);
+  }
+};
+
+window.showUploadDocumentModal = function() {
+  const clientSelect = document.getElementById('uploadClientId');
+  if(clientSelect) {
+    clientSelect.innerHTML = '<option value="">Select Client</option>' + 
+      clients.filter(c => c.status === 'active').map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+  }
+  openModal('uploadDocumentModal');
+};
+
+window.updateProjectSelectForUpload = function(clientId) {
+  const projectSelect = document.getElementById('uploadProjectId');
+  if(!projectSelect) return;
+  if(!clientId) { projectSelect.innerHTML = '<option value="">Select Project</option>'; return; }
+  const clientProjects = projects.filter(p => p.clientId === clientId);
+  projectSelect.innerHTML = '<option value="">Select Project</option>' + 
+    clientProjects.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
+};
+
+window.adminUploadDocument = async function() {
+  const clientId = document.getElementById('uploadClientId').value;
+  const projectId = document.getElementById('uploadProjectId').value;
+  const docType = document.getElementById('documentType').value;
+  const file = document.getElementById('pdfFile').files[0];
+  const url = document.getElementById('documentUrl').value;
+  
+  if(!clientId || !projectId) return showToast('Please select client and project', true);
+  
+  try {
+    let docUrl = url;
+    if(file) {
+      const filename = `admin_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+      const ref = storage.ref(`documents/${clientId}/${projectId}/${filename}`);
+      await ref.put(file);
+      docUrl = await ref.getDownloadURL();
+    }
+    if(!docUrl) return showToast('Please provide a file or URL', true);
     
-    closeModal('editProjectModal');
-    showToast('Client and Project updated successfully.');
+    await db.collection('documents').add({
+      clientId: clientId, projectId: projectId, name: docType, type: docType, url: docUrl,
+      approved: true, uploadedBy: 'admin', date: new Date().toISOString().split('T')[0]
+    });
+    showToast('Document uploaded successfully');
+    closeModal('uploadDocumentModal');
+    document.getElementById('pdfFile').value = '';
+    document.getElementById('documentUrl').value = '';
+  } catch(e) { showToast(e.message, true); }
+};
+
+// Debounced search inputs
+const debouncedRenderClients = debounce(() => renderClientsTable(), 250);
+const debouncedRenderMessages = debounce(() => renderAdminMessages(), 250);
+
+document.getElementById('clientSearch')?.addEventListener('input', debouncedRenderClients);
+document.getElementById('messageSearch')?.addEventListener('input', debouncedRenderMessages);
+
+window.renderClientsTable = function() {
+  const searchTerm = document.getElementById('clientSearch')?.value.toLowerCase() || '';
+  const filtered = clients.filter(c => c.name.toLowerCase().includes(searchTerm) || (c.email || '').toLowerCase().includes(searchTerm));
+  const tbody = document.getElementById('adminClientsTable');
+  if(!tbody) return;
+  tbody.innerHTML = filtered.map(c => {
+    const p = projects.find(x => x.clientId === c.id);
+    return `
+    <tr>
+      <td><strong>${escapeHtml(c.name)}</strong><br><span style="font-size:11px;color:var(--gray-500);">${escapeHtml(c.email)}</span></td>
+      <td>${escapeHtml(p?.name || '—')}</td>
+      <td><span style="color:${c.status==='active'?'var(--success)':'var(--warning)'};">${c.status || 'pending'}</span></td>
+      <td>${c.createdAt ? c.createdAt.split('T')[0] : '—'}</td>
+      <td>
+        ${c.status === 'pending' ? `<button class="btn btn-success" style="padding:4px 8px;font-size:10px;" onclick="approveClient('${c.id}')">Approve</button>` : ''}
+        <button class="btn btn-outline" style="padding:4px 8px;font-size:10px;" onclick="editProject('${p?.id}')">Edit</button>
+        <button class="btn btn-danger" style="padding:4px 8px;font-size:10px;" data-delete-client="${c.id}">Del</button>
+      </td>
+    </tr>
+    `;
+  }).join('');
+};
+
+window.renderAdminDocumentsTable = function() {
+  const tbody = document.getElementById('adminDocumentsTableBody');
+  if(!tbody) return;
+  const filterClient = document.getElementById('adminDocFilterClient')?.value || '';
+  let filtered = documents;
+  if(filterClient) filtered = filtered.filter(d => d.clientId === filterClient);
+  
+  const filterSelect = document.getElementById('adminDocFilterClient');
+  if(filterSelect && filterSelect.options.length <= 1) {
+    filterSelect.innerHTML = '<option value="">All Clients</option>' + 
+      clients.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+  }
+  
+  tbody.innerHTML = filtered.map(d => {
+    const client = clients.find(c => c.id === d.clientId);
+    const proj = projects.find(p => p.id === d.projectId);
+    return `
+    <tr>
+      <td><strong>${escapeHtml(client?.name || 'Unknown')}</strong><br><span style="font-size:10px;">${escapeHtml(proj?.name || '')}</span></td>
+      <td>${escapeHtml(d.name)}</td>
+      <td><span class="doc-status-badge ${d.approved ? 'doc-status-approved' : 'doc-status-uploaded'}">${d.approved ? 'Approved' : 'Pending'}</span></td>
+      <td>${d.date || '—'}</td>
+      <td>
+        <a href="${d.url}" target="_blank" class="doc-action-btn doc-action-view">View</a>
+        ${!d.approved ? `<button class="doc-action-btn" onclick="approveAdminDoc('${d.id}')">Approve</button>` : ''}
+        <button class="doc-action-btn" onclick="deleteAdminDoc('${d.id}')">Delete</button>
+      </td>
+    </tr>
+    `;
+  }).join('');
 };
 
 // Contact Form Handler
 window.submitContactForm = async function(e) {
-    e.preventDefault();
-    const name = document.getElementById('contactName').value;
-    const email = document.getElementById('contactEmail').value;
-    const project = document.getElementById('contactProject').value;
-    const message = document.getElementById('contactMessage').value;
-    
-    // Store in Firestore for admin review
-    await db.collection('contactRequests').add({
-        name, email, project, message,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        status: 'new'
-    });
-    
-    document.getElementById('contactFormContent').style.display = 'none';
-    document.getElementById('contactSuccessContent').style.display = 'block';
+  e.preventDefault();
+  const name = document.getElementById('contactName').value;
+  const email = document.getElementById('contactEmail').value;
+  const project = document.getElementById('contactProject').value;
+  const message = document.getElementById('contactMessage').value;
+  
+  await db.collection('contactRequests').add({
+    name, email, project, message,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    status: 'new'
+  });
+  
+  document.getElementById('contactFormContent').style.display = 'none';
+  document.getElementById('contactSuccessContent').style.display = 'block';
 };
 
 window.resetContactForm = function() {
-    document.getElementById('contactFormContent').style.display = 'block';
-    document.getElementById('contactSuccessContent').style.display = 'none';
-    document.getElementById('homepageContactForm').reset();
+  document.getElementById('contactFormContent').style.display = 'block';
+  document.getElementById('contactSuccessContent').style.display = 'none';
+  document.getElementById('homepageContactForm').reset();
 };
 
 window.acceptCookies = function() {
-    document.getElementById('cookieBanner').style.display = 'none';
-    localStorage.setItem('cookiesAccepted', 'true');
+  document.getElementById('cookieBanner').style.display = 'none';
+  localStorage.setItem('cookiesAccepted', 'true');
 };
 
 if(localStorage.getItem('cookiesAccepted') === 'true') {
-    document.getElementById('cookieBanner').style.display = 'none';
+  document.getElementById('cookieBanner').style.display = 'none';
 }
 
-// Additional stubs for missing functions
-window.downloadTermSheet = function() { alert('Term sheet will be available once issued by Croft Finance.'); };
-window.showIVLModal = function() { alert('Investor Verification Letter: Available upon request.'); };
-window.printInvestorVerificationLetter = function() { alert('Print function ready.'); };
-window.previewIVLFromAdmin = function() { alert('IVL preview.'); };
-window.regenerateIVL = function() { alert('IVL regenerated.'); };
-window.showUploadDocumentModal = function() { alert('Upload document modal would open here.'); };
-window.adminUploadDocument = function() { alert('Admin upload'); };
-window.showAddClientModal = function() { alert('Add client modal'); };
-window.createClient = function() { alert('Create client'); };
+// Stub functions for features to be implemented
+window.downloadTermSheet = function() { showToast('Term sheet will be available once issued by Croft Finance.'); };
+window.showIVLModal = function() { showToast('Investor Verification Letter: Available upon request.'); };
+window.printInvestorVerificationLetter = function() { showToast('Print function ready.'); };
+window.previewIVLFromAdmin = function() { showToast('IVL preview.'); };
+window.regenerateIVL = function() { showToast('IVL regenerated.'); };
 window.switchToAdminLogin = function() { showAdminLogin(); openModal('loginModal'); };
 window.toggleAdminNotifications = function() { };
 window.closeAdminNotifications = function() { };
-window.renderClientsTable = function() { };
-window.updateProjectSelectForUpload = function() { };
-window.renderCapitalStack = renderCapitalStack;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    initFirebase();
-    setInterval(() => {
-        if(currentProjectId) renderCapitalStack();
-    }, 2000);
+  initFirebase();
 });
-// ============================================================
-// COMPLETE ADMIN CLIENT & PROJECT MANAGEMENT FUNCTIONS
-// ============================================================
-
-// Show Add Client Modal
-window.showAddClientModal = function() {
-    // Clear all fields
-    const fields = ['ncName', 'ncEmail', 'ncPassword', 'ncProject', 'ncIndustry', 'ncLocation', 
-                    'ncTotalCost', 'ncSponsorEquity', 'ncFundsNeeded', 'ncCurrentStage', 'ncUseOfFunds',
-                    'ncTargetIRR', 'ncCloseDate', 'ncMOIC', 'ncCapRate', 'ncExitStrategy', 'ncExitCapRate',
-                    'ncPermits', 'ncRevenue', 'ncAssetClass', 'ncInfraType', 'ncCommodity', 'ncMiningStage',
-                    'ncReserveLife', 'ncDataRoom', 'ncAmount', 'ncRate', 'ncTerm', 'ncGrace', 'ncECF', 
-                    'ncGovLaw', 'ncExpiry', 'ncMilestone'];
-    fields.forEach(f => { 
-        const el = document.getElementById(f); 
-        if(el) el.value = ''; 
-    });
-    openModal('addClientModal');
-};
-
-// Create Client (with full project)
-window.createClient = async function() {
-    const name = document.getElementById('ncName').value.trim();
-    const email = document.getElementById('ncEmail').value.trim().toLowerCase();
-    const password = document.getElementById('ncPassword').value;
-    const projectName = document.getElementById('ncProject').value.trim();
-    
-    if(!name || !email || !password || !projectName) {
-        showToast('Please fill in Name, Email, Password, and Project Name', true);
-        return;
-    }
-    
-    if(password.length < 6) {
-        showToast('Password must be at least 6 characters', true);
-        return;
-    }
-    
-    try {
-        // Create Firebase Auth user
-        const userCred = await auth.createUserWithEmailAndPassword(email, password);
-        const uid = userCred.user.uid;
-        
-        // Create client document
-        await db.collection('clients').doc(uid).set({
-            id: uid,
-            name: name,
-            email: email,
-            status: 'active',
-            createdAt: new Date().toISOString()
-        });
-        
-        // Create project document
-        const projectId = db.collection('projects').doc().id;
-        const projectData = {
-            id: projectId,
-            clientId: uid,
-            name: projectName,
-            industry: document.getElementById('ncIndustry').value,
-            location: document.getElementById('ncLocation').value,
-            totalCost: document.getElementById('ncTotalCost').value,
-            sponsorEquity: document.getElementById('ncSponsorEquity').value,
-            fundsNeeded: document.getElementById('ncFundsNeeded').value,
-            currentStage: document.getElementById('ncCurrentStage').value,
-            useOfFunds: document.getElementById('ncUseOfFunds').value,
-            targetIRR: document.getElementById('ncTargetIRR').value,
-            closeDate: document.getElementById('ncCloseDate').value,
-            moic: document.getElementById('ncMOIC').value,
-            capRate: document.getElementById('ncCapRate').value,
-            exitStrategy: document.getElementById('ncExitStrategy').value,
-            exitCapRate: document.getElementById('ncExitCapRate').value,
-            permits: document.getElementById('ncPermits').value,
-            revenue: document.getElementById('ncRevenue').value,
-            assetClass: document.getElementById('ncAssetClass').value,
-            infraType: document.getElementById('ncInfraType').value,
-            commodity: document.getElementById('ncCommodity').value,
-            miningStage: document.getElementById('ncMiningStage').value,
-            reserveLife: document.getElementById('ncReserveLife').value,
-            dataRoom: document.getElementById('ncDataRoom').value,
-            amount: document.getElementById('ncAmount').value || 'TBD',
-            interestRate: document.getElementById('ncRate').value || 'TBD',
-            term: document.getElementById('ncTerm').value,
-            gracePeriod: document.getElementById('ncGrace').value,
-            ecfAmount: document.getElementById('ncECF').value,
-            governingLaw: document.getElementById('ncGovLaw').value,
-            termSheetExpiry: document.getElementById('ncExpiry').value,
-            step: 1,
-            status: 'active',
-            createdAt: new Date().toISOString()
-        };
-        
-        await db.collection('projects').doc(projectId).set(projectData);
-        
-        showToast(`Client ${name} created successfully!`);
-        closeModal('addClientModal');
-        
-    } catch(error) {
-        console.error('Create client error:', error);
-        showToast(error.message, true);
-    }
-};
-
-// Edit Project Modal - Fix missing data loading
-window.editProject = function(pid) {
-    if(!pid) return showToast('No project selected', true);
-    const p = projects.find(x => x.id === pid);
-    if(!p) return;
-    window.editProjectId = pid;
-    const c = clients.find(cl => cl.id === p.clientId);
-    
-    // Tab 1: Client & Project details
-    document.getElementById('editClientName').value = c?.name || '';
-    document.getElementById('editClientEmail').value = c?.email || '';
-    document.getElementById('editProjectName').value = p.name || '';
-    document.getElementById('editIndustry').value = p.industry || 'Real Estate';
-    document.getElementById('editLocation').value = p.location || '';
-    document.getElementById('editTotalCost').value = p.totalCost || '';
-    document.getElementById('editSponsorEquity').value = p.sponsorEquity || '';
-    document.getElementById('editFundsNeeded').value = p.fundsNeeded || '';
-    document.getElementById('editCurrentStage').value = p.currentStage || 'Development';
-    document.getElementById('editUseOfFunds').value = p.useOfFunds || '';
-    document.getElementById('editTargetIRR').value = p.targetIRR || '';
-    document.getElementById('editCloseDate').value = p.closeDate || '';
-    document.getElementById('editMOIC').value = p.moic || '';
-    document.getElementById('editCapRate').value = p.capRate || '';
-    document.getElementById('editExitStrategy').value = p.exitStrategy || 'Sale';
-    document.getElementById('editExitCapRate').value = p.exitCapRate || '';
-    document.getElementById('editPermits').value = p.permits || 'No';
-    document.getElementById('editRevenue').value = p.revenue || '';
-    document.getElementById('editAssetClass').value = p.assetClass || '';
-    document.getElementById('editInfraType').value = p.infraType || '';
-    document.getElementById('editCommodity').value = p.commodity || '';
-    document.getElementById('editMiningStage').value = p.miningStage || 'Development';
-    document.getElementById('editReserveLife').value = p.reserveLife || '';
-    document.getElementById('editDataRoom').value = p.dataRoom || '';
-    document.getElementById('editGovLaw').value = p.governingLaw || '';
-    
-    // Tab 2: Process & Status
-    document.getElementById('editStep').value = p.step || 1;
-    document.getElementById('editAmount').value = p.amount || '';
-    document.getElementById('editRate').value = p.interestRate || '';
-    document.getElementById('editTerm').value = p.term || '';
-    document.getElementById('editGrace').value = p.gracePeriod || '';
-    document.getElementById('editECF').value = p.ecfAmount || '';
-    document.getElementById('editExpiry').value = p.termSheetExpiry || '';
-    document.getElementById('editCommitFeeDeadline').value = p.commitmentFeeDeadline || '';
-    document.getElementById('editDeedExpiry').value = p.deedExpiry || '';
-    document.getElementById('editECFPolicyExpiry').value = p.ecfPolicyExpiry || '';
-    document.getElementById('editCommitFee').value = p.commitmentFeeStatus || 'pending';
-    document.getElementById('editCommitFeeDate').value = p.commitmentFeeDate || '';
-    document.getElementById('editECFStatus').value = p.ecfStatus || 'pending';
-    document.getElementById('editECFDate').value = p.ecfEscrowDate || '';
-    document.getElementById('editFundedDate').value = p.fundedDate || '';
-    document.getElementById('editAdvisorNote').value = p.advisorNote || '';
-    document.getElementById('editAdminNote').value = p.adminNote || '';
-    
-    // Broker dropdown
-    const brokerSelect = document.getElementById('editBrokerAssign');
-    if(brokerSelect) {
-        brokerSelect.innerHTML = '<option value="">Direct Client (No Broker)</option>' + 
-            brokers.map(b => `<option value="${b.id}" ${p.brokerId === b.id ? 'selected' : ''}>${escapeHtml(b.name)} (${b.commissionRate || 0}%)</option>`).join('');
-    }
-    
-    switchEditTab('project');
-    openModal('editProjectModal');
-};
-
-// Save Project Info (Enhanced)
-window.saveProjectInfo = async function() {
-    const pid = window.editProjectId;
-    const p = projects.find(x => x.id === pid);
-    if(!p) return;
-    
-    const clientName = document.getElementById('editClientName').value.trim();
-    const clientEmail = document.getElementById('editClientEmail').value.trim();
-    const oldStep = p.step || 1;
-    const newStep = parseInt(document.getElementById('editStep').value);
-    
-    // Update Client
-    if(p.clientId && clientName) {
-        await db.collection('clients').doc(p.clientId).update({ 
-            name: clientName, 
-            email: clientEmail 
-        });
-    }
-    
-    // Update Project
-    const updates = {
-        name: document.getElementById('editProjectName').value,
-        industry: document.getElementById('editIndustry').value,
-        location: document.getElementById('editLocation').value,
-        totalCost: document.getElementById('editTotalCost').value,
-        sponsorEquity: document.getElementById('editSponsorEquity').value,
-        fundsNeeded: document.getElementById('editFundsNeeded').value,
-        currentStage: document.getElementById('editCurrentStage').value,
-        useOfFunds: document.getElementById('editUseOfFunds').value,
-        targetIRR: document.getElementById('editTargetIRR').value,
-        closeDate: document.getElementById('editCloseDate').value,
-        moic: document.getElementById('editMOIC').value,
-        capRate: document.getElementById('editCapRate').value,
-        exitStrategy: document.getElementById('editExitStrategy').value,
-        exitCapRate: document.getElementById('editExitCapRate').value,
-        permits: document.getElementById('editPermits').value,
-        revenue: document.getElementById('editRevenue').value,
-        assetClass: document.getElementById('editAssetClass').value,
-        infraType: document.getElementById('editInfraType').value,
-        commodity: document.getElementById('editCommodity').value,
-        miningStage: document.getElementById('editMiningStage').value,
-        reserveLife: document.getElementById('editReserveLife').value,
-        dataRoom: document.getElementById('editDataRoom').value,
-        governingLaw: document.getElementById('editGovLaw').value,
-        step: newStep,
-        amount: document.getElementById('editAmount').value,
-        interestRate: document.getElementById('editRate').value,
-        term: document.getElementById('editTerm').value,
-        gracePeriod: document.getElementById('editGrace').value,
-        ecfAmount: document.getElementById('editECF').value,
-        termSheetExpiry: document.getElementById('editExpiry').value,
-        commitmentFeeDeadline: document.getElementById('editCommitFeeDeadline').value,
-        deedExpiry: document.getElementById('editDeedExpiry').value,
-        ecfPolicyExpiry: document.getElementById('editECFPolicyExpiry').value,
-        commitmentFeeStatus: document.getElementById('editCommitFee').value,
-        commitmentFeeDate: document.getElementById('editCommitFeeDate').value,
-        ecfStatus: document.getElementById('editECFStatus').value,
-        ecfEscrowDate: document.getElementById('editECFDate').value,
-        fundedDate: document.getElementById('editFundedDate').value,
-        advisorNote: document.getElementById('editAdvisorNote').value,
-        adminNote: document.getElementById('editAdminNote').value,
-        brokerId: document.getElementById('editBrokerAssign').value || null
-    };
-    
-    await db.collection('projects').doc(pid).update(updates);
-    
-    // Send automated email on step change
-    if(newStep !== oldStep && newStep > oldStep) {
-        const client = clients.find(c => c.id === p.clientId);
-        if(client) {
-            try {
-                await emailjs.send('service_croft', 'template_step_update', {
-                    to_name: client.name,
-                    to_email: client.email,
-                    step_name: STEP_NAMES[newStep] || `Step ${newStep}`,
-                    next_action: newStep === 2 ? 'Submit Commitment Fee via portal' : 
-                                newStep === 3 ? 'Review Deed of Undertaking' :
-                                newStep === 8 ? 'Congratulations! Funding is being arranged' :
-                                'Continue with next steps in your portal'
-                });
-                showToast(`Step update email sent to ${client.name}`);
-            } catch(e) { console.warn('EmailJS not configured:', e); }
-        }
-    }
-    
-    closeModal('editProjectModal');
-    showToast('Client and Project updated successfully!');
-    renderAdminTables(); // Refresh tables
-};
-
-// Delete Project (separate from delete client)
-window.deleteProject = async function(pid) {
-    if(!confirm('Delete this project permanently? This action cannot be undone.')) return;
-    await db.collection('projects').doc(pid).delete();
-    showToast('Project deleted');
-};
-
-// Render Clients Table with search
-window.renderClientsTable = function() {
-    const searchTerm = document.getElementById('clientSearch')?.value.toLowerCase() || '';
-    const filtered = clients.filter(c => 
-        c.name.toLowerCase().includes(searchTerm) || 
-        (c.email || '').toLowerCase().includes(searchTerm)
-    );
-    const tbody = document.getElementById('adminClientsTable');
-    if(!tbody) return;
-    tbody.innerHTML = filtered.map(c => {
-        const p = projects.find(x => x.clientId === c.id);
-        return `
-        <tr>
-            <td><strong>${escapeHtml(c.name)}</strong><br><span style="font-size:11px;color:var(--gray-500);">${escapeHtml(c.email)}</span></td>
-            <td>${escapeHtml(p?.name || '—')}</td>
-            <td><span style="color:${c.status==='active'?'var(--success)':'var(--warning)'};">${c.status || 'pending'}</span></td>
-            <td>${c.createdAt ? c.createdAt.split('T')[0] : '—'}</td>
-            <td>
-                ${c.status === 'pending' ? `<button class="btn btn-success" style="padding:4px 8px;font-size:10px;" onclick="approveClient('${c.id}')">Approve</button>` : ''}
-                <button class="btn btn-outline" style="padding:4px 8px;font-size:10px;" onclick="editProject('${p?.id}')">Edit</button>
-                <button class="btn btn-danger" style="padding:4px 8px;font-size:10px;" onclick="deleteClient('${c.id}')">Del</button>
-            </td>
-        </tr>
-        `;
-    }).join('');
-};
-
-// Approve pending client
-window.approveClient = async function(id) {
-    await db.collection('clients').doc(id).update({status: 'active'});
-    const p = projects.find(x => x.clientId === id);
-    if(p) await db.collection('projects').doc(p.id).update({status: 'active'});
-    showToast('Client approved and activated');
-};
-
-// Delete client and all associated data
-window.deleteClient = async function(id) {
-    if(!confirm('WARNING: This will delete the client, all projects, documents, and messages. This cannot be undone!')) return;
-    
-    // Delete client doc
-    await db.collection('clients').doc(id).delete();
-    
-    // Delete associated projects
-    const clientProjects = projects.filter(p => p.clientId === id);
-    for(const p of clientProjects) {
-        await db.collection('projects').doc(p.id).delete();
-    }
-    
-    // Delete associated documents
-    const clientDocs = documents.filter(d => d.clientId === id);
-    for(const d of clientDocs) {
-        await db.collection('documents').doc(d.id).delete();
-    }
-    
-    // Delete associated messages
-    const clientMsgs = messages.filter(m => m.clientId === id);
-    for(const m of clientMsgs) {
-        await db.collection('messages').doc(m.id).delete();
-    }
-    
-    showToast('Client and all associated data deleted');
-};
-
-// Upload Document Modal
-window.showUploadDocumentModal = function() {
-    // Populate client dropdown
-    const clientSelect = document.getElementById('uploadClientId');
-    if(clientSelect) {
-        clientSelect.innerHTML = '<option value="">Select Client</option>' + 
-            clients.filter(c => c.status === 'active').map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
-    }
-    openModal('uploadDocumentModal');
-};
-
-window.updateProjectSelectForUpload = function(clientId) {
-    const projectSelect = document.getElementById('uploadProjectId');
-    if(!projectSelect) return;
-    if(!clientId) {
-        projectSelect.innerHTML = '<option value="">Select Project</option>';
-        return;
-    }
-    const clientProjects = projects.filter(p => p.clientId === clientId);
-    projectSelect.innerHTML = '<option value="">Select Project</option>' + 
-        clientProjects.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
-};
-
-window.adminUploadDocument = async function() {
-    const clientId = document.getElementById('uploadClientId').value;
-    const projectId = document.getElementById('uploadProjectId').value;
-    const docType = document.getElementById('documentType').value;
-    const file = document.getElementById('pdfFile').files[0];
-    const url = document.getElementById('documentUrl').value;
-    
-    if(!clientId || !projectId) {
-        showToast('Please select client and project', true);
-        return;
-    }
-    
-    try {
-        let docUrl = url;
-        if(file) {
-            const filename = `admin_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
-            const ref = storage.ref(`documents/${clientId}/${projectId}/${filename}`);
-            await ref.put(file);
-            docUrl = await ref.getDownloadURL();
-        }
-        
-        if(!docUrl) {
-            showToast('Please provide a file or URL', true);
-            return;
-        }
-        
-        await db.collection('documents').add({
-            clientId: clientId,
-            projectId: projectId,
-            name: docType,
-            type: docType,
-            url: docUrl,
-            approved: true,
-            uploadedBy: 'admin',
-            date: new Date().toISOString().split('T')[0]
-        });
-        
-        showToast('Document uploaded successfully');
-        closeModal('uploadDocumentModal');
-        document.getElementById('pdfFile').value = '';
-        document.getElementById('documentUrl').value = '';
-    } catch(e) {
-        showToast(e.message, true);
-    }
-};
-
-// Render Admin Documents Table with filters
-window.renderAdminDocumentsTable = function() {
-    const tbody = document.getElementById('adminDocumentsTableBody');
-    if(!tbody) return;
-    const filterClient = document.getElementById('adminDocFilterClient')?.value || '';
-    let filtered = documents;
-    if(filterClient) filtered = filtered.filter(d => d.clientId === filterClient);
-    
-    // Populate client filter dropdown
-    const filterSelect = document.getElementById('adminDocFilterClient');
-    if(filterSelect && filterSelect.options.length <= 1) {
-        filterSelect.innerHTML = '<option value="">All Clients</option>' + 
-            clients.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
-    }
-    
-    tbody.innerHTML = filtered.map(d => {
-        const client = clients.find(c => c.id === d.clientId);
-        const proj = projects.find(p => p.id === d.projectId);
-        return `
-        <tr>
-            <td><strong>${escapeHtml(client?.name || 'Unknown')}</strong><br><span style="font-size:10px;">${escapeHtml(proj?.name || '')}</span></td>
-            <td>${escapeHtml(d.name)}</td>
-            <td><span class="doc-status-badge ${d.approved ? 'doc-status-approved' : 'doc-status-uploaded'}">${d.approved ? 'Approved' : 'Pending'}</span></td>
-            <td>${d.date || '—'}</td>
-            <td>
-                <a href="${d.url}" target="_blank" class="doc-action-btn doc-action-view">View</a>
-                ${!d.approved ? `<button class="doc-action-btn" onclick="approveAdminDoc('${d.id}')">Approve</button>` : ''}
-                <button class="doc-action-btn" onclick="deleteAdminDoc('${d.id}')">Delete</button>
-            </td>
-        </tr>
-        `;
-    }).join('');
-};
-
-window.approveAdminDoc = async function(id) {
-    await db.collection('documents').doc(id).update({approved: true});
-    showToast('Document approved');
-};
-
-// ============================================================
-// IMPROVED DELETE FUNCTIONS - REPLACE FROM HERE
-// ============================================================
-
-// Delete a single document (improved)
-window.deleteAdminDoc = async function(id, event) {
-    if(event) event.stopPropagation();
-    if(confirm('Delete this document permanently?')) {
-        await db.collection('documents').doc(id).delete();
-        showToast('Document deleted');
-    }
-};
-
-// Delete a single project (improved - with better confirmation)
-window.deleteProject = async function(projectId, event) {
-    if(event) event.stopPropagation();
-    
-    const project = projects.find(p => p.id === projectId);
-    if(!project) {
-        showToast('Project not found', true);
-        return;
-    }
-    
-    const client = clients.find(c => c.id === project.clientId);
-    const confirmMsg = `Are you sure you want to delete the project "${project.name}"${client ? ` for client ${client.name}` : ''}?\n\nThis will also delete ALL documents associated with this project. This action cannot be undone.`;
-    
-    if(!confirm(confirmMsg)) return;
-    
-    try {
-        // Delete all documents for this project
-        const projectDocs = documents.filter(d => d.projectId === projectId);
-        for(const doc of projectDocs) {
-            await db.collection('documents').doc(doc.id).delete();
-        }
-        // Delete the project
-        await db.collection('projects').doc(projectId).delete();
-        showToast(`Project "${project.name}" deleted successfully`);
-        if(currentProjectId === projectId) currentProjectId = null;
-    } catch(error) {
-        showToast(error.message, true);
-    }
-};
-
-// Delete a client (improved - requires "DELETE" to be typed)
-window.deleteClient = async function(clientId, event) {
-    if(event) event.stopPropagation();
-    
-    const client = clients.find(c => c.id === clientId);
-    if(!client) {
-        showToast('Client not found', true);
-        return;
-    }
-    
-    const clientProjects = projects.filter(p => p.clientId === clientId);
-    const projectNames = clientProjects.map(p => `  - ${p.name}`).join('\n');
-    
-    const confirmMsg = `⚠️ WARNING: This is PERMANENT and cannot be undone! ⚠️\n\nYou are about to delete client:\n"${client.name}" (${client.email})\n\nThis client has ${clientProjects.length} project(s):\n${projectNames || '  - No projects'}\n\nThis will also delete:\n- ALL documents uploaded by this client\n- ALL message conversations\n\nType "DELETE" to confirm:`;
-    
-    const userInput = prompt(confirmMsg);
-    if(userInput !== 'DELETE') {
-        showToast('Deletion cancelled - you must type DELETE to confirm');
-        return;
-    }
-    
-    try {
-        // Delete all documents for all client projects
-        for(const project of clientProjects) {
-            const projectDocs = documents.filter(d => d.projectId === project.id);
-            for(const doc of projectDocs) {
-                await db.collection('documents').doc(doc.id).delete();
-            }
-        }
-        
-        // Delete all messages from this client
-        const clientMessages = messages.filter(m => m.clientId === clientId);
-        for(const msg of clientMessages) {
-            await db.collection('messages').doc(msg.id).delete();
-        }
-        
-        // Delete all projects
-        for(const project of clientProjects) {
-            await db.collection('projects').doc(project.id).delete();
-        }
-        
-        // Delete the client document
-        await db.collection('clients').doc(clientId).delete();
-        
-        showToast(`Client "${client.name}" and all associated data deleted successfully`);
-    } catch(error) {
-        console.error('Delete client error:', error);
-        showToast(error.message, true);
-    }
-};
-
-// Delete a broker (improved)
-window.deleteBroker = async function(brokerId, event) {
-    if(event) event.stopPropagation();
-    
-    const broker = brokers.find(b => b.id === brokerId);
-    if(!broker) return;
-    
-    if(!confirm(`Delete broker "${broker.name}" (${broker.email})? This will also remove all their deal submissions.`)) return;
-    
-    try {
-        // Delete broker's submissions
-        const submissions = brokerSubmissions.filter(s => s.brokerId === brokerId);
-        for(const sub of submissions) {
-            await db.collection('brokerSubmissions').doc(sub.id).delete();
-        }
-        
-        // Delete broker messages
-        const bMessages = brokerMessages.filter(m => m.brokerId === brokerId);
-        for(const msg of bMessages) {
-            await db.collection('brokerMessages').doc(msg.id).delete();
-        }
-        
-        // Delete broker
-        await db.collection('brokers').doc(brokerId).delete();
-        
-        showToast(`Broker "${broker.name}" deleted`);
-    } catch(error) {
-        showToast(error.message, true);
-    }
-};
-
-// ============================================================
-// Refresh all admin tables
-// ============================================================
-function refreshAllAdminTables() {
-    renderClientsTable();
-    renderAdminDocumentsTable();
-    renderBrokerAdminTable();
-    renderAdminBrokerSubmissionsTable();
-}
-
-// Call refresh when data changes
-if(typeof db !== 'undefined') {
-    db.collection('clients').onSnapshot(() => refreshAllAdminTables());
-    db.collection('projects').onSnapshot(() => refreshAllAdminTables());
-    db.collection('documents').onSnapshot(() => renderAdminDocumentsTable());
-}
-
-// Call refresh when data changes
-if(typeof db !== 'undefined') {
-    db.collection('clients').onSnapshot(() => refreshAllAdminTables());
-    db.collection('projects').onSnapshot(() => refreshAllAdminTables());
-    db.collection('documents').onSnapshot(() => renderAdminDocumentsTable());
-}
 </script>
 </body>
 </html>
