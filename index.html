@@ -328,9 +328,9 @@ body {
   margin-bottom: 28px;
   color: white;
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 32px;
-  align-items: center;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 40px;
+  align-items: start;
   position: relative;
   overflow: hidden;
 }
@@ -357,7 +357,23 @@ body {
 .next-action { margin-top: 16px; padding: 10px 14px; background: rgba(255,255,255,0.08); border-radius: 8px; border: 0.5px solid rgba(255,255,255,0.12); }
 .next-action-label { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.5); }
 .next-action-text { font-size: 12px; font-weight: 500; color: white; margin-top: 2px; }
+.dashboard-hero-left { min-width: 0; }
+.dashboard-hero-right {
+  text-align: left;
+  background: rgba(255,255,255,0.06);
+  border-radius: 10px;
+  padding: 20px;
+  border: 0.5px solid rgba(255,255,255,0.1);
+}
 @media (max-width: 768px) { .dashboard-hero { grid-template-columns: 1fr; } }
+
+/* Client dashboard stats grid */
+#tab-dashboard .stats-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+@media (max-width: 768px) {
+  #tab-dashboard .stats-grid { grid-template-columns: 1fr 1fr; }
+}
 
 /* ===== PIPELINE BOARD ===== */
 .view-toggle { display: flex; gap: 8px; margin-bottom: 16px; }
@@ -1140,7 +1156,7 @@ body {
       <a href="#" onclick="showAdminLogin()" style="color:var(--gray-400);font-size:12px;">Admin access</a>
     </div>
   </div>
-  <div id="brokerLoginForm" style="display:none;"><div class="form-group"><label class="form-label">Email</label><input type="email" id="brokerLoginEmail" class="form-input"></div><div class="form-group"><label class="form-label">Password</label><input type="password" id="brokerLoginPassword" class="form-input"></div><p id="brokerLoginError" style="color:var(--error);font-size:12px;display:none;"></p><button class="btn btn-primary btn-md" onclick="brokerLogin()" style="width:100%">Sign In</button><div style="text-align:center;margin-top:16px;"><a href="#" onclick="showLoginForm()" style="color:var(--gray-500);font-size:12px;">Client portal</a></div></div>
+  <div id="brokerLoginForm" style="display:none;"><div class="form-group"><label class="form-label">Email</label><input type="email" id="brokerLoginEmail" class="form-input"></div><div class="form-group"><label class="form-label">Password</label><input type="password" id="brokerLoginPassword" class="form-input"></div><p id="brokerLoginError" style="color:var(--error);font-size:12px;display:none;"></p><button class="btn btn-primary btn-md" onclick="brokerLogin()" style="width:100%">Sign In</button><div style="text-align:center;margin-top:8px;"><a href="#" onclick="showBrokerRegisterForm()" style="color:var(--navy);font-size:12px;font-weight:500;">Register as broker →</a></div><div style="text-align:center;margin-top:16px;"><a href="#" onclick="showLoginForm()" style="color:var(--gray-500);font-size:12px;">Client portal</a></div></div>
   <div id="adminLoginForm" style="display:none;"><div class="form-group"><label class="form-label">Email</label><input type="email" id="adminUsername" class="form-input"></div><div class="form-group"><label class="form-label">Password</label><input type="password" id="adminPassword" class="form-input"></div><p id="adminLoginError" style="color:var(--error);font-size:12px;display:none;"></p><button class="btn btn-primary btn-md" onclick="doAdminLogin()" style="width:100%">Sign In</button><div style="text-align:center;margin-top:16px;"><a href="#" onclick="showLoginForm()" style="color:var(--gray-500);font-size:12px;">Client portal</a></div></div>
   <div id="registerForm" style="display:none;"><div style="max-height:60vh;overflow-y:auto;"><div class="form-grid-2"><div class="form-group"><label class="form-label">Full Name</label><input type="text" id="regName" class="form-input"></div><div class="form-group"><label class="form-label">Email</label><input type="email" id="regEmail" class="form-input"></div><div class="form-group"><label class="form-label">Password</label><input type="password" id="regPassword" class="form-input"></div><div class="form-group"><label class="form-label">Confirm Password</label><input type="password" id="regConfirmPassword" class="form-input"></div></div><div class="password-strength-meter" style="margin:8px 0 16px;"><div style="display:flex;gap:4px;"><div class="strength-segment" style="flex:1;height:3px;background:var(--gray-200);border-radius:2px;"></div><div class="strength-segment" style="flex:1;height:3px;background:var(--gray-200);border-radius:2px;"></div><div class="strength-segment" style="flex:1;height:3px;background:var(--gray-200);border-radius:2px;"></div><div class="strength-segment" style="flex:1;height:3px;background:var(--gray-200);border-radius:2px;"></div></div><div class="strength-hint" style="font-size:10px;color:var(--gray-400);margin-top:4px;">Use 8+ characters with uppercase, number, special character</div></div><div class="form-group"><label class="form-label">Project Name</label><input type="text" id="regProject" class="form-input"></div><div class="form-grid-2"><div class="form-group"><label class="form-label">Industry</label><select id="regIndustry" class="form-select"><option>Real Estate</option><option>Infrastructure</option><option>Energy & Renewables</option><option>Mining</option><option>Oil & Gas</option></select></div><div class="form-group"><label class="form-label">Location</label><input type="text" id="regLocation" class="form-input"></div></div><div class="form-grid-2"><div class="form-group"><label class="form-label">Total Project Cost</label><input type="text" id="regTotalCost" class="form-input"></div><div class="form-group"><label class="form-label">Funds Needed</label><input type="text" id="regFundsNeeded" class="form-input"></div></div><div class="form-group"><label class="form-label">Brief Description</label><textarea id="regDescription" rows="2" class="form-textarea"></textarea></div><div class="form-group" style="display:flex;align-items:flex-start;gap:10px;"><input type="checkbox" id="ndaCheckbox" style="margin-top:3px;"><label style="font-size:12px;">I agree to the Confidentiality and Portal Access Terms</label></div><p id="regError" style="color:var(--error);font-size:12px;display:none;"></p><button class="btn btn-primary btn-md" onclick="register()" style="width:100%">Submit Registration</button><div style="text-align:center;margin-top:14px;"><a href="#" onclick="showLoginForm()" style="color:var(--gray-500);font-size:12px;">← Back to sign in</a></div></div></div>
   <div id="forgotPasswordForm" style="display:none;"><div class="form-group"><label class="form-label">Email</label><input type="email" id="forgotEmail" class="form-input"></div><p id="forgotError" style="color:var(--error);font-size:12px;display:none;"></p><button class="btn btn-primary btn-md" onclick="requestPasswordReset()" style="width:100%">Send Reset Link</button><div style="text-align:center;margin-top:14px;"><a href="#" onclick="showLoginForm()" style="color:var(--gray-500);font-size:12px;">← Back</a></div></div>
@@ -1194,7 +1210,20 @@ body {
         <div id="adminNoteDisplay"></div>
         <div id="actionBannerDisplay"></div>
         <div class="dashboard-hero">
-          <div class="dashboard-hero-left"><div class="welcome-title" id="welcomeTitle">Welcome back.</div><div class="welcome-date" id="dashboardDate"></div><div class="progress-circle-container"><div class="progress-circle"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" class="progress-circle-bg"></circle><circle cx="50" cy="50" r="45" class="progress-circle-fill" id="progressCircleFill"></circle></svg><div class="progress-circle-text"><div class="progress-percentage" id="progressPercentage">0%</div><div class="progress-label">Complete</div></div></div><div class="step-info"><div class="step-number" id="stepNumber">Step 1 of 8</div><div class="step-name" id="stepName">Term Sheet</div></div></div></div>
+          <div class="dashboard-hero-left">
+            <div class="welcome-title" id="welcomeTitle">Welcome back.</div>
+            <div class="welcome-date" id="dashboardDate"></div>
+            <div style="display:flex;align-items:center;gap:24px;margin-top:16px;">
+              <div class="progress-circle-container">
+                <div class="progress-circle"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" class="progress-circle-bg"></circle><circle cx="50" cy="50" r="45" class="progress-circle-fill" id="progressCircleFill"></circle></svg><div class="progress-circle-text"><div class="progress-percentage" id="progressPercentage">0%</div><div class="progress-label">Complete</div></div></div>
+              </div>
+              <div>
+                <div class="step-number" id="stepNumber">Step 1 of 8</div>
+                <div class="step-name" id="stepName">Term Sheet</div>
+                <div style="margin-top:8px;font-size:11px;color:rgba(255,255,255,0.5);">Overall progress</div>
+              </div>
+            </div>
+          </div>
           <div class="dashboard-hero-right"><div class="estimated-closing">Estimated Closing</div><div class="closing-date" id="closingDateDisplay">—</div><div class="days-remaining" id="daysRemainingDisplay">—</div><div class="days-label">days remaining</div><div class="next-action"><div class="next-action-label">Next Action</div><div class="next-action-text" id="nextActionText">—</div></div></div>
         </div>
         <div class="quick-actions-bar">
@@ -1273,6 +1302,7 @@ body {
         <button class="nav-item" data-admin-tab="projects-admin"><i class="fas fa-briefcase"></i> Projects</button>
         <button class="nav-item" data-admin-tab="documents-admin"><i class="fas fa-file-alt"></i> Documents</button>
         <button class="nav-item" data-admin-tab="brokers"><i class="fas fa-handshake"></i> Brokers</button>
+        <button class="nav-item" data-admin-tab="submissions"><i class="fas fa-paper-plane"></i> Deal Submissions</button>
         <div class="sidebar-divider"></div>
         <button class="nav-item" data-admin-tab="inbox"><i class="fas fa-inbox"></i> Inbox</button>
         <button class="nav-item" data-admin-tab="meetings"><i class="fas fa-calendar"></i> Meetings</button>
@@ -1293,6 +1323,7 @@ body {
           <div class="stat-card"><div class="data-label">Unread Messages</div><div class="stat-value" id="pendingMessages">0</div></div>
           <div class="stat-card"><div class="data-label">Pending Meetings</div><div class="stat-value" id="scheduledMeetings">0</div></div>
         </div>
+        <div id="dealHealthSummary" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;"></div>
         <div class="view-toggle"><button class="view-toggle-btn active" onclick="setPipelineView('board')">Board</button><button class="view-toggle-btn" onclick="setPipelineView('list')">List</button></div>
         <div id="pipelineBoard" class="pipeline-board"></div>
         <div id="pipelineList" style="display:none;"></div>
@@ -1313,16 +1344,48 @@ body {
       </div>
 
       <!-- Clients Tab -->
-      <div id="admin-clients" class="admin-tab"><div class="admin-page-title">Clients</div><div style="display:flex;justify-content:space-between;margin-bottom:16px;"><input type="text" id="clientSearch" class="form-input" placeholder="Search clients..." style="max-width:300px;"><button class="btn btn-primary btn-sm" onclick="showAddClientModal()">+ Add Client</button></div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Email</th><th>Projects</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="adminClientsTable"></tbody></table></div></div>
+      <div id="admin-clients" class="admin-tab"><div class="admin-page-title">Clients</div><div style="display:flex;justify-content:space-between;margin-bottom:16px;"><input type="text" id="clientSearch" class="form-input" placeholder="Search clients..." style="max-width:300px;"><button class="btn btn-primary btn-sm" onclick="showAddClientModal()">+ Add Client</button></div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Email</th><th>Projects</th><th>Status</th><th>Notes</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="adminClientsTable"></tbody></table></div></div>
 
       <!-- Projects Tab -->
-      <div id="admin-projects-admin" class="admin-tab"><div class="admin-page-title">Projects</div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Project</th><th>Industry</th><th>Funds Needed</th><th>Step</th><th>Broker</th><th>CF</th><th>ECF</th><th>Actions</th></tr></thead><tbody id="adminProjectsTable"></tbody>｜DSML｜</div></div>
+      <div id="admin-projects-admin" class="admin-tab"><div class="admin-page-title">Projects</div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Project</th><th>Industry</th><th>Funds Needed</th><th>Step</th><th>Broker</th><th>CF</th><th>ECF</th><th>Data Room</th><th>Actions</th></tr></thead><tbody id="adminProjectsTable"></tbody></table></div></div>
 
       <!-- Documents Tab -->
       <div id="admin-documents-admin" class="admin-tab"><div class="admin-page-title">Documents</div><div class="table-wrap"><table class="documents-table"><thead><tr><th>Client</th><th>Document</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="adminDocumentsTableBody"></tbody></table></div></div>
 
       <!-- Brokers Tab -->
       <div id="admin-brokers" class="admin-tab"><div class="admin-page-title">Brokers</div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Broker</th><th>Firm</th><th>Commission</th><th>Submitted</th><th>Funded</th><th>Est. Commission</th><th>Status</th><th>Engagement</th><th>Actions</th></tr></thead><tbody id="adminBrokersTable"></tbody></table></div><div class="card" style="margin-top:20px;"><div class="card-header"><div class="card-title">Broker Update Requests</div></div><div class="card-body"><div id="brokerUpdateRequestsList"></div></div></div></div>
+
+      <!-- Submissions Tab -->
+      <div id="admin-submissions" class="admin-tab">
+        <div class="admin-page-title">Deal Submissions</div>
+        <div style="margin-bottom:16px;display:flex;gap:12px;">
+          <select id="submissionFilter" class="form-select" style="max-width:200px;" onchange="renderSubmissionsTable()">
+            <option value="all">All Submissions</option>
+            <option value="pending">Pending</option>
+            <option value="accepted">Accepted</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Broker</th>
+                <th>Client</th>
+                <th>Project</th>
+                <th>Industry</th>
+                <th>Funds Needed</th>
+                <th>Data Room</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="submissionsTableBody"></tbody>
+          </table>
+        </div>
+        <div id="submissionDetailPanel" style="display:none;margin-top:20px;"></div>
+      </div>
 
       <!-- Inbox Tab -->
       <div id="admin-inbox" class="admin-tab"><div class="admin-page-title">Inbox</div><div class="inbox-filter"><button class="filter-chip active" data-filter="all">All</button><button class="filter-chip" data-filter="client">Clients</button><button class="filter-chip" data-filter="broker">Brokers</button><button class="filter-chip" data-filter="unread">Unread</button></div><div id="inboxContainer"></div></div>
@@ -1374,7 +1437,16 @@ body {
       </div>
 
       <!-- Submit Deal Tab (Extended Form) -->
-      <div id="broker-tab-submit-deal" class="portal-tab"><div class="admin-page-title">Submit a Deal</div><div class="card"><div class="card-body"><div class="form-group"><label class="form-label">Client Name *</label><input type="text" id="dealClientName" class="form-input"></div><div class="form-group"><label class="form-label">Client Email *</label><input type="email" id="dealClientEmail" class="form-input"></div><div class="form-group"><label class="form-label">Project Name *</label><input type="text" id="dealProjectName" class="form-input"></div><div class="form-grid-2"><div class="form-group"><label class="form-label">Industry</label><select id="dealIndustry" class="form-select"><option>Real Estate</option><option>Infrastructure</option><option>Energy & Renewables</option><option>Mining</option><option>Oil & Gas</option></select></div><div class="form-group"><label class="form-label">Location</label><input type="text" id="dealLocation" class="form-input"></div></div><div class="form-group"><label class="form-label">Funds Needed (USD) *</label><input type="text" id="dealFundsNeeded" class="form-input"></div><div class="form-group"><label class="form-label">Sponsor Equity Committed (USD)</label><input type="text" id="dealSponsorEquity" class="form-input"></div><div class="form-group"><label class="form-label">Sponsor/Borrower Background</label><textarea id="dealBackground" rows="2" class="form-textarea" placeholder="Describe the sponsor's track record..."></textarea></div><div class="form-group"><label class="form-label">Relationship to Borrower</label><select id="dealRelationship" class="form-select"><option>Owner</option><option>Advisor</option><option>Referral</option><option>Other</option></select></div><div class="form-grid-2"><div class="form-group"><label class="form-label">Target Jurisdiction</label><input type="text" id="dealJurisdiction" class="form-input"></div><div class="form-group"><label class="form-label">Target Funding Date</label><input type="date" id="dealTargetDate" class="form-input"></div></div><div class="form-group"><label class="form-label">Has the borrower approached other lenders?</label><select id="dealOtherLenders" class="form-select" onchange="toggleOtherLendersNotes()"><option>No</option><option>Yes</option></select><textarea id="dealOtherLendersNotes" rows="2" class="form-textarea" style="margin-top:8px;display:none;" placeholder="Please provide details..."></textarea></div><div class="form-group"><label class="form-label">Brief Description</label><textarea id="dealDescription" rows="3" class="form-textarea" placeholder="Project overview, use of funds, timeline..."></textarea></div><button class="btn btn-primary btn-md" onclick="submitDeal()" style="width:100%">Submit Deal to Croft Finance</button></div></div></div>
+      <div id="broker-tab-submit-deal" class="portal-tab"><div class="admin-page-title">Submit a Deal</div><div class="card"><div class="card-body"><div class="form-group"><label class="form-label">Client Name *</label><input type="text" id="dealClientName" class="form-input"></div><div class="form-group"><label class="form-label">Client Email *</label><input type="email" id="dealClientEmail" class="form-input"></div><div class="form-group"><label class="form-label">Project Name *</label><input type="text" id="dealProjectName" class="form-input"></div><div class="form-grid-2"><div class="form-group"><label class="form-label">Industry</label><select id="dealIndustry" class="form-select"><option>Real Estate</option><option>Infrastructure</option><option>Energy & Renewables</option><option>Mining</option><option>Oil & Gas</option></select></div><div class="form-group"><label class="form-label">Location</label><input type="text" id="dealLocation" class="form-input"></div></div><div class="form-group"><label class="form-label">Funds Needed (USD) *</label><input type="text" id="dealFundsNeeded" class="form-input"></div><div class="form-group"><label class="form-label">Sponsor Equity Committed (USD)</label><input type="text" id="dealSponsorEquity" class="form-input"></div><div class="form-group"><label class="form-label">Sponsor/Borrower Background</label><textarea id="dealBackground" rows="2" class="form-textarea" placeholder="Describe the sponsor's track record..."></textarea></div><div class="form-group"><label class="form-label">Relationship to Borrower</label><select id="dealRelationship" class="form-select"><option>Owner</option><option>Advisor</option><option>Referral</option><option>Other</option></select></div><div class="form-grid-2"><div class="form-group"><label class="form-label">Target Jurisdiction</label><input type="text" id="dealJurisdiction" class="form-input"></div><div class="form-group"><label class="form-label">Target Funding Date</label><input type="date" id="dealTargetDate" class="form-input"></div></div><div class="form-group"><label class="form-label">Has the borrower approached other lenders?</label><select id="dealOtherLenders" class="form-select" onchange="toggleOtherLendersNotes()"><option>No</option><option>Yes</option></select><textarea id="dealOtherLendersNotes" rows="2" class="form-textarea" style="margin-top:8px;display:none;" placeholder="Please provide details..."></textarea></div><div class="form-group"><label class="form-label">Brief Description</label><textarea id="dealDescription" rows="3" class="form-textarea" placeholder="Project overview, use of funds, timeline..."></textarea></div>
+        <div class="form-group"><label class="form-label">Data Room Link</label><input type="url" id="dealDataRoomLink" class="form-input" placeholder="https://...  (Dropbox, Google Drive, Intralinks, etc.)"><div style="font-size:11px;color:var(--gray-400);margin-top:4px;">Secure link to project documents, feasibility studies, financial models</div></div>
+        <div class="form-group"><label class="form-label">Total Project Cost (USD)</label><input type="text" id="dealTotalCost" class="form-input" placeholder="Total development/acquisition cost"></div>
+        <div class="form-group"><label class="form-label">Debt-to-Equity Ratio</label><input type="text" id="dealDebtEquity" class="form-input" placeholder="e.g. 70:30"></div>
+        <div class="form-group"><label class="form-label">Projected IRR / Return</label><input type="text" id="dealProjectedIRR" class="form-input" placeholder="e.g. 18% IRR over 5 years"></div>
+        <div class="form-group"><label class="form-label">Exit Strategy</label><select id="dealExitStrategy" class="form-select"><option>Sale of Asset</option><option>Refinancing</option><option>IPO</option><option>Revenue / Cash Flow</option><option>Other</option></select></div>
+        <div class="form-group"><label class="form-label">Current Project Status</label><select id="dealProjectStatus" class="form-select"><option>Pre-Development</option><option>Planning / Permitting</option><option>Under Construction</option><option>Operational</option><option>Stabilized</option></select></div>
+        <div class="form-group"><label class="form-label">Key Risks & Mitigants</label><textarea id="dealRisks" rows="2" class="form-textarea" placeholder="Briefly describe key risks and how they are mitigated..."></textarea></div>
+        <div class="form-group"><label class="form-label">Broker Commission Expectation (%)</label><input type="text" id="dealBrokerCommExpectation" class="form-input" placeholder="e.g. 1.5%"></div>
+        <button class="btn btn-primary btn-md" onclick="submitDeal()" style="width:100%">Submit Deal to Croft Finance</button></div></div></div>
 
       <!-- Client Progress Portfolio -->
       <div id="broker-tab-portfolio" class="portal-tab"><div class="admin-page-title">Client Progress</div><div id="brokerPortfolioContainer"></div></div>
@@ -1392,7 +1464,7 @@ body {
 
 <div id="scheduleMeetingModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Schedule Meeting</h3><button class="modal-close" onclick="closeModal('scheduleMeetingModal')">✕</button></div><div class="modal-body"><div class="form-group"><label class="form-label">Client</label><select id="meetingClientId" class="form-select"></select></div><div class="form-group"><label class="form-label">Date</label><input type="date" id="meetingDate" class="form-input"></div><div class="form-group"><label class="form-label">Time</label><input type="time" id="meetingTime" class="form-input"></div><div class="form-group"><label class="form-label">Type</label><select id="meetingType" class="form-select"><option>Video Call</option><option>Phone Call</option></select></div><div class="form-group"><label class="form-label">Notes</label><textarea id="meetingNotes" rows="3" class="form-textarea"></textarea></div><button class="btn btn-primary btn-md" onclick="createMeeting()" style="width:100%">Schedule</button></div></div></div>
 
-<div id="editProjectModal" class="modal-overlay"><div class="modal modal-lg"><div class="modal-header"><h3>Edit Project</h3><button class="modal-close" onclick="closeModal('editProjectModal')">✕</button></div><div class="modal-tabs"><button id="tabBtn-project" class="modal-tab-btn active" onclick="switchEditTab('project')">Details</button><button id="tabBtn-process" class="modal-tab-btn" onclick="switchEditTab('process')">Process</button></div><div class="modal-body"><div id="edit-tab-project" class="modal-tab-pane active"><div class="form-grid-2"><div class="form-group"><label class="form-label">Client Name</label><input type="text" id="editClientName" class="form-input"></div><div class="form-group"><label class="form-label">Client Email</label><input type="email" id="editClientEmail" class="form-input"></div><div class="form-group"><label class="form-label">Project Name</label><input type="text" id="editProjectName" class="form-input"></div><div class="form-group"><label class="form-label">Industry</label><select id="editIndustry" class="form-select"><option>Real Estate</option><option>Infrastructure</option><option>Energy</option><option>Mining</option><option>Oil & Gas</option></select></div><div class="form-group"><label class="form-label">Location</label><input type="text" id="editLocation" class="form-input"></div><div class="form-group"><label class="form-label">Facility Amount</label><input type="text" id="editAmount" class="form-input"></div><div class="form-group"><label class="form-label">Interest Rate</label><input type="text" id="editRate" class="form-input"></div><div class="form-group"><label class="form-label">Funds Needed</label><input type="text" id="editFundsNeeded" class="form-input"></div><div class="form-group"><label class="form-label">Sponsor Equity</label><input type="text" id="editSponsorEquity" class="form-input"></div><div class="form-group"><label class="form-label">Target Close Date</label><input type="date" id="editCloseDate" class="form-input"></div><div class="form-group"><label class="form-label">Assign Broker</label><select id="editBrokerAssign" class="form-select"></select></div><div class="form-group"><label class="form-label">Broker Engagement Status</label><select id="editBrokerEngagement" class="form-select"><option value="none">None</option><option value="pending">Pending</option><option value="active">Active</option></select></div></div></div><div id="edit-tab-process" class="modal-tab-pane"><div class="form-grid-2"><div class="form-group"><label class="form-label">Current Step</label><select id="editStep" class="form-select"><option value="1">Step 1: Term Sheet</option><option value="2">Step 2: Commitment Fee</option><option value="3">Step 3: Deed of Undertaking</option><option value="4">Step 4: Credit Support</option><option value="5">Step 5: Hard-Copy Submission</option><option value="6">Step 6: ECF Escrow</option><option value="7">Step 7: Transfer to Agent</option><option value="8">Step 8: Funded</option></select></div><div class="form-group"><label class="form-label">CF Status</label><select id="editCommitFee" class="form-select"><option value="pending">Pending</option><option value="paid">Paid</option></select></div><div class="form-group"><label class="form-label">ECF Status</label><select id="editECFStatus" class="form-select"><option value="pending">Pending</option><option value="escrowed">Escrowed</option></select></div><div class="form-group"><label class="form-label">Advisor Note</label><textarea id="editAdvisorNote" rows="2" class="form-textarea"></textarea></div></div><div id="stepStatusContainer"></div></div></div><div class="modal-footer">
+<div id="editProjectModal" class="modal-overlay"><div class="modal modal-lg"><div class="modal-header"><h3>Edit Project</h3><button class="modal-close" onclick="closeModal('editProjectModal')">✕</button></div><div class="modal-tabs"><button id="tabBtn-project" class="modal-tab-btn active" onclick="switchEditTab('project')">Details</button><button id="tabBtn-process" class="modal-tab-btn" onclick="switchEditTab('process')">Process</button></div><div class="modal-body"><div id="edit-tab-project" class="modal-tab-pane active"><div class="form-grid-2"><div class="form-group"><label class="form-label">Client Name</label><input type="text" id="editClientName" class="form-input"></div><div class="form-group"><label class="form-label">Client Email</label><input type="email" id="editClientEmail" class="form-input"></div><div class="form-group"><label class="form-label">Project Name</label><input type="text" id="editProjectName" class="form-input"></div><div class="form-group"><label class="form-label">Industry</label><select id="editIndustry" class="form-select"><option>Real Estate</option><option>Infrastructure</option><option>Energy</option><option>Mining</option><option>Oil & Gas</option></select></div><div class="form-group"><label class="form-label">Location</label><input type="text" id="editLocation" class="form-input"></div><div class="form-group"><label class="form-label">Facility Amount</label><input type="text" id="editAmount" class="form-input"></div><div class="form-group"><label class="form-label">Interest Rate</label><input type="text" id="editRate" class="form-input"></div><div class="form-group"><label class="form-label">Funds Needed</label><input type="text" id="editFundsNeeded" class="form-input"></div><div class="form-group"><label class="form-label">Sponsor Equity</label><input type="text" id="editSponsorEquity" class="form-input"></div><div class="form-group"><label class="form-label">Target Close Date</label><input type="date" id="editCloseDate" class="form-input"></div><div class="form-group"><label class="form-label">Term Sheet Expiry</label><input type="date" id="editTermSheetExpiry" class="form-input"></div><div class="form-group"><label class="form-label">Commitment Fee Deadline</label><input type="date" id="editCommitFeeDeadline" class="form-input"></div><div class="form-group"><label class="form-label">Deed Expiry</label><input type="date" id="editDeedExpiry" class="form-input"></div><div class="form-group"><label class="form-label">ECF Policy Expiry</label><input type="date" id="editECFPolicyExpiry" class="form-input"></div><div class="form-group"><label class="form-label">Term (years)</label><input type="text" id="editTerm" class="form-input"></div><div class="form-group"><label class="form-label">Grace Period (months)</label><input type="text" id="editGracePeriod" class="form-input"></div><div class="form-group"><label class="form-label">Governing Law</label><input type="text" id="editGoverningLaw" class="form-input" placeholder="England and Wales"></div><div class="form-group"><label class="form-label">Funded Date</label><input type="date" id="editFundedDate" class="form-input"></div><div class="form-group"><label class="form-label">Data Room Link</label><input type="url" id="editDataRoomLink" class="form-input" placeholder="https://..."></div><div class="form-group"><label class="form-label">Assign Broker</label><select id="editBrokerAssign" class="form-select"></select></div><div class="form-group"><label class="form-label">Broker Engagement Status</label><select id="editBrokerEngagement" class="form-select"><option value="none">None</option><option value="pending">Pending</option><option value="active">Active</option></select></div></div></div><div id="edit-tab-process" class="modal-tab-pane"><div class="form-grid-2"><div class="form-group"><label class="form-label">Current Step</label><select id="editStep" class="form-select"><option value="1">Step 1: Term Sheet</option><option value="2">Step 2: Commitment Fee</option><option value="3">Step 3: Deed of Undertaking</option><option value="4">Step 4: Credit Support</option><option value="5">Step 5: Hard-Copy Submission</option><option value="6">Step 6: ECF Escrow</option><option value="7">Step 7: Transfer to Agent</option><option value="8">Step 8: Funded</option></select></div><div class="form-group"><label class="form-label">CF Status</label><select id="editCommitFee" class="form-select"><option value="pending">Pending</option><option value="paid">Paid</option></select></div><div class="form-group"><label class="form-label">ECF Status</label><select id="editECFStatus" class="form-select"><option value="pending">Pending</option><option value="escrowed">Escrowed</option></select></div><div class="form-group"><label class="form-label">Advisor Note</label><textarea id="editAdvisorNote" rows="2" class="form-textarea"></textarea></div></div><div id="stepStatusContainer"></div></div></div><div class="modal-footer">
   <button class="btn btn-secondary btn-md" onclick="closeModal('editProjectModal')" style="flex:1">Cancel</button>
   <button class="btn btn-primary btn-md" onclick="saveProjectInfo()" style="flex:2">Save Changes</button>
 </div></div></div>
@@ -1708,10 +1780,10 @@ function setupListeners() {
     const adminDoc = await db.collection('admins').doc(user.uid).get();
     if(adminDoc.exists) {
       // Admin subscriptions
-      unsubscribers.push(db.collection('clients').onSnapshot(s => { clients = s.docs.map(d => ({id:d.id, ...d.data()})); renderAdminTables(); renderAnalytics(); renderPipeline(); renderBrokerPerformance(); }));
-      unsubscribers.push(db.collection('projects').onSnapshot(s => { projects = s.docs.map(d => ({id:d.id, ...d.data()})); renderAdminTables(); renderAnalytics(); renderPipeline(); renderBrokerPerformance(); renderInbox(); }));
+      unsubscribers.push(db.collection('clients').onSnapshot(s => { clients = s.docs.map(d => ({id:d.id, ...d.data()})); renderAdminTables(); renderAnalytics(); renderPipeline(); renderBrokerPerformance(); renderSubmissionsTable(); renderDealHealthSummary(); }));
+      unsubscribers.push(db.collection('projects').onSnapshot(s => { projects = s.docs.map(d => ({id:d.id, ...d.data()})); renderAdminTables(); renderAnalytics(); renderPipeline(); renderBrokerPerformance(); renderInbox(); renderDealHealthSummary(); }));
       unsubscribers.push(db.collection('brokers').onSnapshot(s => { brokers = s.docs.map(d => ({id:d.id, ...d.data()})); renderBrokerAdminTable(); renderBrokerPerformance(); }));
-      unsubscribers.push(db.collection('brokerSubmissions').onSnapshot(s => { brokerSubmissions = s.docs.map(d => ({id:d.id, ...d.data()})); renderBrokerAdminTable(); renderBrokerPerformance(); }));
+      unsubscribers.push(db.collection('brokerSubmissions').onSnapshot(s => { brokerSubmissions = s.docs.map(d => ({id:d.id, ...d.data()})); renderBrokerAdminTable(); renderBrokerPerformance(); renderSubmissionsTable(); setupAdminNotifications(); }));
       unsubscribers.push(db.collection('documents').onSnapshot(s => { documents = s.docs.map(d => ({id:d.id, ...d.data()})); renderAdminDocumentsTable(); }));
       unsubscribers.push(db.collection('messages').onSnapshot(s => { messages = s.docs.map(d => ({id:d.id, ...d.data()})); renderInbox(); setupAdminNotifications(); }));
       unsubscribers.push(db.collection('brokerMessages').onSnapshot(s => { brokerMessages = s.docs.map(d => ({id:d.id, ...d.data()})); renderInbox(); setupAdminNotifications(); }));
@@ -1897,6 +1969,7 @@ function switchAdminTab(tabName) {
   if(tabName === 'analytics') renderAnalytics();
   if(tabName === 'audit') loadAuditLog();
   if(tabName === 'inbox') renderInbox();
+  if(tabName === 'submissions') renderSubmissionsTable();
   if(window.innerWidth <= 768) { document.getElementById('adminSidebar').classList.remove('open'); document.getElementById('adminSidebarOverlay').classList.remove('show'); }
 }
 
@@ -2241,7 +2314,7 @@ function updateBrokerDashboard() {
       <td>${formatCurrency(amt * rate / 100)}</strong></td>
     </tr>`;
   }).join('');
-  document.getElementById('brokerCommissionHistory').innerHTML = historyHtml || '<tr><td colspan="6">No funded deals yet.</div>';
+  document.getElementById('brokerCommissionHistory').innerHTML = historyHtml || '<tr><td colspan="6">No funded deals yet. </div>';
 }
 
 window.submitDeal = async function() {
@@ -2262,6 +2335,14 @@ window.submitDeal = async function() {
     otherLenders: document.getElementById('dealOtherLenders').value,
     otherLendersNotes: document.getElementById('dealOtherLendersNotes').value,
     description: document.getElementById('dealDescription').value,
+    dataRoomLink: document.getElementById('dealDataRoomLink').value,
+    totalCost: document.getElementById('dealTotalCost').value,
+    debtEquity: document.getElementById('dealDebtEquity').value,
+    projectedIRR: document.getElementById('dealProjectedIRR').value,
+    exitStrategy: document.getElementById('dealExitStrategy').value,
+    projectStatus: document.getElementById('dealProjectStatus').value,
+    risks: document.getElementById('dealRisks').value,
+    brokerCommExpectation: document.getElementById('dealBrokerCommExpectation').value,
     status: 'pending', createdAt: new Date().toISOString()
   });
   showToast('Deal submitted');
@@ -2270,6 +2351,12 @@ window.submitDeal = async function() {
   document.getElementById('dealSponsorEquity').value = ''; document.getElementById('dealBackground').value = '';
   document.getElementById('dealJurisdiction').value = ''; document.getElementById('dealTargetDate').value = '';
   document.getElementById('dealDescription').value = '';
+  document.getElementById('dealDataRoomLink').value = '';
+  document.getElementById('dealTotalCost').value = '';
+  document.getElementById('dealDebtEquity').value = '';
+  document.getElementById('dealProjectedIRR').value = '';
+  document.getElementById('dealRisks').value = '';
+  document.getElementById('dealBrokerCommExpectation').value = '';
 };
 
 function renderBrokerPortfolio() {
@@ -2430,6 +2517,38 @@ window.approveClient = async function(id) {
   }
 };
 
+window.saveClientNote = async function(clientId, note) {
+  await db.collection('clients').doc(clientId).update({ adminNote: note });
+};
+
+function renderDealHealthSummary() {
+  const el = document.getElementById('dealHealthSummary');
+  if(!el) return;
+  const active = projects.filter(p => p.status === 'active');
+  const overdue = active.filter(p => p.closeDate && Math.ceil((new Date(p.closeDate) - new Date()) / (1000*60*60*24)) < 0);
+  const urgent = active.filter(p => p.closeDate && Math.ceil((new Date(p.closeDate) - new Date()) / (1000*60*60*24)) >= 0 && Math.ceil((new Date(p.closeDate) - new Date()) / (1000*60*60*24)) < 14);
+  const onTrack = active.filter(p => !p.closeDate || Math.ceil((new Date(p.closeDate) - new Date()) / (1000*60*60*24)) >= 14);
+  const funded = active.filter(p => (p.step||1) === 8);
+  el.innerHTML = `
+    <div style="background:var(--error-light);border:0.5px solid var(--error);border-radius:8px;padding:16px;text-align:center;">
+      <div class="data-label" style="color:var(--error);">Past Due</div>
+      <div style="font-size:32px;font-weight:600;color:var(--error);">${overdue.length}</div>
+    </div>
+    <div style="background:var(--warning-light);border:0.5px solid var(--warning);border-radius:8px;padding:16px;text-align:center;">
+      <div class="data-label" style="color:var(--warning);">Urgent (≤14 days)</div>
+      <div style="font-size:32px;font-weight:600;color:var(--warning);">${urgent.length}</div>
+    </div>
+    <div style="background:var(--success-light);border:0.5px solid var(--success);border-radius:8px;padding:16px;text-align:center;">
+      <div class="data-label" style="color:var(--success);">On Track</div>
+      <div style="font-size:32px;font-weight:600;color:var(--success);">${onTrack.length}</div>
+    </div>
+    <div style="background:var(--info-light);border:0.5px solid var(--info);border-radius:8px;padding:16px;text-align:center;">
+      <div class="data-label" style="color:var(--info);">Funded</div>
+      <div style="font-size:32px;font-weight:600;color:var(--info);">${funded.length}</div>
+    </div>
+  `;
+}
+
 function renderAdminTables() {
   const cTbody = document.getElementById('adminClientsTable');
   if(cTbody) {
@@ -2440,6 +2559,7 @@ function renderAdminTables() {
         <td>${escapeHtml(c.email)}</div></td>
         <td>${projectCount}</div></td>
         <td><span class="badge ${c.status === 'active' ? 'badge-success' : 'badge-warning'}">${c.status}</span></td>
+        <td><input type="text" class="form-input" style="font-size:11px;padding:4px 8px;" placeholder="Add note..." value="${escapeHtml(c.adminNote || '')}" onblur="saveClientNote('${c.id}', this.value)"></td>
         <td>${c.createdAt ? c.createdAt.split('T')[0] : '—'}</div></td>
         <td>
           ${c.status === 'pending' ? `<button class="btn btn-ghost btn-sm" onclick="approveClient('${c.id}')">Approve</button>` : ''}
@@ -2458,11 +2578,12 @@ function renderAdminTables() {
         <td>${escapeHtml(c?.name || 'Unknown')}</div></td>
         <td><strong>${escapeHtml(p.name)}</strong></div></td>
         <td>${escapeHtml(p.industry || '—')}</div></td>
-        <td>${formatCurrency(p.fundsNeeded)}</div></td>
+        <td>${formatCurrency(p.fundsNeeded || p.amount)}</div></td>
         <td><span class="badge badge-info">${p.step||1}</span></div></td>
         <td>${broker ? escapeHtml(broker.name) : 'Direct'}</div></td>
         <td><span class="badge ${p.commitmentFeeStatus === 'paid' ? 'badge-success' : 'badge-warning'}">${p.commitmentFeeStatus === 'paid' ? 'Paid' : 'Pending'}</span></div></td>
         <td><span class="badge ${p.ecfStatus === 'escrowed' ? 'badge-success' : 'badge-warning'}">${p.ecfStatus === 'escrowed' ? 'Escrowed' : 'Pending'}</span></div></td>
+        <td>${p.dataRoomLink ? `<a href="${escapeHtml(p.dataRoomLink)}" target="_blank" class="btn btn-ghost btn-sm" style="font-size:10px;"><i class="fas fa-external-link-alt"></i> Open</a>` : '—'}</div></td>
         <td><button class="btn btn-ghost btn-sm" onclick="editProject('${p.id}')">Edit</button><button class="btn btn-ghost btn-sm btn-danger" onclick="deleteProject('${p.id}')">Delete</button></div></td>
       </tr>`;
     }).join('');
@@ -2592,6 +2713,50 @@ function renderBrokerAdminTable() {
   }
 }
 
+function renderSubmissionsTable() {
+  const tbody = document.getElementById('submissionsTableBody');
+  if(!tbody) return;
+  const filter = document.getElementById('submissionFilter')?.value || 'all';
+  const filtered = filter === 'all' ? brokerSubmissions : brokerSubmissions.filter(s => s.status === filter);
+  const sorted = [...filtered].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+  tbody.innerHTML = sorted.map(s => `<tr>
+    <td>${s.createdAt ? s.createdAt.split('T')[0] : '—'}</td>
+    <td><strong>${escapeHtml(s.brokerName)}</strong></td>
+    <td>${escapeHtml(s.clientName)}<br><span class="data-label">${escapeHtml(s.clientEmail)}</span></td>
+    <td><strong>${escapeHtml(s.projectName)}</strong><br><span class="data-label">${escapeHtml(s.industry)} · ${escapeHtml(s.location)}</span></td>
+    <td>${escapeHtml(s.industry)}</div></td>
+    <td>${formatCurrency(s.fundsNeeded)}</div></td>
+    <td>${s.dataRoomLink ? `<a href="${escapeHtml(s.dataRoomLink)}" target="_blank" class="btn btn-ghost btn-sm"><i class="fas fa-external-link-alt"></i> Open</a>` : '<span class="data-label">None</span>'}</div></td>
+    <td><span class="badge ${s.status === 'accepted' ? 'badge-success' : s.status === 'rejected' ? 'badge-danger' : 'badge-warning'}">${s.status}</span></div></td>
+    <td>
+      <button class="btn btn-ghost btn-sm" onclick="viewSubmissionDetail('${s.id}')">View</button>
+      <button class="btn btn-success btn-sm" onclick="acceptSubmission('${s.id}')">Accept</button>
+      <button class="btn btn-danger btn-sm" onclick="rejectSubmission('${s.id}')">Reject</button>
+     </div></td>
+  </tr>`).join('') || '<tr><td colspan="9" style="text-align:center;color:var(--gray-400);">No submissions</div>';
+}
+
+window.viewSubmissionDetail = function(id) {
+  const s = brokerSubmissions.find(x => x.id === id);
+  if(!s) return;
+  const panel = document.getElementById('submissionDetailPanel');
+  panel.style.display = 'block';
+  panel.innerHTML = `<div class="card"><div class="card-header" style="display:flex;justify-content:space-between;"><div class="card-title">Full Submission Detail — ${escapeHtml(s.projectName)}</div><button class="btn btn-ghost btn-sm" onclick="document.getElementById('submissionDetailPanel').style.display='none'">✕ Close</button></div><div class="card-body"><div class="form-grid-2" style="gap:20px;"><div><div class="data-label">Broker</div><div>${escapeHtml(s.brokerName)}</div></div><div><div class="data-label">Client</div><div>${escapeHtml(s.clientName)} · ${escapeHtml(s.clientEmail)}</div></div><div><div class="data-label">Industry</div><div>${escapeHtml(s.industry)}</div></div><div><div class="data-label">Location</div><div>${escapeHtml(s.location)}</div></div><div><div class="data-label">Funds Needed</div><div>${formatCurrency(s.fundsNeeded)}</div></div><div><div class="data-label">Total Cost</div><div>${formatCurrency(s.totalCost)}</div></div><div><div class="data-label">Sponsor Equity</div><div>${formatCurrency(s.sponsorEquity)}</div></div><div><div class="data-label">Debt:Equity</div><div>${escapeHtml(s.debtEquity || '—')}</div></div><div><div class="data-label">Projected IRR</div><div>${escapeHtml(s.projectedIRR || '—')}</div></div><div><div class="data-label">Exit Strategy</div><div>${escapeHtml(s.exitStrategy || '—')}</div></div><div><div class="data-label">Project Status</div><div>${escapeHtml(s.projectStatus || '—')}</div></div><div><div class="data-label">Broker Commission Ask</div><div>${escapeHtml(s.brokerCommExpectation || '—')}</div></div><div><div class="data-label">Other Lenders</div><div>${escapeHtml(s.otherLenders || '—')}</div></div><div><div class="data-label">Relationship</div><div>${escapeHtml(s.relationship || '—')}</div></div></div><div style="margin-top:20px;"><div class="data-label">Project Description</div><div style="margin-top:8px;padding:12px;background:var(--gray-50);border-radius:6px;">${escapeHtml(s.description || '—')}</div></div><div style="margin-top:16px;"><div class="data-label">Key Risks</div><div style="margin-top:8px;padding:12px;background:var(--gray-50);border-radius:6px;">${escapeHtml(s.risks || '—')}</div></div><div style="margin-top:16px;"><div class="data-label">Sponsor Background</div><div style="margin-top:8px;padding:12px;background:var(--gray-50);border-radius:6px;">${escapeHtml(s.background || '—')}</div></div>${s.dataRoomLink ? `<div style="margin-top:16px;"><div class="data-label">Data Room</div><a href="${escapeHtml(s.dataRoomLink)}" target="_blank" class="btn btn-primary btn-sm" style="margin-top:8px;"><i class="fas fa-external-link-alt"></i> Open Data Room</a></div>` : ''}<div style="margin-top:20px;display:flex;gap:12px;"><button class="btn btn-success btn-md" onclick="acceptSubmission('${s.id}')">Accept Submission</button><button class="btn btn-danger btn-md" onclick="rejectSubmission('${s.id}')">Reject</button></div></div></div>`;
+  panel.scrollIntoView({ behavior: 'smooth' });
+};
+
+window.acceptSubmission = async function(id) {
+  await db.collection('brokerSubmissions').doc(id).update({ status: 'accepted' });
+  showToast('Submission accepted');
+  renderSubmissionsTable();
+};
+
+window.rejectSubmission = async function(id) {
+  await db.collection('brokerSubmissions').doc(id).update({ status: 'rejected' });
+  showToast('Submission rejected');
+  renderSubmissionsTable();
+};
+
 window.updateBrokerEngagement = async function(id, status) {
   await db.collection('brokers').doc(id).update({ engagementStatus: status });
   showToast(`Engagement status updated to ${status}`);
@@ -2639,7 +2804,7 @@ function renderMeetings() {
       <td>${escapeHtml(m.type)}</div></td>
       <td><span class="badge ${m.status === 'confirmed' ? 'badge-success' : (m.status === 'cancelled' ? 'badge-danger' : 'badge-warning')}">${m.status}</span></div></td>
       <td><button class="btn btn-ghost btn-sm" onclick="updateMeetingStatus('${m.id}', 'confirmed')">Confirm</button><button class="btn btn-ghost btn-sm btn-danger" onclick="updateMeetingStatus('${m.id}', 'cancelled')">Cancel</button><button class="btn btn-ghost btn-sm btn-danger" onclick="deleteMeeting('${m.id}')">Del</button></div></td>
-    </tr>`).join('') || '<tr><td colspan="5">No meetings</div>';
+    </tr>`).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--gray-400);">No meetings scheduled</div>';
 }
 
 window.updateMeetingStatus = async function(id, status) { await db.collection('meetings').doc(id).update({ status }); showToast(`Meeting ${status}`); };
@@ -2707,8 +2872,29 @@ window.sendInboxReply = async function(id, type) {
   const input = document.getElementById(`reply_${id}_${type}`);
   const val = input.value.trim();
   if(!val) return;
-  if(type === 'client') await db.collection('messages').add({ clientId: id, content: val, sender: 'admin', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-  else await db.collection('brokerMessages').add({ brokerId: id, content: val, sender: 'admin', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+  if(type === 'client') {
+    await db.collection('messages').add({ clientId: id, content: val, sender: 'admin', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+    const client = clients.find(c => c.id === id);
+    await sendEmailNotification({
+      to_name: client?.name || 'Client',
+      to_email: client?.email || '',
+      from_name: 'Suzana Aleksić — Croft Finance',
+      subject: 'New message from Croft Finance',
+      message: val,
+      project_name: projects.find(p => p.clientId === id)?.name || 'N/A'
+    });
+  } else {
+    await db.collection('brokerMessages').add({ brokerId: id, content: val, sender: 'admin', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+    const broker = brokers.find(b => b.id === id);
+    await sendEmailNotification({
+      to_name: broker?.name || 'Broker',
+      to_email: broker?.email || '',
+      from_name: 'Suzana Aleksić — Croft Finance',
+      subject: 'New message from Croft Finance',
+      message: val,
+      project_name: 'Broker Communication'
+    });
+  }
   input.value = '';
 };
 
@@ -2791,7 +2977,7 @@ function renderAnalytics() {
         <td>${p.fundedDate || formatDate(p.fundedDate) || '—'}</div></td>
       </tr>`;
   }).join('');
-  document.getElementById('commissionTableBody').innerHTML = commissionHtml || '<tr><td colspan="9">No funded projects</div>';
+  document.getElementById('commissionTableBody').innerHTML = commissionHtml || '<td><td colspan="9">No funded projects</div>';
   document.getElementById('commissionTotalRow').innerHTML = `<td colspan="4"><strong>Total</strong></div><td>${formatCurrency(fundedProjects.reduce((s,p)=> s + (parseFloat(String(p.amount||'0').replace(/[^0-9.-]/g,''))||0),0))}</td><td>${formatCurrency(totalCommission)}</div><td>${formatCurrency(fundedProjects.reduce((s,p)=> s + ((parseFloat(String(p.amount||'0').replace(/[^0-9.-]/g,''))||0)*ADMIN_ONLY_COMMISSION_RATE),0))}</td><td colspan="2">`;
 }
 
@@ -2937,6 +3123,15 @@ window.editProject = function(pid) {
   document.getElementById('editRate').value = p.interestRate || '';
   document.getElementById('editStep').value = p.step || 1;
   document.getElementById('editCloseDate').value = p.closeDate || '';
+  document.getElementById('editTermSheetExpiry').value = p.termSheetExpiry || '';
+  document.getElementById('editCommitFeeDeadline').value = p.commitmentFeeDeadline || '';
+  document.getElementById('editDeedExpiry').value = p.deedExpiry || '';
+  document.getElementById('editECFPolicyExpiry').value = p.ecfPolicyExpiry || '';
+  document.getElementById('editTerm').value = p.term || '';
+  document.getElementById('editGracePeriod').value = p.gracePeriod || '';
+  document.getElementById('editGoverningLaw').value = p.governingLaw || 'England and Wales';
+  document.getElementById('editFundedDate').value = p.fundedDate || '';
+  document.getElementById('editDataRoomLink').value = p.dataRoomLink || '';
   document.getElementById('editCommitFee').value = p.commitmentFeeStatus || 'pending';
   document.getElementById('editECFStatus').value = p.ecfStatus || 'pending';
   document.getElementById('editAdvisorNote').value = p.advisorNote || '';
@@ -3089,6 +3284,15 @@ window.saveProjectInfo = async function() {
     sponsorEquity: document.getElementById('editSponsorEquity').value, step: newStep,
     amount: document.getElementById('editAmount').value, interestRate: document.getElementById('editRate').value,
     brokerId: document.getElementById('editBrokerAssign').value || null, closeDate: document.getElementById('editCloseDate').value,
+    termSheetExpiry: document.getElementById('editTermSheetExpiry').value,
+    commitmentFeeDeadline: document.getElementById('editCommitFeeDeadline').value,
+    deedExpiry: document.getElementById('editDeedExpiry').value,
+    ecfPolicyExpiry: document.getElementById('editECFPolicyExpiry').value,
+    term: document.getElementById('editTerm').value,
+    gracePeriod: document.getElementById('editGracePeriod').value,
+    governingLaw: document.getElementById('editGoverningLaw').value,
+    fundedDate: document.getElementById('editFundedDate').value,
+    dataRoomLink: document.getElementById('editDataRoomLink').value,
     commitmentFeeStatus: document.getElementById('editCommitFee').value, ecfStatus: document.getElementById('editECFStatus').value,
     advisorNote: document.getElementById('editAdvisorNote').value, brokerEngagement: document.getElementById('editBrokerEngagement').value
   };
