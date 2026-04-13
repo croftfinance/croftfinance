@@ -1151,7 +1151,6 @@ body {
     <button class="btn btn-primary btn-md" onclick="login()" style="width:100%">Sign In</button>
     <div style="text-align:center;margin-top:8px;"><a href="#" onclick="showForgotPassword()" style="color:var(--gray-400);font-size:12px;">Forgot password?</a></div>
     <div style="text-align:center;margin-top:4px;"><a href="#" onclick="showRegisterForm()" style="color:var(--navy);font-size:12px;font-weight:500;">Request portal access →</a></div>
-    <div style="text-align:center;margin-top:4px;"><a href="#" onclick="showBrokerRegisterForm()" style="color:var(--navy);font-size:12px;font-weight:500;">Register as broker →</a></div>
     <div style="text-align:center;margin-top:8px;">
       <a href="#" onclick="showBrokerLoginForm()" style="color:var(--gray-400);font-size:12px;">Broker access</a> | 
       <a href="#" onclick="showAdminLogin()" style="color:var(--gray-400);font-size:12px;">Admin access</a>
@@ -1251,7 +1250,7 @@ body {
       <!-- Documents Tab -->
       <div id="tab-documents" class="portal-tab">
         <div class="client-page-title">Documents</div>
-        <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-file-signature"></i> Closing Documents</div></div><div class="card-body" style="padding:0;"><div class="table-wrap"><table class="documents-table" id="closingDocumentsTable"><thead><tr><th>Document Name</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="closingDocumentsBody"></tbody></table></div></div></div>
+        <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-file-signature"></i> Closing Documents</div></div><div class="card-body" style="padding:0;"><div class="table-wrap"><table class="documents-table" id="closingDocumentsTable"><thead><tr><th>Document Name</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="closingDocumentsBody"></tbody></tr></div></div></div>
         <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-upload"></i> Upload a Document</div></div><div class="card-body"><div class="upload-form-inline"><div class="form-group"><label class="form-label">Document Type</label><select id="clientUploadDocType" class="form-select"><option value="">Select document type...</option></select></div><div class="form-group"><label class="form-label">PDF File (max 10MB)</label><input type="file" id="clientUploadFile" class="form-input" accept=".pdf"></div><button class="btn btn-primary btn-md" onclick="clientUploadDocument()">Upload Document</button><div id="clientUploadStatus" style="margin-top:12px;font-size:12px;display:none;"></div></div></div></div>
       </div>
 
@@ -1340,8 +1339,8 @@ body {
           <div class="card"><div class="card-header"><div class="card-title">Projects by Industry</div></div><div class="card-body"><canvas id="industryChart" height="220" style="max-height:220px;"></canvas></div></div>
           <div class="card"><div class="card-header"><div class="card-title">Pipeline Stage Distribution</div></div><div class="card-body"><canvas id="pipelineStageChart" height="220" style="max-height:220px;"></canvas></div></div>
         </div>
-        <div class="card"><div class="card-header"><div class="card-title">Broker Performance</div><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="exportBrokerPerformanceCSV()">Export CSV</button></div></div><div class="card-body"><div class="table-wrap"><table class="admin-table" id="brokerPerformanceTable"><thead><tr><th data-sort="name" style="cursor:pointer;">Broker Name</th><th>Firm</th><th>Market</th><th data-sort="submissions" style="cursor:pointer;">Submissions</th><th data-sort="accepted" style="cursor:pointer;">Accepted</th><th data-sort="funded" style="cursor:pointer;">Funded</th><th data-sort="conversion" style="cursor:pointer;">Conversion %</th><th data-sort="volume" style="cursor:pointer;">Total Volume</th><th data-sort="commission" style="cursor:pointer;">Est. Commission</th></tr></thead><tbody id="brokerPerformanceBody"></tbody></table></div></div></div>
-        <div class="card"><div class="card-header"><div class="card-title">Commission Breakdown</div><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="exportCommissionCSV()">Export CSV</button><button class="btn btn-ghost btn-sm" onclick="window.print()">Print Report</button></div></div><div class="card-body"><div class="table-wrap"><table class="admin-table" id="commissionTable"><thead><tr><th>Client</th><th>Project</th><th>Industry</th><th>Location</th><th>Facility Amount</th><th>Broker Commission</th><th>Net Commission (2%)</th><th>Days to Close</th><th>Funded Date</th></tr></thead><tbody id="commissionTableBody"></tbody><tfoot><tr id="commissionTotalRow"><tr></tfoot></table></div></div></div>
+        <div class="card"><div class="card-header"><div class="card-title">Broker Performance</div><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="exportBrokerPerformanceCSV()">Export CSV</button></div></div><div class="card-body"><div class="table-wrap"><table class="admin-table" id="brokerPerformanceTable"><thead><tr><th data-sort="name" style="cursor:pointer;">Broker Name</th><th>Firm</th><th>Market</th><th data-sort="submissions" style="cursor:pointer;">Submissions</th><th data-sort="accepted" style="cursor:pointer;">Accepted</th><th data-sort="funded" style="cursor:pointer;">Funded</th><th data-sort="conversion" style="cursor:pointer;">Conversion %</th><th data-sort="volume" style="cursor:pointer;">Total Volume</th><th data-sort="commission" style="cursor:pointer;">Est. Commission</th></tr></thead><tbody id="brokerPerformanceBody"></tbody><tr></div></div></div>
+        <div class="card"><div class="card-header"><div class="card-title">Commission Breakdown</div><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="exportCommissionCSV()">Export CSV</button><button class="btn btn-ghost btn-sm" onclick="window.print()">Print Report</button></div></div><div class="card-body"><div class="table-wrap"><table class="admin-table" id="commissionTable"><thead><tr><th>Client</th><th>Project</th><th>Industry</th><th>Location</th><th>Facility Amount</th><th>Broker Commission</th><th>Net Commission (2%)</th><th>Days to Close</th><th>Funded Date</th></tr></thead><tbody id="commissionTableBody"></tbody><tfoot><tr id="commissionTotalRow"></tr></tfoot></table></div></div></div>
         <div class="card"><div class="card-header"><div class="card-title">Quarterly Trend</div></div><div class="card-body"><canvas id="quarterlyTrendChart" height="200" style="max-height:200px;"></canvas></div></div>
       </div>
 
@@ -1435,7 +1434,7 @@ body {
           <div class="stat-card"><div class="data-label">Active Deals</div><div class="stat-value" id="brokerActiveDeals">0</div></div>
           <div class="stat-card commission-rate-card"><div class="data-label">Your Commission Rate</div><div class="stat-value" id="brokerCommRate">0%</div><div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:4px;">Per funded facility</div></div>
         </div>
-        <div class="card"><div class="card-header"><div class="card-title">Commission History</div></div><div class="card-body"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Project</th><th>Client</th><th>Funded Date</th><th>Facility Amount</th><th>Commission Rate</th><th>Commission Amount</th></tr></thead><tbody id="brokerCommissionHistory"></tbody></tr></div></div></div>
+        <div class="card"><div class="card-header"><div class="card-title">Commission History</div></div><div class="card-body"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Project</th><th>Client</th><th>Funded Date</th><th>Facility Amount</th><th>Commission Rate</th><th>Commission Amount</th></tr></thead><tbody id="brokerCommissionHistory"></tbody></table></div></div></div>
       </div>
 
       <!-- Submit Deal Tab (Extended Form) -->
@@ -1576,7 +1575,7 @@ const FIREBASE_CONFIG = {
 };
 
 const STEP_NAMES = ['', 'Mandate Review', 'Term Sheet', 'Commitment Fee', 'Deed of Undertaking', 'Credit Support', 'Hard-Copy Submission', 'ECF Escrow', 'Transfer to Agent', 'Funded'];
-const ADMIN_ONLY_COMMISSION_RATE = 0.02; // NEVER reference in broker or client portal functions
+const ADMIN_ONLY_COMMISSION_RATE = 0.02;
 
 const STEP_CONFIG = {
   1: { name: 'Mandate Review', clientAction: 'Provide project overview and any supporting materials requested by Croft Finance', croftAction: 'Evaluate mandate fit, conduct preliminary due diligence, and issue decision within 5 business days' },
@@ -1616,7 +1615,6 @@ let loginLockoutUntil = 0;
 let brokerSortField = 'volume';
 let brokerSortDesc = true;
 
-// Chart.js defaults
 Chart.defaults.font.family = "'Jost', sans-serif";
 Chart.defaults.font.size = 11;
 Chart.defaults.color = '#6c757d';
@@ -1649,21 +1647,31 @@ function formatCurrency(value) {
   if(isNaN(num)) return '—';
   return '$' + num.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 }
+
+function formatNumber(value) {
+  const num = parseInt(String(value || 0).replace(/[^0-9.-]/g, ''));
+  if(isNaN(num)) return '—';
+  return num.toLocaleString('en-US');
+}
+
 function formatDate(isoString) {
   if(!isoString) return '—';
   return new Date(isoString).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 }
+
 function formatDateTime(timestamp) {
   if(!timestamp) return '—';
   const d = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
   return d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + ' · ' + d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
 }
+
 function escapeHtml(str) {
   if(!str) return '';
   return String(str).replace(/[&<>]/g, function(m) {
     return m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;';
   });
 }
+
 function showToast(msg, isError = false) {
   const t = document.createElement('div');
   t.className = 'toast';
@@ -1672,11 +1680,11 @@ function showToast(msg, isError = false) {
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 3500);
 }
+
 function openModal(id) { document.getElementById(id).classList.add('active'); }
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 function showView(v) { document.querySelectorAll('.view').forEach(x => x.classList.remove('active')); document.getElementById('view-' + v).classList.add('active'); }
 
-// Skeleton rows
 function renderSkeletonRows(containerId, columnCount, rowCount = 5) {
   const container = document.getElementById(containerId);
   if(!container) return;
@@ -1691,8 +1699,7 @@ function renderSkeletonRows(containerId, columnCount, rowCount = 5) {
   container.innerHTML = html;
 }
 
-// Animate counter
-function animateCounter(element, target, duration = 800) {
+function animateNumber(element, target, isCurrency = false, duration = 800) {
   if(!element) return;
   const start = 0;
   const increment = target / (duration / 16);
@@ -1700,10 +1707,10 @@ function animateCounter(element, target, duration = 800) {
   const timer = setInterval(() => {
     current += increment;
     if(current >= target) {
-      element.innerHTML = formatCurrency(target);
+      element.innerHTML = isCurrency ? formatCurrency(target) : formatNumber(target);
       clearInterval(timer);
     } else {
-      element.innerHTML = formatCurrency(Math.floor(current));
+      element.innerHTML = isCurrency ? formatCurrency(Math.floor(current)) : formatNumber(Math.floor(current));
     }
   }, 16);
 }
@@ -1717,10 +1724,8 @@ async function initFirebase() {
   auth = firebase.auth();
   storage = firebase.storage();
   
-  // Initialize EmailJS with public key
   emailjs.init(EMAILJS_CONFIG.publicKey);
   
-  // Session ID
   if(!sessionStorage.getItem('croftSessionId')) {
     sessionStorage.setItem('croftSessionId', crypto.randomUUID());
   }
@@ -1732,7 +1737,6 @@ async function initFirebase() {
   window.addEventListener('scroll', () => { const nav = document.getElementById('homeNav'); if(nav) nav.classList.toggle('scrolled', window.scrollY > 20); });
   document.addEventListener('keydown', (e) => { if(e.key === 'Escape') document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active')); });
   
-  // Session inactivity
   ['mousemove','keypress','click','scroll','touchstart'].forEach(evt =>
     document.addEventListener(evt, () => {
       lastActivity = Date.now();
@@ -1751,7 +1755,6 @@ async function initFirebase() {
     }
   }, 30000);
   
-  // Advisor availability
   updateAdvisorAvailability();
   setInterval(updateAdvisorAvailability, 60000);
 }
@@ -1820,6 +1823,191 @@ async function logActivity(actorId, actorName, actorRole, action, projectId, det
   } catch(e) { console.warn('Activity log error:', e); }
 }
 
+// ============================================================
+// FIXED: showLoginForm - hides broker register form correctly
+// ============================================================
+window.showLoginForm = function() { 
+  document.getElementById('loginForm').style.display = 'block'; 
+  document.getElementById('brokerLoginForm').style.display = 'none'; 
+  document.getElementById('adminLoginForm').style.display = 'none'; 
+  document.getElementById('registerForm').style.display = 'none'; 
+  document.getElementById('forgotPasswordForm').style.display = 'none'; 
+  document.getElementById('brokerRegisterForm').style.display = 'none'; 
+};
+
+window.showBrokerLoginForm = function() { 
+  document.getElementById('loginForm').style.display = 'none'; 
+  document.getElementById('brokerLoginForm').style.display = 'block'; 
+  document.getElementById('adminLoginForm').style.display = 'none'; 
+  document.getElementById('registerForm').style.display = 'none'; 
+  document.getElementById('forgotPasswordForm').style.display = 'none'; 
+  document.getElementById('brokerRegisterForm').style.display = 'none'; 
+};
+
+window.showAdminLogin = function() { 
+  document.getElementById('loginForm').style.display = 'none'; 
+  document.getElementById('brokerLoginForm').style.display = 'none'; 
+  document.getElementById('adminLoginForm').style.display = 'block'; 
+  document.getElementById('registerForm').style.display = 'none'; 
+  document.getElementById('forgotPasswordForm').style.display = 'none'; 
+  document.getElementById('brokerRegisterForm').style.display = 'none'; 
+};
+
+window.showRegisterForm = function() { 
+  document.getElementById('loginForm').style.display = 'none'; 
+  document.getElementById('brokerLoginForm').style.display = 'none'; 
+  document.getElementById('adminLoginForm').style.display = 'none'; 
+  document.getElementById('registerForm').style.display = 'block'; 
+  document.getElementById('forgotPasswordForm').style.display = 'none'; 
+  document.getElementById('brokerRegisterForm').style.display = 'none'; 
+};
+
+window.showForgotPassword = function() { 
+  document.getElementById('loginForm').style.display = 'none'; 
+  document.getElementById('brokerLoginForm').style.display = 'none'; 
+  document.getElementById('adminLoginForm').style.display = 'none'; 
+  document.getElementById('registerForm').style.display = 'none'; 
+  document.getElementById('forgotPasswordForm').style.display = 'block'; 
+  document.getElementById('brokerRegisterForm').style.display = 'none'; 
+};
+
+window.showBrokerRegisterForm = function() { 
+  document.getElementById('loginForm').style.display = 'none'; 
+  document.getElementById('brokerLoginForm').style.display = 'none'; 
+  document.getElementById('adminLoginForm').style.display = 'none'; 
+  document.getElementById('registerForm').style.display = 'none'; 
+  document.getElementById('forgotPasswordForm').style.display = 'none'; 
+  document.getElementById('brokerRegisterForm').style.display = 'block'; 
+};
+
+// ============================================================
+// FIXED: Password Reset with visible success message
+// ============================================================
+window.requestPasswordReset = function() {
+  const email = document.getElementById('forgotEmail').value.trim().toLowerCase(); 
+  if(!email) return;
+  const errEl = document.getElementById('forgotError');
+  errEl.style.display = 'block';
+  errEl.style.color = 'var(--info)';
+  errEl.innerText = 'Sending reset link...';
+  auth.sendPasswordResetEmail(email).then(() => {
+    errEl.style.color = 'var(--success)';
+    errEl.innerText = 'If an account exists with this email, you will receive password reset instructions.';
+    setTimeout(() => showLoginForm(), 4000);
+  }).catch((e) => {
+    errEl.style.color = 'var(--error)';
+    errEl.innerText = 'Unable to send reset link. Please contact Croft Finance directly for assistance.';
+  });
+};
+
+// ============================================================
+// LOGIN FUNCTIONS
+// ============================================================
+window.login = async function() {
+  if(checkLoginLockout('client')) return;
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const pass = document.getElementById('loginPassword').value;
+  const errEl = document.getElementById('loginError');
+  errEl.style.display = 'none';
+  try { await auth.signInWithEmailAndPassword(email, pass); resetLoginAttempts('client'); closeModal('loginModal'); } 
+  catch(e) { recordFailedLogin('client'); errEl.innerText = 'Invalid credentials.'; errEl.style.display = 'block'; }
+};
+
+window.brokerLogin = async function() {
+  if(checkLoginLockout('broker')) return;
+  const email = document.getElementById('brokerLoginEmail').value.trim().toLowerCase();
+  const pass = document.getElementById('brokerLoginPassword').value;
+  const errEl = document.getElementById('brokerLoginError');
+  errEl.style.display = 'none';
+  try { await auth.signInWithEmailAndPassword(email, pass); resetLoginAttempts('broker'); closeModal('loginModal'); } 
+  catch(e) { recordFailedLogin('broker'); errEl.innerText = 'Invalid credentials.'; errEl.style.display = 'block'; }
+};
+
+window.doAdminLogin = async function() {
+  if(checkLoginLockout('admin')) return;
+  const email = document.getElementById('adminUsername').value.trim(); 
+  const pass = document.getElementById('adminPassword').value; 
+  const errEl = document.getElementById('adminLoginError'); 
+  errEl.style.display = 'none';
+  try {
+    const cred = await auth.signInWithEmailAndPassword(email, pass);
+    const adminCheck = await db.collection('admins').doc(cred.user.uid).get();
+    if (!adminCheck.exists) { await auth.signOut(); errEl.textContent = 'Access denied.'; errEl.style.display = 'block'; recordFailedLogin('admin'); return; }
+    resetLoginAttempts('admin');
+    closeModal('loginModal'); 
+  } catch(e) { recordFailedLogin('admin'); errEl.textContent = 'Incorrect credentials.'; errEl.style.display = 'block'; }
+};
+
+// ============================================================
+// FIXED: REGISTRATION (success message stays visible)
+// ============================================================
+window.register = async function() {
+  const name = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim().toLowerCase();
+  const pass = document.getElementById('regPassword').value;
+  const confirm = document.getElementById('regConfirmPassword').value;
+  const project = document.getElementById('regProject').value.trim();
+  if(!name || !email || !pass || !project) return showToast('Please fill all required fields', true);
+  if(pass !== confirm) return showToast('Passwords do not match', true);
+  if(checkPasswordStrength(pass) < 2) return showToast('Password too weak. Use 8+ characters with uppercase, number, and special character.', true);
+  try {
+    const cred = await auth.createUserWithEmailAndPassword(email, pass);
+    await db.collection('clients').doc(cred.user.uid).set({ id:cred.user.uid, name, email, status:'pending', createdAt: new Date().toISOString() });
+    await db.collection('projects').doc(String(Date.now())).set({ id:String(Date.now()), clientId:cred.user.uid, name:project, step:1, status:'active', amount:'TBD', interestRate:'TBD' });
+    await logActivity(cred.user.uid, name, 'client', 'register', null, `Registered new account`);
+    
+    await sendEmailNotification({
+      to_name: 'Croft Finance Team',
+      to_email: EMAILJS_CONFIG.adminEmail,
+      from_name: 'Croft Finance',
+      subject: `New Client Registration: ${name}`,
+      message: `Name: ${name}\nEmail: ${email}\nProject: ${project}\n\nPlease review and approve this client account.`,
+      project_name: project
+    });
+    
+    // Show success message before signing out
+    const regContainer = document.getElementById('registerForm');
+    const originalContent = regContainer.innerHTML;
+    regContainer.innerHTML = '<div style="text-align:center;padding:20px;"><i class="fas fa-check-circle" style="font-size:48px;color:var(--success);"></i><h3 style="margin-top:16px;">Registration Submitted</h3><p>Your application has been received. You will receive an email once your account is approved.</p><button class="btn btn-primary btn-md" onclick="location.reload()">Close</button></div>';
+    await auth.signOut();
+  } catch(e) { showToast(e.message, true); }
+};
+
+// ============================================================
+// FIXED: BROKER REGISTRATION (success message stays visible)
+// ============================================================
+window.brokerRegister = async function() {
+  const name = document.getElementById('brokerRegName').value.trim();
+  const firm = document.getElementById('brokerRegFirm').value.trim();
+  const email = document.getElementById('brokerRegEmail').value.trim().toLowerCase();
+  const pass = document.getElementById('brokerRegPassword').value;
+  const confirm = document.getElementById('brokerRegConfirmPassword').value;
+  if(!name || !email || !pass || !firm) return showToast('Please fill all required fields', true);
+  if(pass !== confirm) return showToast('Passwords do not match', true);
+  if(checkPasswordStrength(pass) < 2) return showToast('Password too weak.', true);
+  try {
+    const cred = await auth.createUserWithEmailAndPassword(email, pass);
+    await db.collection('brokers').doc(cred.user.uid).set({ id:cred.user.uid, name, email, firm, commissionRate:0, status:'pending', engagementStatus:'none', createdAt: new Date().toISOString() });
+    
+    const regContainer = document.getElementById('brokerRegisterForm');
+    regContainer.innerHTML = '<div style="text-align:center;padding:20px;"><i class="fas fa-check-circle" style="font-size:48px;color:var(--success);"></i><h3 style="margin-top:16px;">Application Submitted</h3><p>Your broker application has been received. You will receive an email once your account is approved.</p><button class="btn btn-primary btn-md" onclick="location.reload()">Close</button></div>';
+    
+    await sendEmailNotification({
+      to_name: 'Croft Finance Team',
+      to_email: EMAILJS_CONFIG.adminEmail,
+      from_name: 'Croft Finance',
+      subject: `New Broker Registration: ${name}`,
+      message: `New broker registration:\n\nName: ${name}\nFirm: ${firm}\nEmail: ${email}\n\nPlease review and approve this broker account in the admin portal.`,
+      project_name: 'Broker Registration'
+    });
+    
+    await auth.signOut();
+  } catch(e) { showToast(e.message, true); }
+};
+
+// ============================================================
+// SETUP LISTENERS
+// ============================================================
 function setupListeners() {
   auth.onAuthStateChanged(async (user) => {
     if (unsubscribers.length) { unsubscribers.forEach(fn => fn()); unsubscribers = []; }
@@ -1875,7 +2063,22 @@ function setupListeners() {
           unsubscribers.push(db.collection('settings').doc('dealAppetite').onSnapshot(doc => { if(doc.exists) document.getElementById('dealAppetiteContent').innerHTML = doc.data().content || 'Croft Finance is currently active across all sectors. Please contact Suzana to discuss specific mandates.'; }));
           showView('broker');
           loadBrokerPortal();
-        } else { logout(); }
+        } else {
+          // Auto-create broker document if it doesn't exist but user is authenticated
+          await db.collection('brokers').doc(user.uid).set({
+            id: user.uid,
+            email: user.email,
+            name: user.email.split('@')[0],
+            firm: 'Pending',
+            commissionRate: 0,
+            status: 'pending',
+            engagementStatus: 'none',
+            createdAt: new Date().toISOString()
+          });
+          showToast('Broker account created. Please wait for approval.', true);
+          await auth.signOut();
+          showView('home');
+        }
       }
     }
   });
@@ -1890,122 +2093,6 @@ function logout() {
 }
 
 // ============================================================
-// AUTHENTICATION EVENT HANDLERS
-// ============================================================
-window.login = async function() {
-  if(checkLoginLockout('client')) return;
-  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-  const pass = document.getElementById('loginPassword').value;
-  const errEl = document.getElementById('loginError');
-  errEl.style.display = 'none';
-  try { await auth.signInWithEmailAndPassword(email, pass); resetLoginAttempts('client'); closeModal('loginModal'); } 
-  catch(e) { recordFailedLogin('client'); errEl.innerText = 'Invalid credentials.'; errEl.style.display = 'block'; }
-};
-window.brokerLogin = async function() {
-  if(checkLoginLockout('broker')) return;
-  const email = document.getElementById('brokerLoginEmail').value.trim().toLowerCase();
-  const pass = document.getElementById('brokerLoginPassword').value;
-  const errEl = document.getElementById('brokerLoginError');
-  errEl.style.display = 'none';
-  try { await auth.signInWithEmailAndPassword(email, pass); resetLoginAttempts('broker'); closeModal('loginModal'); } 
-  catch(e) { recordFailedLogin('broker'); errEl.innerText = 'Invalid credentials.'; errEl.style.display = 'block'; }
-};
-window.doAdminLogin = async function() {
-  if(checkLoginLockout('admin')) return;
-  const email = document.getElementById('adminUsername').value.trim(); 
-  const pass = document.getElementById('adminPassword').value; 
-  const errEl = document.getElementById('adminLoginError'); 
-  errEl.style.display = 'none';
-  try {
-    const cred = await auth.signInWithEmailAndPassword(email, pass);
-    const adminCheck = await db.collection('admins').doc(cred.user.uid).get();
-    if (!adminCheck.exists) { await auth.signOut(); errEl.textContent = 'Access denied.'; errEl.style.display = 'block'; recordFailedLogin('admin'); return; }
-    resetLoginAttempts('admin');
-    closeModal('loginModal'); 
-  } catch(e) { recordFailedLogin('admin'); errEl.textContent = 'Incorrect credentials.'; errEl.style.display = 'block'; }
-};
-window.requestPasswordReset = function() {
-  const email = document.getElementById('forgotEmail').value.trim().toLowerCase(); 
-  if(!email) return;
-  const errEl = document.getElementById('forgotError');
-  errEl.style.display = 'none';
-  auth.sendPasswordResetEmail(email).then(() => {
-    errEl.style.color = 'var(--success)';
-    errEl.innerText = 'Password reset email sent! Please check your inbox.';
-    errEl.style.display = 'block';
-    setTimeout(() => showLoginForm(), 3000);
-  }).catch((e) => {
-    errEl.style.color = 'var(--error)';
-    errEl.innerText = e.message;
-    errEl.style.display = 'block';
-  });
-};
-window.register = async function() {
-  const name = document.getElementById('regName').value.trim();
-  const email = document.getElementById('regEmail').value.trim().toLowerCase();
-  const pass = document.getElementById('regPassword').value;
-  const confirm = document.getElementById('regConfirmPassword').value;
-  const project = document.getElementById('regProject').value.trim();
-  if(!name || !email || !pass || !project) return showToast('Please fill all required fields', true);
-  if(pass !== confirm) return showToast('Passwords do not match', true);
-  if(checkPasswordStrength(pass) < 2) return showToast('Password too weak. Use 8+ characters with uppercase, number, and special character.', true);
-  try {
-    const cred = await auth.createUserWithEmailAndPassword(email, pass);
-    await db.collection('clients').doc(cred.user.uid).set({ id:cred.user.uid, name, email, status:'pending', createdAt: new Date().toISOString() });
-    await db.collection('projects').doc(String(Date.now())).set({ id:String(Date.now()), clientId:cred.user.uid, name:project, step:1, status:'active', amount:'TBD', interestRate:'TBD' });
-    await logActivity(cred.user.uid, name, 'client', 'register', null, `Registered new account`);
-    
-    // EMAILJS: New client registration
-    await sendEmailNotification({
-      to_name: 'Croft Finance Team',
-      to_email: EMAILJS_CONFIG.adminEmail,
-      from_name: 'Croft Finance',
-      subject: `New Client Registration: ${name}`,
-      message: `Name: ${name}\nEmail: ${email}\nProject: ${project}\n\nPlease review and approve this client account.`,
-      project_name: project
-    });
-    
-    showToast('Registration submitted for review.');
-    logout();
-  } catch(e) { showToast(e.message, true); }
-};
-window.brokerRegister = async function() {
-  const name = document.getElementById('brokerRegName').value.trim();
-  const firm = document.getElementById('brokerRegFirm').value.trim();
-  const email = document.getElementById('brokerRegEmail').value.trim().toLowerCase();
-  const pass = document.getElementById('brokerRegPassword').value;
-  const confirm = document.getElementById('brokerRegConfirmPassword').value;
-  if(!name || !email || !pass || !firm) return showToast('Please fill all required fields', true);
-  if(pass !== confirm) return showToast('Passwords do not match', true);
-  if(checkPasswordStrength(pass) < 2) return showToast('Password too weak.', true);
-  try {
-    const cred = await auth.createUserWithEmailAndPassword(email, pass);
-    await db.collection('brokers').doc(cred.user.uid).set({ id:cred.user.uid, name, email, firm, commissionRate:0, status:'pending', engagementStatus:'none', createdAt: new Date().toISOString() });
-    
-    // Show success message inside the modal before closing
-    const regContainer = document.getElementById('brokerRegisterForm');
-    regContainer.innerHTML = '<div style="text-align:center;padding:20px;"><i class="fas fa-check-circle" style="font-size:48px;color:var(--success);"></i><h3 style="margin-top:16px;">Application Submitted</h3><p>Your broker application has been received. You will receive an email once your account is approved.</p><button class="btn btn-primary btn-md" onclick="showLoginForm()">Back to Login</button></div>';
-    
-    await sendEmailNotification({
-      to_name: 'Croft Finance Team',
-      to_email: EMAILJS_CONFIG.adminEmail,
-      from_name: 'Croft Finance',
-      subject: `New Broker Registration: ${name}`,
-      message: `New broker registration:\n\nName: ${name}\nFirm: ${firm}\nEmail: ${email}\n\nPlease review and approve this broker account in the admin portal.`,
-      project_name: 'Broker Registration'
-    });
-    
-    await auth.signOut();
-  } catch(e) { showToast(e.message, true); }
-};
-window.showLoginForm = function() { document.getElementById('loginForm').style.display = 'block'; document.getElementById('brokerLoginForm').style.display = 'none'; document.getElementById('adminLoginForm').style.display = 'none'; document.getElementById('registerForm').style.display = 'none'; document.getElementById('forgotPasswordForm').style.display = 'none'; document.getElementById('brokerRegisterForm').style.display = 'block'; document.getElementById('brokerRegisterForm').innerHTML = document.getElementById('brokerRegisterForm').innerHTML; };
-window.showBrokerLoginForm = function() { document.getElementById('loginForm').style.display = 'none'; document.getElementById('brokerLoginForm').style.display = 'block'; document.getElementById('adminLoginForm').style.display = 'none'; document.getElementById('registerForm').style.display = 'none'; document.getElementById('forgotPasswordForm').style.display = 'none'; document.getElementById('brokerRegisterForm').style.display = 'none'; };
-window.showAdminLogin = function() { document.getElementById('loginForm').style.display = 'none'; document.getElementById('brokerLoginForm').style.display = 'none'; document.getElementById('adminLoginForm').style.display = 'block'; document.getElementById('registerForm').style.display = 'none'; document.getElementById('forgotPasswordForm').style.display = 'none'; document.getElementById('brokerRegisterForm').style.display = 'none'; };
-window.showRegisterForm = function() { document.getElementById('loginForm').style.display = 'none'; document.getElementById('brokerLoginForm').style.display = 'none'; document.getElementById('adminLoginForm').style.display = 'none'; document.getElementById('registerForm').style.display = 'block'; document.getElementById('forgotPasswordForm').style.display = 'none'; document.getElementById('brokerRegisterForm').style.display = 'none'; };
-window.showForgotPassword = function() { document.getElementById('loginForm').style.display = 'none'; document.getElementById('brokerLoginForm').style.display = 'none'; document.getElementById('adminLoginForm').style.display = 'none'; document.getElementById('registerForm').style.display = 'none'; document.getElementById('forgotPasswordForm').style.display = 'block'; document.getElementById('brokerRegisterForm').style.display = 'none'; };
-window.showBrokerRegisterForm = function() { document.getElementById('loginForm').style.display = 'none'; document.getElementById('brokerLoginForm').style.display = 'none'; document.getElementById('adminLoginForm').style.display = 'none'; document.getElementById('registerForm').style.display = 'none'; document.getElementById('forgotPasswordForm').style.display = 'none'; document.getElementById('brokerRegisterForm').style.display = 'block'; };
-
-// ============================================================
 // SIDEBAR TOGGLES & TAB SWITCHERS
 // ============================================================
 window.toggleSidebar = function() { document.getElementById('clientSidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('show'); const h = document.getElementById('hamburgerBtn'); if(h) h.classList.toggle('open'); };
@@ -2014,7 +2101,6 @@ window.toggleBrokerSidebar = function() { document.getElementById('brokerSidebar
 window.scrollToSection = function(id) { document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }); };
 window.openLoginModal = function() { showLoginForm(); openModal('loginModal'); };
 
-// Event delegation for tabs
 document.addEventListener('click', function(e) {
   const btn = e.target.closest('[data-tab]');
   if(btn && btn.closest('#view-portal')) { e.preventDefault(); switchPortalTab(btn.dataset.tab); }
@@ -2037,7 +2123,7 @@ function switchPortalTab(tabName) {
   const activeNav = document.querySelector(`#view-portal .nav-item[data-tab="${tabName}"]`);
   if(activeNav) activeNav.classList.add('active');
   if(tabName === 'messages') loadMessages();
-  if(tabName === 'documents') renderDocuments();
+  if(tabName === 'documents' && currentProjectId) renderDocuments();
   if(tabName === 'schedule') loadClientMeetings();
   if(tabName === 'activity') loadClientActivityLog();
   if(window.innerWidth <= 768) { document.getElementById('clientSidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('show'); }
@@ -2072,6 +2158,7 @@ window.switchEditTab = function(tabName) {
   document.getElementById('tabBtn-' + tabName).classList.add('active');
   document.getElementById('edit-tab-' + tabName).classList.add('active');
 };
+
 window.setPipelineView = function(view) { currentPipelineView = view; renderPipeline(); };
 window.toggleOtherLendersNotes = function() {
   const notes = document.getElementById('dealOtherLendersNotes');
@@ -2159,7 +2246,7 @@ function renderDocuments() {
       <td><span class="badge ${d.approved ? 'badge-success' : 'badge-warning'}">${d.approved ? 'Approved' : 'Pending'}</span></td>
       <td>${d.date || '—'}</td>
       <td><button class="doc-action-btn" onclick="openPDFWithWatermark('${d.url}', '${d.name}')">View</button><a href="${d.url}" download class="doc-action-btn">Download</a></td>
-    </tr>`).join('') || '<tr><td colspan="4">No documents.</td></tr>';
+    </tr>`).join('') || '<tr><td colspan="4">No documents. <tr>';
   const drop = document.getElementById('clientUploadDocType');
   if(drop) drop.innerHTML = '<option value="">Select Type</option><option>Term Sheet</option><option>Financial Statement</option><option>Due Diligence</option><option>Commitment Fee Receipt</option><option>Other</option>';
 }
@@ -2181,7 +2268,6 @@ window.clientUploadDocument = async function() {
     await db.collection('documents').add({ clientId: currentClient.id, projectId: currentProjectId, name: type, url: url, approved: false, date: new Date().toISOString().split('T')[0] });
     await logActivity(currentClient.id, currentClient.name, 'client', 'upload_document', currentProjectId, `Uploaded: ${type}`);
     
-    // EMAILJS: Client uploads document
     await sendEmailNotification({
       to_name: 'Croft Finance Team',
       to_email: EMAILJS_CONFIG.adminEmail,
@@ -2212,7 +2298,6 @@ window.sendMessage = async function() {
   await db.collection('messages').add({ clientId: currentClient.id, content: val, sender: 'client', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
   await logActivity(currentClient.id, currentClient.name, 'client', 'send_message', currentProjectId, `Message sent`);
   
-  // EMAILJS: Client sends message
   await sendEmailNotification({
     to_name: 'Croft Finance Team',
     to_email: EMAILJS_CONFIG.adminEmail,
@@ -2350,7 +2435,6 @@ window.requestClientMeeting = async function() {
   document.getElementById('meetingSuccessMessage').style.display = 'block';
   showToast('Meeting request sent');
   
-  // EMAILJS: Meeting requested
   await sendEmailNotification({
     to_name: 'Croft Finance Team',
     to_email: EMAILJS_CONFIG.adminEmail,
@@ -2426,7 +2510,7 @@ function updateBrokerDashboard() {
       <td>${formatCurrency(amt * rate / 100)}</strong></td>
     </tr>`;
   }).join('');
-  document.getElementById('brokerCommissionHistory').innerHTML = historyHtml || '<tr><td colspan="6">No funded deals yet. </div>';
+  document.getElementById('brokerCommissionHistory').innerHTML = historyHtml || '<tr><td colspan="6">No funded deals yet. </td>';
 }
 
 window.submitDeal = async function() {
@@ -2544,7 +2628,6 @@ window.sendBrokerMessage = async function() {
   if(!val) return;
   await db.collection('brokerMessages').add({ brokerId: currentBroker.id, content: val, sender: 'broker', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
   
-  // EMAILJS: Broker sends message
   await sendEmailNotification({
     to_name: 'Croft Finance Team',
     to_email: EMAILJS_CONFIG.adminEmail,
@@ -2615,7 +2698,6 @@ window.approveClient = async function(id) {
   if(p) await db.collection('projects').doc(p.id).update({ status: 'active' });
   showToast('Client approved and activated');
   
-  // EMAILJS: Client approved → email the client
   const client = clients.find(c => c.id === id);
   if(client) {
     await sendEmailNotification({
@@ -2683,10 +2765,17 @@ window.saveClientNote = async function(clientId, note) {
   await db.collection('clients').doc(clientId).update({ adminNote: note });
 };
 
+// FIXED: showUploadDocumentModal - proper event handling
+let uploadClientChangeHandler = null;
+
 window.showUploadDocumentModal = function() {
   const sel = document.getElementById('uploadClientId');
   sel.innerHTML = '<option value="">Select Client</option>' + clients.filter(c=>c.status==='active').map(c=>`<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
-  sel.onchange = () => updateProjectSelectForUpload(sel.value);
+  if (uploadClientChangeHandler) {
+    sel.removeEventListener('change', uploadClientChangeHandler);
+  }
+  uploadClientChangeHandler = function() { updateProjectSelectForUpload(sel.value); };
+  sel.addEventListener('change', uploadClientChangeHandler);
   document.getElementById('uploadProjectId').innerHTML = '<option value="">Select Project</option>';
   openModal('uploadDocumentModal');
 };
@@ -2967,7 +3056,7 @@ window.rejectBrokerUpdate = async function(id) {
 function renderAdminDocumentsTable() {
   const tbody = document.getElementById('adminDocumentsTableBody');
   if(!tbody) return;
-  if(!documents.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--gray-400);padding:24px;">No documents uploaded yet. </tr>'; return; }
+  if(!documents.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--gray-400);padding:24px;">No documents uploaded yet. </td>'; return; }
   tbody.innerHTML = documents.map(d => {
     const client = clients.find(c => c.id === d.clientId);
     const project = projects.find(p => p.id === d.projectId);
@@ -2998,7 +3087,7 @@ window.deleteBroker = async function(id) { if(confirm('Delete broker?')) { await
 function renderMeetings() {
   const tbody = document.getElementById('meetingsTableBody');
   if(!tbody) return;
-  tbody.innerHTML = meetings.map(m => `<tr>
+  tbody.innerHTML = meetings.map(m => `<td>
       <td>${formatDate(m.date)} at ${m.time}</div></td>
       <td><strong>${escapeHtml(m.clientName)}</strong></div></td>
       <td>${escapeHtml(m.type)}</div></td>
@@ -3098,6 +3187,9 @@ window.sendInboxReply = async function(id, type) {
   input.value = '';
 };
 
+// ============================================================
+// FIXED: ANALYTICS with proper number formatting
+// ============================================================
 function renderAnalytics() {
   const activeProjects = projects.filter(p => p.status === 'active');
   const pipelineCount = activeProjects.filter(p => (p.step || 1) < 9).length;
@@ -3112,17 +3204,28 @@ function renderAnalytics() {
   const brokerPercent = directVolume + brokerVolume > 0 ? Math.round((brokerVolume / (directVolume + brokerVolume)) * 100) : 0;
   const activeBrokers = brokers.filter(b => b.status === 'active' && b.engagementStatus === 'active').length;
   const pendingActions = clients.filter(c => c.status === 'pending').length + meetings.filter(m => m.status === 'pending').length + brokerSubmissions.filter(s => s.status === 'pending').length;
+  
   document.getElementById('analyticsKPI').innerHTML = `
-    <div class="kpi-card navy"><span class="kpi-label">Pipeline Projects</span><div class="kpi-value" id="kpiPipeline">${pipelineCount}</div><div class="kpi-sub">Active deals in progress</div></div>
-    <div class="kpi-card success"><span class="kpi-label">Funded Projects</span><div class="kpi-value" id="kpiFunded">${fundedCount}</div><div class="kpi-sub">Successfully closed</div></div>
+    <div class="kpi-card navy"><span class="kpi-label">Pipeline Projects</span><div class="kpi-value" id="kpiPipeline">${formatNumber(pipelineCount)}</div><div class="kpi-sub">Active deals in progress</div></div>
+    <div class="kpi-card success"><span class="kpi-label">Funded Projects</span><div class="kpi-value" id="kpiFunded">${formatNumber(fundedCount)}</div><div class="kpi-sub">Successfully closed</div></div>
     <div class="kpi-card blue"><span class="kpi-label">Total Capital Raised</span><div class="kpi-value" id="kpiCapital">${formatCurrency(totalCapital)}</div><div class="kpi-sub">Across all funded deals</div></div>
     <div class="kpi-card warning"><span class="kpi-label">Suzana's Commission (2%)</span><div class="kpi-value" id="kpiCommission">${formatCurrency(commission2pc)}</div><div class="kpi-sub">Net of broker fees</div></div>
     <div class="kpi-card navy"><span class="kpi-label">Average Facility Size</span><div class="kpi-value" id="kpiAvgFacility">${formatCurrency(avgFacility)}</div><div class="kpi-sub">Per funded project</div></div>
-    <div class="kpi-card blue"><span class="kpi-label">Broker vs Direct</span><div class="kpi-value" id="kpiBrokerSplit">${brokerPercent}%</div><div class="kpi-sub">Broker-originated volume</div></div>
-    <div class="kpi-card success"><span class="kpi-label">Active Brokers</span><div class="kpi-value" id="kpiActiveBrokers">${activeBrokers}</div><div class="kpi-sub">With signed engagement</div></div>
-    <div class="kpi-card warning"><span class="kpi-label">Pending Actions</span><div class="kpi-value" id="kpiPending">${pendingActions}</div><div class="kpi-sub">Require your attention</div></div>
+    <div class="kpi-card blue"><span class="kpi-label">Broker vs Direct</span><div class="kpi-value" id="kpiBrokerSplit">${formatNumber(brokerPercent)}%</div><div class="kpi-sub">Broker-originated volume</div></div>
+    <div class="kpi-card success"><span class="kpi-label">Active Brokers</span><div class="kpi-value" id="kpiActiveBrokers">${formatNumber(activeBrokers)}</div><div class="kpi-sub">With signed engagement</div></div>
+    <div class="kpi-card warning"><span class="kpi-label">Pending Actions</span><div class="kpi-value" id="kpiPending">${formatNumber(pendingActions)}</div><div class="kpi-sub">Require your attention</div></div>
   `;
-  animateStatValues();
+  
+  // Animate numeric values (non-currency)
+  animateNumber(document.getElementById('kpiPipeline'), pipelineCount, false);
+  animateNumber(document.getElementById('kpiFunded'), fundedCount, false);
+  animateNumber(document.getElementById('kpiActiveBrokers'), activeBrokers, false);
+  animateNumber(document.getElementById('kpiPending'), pendingActions, false);
+  // Currency values
+  animateNumber(document.getElementById('kpiCapital'), totalCapital, true);
+  animateNumber(document.getElementById('kpiCommission'), commission2pc, true);
+  animateNumber(document.getElementById('kpiAvgFacility'), avgFacility, true);
+  
   // Pipeline funnel
   const stepCounts = [0,0,0,0,0,0,0,0,0];
   projects.forEach(p => { const step = p.step || 1; if(step >=1 && step <=9) stepCounts[step-1]++; });
@@ -3134,14 +3237,17 @@ function renderAnalytics() {
     return `<div class="funnel-step"><div class="funnel-step-label">${name}</div><div class="funnel-step-bar" style="width:${widthPercent}%;background:rgba(6,9,26,${opacity});">${cumulative}</div><div class="funnel-step-count">${cumulative}</div></div>`;
   }).join('');
   document.getElementById('pipelineFunnel').innerHTML = `<div class="card-header"><div class="card-title">Pipeline Funnel</div></div><div class="card-body">${funnelHtml}</div>`;
+  
   // Industry chart
   const industryCounts = {};
   projects.forEach(p => { const ind = p.industry || 'Other'; industryCounts[ind] = (industryCounts[ind] || 0) + 1; });
   const industryCtx = document.getElementById('industryChart')?.getContext('2d');
   if(industryCtx) { if(industryChart) industryChart.destroy(); industryChart = new Chart(industryCtx, { type: 'bar', data: { labels: Object.keys(industryCounts), datasets: [{ label: 'Projects', data: Object.values(industryCounts), backgroundColor: '#2c5f8a', borderRadius: 4, barPercentage: 0.7 }] }, options: { responsive: true, maintainAspectRatio: true, scales: { y: { grid: { display: false } }, x: { grid: { display: false } } }, plugins: { legend: { display: false }, tooltip: { backgroundColor: 'white', titleColor: '#374151', bodyColor: '#6b7280', borderColor: '#e5e7eb', borderWidth: 0.5 } } } }); }
+  
   // Pipeline stage chart
   const stageCtx = document.getElementById('pipelineStageChart')?.getContext('2d');
   if(stageCtx) { if(pipelineStageChart) pipelineStageChart.destroy(); pipelineStageChart = new Chart(stageCtx, { type: 'doughnut', data: { labels: STEP_NAMES.slice(1), datasets: [{ data: stepCounts, backgroundColor: ['#06091a','#0c1126','#141c3a','#1c274a','#2c5f8a','#4a7c9e','#6b96b5','#8bb0cc','#c9a96e'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: true, plugins: { tooltip: { backgroundColor: 'white', titleColor: '#374151', bodyColor: '#6b7280', borderColor: '#e5e7eb', borderWidth: 0.5 } } } }); }
+  
   // Quarterly trend
   const quarters = {};
   projects.forEach(p => {
@@ -3156,7 +3262,8 @@ function renderAnalytics() {
   const last6Quarters = Object.keys(quarters).sort().slice(-6);
   const quarterlyCtx = document.getElementById('quarterlyTrendChart')?.getContext('2d');
   if(quarterlyCtx) { if(quarterlyChart) quarterlyChart.destroy(); quarterlyChart = new Chart(quarterlyCtx, { type: 'bar', data: { labels: last6Quarters, datasets: [{ label: 'Deals Entered', data: last6Quarters.map(q => quarters[q]?.entered || 0), backgroundColor: '#2c5f8a', borderRadius: 4 }, { label: 'Deals Funded', data: last6Quarters.map(q => quarters[q]?.funded || 0), backgroundColor: '#06091a', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: true, scales: { y: { grid: { display: false } }, x: { grid: { display: false } } }, plugins: { tooltip: { backgroundColor: 'white', titleColor: '#374151', bodyColor: '#6b7280', borderColor: '#e5e7eb', borderWidth: 0.5 } } } }); }
-  // Commission table
+  
+  // FIXED: Commission table - properly formatted HTML
   const fundedProjects = projects.filter(p => (p.step || 1) === 9);
   let totalCommission = 0;
   const commissionHtml = fundedProjects.map(p => {
@@ -3177,32 +3284,18 @@ function renderAnalytics() {
         <td>${p.fundedDate || formatDate(p.fundedDate) || '—'}</div></td>
       </tr>`;
   }).join('');
-  document.getElementById('commissionTableBody').innerHTML = commissionHtml || '<td><td colspan="9">No funded projects</div>';
-  document.getElementById('commissionTotalRow').innerHTML = `<td colspan="4"><strong>Total</strong></div><td>${formatCurrency(fundedProjects.reduce((s,p)=> s + (parseFloat(String(p.amount||'0').replace(/[^0-9.-]/g,''))||0),0))}</td><td>${formatCurrency(totalCommission)}</div><td>${formatCurrency(fundedProjects.reduce((s,p)=> s + ((parseFloat(String(p.amount||'0').replace(/[^0-9.-]/g,''))||0)*ADMIN_ONLY_COMMISSION_RATE),0))}</td><td colspan="2">`;
-}
-
-function animateStatValues() {
-  const elements = ['kpiPipeline', 'kpiFunded', 'kpiCapital', 'kpiCommission', 'kpiAvgFacility', 'kpiActiveBrokers', 'kpiPending'];
-  elements.forEach(id => {
-    const el = document.getElementById(id);
-    if(el) {
-      const targetText = el.innerText;
-      const targetNum = parseFloat(targetText.replace(/[^0-9.-]/g, ''));
-      if(!isNaN(targetNum)) {
-        let current = 0;
-        const step = targetNum / 40;
-        const timer = setInterval(() => {
-          current += step;
-          if(current >= targetNum) {
-            el.innerHTML = targetText;
-            clearInterval(timer);
-          } else {
-            el.innerHTML = formatCurrency(Math.floor(current));
-          }
-        }, 20);
-      }
-    }
-  });
+  
+  const emptyCommissionHtml = '<tr><td colspan="9" style="text-align:center;color:var(--gray-400);padding:24px;">No funded projects yet </td></tr>';
+  document.getElementById('commissionTableBody').innerHTML = commissionHtml || emptyCommissionHtml;
+  
+  const totalAmount = fundedProjects.reduce((s,p)=> s + (parseFloat(String(p.amount||'0').replace(/[^0-9.-]/g,''))||0),0);
+  document.getElementById('commissionTotalRow').innerHTML = `
+    <td colspan="4"><strong>Total</strong></td>
+    <td><strong>${formatCurrency(totalAmount)}</strong></td>
+    <td><strong>${formatCurrency(totalCommission)}</strong></td>
+    <td><strong>${formatCurrency(totalAmount * ADMIN_ONLY_COMMISSION_RATE)}</strong></td>
+    <td colspan="2"></td>
+  `;
 }
 
 function renderBrokerPerformance() {
@@ -3229,7 +3322,7 @@ function renderBrokerPerformance() {
         <td>${formatCurrency(s.commission)}</div></td>
       </tr>`;
   }).join('');
-  // Add sorting listeners
+  
   document.querySelectorAll('#brokerPerformanceTable th[data-sort]').forEach(th => {
     th.style.cursor = 'pointer';
     th.onclick = () => {
@@ -3270,18 +3363,13 @@ function loadAuditLog() {
   if(!cont) return;
   db.collection('activityLog').orderBy('timestamp', 'desc').limit(100).get().then(snapshot => {
     const logs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-    let actionText = '';
     cont.innerHTML = logs.map(l => {
-      actionText = ACTION_LABELS[l.action] || l.action;
-      if(typeof actionText === 'function') actionText = actionText(l.details || '');
+      const actionText = (typeof ACTION_LABELS[l.action] === 'function') ? ACTION_LABELS[l.action](l.details || '') : (ACTION_LABELS[l.action] || l.action);
       return `<div class="audit-entry"><div class="audit-time">${formatDateTime(l.timestamp)}</div><div><div class="audit-action"><strong>${escapeHtml(l.actorName)}</strong> (${l.actorRole}) — ${escapeHtml(actionText)}</div><div class="audit-detail">${escapeHtml(l.details || '')}</div></div></div>`;
     }).join('') || '<div class="data-label" style="text-align:center;">No audit logs</div>';
   });
 }
 
-// ============================================================
-// ADMIN NOTIFICATIONS
-// ============================================================
 function setupAdminNotifications() {
   let unreadCount = 0;
   const pendingClients = clients.filter(c => c.status === 'pending').length;
@@ -3477,7 +3565,6 @@ window.confirmCommitmentFee = async function(projectId) {
   renderAdminTables();
   if(editProjectId === projectId) document.getElementById('stepStatusContainer').innerHTML = renderStepDashboard(projects.find(p=>p.id===projectId));
   
-  // EMAILJS: Commitment fee confirmed → email the client
   const project = projects.find(p => p.id === projectId);
   const client = clients.find(c => c.id === project?.clientId);
   if(client) {
@@ -3507,7 +3594,6 @@ window.confirmECFEscrow = async function(projectId) {
   renderAdminTables();
   if(editProjectId === projectId) document.getElementById('stepStatusContainer').innerHTML = renderStepDashboard(projects.find(p=>p.id===projectId));
   
-  // EMAILJS: ECF escrow confirmed → email the client
   const project = projects.find(p => p.id === projectId);
   const client = clients.find(c => c.id === project?.clientId);
   if(client) {
@@ -3627,7 +3713,6 @@ window.submitContactForm = async function(e) {
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
   
-  // EMAILJS: Contact form submitted
   await sendEmailNotification({
     to_name: 'Croft Finance Team',
     to_email: EMAILJS_CONFIG.adminEmail,
@@ -3644,11 +3729,9 @@ window.submitContactForm = async function(e) {
 window.acceptCookies = function() { document.getElementById('cookieBanner').style.display = 'none'; localStorage.setItem('cookiesAccepted', 'true'); };
 if(localStorage.getItem('cookiesAccepted') === 'true') document.getElementById('cookieBanner').style.display = 'none';
 
-// Initialize password strength meters with correct scoping
 updatePasswordStrengthMeter('regPassword', '#registerForm .strength-segment', '#registerForm .strength-hint');
 updatePasswordStrengthMeter('brokerRegPassword', '#brokerRegisterForm .strength-segment', '#brokerRegisterForm .strength-hint');
 
-// Initialize
 document.addEventListener('DOMContentLoaded', () => { initFirebase(); });
 </script>
 </body>
