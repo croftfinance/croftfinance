@@ -1034,6 +1034,12 @@ body {
 }
 .commission-rate-card .data-label { color: rgba(255,255,255,0.5); }
 .commission-rate-card .stat-value { color: #c9a96e; font-size: 40px; }
+
+/* Progress Circle CSS - FIX 4 */
+.progress-circle-container { display: inline-flex; flex-direction: column; align-items: center; }
+.progress-circle { width: 110px; height: 110px; position: relative; }
+.progress-circle svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.progress-circle-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
 </style>
 </head>
 <body>
@@ -1250,7 +1256,7 @@ body {
       <!-- Documents Tab -->
       <div id="tab-documents" class="portal-tab">
         <div class="client-page-title">Documents</div>
-        <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-file-signature"></i> Closing Documents</div></div><div class="card-body" style="padding:0;"><div class="table-wrap"><table class="documents-table" id="closingDocumentsTable"><thead><tr><th>Document Name</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="closingDocumentsBody"></tbody></tr></div></div></div>
+        <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-file-signature"></i> Closing Documents</div></div><div class="card-body" style="padding:0;"><div class="table-wrap"><table class="documents-table" id="closingDocumentsTable"><thead><tr><th>Document Name</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="closingDocumentsBody"></tbody></table></div></div></div>
         <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-upload"></i> Upload a Document</div></div><div class="card-body"><div class="upload-form-inline"><div class="form-group"><label class="form-label">Document Type</label><select id="clientUploadDocType" class="form-select"><option value="">Select document type...</option></select></div><div class="form-group"><label class="form-label">PDF File (max 10MB)</label><input type="file" id="clientUploadFile" class="form-input" accept=".pdf"></div><button class="btn btn-primary btn-md" onclick="clientUploadDocument()">Upload Document</button><div id="clientUploadStatus" style="margin-top:12px;font-size:12px;display:none;"></div></div></div></div>
       </div>
 
@@ -1339,8 +1345,8 @@ body {
           <div class="card"><div class="card-header"><div class="card-title">Projects by Industry</div></div><div class="card-body"><canvas id="industryChart" height="220" style="max-height:220px;"></canvas></div></div>
           <div class="card"><div class="card-header"><div class="card-title">Pipeline Stage Distribution</div></div><div class="card-body"><canvas id="pipelineStageChart" height="220" style="max-height:220px;"></canvas></div></div>
         </div>
-        <div class="card"><div class="card-header"><div class="card-title">Broker Performance</div><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="exportBrokerPerformanceCSV()">Export CSV</button></div></div><div class="card-body"><div class="table-wrap"><table class="admin-table" id="brokerPerformanceTable"><thead><tr><th data-sort="name" style="cursor:pointer;">Broker Name</th><th>Firm</th><th>Market</th><th data-sort="submissions" style="cursor:pointer;">Submissions</th><th data-sort="accepted" style="cursor:pointer;">Accepted</th><th data-sort="funded" style="cursor:pointer;">Funded</th><th data-sort="conversion" style="cursor:pointer;">Conversion %</th><th data-sort="volume" style="cursor:pointer;">Total Volume</th><th data-sort="commission" style="cursor:pointer;">Est. Commission</th></tr></thead><tbody id="brokerPerformanceBody"></tbody><tr></div></div></div>
-        <div class="card"><div class="card-header"><div class="card-title">Commission Breakdown</div><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="exportCommissionCSV()">Export CSV</button><button class="btn btn-ghost btn-sm" onclick="window.print()">Print Report</button></div></div><div class="card-body"><div class="table-wrap"><table class="admin-table" id="commissionTable"><thead><tr><th>Client</th><th>Project</th><th>Industry</th><th>Location</th><th>Facility Amount</th><th>Broker Commission</th><th>Net Commission (2%)</th><th>Days to Close</th><th>Funded Date</th></tr></thead><tbody id="commissionTableBody"></tbody><tfoot><tr id="commissionTotalRow"></tr></tfoot></table></div></div></div>
+        <div class="card"><div class="card-header"><div class="card-title">Broker Performance</div><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="exportBrokerPerformanceCSV()">Export CSV</button></div></div><div class="card-body"><div class="table-wrap"><table class="admin-table" id="brokerPerformanceTable"><thead><tr><th data-sort="name" style="cursor:pointer;">Broker Name</th><th>Firm</th><th>Market</th><th data-sort="submissions" style="cursor:pointer;">Submissions</th><th data-sort="accepted" style="cursor:pointer;">Accepted</th><th data-sort="funded" style="cursor:pointer;">Funded</th><th data-sort="conversion" style="cursor:pointer;">Conversion %</th><th data-sort="volume" style="cursor:pointer;">Total Volume</th><th data-sort="commission" style="cursor:pointer;">Est. Commission</th></tr></thead><tbody id="brokerPerformanceBody"></tbody></table></div></div></div>
+        <div class="card"><div class="card-header"><div class="card-title">Commission Breakdown</div><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="exportCommissionCSV()">Export CSV</button><button class="btn btn-ghost btn-sm" onclick="window.print()">Print Report</button></div></div><div class="card-body"><div class="table-wrap"><table class="admin-table" id="commissionTable"><thead><tr><th>Client</th><th>Project</th><th>Industry</th><th>Location</th><th>Facility Amount</th><th>Broker Commission</th><th>Net Commission (2%)</th><th>Days to Close</th><th>Funded Date</th></td></thead><tbody id="commissionTableBody"></tbody><tfoot><tr id="commissionTotalRow"><tr></tfoot></table></div></div></div>
         <div class="card"><div class="card-header"><div class="card-title">Quarterly Trend</div></div><div class="card-body"><canvas id="quarterlyTrendChart" height="200" style="max-height:200px;"></canvas></div></div>
       </div>
 
@@ -1351,7 +1357,7 @@ body {
       <div id="admin-projects-admin" class="admin-tab"><div class="admin-page-title">Projects</div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Project</th><th>Industry</th><th>Funds Needed</th><th>Step</th><th>Broker</th><th>CF</th><th>ECF</th><th>Data Room</th><th>Actions</th></tr></thead><tbody id="adminProjectsTable"></tbody></table></div></div>
 
       <!-- Documents Tab -->
-      <div id="admin-documents-admin" class="admin-tab"><div class="admin-page-title">Documents</div><div style="margin-bottom:16px;"><button class="btn btn-primary btn-sm" onclick="showUploadDocumentModal()">+ Upload Document</button></div><div class="table-wrap"><table class="documents-table"><thead><tr><th>Client</th><th>Project</th><th>Document</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="adminDocumentsTableBody"></tbody></table></div></div>
+      <div id="admin-documents-admin" class="admin-tab"><div class="admin-page-title">Documents</div><div style="margin-bottom:16px;"><button class="btn btn-primary btn-sm" onclick="showUploadDocumentModal()">+ Upload Document</button></div><div class="table-wrap"><table class="documents-table"><thead><tr><th>Client</th><th>Project</th><th>Document</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="adminDocumentsTableBody"></tbody></tr></div></div>
 
       <!-- Brokers Tab -->
       <div id="admin-brokers" class="admin-tab"><div class="admin-page-title">Brokers</div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Broker</th><th>Firm</th><th>Commission</th><th>Submitted</th><th>Funded</th><th>Est. Commission</th><th>Status</th><th>Engagement</th><th>Actions</th></tr></thead><tbody id="adminBrokersTable"></tbody></table></div><div class="card" style="margin-top:20px;"><div class="card-header"><div class="card-title">Broker Update Requests</div></div><div class="card-body"><div id="brokerUpdateRequestsList"></div></div></div></div>
@@ -1434,7 +1440,7 @@ body {
           <div class="stat-card"><div class="data-label">Active Deals</div><div class="stat-value" id="brokerActiveDeals">0</div></div>
           <div class="stat-card commission-rate-card"><div class="data-label">Your Commission Rate</div><div class="stat-value" id="brokerCommRate">0%</div><div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:4px;">Per funded facility</div></div>
         </div>
-        <div class="card"><div class="card-header"><div class="card-title">Commission History</div></div><div class="card-body"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Project</th><th>Client</th><th>Funded Date</th><th>Facility Amount</th><th>Commission Rate</th><th>Commission Amount</th></tr></thead><tbody id="brokerCommissionHistory"></tbody></table></div></div></div>
+        <div class="card"><div class="card-header"><div class="card-title">Commission History</div></div><div class="card-body"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Project</th><th>Client</th><th>Funded Date</th><th>Facility Amount</th><th>Commission Rate</th><th>Commission Amount</th></tr></thead><tbody id="brokerCommissionHistory"></tbody></tr></div></div></div>
       </div>
 
       <!-- Submit Deal Tab (Extended Form) -->
@@ -2239,14 +2245,14 @@ function renderCapitalStack() {
 
 function renderDocuments() {
   const tbody = document.getElementById('closingDocumentsBody');
-  if(!currentProjectId) { tbody.innerHTML = '<tr><td colspan="4">No project attached. <tr>'; return; }
+  if(!currentProjectId) { tbody.innerHTML = '<tr><td colspan="4">No project attached. </td>'; return; }
   const projDocs = documents.filter(d => d.projectId === currentProjectId);
-  tbody.innerHTML = projDocs.map(d => `<tr>
+  tbody.innerHTML = projDocs.map(d => `<td>
       <td><strong>${escapeHtml(d.name)}</strong></td>
       <td><span class="badge ${d.approved ? 'badge-success' : 'badge-warning'}">${d.approved ? 'Approved' : 'Pending'}</span></td>
       <td>${d.date || '—'}</td>
       <td><button class="doc-action-btn" onclick="openPDFWithWatermark('${d.url}', '${d.name}')">View</button><a href="${d.url}" download class="doc-action-btn">Download</a></td>
-    </tr>`).join('') || '<tr><td colspan="4">No documents. <tr>';
+    </tr>`).join('') || '<tr><td colspan="4">No documents. </td>';
   const drop = document.getElementById('clientUploadDocType');
   if(drop) drop.innerHTML = '<option value="">Select Type</option><option>Term Sheet</option><option>Financial Statement</option><option>Due Diligence</option><option>Commitment Fee Receipt</option><option>Other</option>';
 }
@@ -3084,15 +3090,16 @@ window.deleteDoc = async function(id) { if(confirm('Delete document?')) { await 
 window.setBrokerCommission = async function(id) { const rate = prompt('Commission %:'); if(rate && !isNaN(parseFloat(rate))) { await db.collection('brokers').doc(id).update({commissionRate: parseFloat(rate)}); showToast(`Rate set to ${rate}%`); } };
 window.deleteBroker = async function(id) { if(confirm('Delete broker?')) { await db.collection('brokers').doc(id).delete(); showToast('Deleted'); } };
 
+// FIXED: renderMeetings - proper row tag and cell formatting
 function renderMeetings() {
   const tbody = document.getElementById('meetingsTableBody');
   if(!tbody) return;
-  tbody.innerHTML = meetings.map(m => `<td>
-      <td>${formatDate(m.date)} at ${m.time}</div></td>
-      <td><strong>${escapeHtml(m.clientName)}</strong></div></td>
+  tbody.innerHTML = meetings.map(m => `<tr>
+      <td>${formatDate(m.date)} at ${m.time}</td>
+      <td><strong>${escapeHtml(m.clientName)}</strong></td>
       <td>${escapeHtml(m.type)}</div></td>
-      <td><span class="badge ${m.status === 'confirmed' ? 'badge-success' : (m.status === 'cancelled' ? 'badge-danger' : 'badge-warning')}">${m.status}</span></div></td>
-      <td><button class="btn btn-ghost btn-sm" onclick="updateMeetingStatus('${m.id}', 'confirmed')">Confirm</button><button class="btn btn-ghost btn-sm btn-danger" onclick="updateMeetingStatus('${m.id}', 'cancelled')">Cancel</button><button class="btn btn-ghost btn-sm btn-danger" onclick="deleteMeeting('${m.id}')">Del</button></div></td>
+      <td><span class="badge ${m.status === 'confirmed' ? 'badge-success' : (m.status === 'cancelled' ? 'badge-danger' : 'badge-warning')}">${m.status}</span></td>
+      <td><button class="btn btn-ghost btn-sm" onclick="updateMeetingStatus('${m.id}', 'confirmed')">Confirm</button><button class="btn btn-ghost btn-sm btn-danger" onclick="updateMeetingStatus('${m.id}', 'cancelled')">Cancel</button><button class="btn btn-ghost btn-sm btn-danger" onclick="deleteMeeting('${m.id}')">Del</button></td>
     </tr>`).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--gray-400);">No meetings scheduled</div>';
 }
 
