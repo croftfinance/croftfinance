@@ -1218,8 +1218,8 @@ body {
                 <div class="progress-circle"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" class="progress-circle-bg"></circle><circle cx="50" cy="50" r="45" class="progress-circle-fill" id="progressCircleFill"></circle></svg><div class="progress-circle-text"><div class="progress-percentage" id="progressPercentage">0%</div><div class="progress-label">Complete</div></div></div>
               </div>
               <div>
-                <div class="step-number" id="stepNumber">Step 1 of 8</div>
-                <div class="step-name" id="stepName">Term Sheet</div>
+                <div class="step-number" id="stepNumber">Step 1 of 9</div>
+                <div class="step-name" id="stepName">Mandate Review</div>
                 <div style="margin-top:8px;font-size:11px;color:rgba(255,255,255,0.5);">Overall progress</div>
               </div>
             </div>
@@ -1322,6 +1322,7 @@ body {
           <div class="stat-card"><div class="data-label" style="color:var(--warning);">New Registrations</div><div class="stat-value" id="pendingClientsCount" style="color:var(--warning);">0</div></div>
           <div class="stat-card"><div class="data-label">Unread Messages</div><div class="stat-value" id="pendingMessages">0</div></div>
           <div class="stat-card"><div class="data-label">Pending Meetings</div><div class="stat-value" id="scheduledMeetings">0</div></div>
+          <div class="stat-card"><div class="data-label" style="color:var(--blue);">Pending Review</div><div class="stat-value" id="pendingReviewCount" style="color:var(--blue);">0</div></div>
         </div>
         <div id="dealHealthSummary" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;"></div>
         <div class="view-toggle"><button class="view-toggle-btn active" onclick="setPipelineView('board')">Board</button><button class="view-toggle-btn" onclick="setPipelineView('list')">List</button></div>
@@ -1339,7 +1340,7 @@ body {
           <div class="card"><div class="card-header"><div class="card-title">Pipeline Stage Distribution</div></div><div class="card-body"><canvas id="pipelineStageChart" height="220" style="max-height:220px;"></canvas></div></div>
         </div>
         <div class="card"><div class="card-header"><div class="card-title">Broker Performance</div><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="exportBrokerPerformanceCSV()">Export CSV</button></div></div><div class="card-body"><div class="table-wrap"><table class="admin-table" id="brokerPerformanceTable"><thead><tr><th data-sort="name" style="cursor:pointer;">Broker Name</th><th>Firm</th><th>Market</th><th data-sort="submissions" style="cursor:pointer;">Submissions</th><th data-sort="accepted" style="cursor:pointer;">Accepted</th><th data-sort="funded" style="cursor:pointer;">Funded</th><th data-sort="conversion" style="cursor:pointer;">Conversion %</th><th data-sort="volume" style="cursor:pointer;">Total Volume</th><th data-sort="commission" style="cursor:pointer;">Est. Commission</th></tr></thead><tbody id="brokerPerformanceBody"></tbody></table></div></div></div>
-        <div class="card"><div class="card-header"><div class="card-title">Commission Breakdown</div><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="exportCommissionCSV()">Export CSV</button><button class="btn btn-ghost btn-sm" onclick="window.print()">Print Report</button></div></div><div class="card-body"><div class="table-wrap"><table class="admin-table" id="commissionTable"><thead><tr><th>Client</th><th>Project</th><th>Industry</th><th>Location</th><th>Facility Amount</th><th>Broker Commission</th><th>Net Commission (2%)</th><th>Days to Close</th><th>Funded Date</th></tr></thead><tbody id="commissionTableBody"></tbody><tfoot><tr id="commissionTotalRow"></tr></tfoot></table></div></div></div>
+        <div class="card"><div class="card-header"><div class="card-title">Commission Breakdown</div><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="exportCommissionCSV()">Export CSV</button><button class="btn btn-ghost btn-sm" onclick="window.print()">Print Report</button></div></div><div class="card-body"><div class="table-wrap"><table class="admin-table" id="commissionTable"><thead><tr><th>Client</th><th>Project</th><th>Industry</th><th>Location</th><th>Facility Amount</th><th>Broker Commission</th><th>Net Commission (2%)</th><th>Days to Close</th><th>Funded Date</th></tr></thead><tbody id="commissionTableBody"></tbody><tfoot><tr id="commissionTotalRow"><tr></tfoot></table></div></div></div>
         <div class="card"><div class="card-header"><div class="card-title">Quarterly Trend</div></div><div class="card-body"><canvas id="quarterlyTrendChart" height="200" style="max-height:200px;"></canvas></div></div>
       </div>
 
@@ -1350,7 +1351,7 @@ body {
       <div id="admin-projects-admin" class="admin-tab"><div class="admin-page-title">Projects</div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Project</th><th>Industry</th><th>Funds Needed</th><th>Step</th><th>Broker</th><th>CF</th><th>ECF</th><th>Data Room</th><th>Actions</th></tr></thead><tbody id="adminProjectsTable"></tbody></table></div></div>
 
       <!-- Documents Tab -->
-      <div id="admin-documents-admin" class="admin-tab"><div class="admin-page-title">Documents</div><div class="table-wrap"><table class="documents-table"><thead><tr><th>Client</th><th>Document</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="adminDocumentsTableBody"></tbody></table></div></div>
+      <div id="admin-documents-admin" class="admin-tab"><div class="admin-page-title">Documents</div><div class="table-wrap"><table class="documents-table"><thead><tr><th>Client</th><th>Project</th><th>Document</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="adminDocumentsTableBody"></tbody></table></div></div>
 
       <!-- Brokers Tab -->
       <div id="admin-brokers" class="admin-tab"><div class="admin-page-title">Brokers</div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Broker</th><th>Firm</th><th>Commission</th><th>Submitted</th><th>Funded</th><th>Est. Commission</th><th>Status</th><th>Engagement</th><th>Actions</th></tr></thead><tbody id="adminBrokersTable"></tbody></table></div><div class="card" style="margin-top:20px;"><div class="card-header"><div class="card-title">Broker Update Requests</div></div><div class="card-body"><div id="brokerUpdateRequestsList"></div></div></div></div>
@@ -1391,7 +1392,7 @@ body {
       <div id="admin-inbox" class="admin-tab"><div class="admin-page-title">Inbox</div><div class="inbox-filter"><button class="filter-chip active" data-filter="all">All</button><button class="filter-chip" data-filter="client">Clients</button><button class="filter-chip" data-filter="broker">Brokers</button><button class="filter-chip" data-filter="unread">Unread</button></div><div id="inboxContainer"></div></div>
 
       <!-- Meetings Tab -->
-      <div id="admin-meetings" class="admin-tab"><div class="admin-page-title">Meeting Requests</div><div style="margin-bottom:16px;"><button class="btn btn-primary btn-sm" onclick="showScheduleMeetingModal()">+ Schedule Meeting</button></div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Date</th><th>Client</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead><tbody id="meetingsTableBody"></tbody></table></div></div>
+      <div id="admin-meetings" class="admin-tab"><div class="admin-page-title">Meeting Requests</div><div style="margin-bottom:16px;"><button class="btn btn-primary btn-sm" onclick="showScheduleMeetingModal()">+ Schedule Meeting</button></div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Date</th><th>Client</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead><tbody id="meetingsTableBody"></tbody></tr></div></div>
 
       <!-- Settings Tab -->
       <div id="admin-settings" class="admin-tab"><div class="admin-page-title">Settings</div><div class="card"><div class="card-header"><div class="card-title">Deal Appetite</div></div><div class="card-body"><textarea id="dealAppetiteText" rows="4" class="form-textarea" placeholder="Describe current deal preferences, preferred industries, min/max facility size, geographic focus..."></textarea><button class="btn btn-primary btn-sm" onclick="saveDealAppetite()" style="margin-top:12px;">Save Deal Appetite</button></div></div><div class="card"><div class="card-header"><div class="card-title">Platform Announcement</div></div><div class="card-body"><textarea id="announcementText" rows="2" class="form-textarea" placeholder="Brief announcement shown to all users..."></textarea><button class="btn btn-primary btn-sm" onclick="saveAnnouncement()" style="margin-top:12px;">Publish Announcement</button></div></div><div class="card"><div class="card-header"><div class="card-title">Admin Profile</div></div><div class="card-body"><div class="form-grid-2"><div class="form-group"><label class="form-label">Display Name</label><input type="text" id="adminDisplayName" class="form-input"></div><div class="form-group"><label class="form-label">Title</label><input type="text" id="adminTitle" class="form-input"></div><div class="form-group"><label class="form-label">Email</label><input type="email" id="adminProfileEmail" class="form-input"></div><div class="form-group"><label class="form-label">Phone</label><input type="text" id="adminPhone" class="form-input"></div><div class="form-group"><label class="form-label">Availability Hours</label><input type="text" id="adminAvailability" class="form-input" placeholder="Mon–Fri, 9:00–18:00 CET"></div></div><button class="btn btn-primary btn-sm" onclick="saveAdminProfile()">Save Profile</button></div></div></div>
@@ -1464,7 +1465,7 @@ body {
 
 <div id="scheduleMeetingModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Schedule Meeting</h3><button class="modal-close" onclick="closeModal('scheduleMeetingModal')">✕</button></div><div class="modal-body"><div class="form-group"><label class="form-label">Client</label><select id="meetingClientId" class="form-select"></select></div><div class="form-group"><label class="form-label">Date</label><input type="date" id="meetingDate" class="form-input"></div><div class="form-group"><label class="form-label">Time</label><input type="time" id="meetingTime" class="form-input"></div><div class="form-group"><label class="form-label">Type</label><select id="meetingType" class="form-select"><option>Video Call</option><option>Phone Call</option></select></div><div class="form-group"><label class="form-label">Notes</label><textarea id="meetingNotes" rows="3" class="form-textarea"></textarea></div><button class="btn btn-primary btn-md" onclick="createMeeting()" style="width:100%">Schedule</button></div></div></div>
 
-<div id="editProjectModal" class="modal-overlay"><div class="modal modal-lg"><div class="modal-header"><h3>Edit Project</h3><button class="modal-close" onclick="closeModal('editProjectModal')">✕</button></div><div class="modal-tabs"><button id="tabBtn-project" class="modal-tab-btn active" onclick="switchEditTab('project')">Details</button><button id="tabBtn-process" class="modal-tab-btn" onclick="switchEditTab('process')">Process</button></div><div class="modal-body"><div id="edit-tab-project" class="modal-tab-pane active"><div class="form-grid-2"><div class="form-group"><label class="form-label">Client Name</label><input type="text" id="editClientName" class="form-input"></div><div class="form-group"><label class="form-label">Client Email</label><input type="email" id="editClientEmail" class="form-input"></div><div class="form-group"><label class="form-label">Project Name</label><input type="text" id="editProjectName" class="form-input"></div><div class="form-group"><label class="form-label">Industry</label><select id="editIndustry" class="form-select"><option>Real Estate</option><option>Infrastructure</option><option>Energy</option><option>Mining</option><option>Oil & Gas</option></select></div><div class="form-group"><label class="form-label">Location</label><input type="text" id="editLocation" class="form-input"></div><div class="form-group"><label class="form-label">Facility Amount</label><input type="text" id="editAmount" class="form-input"></div><div class="form-group"><label class="form-label">Interest Rate</label><input type="text" id="editRate" class="form-input"></div><div class="form-group"><label class="form-label">Funds Needed</label><input type="text" id="editFundsNeeded" class="form-input"></div><div class="form-group"><label class="form-label">Sponsor Equity</label><input type="text" id="editSponsorEquity" class="form-input"></div><div class="form-group"><label class="form-label">Target Close Date</label><input type="date" id="editCloseDate" class="form-input"></div><div class="form-group"><label class="form-label">Term Sheet Expiry</label><input type="date" id="editTermSheetExpiry" class="form-input"></div><div class="form-group"><label class="form-label">Commitment Fee Deadline</label><input type="date" id="editCommitFeeDeadline" class="form-input"></div><div class="form-group"><label class="form-label">Deed Expiry</label><input type="date" id="editDeedExpiry" class="form-input"></div><div class="form-group"><label class="form-label">ECF Policy Expiry</label><input type="date" id="editECFPolicyExpiry" class="form-input"></div><div class="form-group"><label class="form-label">Term (years)</label><input type="text" id="editTerm" class="form-input"></div><div class="form-group"><label class="form-label">Grace Period (months)</label><input type="text" id="editGracePeriod" class="form-input"></div><div class="form-group"><label class="form-label">Governing Law</label><input type="text" id="editGoverningLaw" class="form-input" placeholder="England and Wales"></div><div class="form-group"><label class="form-label">Funded Date</label><input type="date" id="editFundedDate" class="form-input"></div><div class="form-group"><label class="form-label">Data Room Link</label><input type="url" id="editDataRoomLink" class="form-input" placeholder="https://..."></div><div class="form-group"><label class="form-label">Assign Broker</label><select id="editBrokerAssign" class="form-select"></select></div><div class="form-group"><label class="form-label">Broker Engagement Status</label><select id="editBrokerEngagement" class="form-select"><option value="none">None</option><option value="pending">Pending</option><option value="active">Active</option></select></div></div></div><div id="edit-tab-process" class="modal-tab-pane"><div class="form-grid-2"><div class="form-group"><label class="form-label">Current Step</label><select id="editStep" class="form-select"><option value="1">Step 1: Term Sheet</option><option value="2">Step 2: Commitment Fee</option><option value="3">Step 3: Deed of Undertaking</option><option value="4">Step 4: Credit Support</option><option value="5">Step 5: Hard-Copy Submission</option><option value="6">Step 6: ECF Escrow</option><option value="7">Step 7: Transfer to Agent</option><option value="8">Step 8: Funded</option></select></div><div class="form-group"><label class="form-label">CF Status</label><select id="editCommitFee" class="form-select"><option value="pending">Pending</option><option value="paid">Paid</option></select></div><div class="form-group"><label class="form-label">ECF Status</label><select id="editECFStatus" class="form-select"><option value="pending">Pending</option><option value="escrowed">Escrowed</option></select></div><div class="form-group"><label class="form-label">Advisor Note</label><textarea id="editAdvisorNote" rows="2" class="form-textarea"></textarea></div></div><div id="stepStatusContainer"></div></div></div><div class="modal-footer">
+<div id="editProjectModal" class="modal-overlay"><div class="modal modal-lg"><div class="modal-header"><h3>Edit Project</h3><button class="modal-close" onclick="closeModal('editProjectModal')">✕</button></div><div class="modal-tabs"><button id="tabBtn-project" class="modal-tab-btn active" onclick="switchEditTab('project')">Details</button><button id="tabBtn-process" class="modal-tab-btn" onclick="switchEditTab('process')">Process</button></div><div class="modal-body"><div id="edit-tab-project" class="modal-tab-pane active"><div class="form-grid-2"><div class="form-group"><label class="form-label">Client Name</label><input type="text" id="editClientName" class="form-input"></div><div class="form-group"><label class="form-label">Client Email</label><input type="email" id="editClientEmail" class="form-input"></div><div class="form-group"><label class="form-label">Project Name</label><input type="text" id="editProjectName" class="form-input"></div><div class="form-group"><label class="form-label">Industry</label><select id="editIndustry" class="form-select"><option>Real Estate</option><option>Infrastructure</option><option>Energy</option><option>Mining</option><option>Oil & Gas</option></select></div><div class="form-group"><label class="form-label">Location</label><input type="text" id="editLocation" class="form-input"></div><div class="form-group"><label class="form-label">Facility Amount</label><input type="text" id="editAmount" class="form-input"></div><div class="form-group"><label class="form-label">Interest Rate</label><input type="text" id="editRate" class="form-input"></div><div class="form-group"><label class="form-label">Funds Needed</label><input type="text" id="editFundsNeeded" class="form-input"></div><div class="form-group"><label class="form-label">Sponsor Equity</label><input type="text" id="editSponsorEquity" class="form-input"></div><div class="form-group"><label class="form-label">Target Close Date</label><input type="date" id="editCloseDate" class="form-input"></div><div class="form-group"><label class="form-label">Term Sheet Expiry</label><input type="date" id="editTermSheetExpiry" class="form-input"></div><div class="form-group"><label class="form-label">Commitment Fee Deadline</label><input type="date" id="editCommitFeeDeadline" class="form-input"></div><div class="form-group"><label class="form-label">Deed Expiry</label><input type="date" id="editDeedExpiry" class="form-input"></div><div class="form-group"><label class="form-label">ECF Policy Expiry</label><input type="date" id="editECFPolicyExpiry" class="form-input"></div><div class="form-group"><label class="form-label">Term (years)</label><input type="text" id="editTerm" class="form-input"></div><div class="form-group"><label class="form-label">Grace Period (months)</label><input type="text" id="editGracePeriod" class="form-input"></div><div class="form-group"><label class="form-label">Governing Law</label><input type="text" id="editGoverningLaw" class="form-input" placeholder="England and Wales"></div><div class="form-group"><label class="form-label">Funded Date</label><input type="date" id="editFundedDate" class="form-input"></div><div class="form-group"><label class="form-label">Data Room Link</label><input type="url" id="editDataRoomLink" class="form-input" placeholder="https://..."></div><div class="form-group"><label class="form-label">Assign Broker</label><select id="editBrokerAssign" class="form-select"></select></div><div class="form-group"><label class="form-label">Broker Engagement Status</label><select id="editBrokerEngagement" class="form-select"><option value="none">None</option><option value="pending">Pending</option><option value="active">Active</option></select></div></div></div><div id="edit-tab-process" class="modal-tab-pane"><div class="form-grid-2"><div class="form-group"><label class="form-label">Current Step</label><select id="editStep" class="form-select"><option value="1">Step 1: Mandate Review</option><option value="2">Step 2: Term Sheet</option><option value="3">Step 3: Commitment Fee</option><option value="4">Step 4: Deed of Undertaking</option><option value="5">Step 5: Credit Support</option><option value="6">Step 6: Hard-Copy Submission</option><option value="7">Step 7: ECF Escrow</option><option value="8">Step 8: Transfer to Agent</option><option value="9">Step 9: Funded</option></select></div><div class="form-group"><label class="form-label">CF Status</label><select id="editCommitFee" class="form-select"><option value="pending">Pending</option><option value="paid">Paid</option></select></div><div class="form-group"><label class="form-label">ECF Status</label><select id="editECFStatus" class="form-select"><option value="pending">Pending</option><option value="escrowed">Escrowed</option></select></div><div class="form-group"><label class="form-label">Advisor Note</label><textarea id="editAdvisorNote" rows="2" class="form-textarea"></textarea></div></div><div id="stepStatusContainer"></div></div></div><div class="modal-footer">
   <button class="btn btn-secondary btn-md" onclick="closeModal('editProjectModal')" style="flex:1">Cancel</button>
   <button class="btn btn-primary btn-md" onclick="saveProjectInfo()" style="flex:2">Save Changes</button>
 </div></div></div>
@@ -1516,6 +1517,40 @@ body {
 </div>
 
 <script>
+/*
+ * REQUIRED FIREBASE SECURITY RULES
+ * Set these in Firebase Console > Firestore > Rules:
+ *
+ * rules_version = '2';
+ * service cloud.firestore {
+ *   match /databases/{database}/documents {
+ *     match /admins/{uid} { allow read: if request.auth.uid == uid; }
+ *     match /clients/{uid} { allow read, write: if request.auth.uid == uid || exists(/databases/$(database)/documents/admins/$(request.auth.uid)); }
+ *     match /projects/{pid} { allow read, write: if request.auth != null; }
+ *     match /documents/{did} { allow read, write: if request.auth != null; }
+ *     match /messages/{mid} { allow read, write: if request.auth != null; }
+ *     match /meetings/{mid} { allow read, write: if request.auth != null; }
+ *     match /brokers/{uid} { allow read, write: if request.auth.uid == uid || exists(/databases/$(database)/documents/admins/$(request.auth.uid)); }
+ *     match /brokerSubmissions/{sid} { allow read, write: if request.auth != null; }
+ *     match /brokerMessages/{mid} { allow read, write: if request.auth != null; }
+ *     match /brokerUpdateRequests/{rid} { allow read, write: if request.auth != null; }
+ *     match /activityLog/{lid} { allow read, write: if request.auth != null; }
+ *     match /settings/{sid} { allow read: if request.auth != null; allow write: if exists(/databases/$(database)/documents/admins/$(request.auth.uid)); }
+ *     match /contactRequests/{rid} { allow write: if true; }
+ *   }
+ * }
+ *
+ * REQUIRED FIREBASE STORAGE RULES:
+ * rules_version = '2';
+ * service firebase.storage {
+ *   match /b/{bucket}/o {
+ *     match /documents/{allPaths=**} {
+ *       allow read: if request.auth != null;
+ *       allow write: if request.auth != null && request.resource.size < 10 * 1024 * 1024;
+ *     }
+ *   }
+ * }
+ */
 // ============================================================
 // FIREBASE CONFIG & GLOBAL STATE
 // ============================================================
@@ -1528,18 +1563,19 @@ const FIREBASE_CONFIG = {
   appId: "1:718693826553:web:c764558447a34cccd74728"
 };
 
-const STEP_NAMES = ['', 'Term Sheet', 'Commitment Fee', 'Deed of Undertaking', 'Credit Support', 'Hard-Copy Submission', 'ECF Escrow', 'Transfer to Agent', 'Funded'];
+const STEP_NAMES = ['', 'Mandate Review', 'Term Sheet', 'Commitment Fee', 'Deed of Undertaking', 'Credit Support', 'Hard-Copy Submission', 'ECF Escrow', 'Transfer to Agent', 'Funded'];
 const ADMIN_ONLY_COMMISSION_RATE = 0.02; // NEVER reference in broker or client portal functions
 
 const STEP_CONFIG = {
-  1: { name: 'Term Sheet', clientAction: 'Review and sign term sheet', croftAction: 'Issue term sheet and schedule introductory call' },
-  2: { name: 'Commitment Fee', clientAction: 'Pay commitment fee via wire transfer', croftAction: 'Verify receipt of funds and issue confirmation' },
-  3: { name: 'Deed of Undertaking', clientAction: 'Review and sign deed', croftAction: 'Prepare and execute deed of undertaking' },
-  4: { name: 'Credit Support', clientAction: 'Provide credit support documents (guarantees, collateral)', croftAction: 'Review and verify credit support package' },
-  5: { name: 'Hard-Copy Submission', clientAction: 'Submit hard copies of all executed documents', croftAction: 'Review submission and prepare closing binder' },
-  6: { name: 'ECF Escrow', clientAction: 'Fund ECF escrow account', croftAction: 'Confirm escrow funding with agent bank' },
-  7: { name: 'Transfer to Agent', clientAction: 'Await transfer instructions', croftAction: 'Execute transfer to agent and coordinate disbursement' },
-  8: { name: 'Funded', clientAction: 'Complete closing formalities', croftAction: 'Disburse funds and provide final closing statement' }
+  1: { name: 'Mandate Review', clientAction: 'Provide project overview and any supporting materials requested by Croft Finance', croftAction: 'Evaluate mandate fit, conduct preliminary due diligence, and issue decision within 5 business days' },
+  2: { name: 'Term Sheet', clientAction: 'Review and sign term sheet', croftAction: 'Issue term sheet and schedule introductory call' },
+  3: { name: 'Commitment Fee', clientAction: 'Pay commitment fee via wire transfer', croftAction: 'Verify receipt of funds and issue confirmation' },
+  4: { name: 'Deed of Undertaking', clientAction: 'Review and sign deed', croftAction: 'Prepare and execute deed of undertaking' },
+  5: { name: 'Credit Support', clientAction: 'Provide credit support documents (guarantees, collateral)', croftAction: 'Review and verify credit support package' },
+  6: { name: 'Hard-Copy Submission', clientAction: 'Submit hard copies of all executed documents', croftAction: 'Review submission and prepare closing binder' },
+  7: { name: 'ECF Escrow', clientAction: 'Fund ECF escrow account', croftAction: 'Confirm escrow funding with agent bank' },
+  8: { name: 'Transfer to Agent', clientAction: 'Await transfer instructions', croftAction: 'Execute transfer to agent and coordinate disbursement' },
+  9: { name: 'Funded', clientAction: 'Complete closing formalities', croftAction: 'Disburse funds and provide final closing statement' }
 };
 
 const ACTION_LABELS = {
@@ -1888,7 +1924,7 @@ window.register = async function() {
   try {
     const cred = await auth.createUserWithEmailAndPassword(email, pass);
     await db.collection('clients').doc(cred.user.uid).set({ id:cred.user.uid, name, email, status:'pending', createdAt: new Date().toISOString() });
-    await db.collection('projects').doc(String(Date.now())).set({ id:String(Date.now()), clientId:cred.user.uid, name:project, step:1, status:'pending', amount:'TBD', interestRate:'TBD' });
+    await db.collection('projects').doc(String(Date.now())).set({ id:String(Date.now()), clientId:cred.user.uid, name:project, step:1, status:'active', amount:'TBD', interestRate:'TBD' });
     await logActivity(cred.user.uid, name, 'client', 'register', null, `Registered new account`);
     
     // EMAILJS: New client registration
@@ -1918,6 +1954,14 @@ window.brokerRegister = async function() {
     const cred = await auth.createUserWithEmailAndPassword(email, pass);
     await db.collection('brokers').doc(cred.user.uid).set({ id:cred.user.uid, name, email, firm, commissionRate:0, status:'pending', engagementStatus:'none', createdAt: new Date().toISOString() });
     showToast('Broker application submitted for approval.');
+    await sendEmailNotification({
+      to_name: 'Croft Finance Team',
+      to_email: EMAILJS_CONFIG.adminEmail,
+      from_name: 'Croft Finance',
+      subject: `New Broker Registration: ${name}`,
+      message: `New broker registration:\n\nName: ${name}\nFirm: ${firm}\nEmail: ${email}\n\nPlease review and approve this broker account in the admin portal.`,
+      project_name: 'Broker Registration'
+    });
     logout();
   } catch(e) { showToast(e.message, true); }
 };
@@ -2009,29 +2053,35 @@ function loadClientPortal() {
 function loadCurrentProjectData() {
   const p = projects.find(x => x.id === currentProjectId);
   if (!p) return;
+  if(p.status === 'declined') {
+    document.getElementById('actionBannerDisplay').innerHTML = `<div class="action-banner" style="background:var(--error-light);border:0.5px solid var(--error);"><i class="fas fa-times-circle" style="color:var(--error);"></i><div><strong style="color:var(--error);">Mandate Not Approved</strong><br>Croft Finance has reviewed your project and is unable to proceed at this time. Please contact Suzana for feedback.</div></div>`;
+    return;
+  }
   const step = p.step || 1;
   document.getElementById('dashStage').innerHTML = STEP_NAMES[step];
   document.getElementById('dashAmount').innerHTML = formatCurrency(p.amount);
   document.getElementById('dashRate').innerHTML = p.interestRate ? p.interestRate + '%' : '—';
   document.getElementById('dashCountdown').innerHTML = p.closeDate ? formatDate(p.closeDate) : '—';
   document.getElementById('dashFundsNeeded').innerHTML = formatCurrency(p.fundsNeeded);
-  const percent = Math.round((step / 8) * 100);
+  const percent = Math.round((step / 9) * 100);
   document.getElementById('progressPercentage').innerHTML = percent + '%';
   const circle = document.querySelector('.progress-circle-fill');
   if(circle) circle.style.strokeDashoffset = (2 * Math.PI * 45) - (percent/100)*(2 * Math.PI * 45);
   const bannerDiv = document.getElementById('actionBannerDisplay');
-  if(step === 2 && p.commitmentFeeStatus !== 'paid') bannerDiv.innerHTML = `<div class="action-banner client-action"><i class="fas fa-exclamation-triangle"></i><div><strong>Action Required: Commitment Fee</strong><br>Please submit the commitment fee to advance to Step 3.</div><button class="btn btn-primary btn-sm" style="margin-top:8px;" onclick="showWiringInstructions()">Wiring Instructions</button></div>`;
-  else if(step === 6 && p.ecfStatus !== 'escrowed') bannerDiv.innerHTML = `<div class="action-banner client-action"><i class="fas fa-exclamation-triangle"></i><div><strong>Action Required: ECF Escrow</strong><br>Please fund the ECF escrow account to proceed to Step 7.</div></div>`;
+  if(step === 1) {
+    document.getElementById('actionBannerDisplay').innerHTML = `<div class="action-banner" style="background:var(--navy);border:none;color:white;"><i class="fas fa-search" style="color:#c9a96e;"></i><div><strong style="color:#c9a96e;">Mandate Under Review</strong><br><span style="opacity:0.8;">Croft Finance is evaluating your project. You will be notified within 5 business days.</span></div></div>`;
+  } else if(step === 3 && p.commitmentFeeStatus !== 'paid') bannerDiv.innerHTML = `<div class="action-banner client-action"><i class="fas fa-exclamation-triangle"></i><div><strong>Action Required: Commitment Fee</strong><br>Please submit the commitment fee to advance to Step 4.</div><button class="btn btn-primary btn-sm" style="margin-top:8px;" onclick="showWiringInstructions()">Wiring Instructions</button></div>`;
+  else if(step === 7 && p.ecfStatus !== 'escrowed') bannerDiv.innerHTML = `<div class="action-banner client-action"><i class="fas fa-exclamation-triangle"></i><div><strong>Action Required: ECF Escrow</strong><br>Please fund the ECF escrow account to proceed to Step 8.</div></div>`;
   else bannerDiv.innerHTML = '';
   
   const statCards = document.querySelectorAll('#tab-dashboard .stat-card');
   statCards.forEach(card => {
-    card.style.borderLeft = step === 8 ? '3px solid var(--success)' : (step >= 5 ? '3px solid var(--blue)' : '3px solid var(--gray-200)');
+    card.style.borderLeft = step === 9 ? '3px solid var(--success)' : (step >= 5 ? '3px solid var(--blue)' : '3px solid var(--gray-200)');
   });
   const healthDot = document.getElementById('dealHealthDot');
   if(healthDot) {
     const daysLeft = p.closeDate ? Math.ceil((new Date(p.closeDate) - new Date()) / (1000*60*60*24)) : 999;
-    if(step === 8) healthDot.style.background = 'var(--success)';
+    if(step === 9) healthDot.style.background = 'var(--success)';
     else if(daysLeft < 14) healthDot.style.background = 'var(--error)';
     else if(daysLeft < 30) healthDot.style.background = 'var(--warning)';
     else healthDot.style.background = 'var(--success)';
@@ -2069,12 +2119,15 @@ window.clientUploadDocument = async function() {
   const file = document.getElementById('clientUploadFile').files[0];
   const type = document.getElementById('clientUploadDocType').value;
   if(!file || !type) return showToast('Select file and type', true);
+  if(file.size > 10 * 1024 * 1024) return showToast('File must be under 10MB', true);
+  if(file.type !== 'application/pdf') return showToast('Only PDF files are accepted', true);
   const statusDiv = document.getElementById('clientUploadStatus');
   statusDiv.style.display = 'block'; statusDiv.innerText = 'Uploading...';
   try {
     const filename = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
     const ref = storage.ref(`documents/${currentClient.id}/${currentProjectId}/${filename}`);
-    await ref.put(file);
+    const metadata = { customMetadata: { uploadedBy: currentClient.id, clientName: currentClient.name, docType: type } };
+    await ref.put(file, metadata);
     const url = await ref.getDownloadURL();
     await db.collection('documents').add({ clientId: currentClient.id, projectId: currentProjectId, name: type, url: url, approved: false, date: new Date().toISOString().split('T')[0] });
     await logActivity(currentClient.id, currentClient.name, 'client', 'upload_document', currentProjectId, `Uploaded: ${type}`);
@@ -2136,11 +2189,11 @@ function renderStepAccordion() {
   if(!p) return;
   const currentStep = p.step || 1;
   let html = '';
-  for(let i = 1; i <= 8; i++) {
+  for(let i = 1; i <= 9; i++) {
     const isCompleted = p[`step${i}Completed`];
     const isCurrent = i === currentStep;
     const stepData = STEP_CONFIG[i];
-    const deadlineField = ['termSheetExpiry', 'commitmentFeeDeadline', 'deedExpiry', 'ecfPolicyExpiry', '', '', '', ''][i-1];
+    const deadlineField = ['', 'termSheetExpiry', 'commitmentFeeDeadline', 'deedExpiry', 'ecfPolicyExpiry', '', '', '', ''][i-1];
     const deadline = p[deadlineField];
     let deadlineHtml = '';
     if(deadline) {
@@ -2164,7 +2217,17 @@ window.toggleStepAccordion = function(stepNum) {
 };
 
 function getRequiredDocsForStep(step) {
-  const docs = { 1: ['Term Sheet'], 2: ['Commitment Fee Receipt'], 3: ['Signed Deed'], 4: ['Credit Support Documents'], 5: ['Hard Copies'], 6: ['ECF Confirmation'], 7: ['Transfer Confirmation'], 8: ['Funding Confirmation'] };
+  const docs = {
+    1: [],
+    2: ['Term Sheet'],
+    3: ['Commitment Fee Receipt'],
+    4: ['Signed Deed'],
+    5: ['Credit Support Documents'],
+    6: ['Hard Copies'],
+    7: ['ECF Confirmation'],
+    8: ['Transfer Confirmation'],
+    9: ['Funding Confirmation']
+  };
   return docs[step] || [];
 }
 
@@ -2294,8 +2357,8 @@ function updateBrokerDashboard() {
   const rate = currentBroker.commissionRate || 0;
   document.getElementById('brokerCommRate').innerText = rate + '%';
   const myProjects = projects.filter(p => p.brokerId === currentBroker.id && p.status === 'active');
-  const pipelineProjects = myProjects.filter(p => (p.step || 1) < 8);
-  const fundedProjects = myProjects.filter(p => (p.step || 1) === 8);
+  const pipelineProjects = myProjects.filter(p => (p.step || 1) < 9);
+  const fundedProjects = myProjects.filter(p => (p.step || 1) === 9);
   let pipelineCommission = 0, earnedCommission = 0;
   pipelineProjects.forEach(p => { let amt = parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g,"")) || 0; pipelineCommission += amt * (rate / 100); });
   fundedProjects.forEach(p => { let amt = parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g,"")) || 0; earnedCommission += amt * (rate / 100); });
@@ -2370,16 +2433,16 @@ function renderBrokerPortfolio() {
   if(!myProjects.length) { cont.innerHTML = '<div class="card"><div class="card-body">No active clients</div></div>'; return; }
   cont.innerHTML = myProjects.map(p => {
     const client = clients.find(c => c.id === p.clientId);
-    const percent = Math.round(((p.step||1)/8)*100);
+    const percent = Math.round(((p.step||1)/9)*100);
     const amt = parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g,"")) || 0;
     const commission = amt * ((currentBroker.commissionRate || 0) / 100);
-    return `<div class="card" style="margin-bottom:16px;border-left:3px solid ${(p.step||1) === 8 ? 'var(--success)' : 'var(--blue)'};">
+    return `<div class="card" style="margin-bottom:16px;border-left:3px solid ${(p.step||1) === 9 ? 'var(--success)' : 'var(--blue)'};">
       <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
         <div>
           <div style="font-size:16px;font-weight:600;color:var(--navy);">${escapeHtml(p.name)}</div>
           <div style="font-size:11px;color:var(--gray-500);margin-top:2px;">${escapeHtml(client?.name)} · ${escapeHtml(client?.email)}</div>
         </div>
-        <span class="badge ${(p.step||1) === 8 ? 'badge-success' : 'badge-info'}">Step ${p.step||1} of 8 · ${STEP_NAMES[p.step||1]}</span>
+        <span class="badge ${(p.step||1) === 9 ? 'badge-success' : 'badge-info'}">Step ${p.step||1} of 9 · ${STEP_NAMES[p.step||1]}</span>
       </div>
       <div class="card-body">
         <div class="progress-bar-wrap" style="margin-bottom:16px;"><div class="progress-bar-fill" style="width:${percent}%;"></div></div>
@@ -2390,7 +2453,7 @@ function renderBrokerPortfolio() {
         </div>
         <div style="background:var(--gray-50);border-radius:8px;padding:12px;margin-bottom:12px;">
           <div class="data-label" style="margin-bottom:4px;">Next Required Action</div>
-          <div style="font-size:13px;font-weight:500;color:var(--navy);">${(p.step||1) >= 8 ? '✓ Deal funded successfully' : (p.step === 2 && p.commitmentFeeStatus !== 'paid' ? '⚠ Client must pay commitment fee' : (p.step === 6 && p.ecfStatus !== 'escrowed' ? '⚠ Client must fund ECF escrow' : 'Croft Finance is processing this step'))}</div>
+          <div style="font-size:13px;font-weight:500;color:var(--navy);">${(p.step||1) >= 9 ? '✓ Deal funded successfully' : (p.step === 3 && p.commitmentFeeStatus !== 'paid' ? '⚠ Client must pay commitment fee' : (p.step === 7 && p.ecfStatus !== 'escrowed' ? '⚠ Client must fund ECF escrow' : 'Croft Finance is processing this step'))}</div>
         </div>
         <button class="btn btn-secondary btn-sm" style="width:100%;" onclick="showBrokerUpdateRequest('${p.id}')"><i class="fas fa-edit"></i> Request Update from Croft Finance</button>
       </div>
@@ -2517,6 +2580,22 @@ window.approveClient = async function(id) {
   }
 };
 
+window.approveBroker = async function(id) {
+  await db.collection('brokers').doc(id).update({ status: 'active' });
+  showToast('Broker approved and activated');
+  const broker = brokers.find(b => b.id === id);
+  if(broker) {
+    await sendEmailNotification({
+      to_name: broker.name,
+      to_email: broker.email,
+      from_name: 'Croft Finance',
+      subject: 'Your Croft Finance broker account has been approved',
+      message: `Dear ${broker.name},\n\nYour broker account with Croft Finance has been approved. You may now log in to the broker portal and submit deals.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
+      project_name: 'Broker Registration'
+    });
+  }
+};
+
 window.saveClientNote = async function(clientId, note) {
   await db.collection('clients').doc(clientId).update({ adminNote: note });
 };
@@ -2528,7 +2607,7 @@ function renderDealHealthSummary() {
   const overdue = active.filter(p => p.closeDate && Math.ceil((new Date(p.closeDate) - new Date()) / (1000*60*60*24)) < 0);
   const urgent = active.filter(p => p.closeDate && Math.ceil((new Date(p.closeDate) - new Date()) / (1000*60*60*24)) >= 0 && Math.ceil((new Date(p.closeDate) - new Date()) / (1000*60*60*24)) < 14);
   const onTrack = active.filter(p => !p.closeDate || Math.ceil((new Date(p.closeDate) - new Date()) / (1000*60*60*24)) >= 14);
-  const funded = active.filter(p => (p.step||1) === 8);
+  const funded = active.filter(p => (p.step||1) === 9);
   el.innerHTML = `
     <div style="background:var(--error-light);border:0.5px solid var(--error);border-radius:8px;padding:16px;text-align:center;">
       <div class="data-label" style="color:var(--error);">Past Due</div>
@@ -2596,6 +2675,8 @@ function renderAdminTables() {
   if(el1) el1.innerHTML = messages.filter(m => m.sender === 'client').length;
   const el2 = document.getElementById('scheduledMeetings');
   if(el2) el2.innerHTML = meetings.filter(m => m.status === 'pending').length;
+  const el3 = document.getElementById('pendingReviewCount');
+  if(el3) el3.innerHTML = projects.filter(p => (p.step||1) === 1 && p.status === 'active').length;
 }
 
 function editClientProject(clientId) { const p = projects.find(x => x.clientId === clientId); if(p) editProject(p.id); else showToast('No project found', true); }
@@ -2607,10 +2688,10 @@ function renderPipeline() {
     boardDiv.style.display = 'grid';
     listDiv.style.display = 'none';
     const stages = [
-      { name: 'Origination', steps: [1, 2] },
-      { name: 'Structuring', steps: [3, 4] },
-      { name: 'Execution', steps: [5, 6, 7] },
-      { name: 'Closed', steps: [8] }
+      { name: 'Origination', steps: [1, 2, 3] },
+      { name: 'Structuring', steps: [4, 5] },
+      { name: 'Execution', steps: [6, 7, 8] },
+      { name: 'Funded', steps: [9] }
     ];
     boardDiv.innerHTML = stages.map(stage => {
       const stageProjects = projects.filter(p => stage.steps.includes(p.step || 1) && p.status === 'active');
@@ -2623,21 +2704,21 @@ function renderPipeline() {
           ${stageProjects.map(p => {
             const c = clients.find(cl => cl.id === p.clientId);
             const initials = (c?.name || 'U').split(' ').map(w => w[0]).join('').substring(0,2).toUpperCase();
-            const percent = Math.round(((p.step||1)/8)*100);
+            const percent = Math.round(((p.step||1)/9)*100);
             let daysToClose = null, urgencyClass = '';
             if(p.closeDate) {
               daysToClose = Math.ceil((new Date(p.closeDate) - new Date()) / (1000*60*60*24));
               if(daysToClose <= 14) urgencyClass = 'urgent';
               else if(daysToClose <= 30) urgencyClass = 'warning';
             }
-            const isFunded = (p.step||1) === 8;
+            const isFunded = (p.step||1) === 9;
             return `<div class="pipeline-card ${urgencyClass} ${isFunded ? 'funded' : ''}" onclick="editProject('${p.id}')">
               <div class="pipeline-card-initials">${initials}</div>
               <div class="pipeline-card-name">${escapeHtml(c?.name || 'Unknown')}</div>
               <div class="pipeline-card-project">${escapeHtml(p.name)}</div>
               <div class="pipeline-card-amount">${formatCurrency(p.amount)}</div>
               <div class="pipeline-card-step">${STEP_NAMES[p.step || 1]}</div>
-              <div class="mini-progress">${Array(8).fill(0).map((_,i) => `<div class="mini-progress-dot ${i+1 <= (p.step||1) ? 'completed' : ''}"></div>`).join('')}</div>
+              <div class="mini-progress">${Array(9).fill(0).map((_,i) => `<div class="mini-progress-dot ${i+1 <= (p.step||1) ? 'completed' : ''}"></div>`).join('')}</div>
               <div class="pipeline-card-footer">
                 <span class="pipeline-card-days ${urgencyClass}">${daysToClose !== null ? (daysToClose < 0 ? 'Past due' : daysToClose + ' days to close') : 'No close date'}</span>
                 <span style="font-size:10px;color:var(--gray-400);">${percent}%</span>
@@ -2666,7 +2747,7 @@ function renderPipeline() {
       return `<tr>
         <td>${escapeHtml(c?.name || 'Unknown')}</td>
         <td>${escapeHtml(p.name)}</strong></td>
-        <td>${p.step <=2 ? 'Origination' : (p.step <=4 ? 'Structuring' : (p.step <=7 ? 'Execution' : 'Closed'))}</td>
+        <td>${p.step <= 3 ? 'Origination' : (p.step <= 5 ? 'Structuring' : (p.step <= 8 ? 'Execution' : 'Funded'))}</td>
         <td>${STEP_NAMES[p.step||1]}</td>
         <td>${formatCurrency(p.amount)}</div></td>
         <td>${daysInStep}</div></td>
@@ -2686,7 +2767,7 @@ function renderBrokerAdminTable() {
   tbody.innerHTML = brokers.map(b => {
     const submissions = brokerSubmissions.filter(s => s.brokerId === b.id);
     const brokerProjects = projects.filter(p => p.brokerId === b.id);
-    const fundedProjects = brokerProjects.filter(p => p.step >= 8);
+    const fundedProjects = brokerProjects.filter(p => p.step >= 9);
     let estCommission = 0;
     fundedProjects.forEach(p => { let amt = parseFloat(String(p.amount || '0').replace(/[^0-9.-]+/g,"")) || 0; estCommission += amt * ((b.commissionRate || 0) / 100); });
     const pendingRequests = brokerUpdateRequests.filter(r => r.brokerId === b.id && r.status === 'pending').length;
@@ -2699,7 +2780,12 @@ function renderBrokerAdminTable() {
         <td>${formatCurrency(estCommission)}</div></td>
         <td><span class="badge ${b.status === 'active' ? 'badge-success' : 'badge-warning'}">${b.status}</span></div></td>
         <td><select class="form-select" style="width:100px;" onchange="updateBrokerEngagement('${b.id}', this.value)"><option value="none" ${b.engagementStatus === 'none' ? 'selected' : ''}>None</option><option value="pending" ${b.engagementStatus === 'pending' ? 'selected' : ''}>Pending</option><option value="active" ${b.engagementStatus === 'active' ? 'selected' : ''}>Active</option></select></div></td>
-        <td><button class="btn btn-ghost btn-sm" onclick="setBrokerCommission('${b.id}')">Set Rate</button><button class="btn btn-ghost btn-sm btn-danger" onclick="deleteBroker('${b.id}')">Delete</button>${pendingRequests ? `<span class="badge badge-warning" style="margin-left:8px;">${pendingRequests} updates</span>` : ''}</div></td>
+        <td>
+          ${b.status === 'pending' ? `<button class="btn btn-success btn-sm" onclick="approveBroker('${b.id}')">Approve</button>` : ''}
+          <button class="btn btn-ghost btn-sm" onclick="setBrokerCommission('${b.id}')">Set Rate</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteBroker('${b.id}')">Delete</button>
+          ${pendingRequests ? `<span class="badge badge-warning" style="margin-left:8px;">${pendingRequests} updates</span>` : ''}
+         </div></td>
       </tr>`;
   }).join('');
   const requestsDiv = document.getElementById('brokerUpdateRequestsList');
@@ -2779,17 +2865,29 @@ window.rejectBrokerUpdate = async function(id) {
 function renderAdminDocumentsTable() {
   const tbody = document.getElementById('adminDocumentsTableBody');
   if(!tbody) return;
+  if(!documents.length) { tbody.innerHTML = '<td><td colspan="6" style="text-align:center;color:var(--gray-400);padding:24px;">No documents uploaded yet. </td>'; return; }
   tbody.innerHTML = documents.map(d => {
     const client = clients.find(c => c.id === d.clientId);
+    const project = projects.find(p => p.id === d.projectId);
     return `<tr>
-        <td><strong>${escapeHtml(client?.name || 'Unknown')}</strong></div></td>
-        <td>${escapeHtml(d.name)}</strong></div></td>
-        <td><span class="badge ${d.approved ? 'badge-success' : 'badge-warning'}">${d.approved ? 'Approved' : 'Pending'}</span></div></td>
-        <td>${d.date || '—'}</div></td>
-        <td><a href="${d.url}" target="_blank" class="btn btn-ghost btn-sm">View</a><button class="btn btn-ghost btn-sm btn-danger" onclick="deleteDoc('${d.id}')">Delete</button></div></td>
-      </tr>`;
+      <td><strong>${escapeHtml(client?.name || 'Unknown')}</strong><br><span class="data-label">${escapeHtml(client?.email || '')}</span></td>
+      <td>${escapeHtml(project?.name || '—')}</td>
+      <td>${escapeHtml(d.name)}</strong></td>
+      <td><span class="badge ${d.approved ? 'badge-success' : 'badge-warning'}">${d.approved ? 'Approved' : 'Pending Review'}</span></td>
+      <td>${d.date || '—'}</td>
+      <td>
+        <a href="${d.url}" target="_blank" class="btn btn-ghost btn-sm"><i class="fas fa-eye"></i> View</a>
+        <button class="btn btn-${d.approved ? 'warning' : 'success'} btn-sm" onclick="toggleDocumentApproval('${d.id}', ${d.approved})">${d.approved ? 'Revoke' : 'Approve'}</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteDoc('${d.id}')">Delete</button>
+       </div></td>
+    </tr>`;
   }).join('');
 }
+
+window.toggleDocumentApproval = async function(docId, currentStatus) {
+  await db.collection('documents').doc(docId).update({ approved: !currentStatus });
+  showToast(currentStatus ? 'Document approval revoked' : 'Document approved');
+};
 
 window.deleteDoc = async function(id) { if(confirm('Delete document?')) { await db.collection('documents').doc(id).delete(); showToast('Deleted'); } };
 window.setBrokerCommission = async function(id) { const rate = prompt('Commission %:'); if(rate && !isNaN(parseFloat(rate))) { await db.collection('brokers').doc(id).update({commissionRate: parseFloat(rate)}); showToast(`Rate set to ${rate}%`); } };
@@ -2900,10 +2998,10 @@ window.sendInboxReply = async function(id, type) {
 
 function renderAnalytics() {
   const activeProjects = projects.filter(p => p.status === 'active');
-  const pipelineCount = activeProjects.filter(p => (p.step || 1) < 8).length;
-  const fundedCount = activeProjects.filter(p => (p.step || 1) === 8).length;
+  const pipelineCount = activeProjects.filter(p => (p.step || 1) < 9).length;
+  const fundedCount = activeProjects.filter(p => (p.step || 1) === 9).length;
   let totalCapital = 0;
-  activeProjects.filter(p => (p.step || 1) === 8).forEach(p => { totalCapital += parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g, '')) || 0; });
+  activeProjects.filter(p => (p.step || 1) === 9).forEach(p => { totalCapital += parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g, '')) || 0; });
   const commission2pc = totalCapital * ADMIN_ONLY_COMMISSION_RATE;
   const avgFacility = activeProjects.length ? totalCapital / activeProjects.length : 0;
   const brokerProjects = projects.filter(p => p.brokerId && p.brokerId !== '');
@@ -2924,8 +3022,8 @@ function renderAnalytics() {
   `;
   animateStatValues();
   // Pipeline funnel
-  const stepCounts = [0,0,0,0,0,0,0,0];
-  projects.forEach(p => { const step = p.step || 1; if(step >=1 && step <=8) stepCounts[step-1]++; });
+  const stepCounts = [0,0,0,0,0,0,0,0,0];
+  projects.forEach(p => { const step = p.step || 1; if(step >=1 && step <=9) stepCounts[step-1]++; });
   let cumulative = 0;
   const funnelHtml = STEP_NAMES.slice(1).map((name, i) => {
     cumulative += stepCounts[i];
@@ -2941,7 +3039,7 @@ function renderAnalytics() {
   if(industryCtx) { if(industryChart) industryChart.destroy(); industryChart = new Chart(industryCtx, { type: 'bar', data: { labels: Object.keys(industryCounts), datasets: [{ label: 'Projects', data: Object.values(industryCounts), backgroundColor: '#2c5f8a', borderRadius: 4, barPercentage: 0.7 }] }, options: { responsive: true, maintainAspectRatio: true, scales: { y: { grid: { display: false } }, x: { grid: { display: false } } }, plugins: { legend: { display: false }, tooltip: { backgroundColor: 'white', titleColor: '#374151', bodyColor: '#6b7280', borderColor: '#e5e7eb', borderWidth: 0.5 } } } }); }
   // Pipeline stage chart
   const stageCtx = document.getElementById('pipelineStageChart')?.getContext('2d');
-  if(stageCtx) { if(pipelineStageChart) pipelineStageChart.destroy(); pipelineStageChart = new Chart(stageCtx, { type: 'doughnut', data: { labels: STEP_NAMES.slice(1), datasets: [{ data: stepCounts, backgroundColor: ['#06091a','#0c1126','#141c3a','#1c274a','#2c5f8a','#4a7c9e','#6b96b5','#8bb0cc'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: true, plugins: { tooltip: { backgroundColor: 'white', titleColor: '#374151', bodyColor: '#6b7280', borderColor: '#e5e7eb', borderWidth: 0.5 } } } }); }
+  if(stageCtx) { if(pipelineStageChart) pipelineStageChart.destroy(); pipelineStageChart = new Chart(stageCtx, { type: 'doughnut', data: { labels: STEP_NAMES.slice(1), datasets: [{ data: stepCounts, backgroundColor: ['#06091a','#0c1126','#141c3a','#1c274a','#2c5f8a','#4a7c9e','#6b96b5','#8bb0cc','#c9a96e'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: true, plugins: { tooltip: { backgroundColor: 'white', titleColor: '#374151', bodyColor: '#6b7280', borderColor: '#e5e7eb', borderWidth: 0.5 } } } }); }
   // Quarterly trend
   const quarters = {};
   projects.forEach(p => {
@@ -2950,14 +3048,14 @@ function renderAnalytics() {
       const quarter = `${date.getFullYear()}-Q${Math.floor(date.getMonth()/3)+1}`;
       if(!quarters[quarter]) quarters[quarter] = { entered: 0, funded: 0 };
       quarters[quarter].entered++;
-      if((p.step || 1) === 8) quarters[quarter].funded++;
+      if((p.step || 1) === 9) quarters[quarter].funded++;
     }
   });
   const last6Quarters = Object.keys(quarters).sort().slice(-6);
   const quarterlyCtx = document.getElementById('quarterlyTrendChart')?.getContext('2d');
   if(quarterlyCtx) { if(quarterlyChart) quarterlyChart.destroy(); quarterlyChart = new Chart(quarterlyCtx, { type: 'bar', data: { labels: last6Quarters, datasets: [{ label: 'Deals Entered', data: last6Quarters.map(q => quarters[q]?.entered || 0), backgroundColor: '#2c5f8a', borderRadius: 4 }, { label: 'Deals Funded', data: last6Quarters.map(q => quarters[q]?.funded || 0), backgroundColor: '#06091a', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: true, scales: { y: { grid: { display: false } }, x: { grid: { display: false } } }, plugins: { tooltip: { backgroundColor: 'white', titleColor: '#374151', bodyColor: '#6b7280', borderColor: '#e5e7eb', borderWidth: 0.5 } } } }); }
   // Commission table
-  const fundedProjects = projects.filter(p => (p.step || 1) === 8);
+  const fundedProjects = projects.filter(p => (p.step || 1) === 9);
   let totalCommission = 0;
   const commissionHtml = fundedProjects.map(p => {
     const client = clients.find(c => c.id === p.clientId);
@@ -3010,7 +3108,7 @@ function renderBrokerPerformance() {
     const submissions = brokerSubmissions.filter(s => s.brokerId === b.id);
     const brokerProjects = projects.filter(p => p.brokerId === b.id);
     const accepted = brokerProjects.filter(p => p.status === 'active');
-    const funded = brokerProjects.filter(p => p.step >= 8);
+    const funded = brokerProjects.filter(p => p.step >= 9);
     const conversion = submissions.length ? Math.round((accepted.length / submissions.length) * 100) : 0;
     const volume = brokerProjects.reduce((sum, p) => sum + (parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g,'')) || 0), 0);
     const commission = funded.reduce((sum, p) => sum + ((parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g,'')) || 0) * (b.commissionRate || 0) / 100), 0);
@@ -3146,27 +3244,79 @@ window.editProject = function(pid) {
 
 function renderStepDashboard(project) {
   if(!project) return '<div>No project data</div>';
-  let html = `<div class="card"><div class="card-header"><div class="card-title">Closing Process Dashboard</div></div><div class="card-body"><div style="margin-bottom:20px;"><div class="data-label">Overall Progress</div><div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${project.overallProgress || Math.round(((project.step||1)/8)*100)}%;height:8px;"></div></div></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;">`;
-  for(let i=1;i<=8;i++) {
+  let html = `<div class="card"><div class="card-header"><div class="card-title">Closing Process Dashboard</div></div><div class="card-body"><div style="margin-bottom:20px;"><div class="data-label">Overall Progress</div><div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${project.overallProgress || Math.round(((project.step||1)/9)*100)}%;height:8px;"></div></div></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;">`;
+  for(let i=1;i<=9;i++) {
     const isCompleted = project[`step${i}Completed`];
     const isCurrent = (project.step||1)===i;
-    html += `<div style="border:0.5px solid ${isCompleted?'var(--success)':isCurrent?'var(--blue)':'var(--gray-200)'};border-radius:8px;"><div style="padding:12px;background:${isCompleted?'var(--success)':isCurrent?'var(--navy)':'var(--gray-50)'};color:${(isCompleted||isCurrent)?'white':'var(--gray-600)'};">STEP ${i}: ${STEP_NAMES[i]}</div><div style="padding:12px;">${project[`step${i}CompletedAt`] ? `<div class="data-label">Completed: ${formatDate(project[`step${i}CompletedAt`])}</div>` : ''}<div style="margin-top:12px;display:flex;gap:8px;">${!isCompleted ? `<button class="btn btn-success btn-sm" onclick="markStepCompleted('${project.id}', ${i})">Mark Complete</button>` : ''}<button class="btn btn-ghost btn-sm" onclick="revertStepStatus('${project.id}', ${i})">${isCompleted?'Revert':'Skip'}</button></div></div></div>`;
+    let stepHtml = `<div style="border:0.5px solid ${isCompleted?'var(--success)':isCurrent?'var(--blue)':'var(--gray-200)'};border-radius:8px;"><div style="padding:12px;background:${isCompleted?'var(--success)':isCurrent?'var(--navy)':'var(--gray-50)'};color:${(isCompleted||isCurrent)?'white':'var(--gray-600)'};">STEP ${i}: ${STEP_NAMES[i]}</div><div style="padding:12px;">${project[`step${i}CompletedAt`] ? `<div class="data-label">Completed: ${formatDate(project[`step${i}CompletedAt`])}</div>` : ''}<div style="margin-top:12px;display:flex;gap:8px;">`;
+    if(i === 1 && !isCompleted) {
+      stepHtml += `<button class="btn btn-success btn-sm" onclick="approveMandateReview('${project.id}')">Approve Mandate</button>
+                   <button class="btn btn-danger btn-sm" onclick="rejectMandateReview('${project.id}')">Decline Mandate</button>`;
+    } else if(!isCompleted) {
+      stepHtml += `<button class="btn btn-success btn-sm" onclick="markStepCompleted('${project.id}', ${i})">Mark Complete</button>`;
+    }
+    stepHtml += `<button class="btn btn-ghost btn-sm" onclick="revertStepStatus('${project.id}', ${i})">${isCompleted?'Revert':'Skip'}</button></div></div></div>`;
+    html += stepHtml;
   }
   html += `</div></div></div>`;
   return html;
 }
 
+window.approveMandateReview = async function(projectId) {
+  if(!confirm('Approve this mandate and advance to Term Sheet stage?')) return;
+  await db.collection('projects').doc(projectId).update({
+    step1Completed: true, step1CompletedAt: new Date().toISOString(), step: 2,
+    overallProgress: Math.round((1/9)*100)
+  });
+  await logActivity('admin', 'Suzana Aleksić', 'croft', 'step_completed', projectId, 'Step 1: Mandate Review — Approved');
+  showToast('Mandate approved — advancing to Term Sheet');
+  const project = projects.find(p => p.id === projectId);
+  const client = clients.find(c => c.id === project?.clientId);
+  if(client) {
+    await sendEmailNotification({
+      to_name: client.name,
+      to_email: client.email,
+      from_name: 'Croft Finance',
+      subject: `Your project mandate has been approved — ${project?.name}`,
+      message: `Dear ${client.name},\n\nWe are pleased to inform you that following our initial review, Croft Finance has approved your mandate for ${project?.name}.\n\nYour deal is now advancing to Step 2: Term Sheet. Suzana will be in touch shortly to discuss next steps.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
+      project_name: project?.name || 'N/A'
+    });
+  }
+  renderAdminTables();
+  if(editProjectId === projectId) document.getElementById('stepStatusContainer').innerHTML = renderStepDashboard(projects.find(p=>p.id===projectId));
+};
+
+window.rejectMandateReview = async function(projectId) {
+  if(!confirm('Decline this mandate? The client will be notified.')) return;
+  await db.collection('projects').doc(projectId).update({ status: 'declined', declinedAt: new Date().toISOString() });
+  await logActivity('admin', 'Suzana Aleksić', 'croft', 'step_completed', projectId, 'Step 1: Mandate Review — Declined');
+  showToast('Mandate declined');
+  const project = projects.find(p => p.id === projectId);
+  const client = clients.find(c => c.id === project?.clientId);
+  if(client) {
+    await sendEmailNotification({
+      to_name: client.name,
+      to_email: client.email,
+      from_name: 'Croft Finance',
+      subject: `Update on your project application — ${project?.name}`,
+      message: `Dear ${client.name},\n\nThank you for submitting your project ${project?.name} to Croft Finance for consideration.\n\nAfter careful review, we regret that we are unable to proceed with this mandate at this time. This decision does not reflect the quality of your project but rather our current deployment criteria.\n\nWe encourage you to reapply in the future. If you would like feedback, please contact Suzana directly.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
+      project_name: project?.name || 'N/A'
+    });
+  }
+  renderAdminTables();
+};
+
 window.markStepCompleted = async function(projectId, stepNumber) {
   const project = projects.find(p => p.id === projectId);
   if(!project) return;
-  if(stepNumber===2) { showCommitmentFeeModal(projectId); return; }
-  if(stepNumber===6) { showECFEscrowModal(projectId); return; }
+  if(stepNumber===3) { showCommitmentFeeModal(projectId); return; }
+  if(stepNumber===7) { showECFEscrowModal(projectId); return; }
   if(!confirm(`Mark Step ${stepNumber} as complete?`)) return;
   const updateData = { [`step${stepNumber}Completed`]: true, [`step${stepNumber}CompletedAt`]: new Date().toISOString() };
   if(project.step === stepNumber) updateData.step = stepNumber + 1;
   let completedCount = 0;
   for(let i=1;i<=stepNumber;i++) if(i===stepNumber || project[`step${i}Completed`]) completedCount++;
-  updateData.overallProgress = Math.round((completedCount/8)*100);
+  updateData.overallProgress = Math.round((completedCount/9)*100);
   await db.collection('projects').doc(projectId).update(updateData);
   await logActivity('admin', 'Suzana Aleksić', 'croft', 'step_completed', projectId, `Step ${stepNumber}: ${STEP_NAMES[stepNumber]}`);
   showToast(`Step ${stepNumber} completed`);
@@ -3183,8 +3333,8 @@ window.revertStepStatus = async function(projectId, stepNumber) {
   if(isCompleted) { updateData[`step${stepNumber}Completed`] = false; updateData[`step${stepNumber}CompletedAt`] = null; if(project.step > stepNumber) updateData.step = stepNumber; }
   else { updateData[`step${stepNumber}Completed`] = true; updateData[`step${stepNumber}CompletedAt`] = new Date().toISOString(); if(project.step === stepNumber) updateData.step = stepNumber + 1; }
   let completedCount = 0;
-  for(let i=1;i<=8;i++) { if(i===stepNumber) { if(updateData[`step${stepNumber}Completed`]===true) completedCount++; else if(isCompleted && updateData[`step${stepNumber}Completed`]===false) {} else if(project[`step${i}Completed`]) completedCount++; } else if(project[`step${i}Completed`]) completedCount++; }
-  updateData.overallProgress = Math.round((completedCount/8)*100);
+  for(let i=1;i<=9;i++) { if(i===stepNumber) { if(updateData[`step${stepNumber}Completed`]===true) completedCount++; else if(isCompleted && updateData[`step${stepNumber}Completed`]===false) {} else if(project[`step${i}Completed`]) completedCount++; } else if(project[`step${i}Completed`]) completedCount++; }
+  updateData.overallProgress = Math.round((completedCount/9)*100);
   await db.collection('projects').doc(projectId).update(updateData);
   showToast(`Step ${stepNumber} updated`);
   renderAdminTables();
@@ -3217,7 +3367,7 @@ window.confirmCommitmentFee = async function(projectId) {
   await db.collection('projects').doc(projectId).update({
     commitmentFeeStatus:'paid', commitmentFeeAmount:amount, commitmentFeeReference:reference,
     commitmentFeeDate:document.getElementById('feeDate')?.value, commitmentFeeMethod:document.getElementById('feeMethod')?.value,
-    step2Completed:true, step2CompletedAt:new Date().toISOString(), step:3
+    step3Completed:true, step3CompletedAt:new Date().toISOString(), step:4
   });
   await logActivity('admin', 'Suzana Aleksić', 'croft', 'cf_confirmed', projectId, `Amount: $${amount}`);
   showToast(`Fee confirmed: $${amount}`);
@@ -3234,7 +3384,7 @@ window.confirmCommitmentFee = async function(projectId) {
       to_email: client.email,
       from_name: 'Croft Finance',
       subject: `Commitment Fee Confirmed for ${project?.name}`,
-      message: `Dear ${client.name},\n\nThe commitment fee for your project (${project?.name}) has been confirmed. Your deal is now advancing to Step 3: Deed of Undertaking.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
+      message: `Dear ${client.name},\n\nThe commitment fee for your project (${project?.name}) has been confirmed. Your deal is now advancing to Step 4: Deed of Undertaking.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
       project_name: project?.name || 'N/A'
     });
   }
@@ -3247,7 +3397,7 @@ window.confirmECFEscrow = async function(projectId) {
   await db.collection('projects').doc(projectId).update({
     ecfStatus:'escrowed', ecfAmount:amount, ecfInstitution:institution,
     ecfReference:document.getElementById('ecfReference')?.value, ecfEscrowDate:document.getElementById('ecfDate')?.value,
-    step6Completed:true, step6CompletedAt:new Date().toISOString(), step:7
+    step7Completed:true, step7CompletedAt:new Date().toISOString(), step:8
   });
   await logActivity('admin', 'Suzana Aleksić', 'croft', 'ecf_confirmed', projectId, `Amount: $${amount}`);
   showToast(`ECF escrow confirmed: $${amount}`);
@@ -3264,7 +3414,7 @@ window.confirmECFEscrow = async function(projectId) {
       to_email: client.email,
       from_name: 'Croft Finance',
       subject: `ECF Escrow Confirmed for ${project?.name}`,
-      message: `Dear ${client.name},\n\nThe ECF escrow for your project (${project?.name}) has been confirmed. Your deal is now advancing to Step 7: Transfer to Agent.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
+      message: `Dear ${client.name},\n\nThe ECF escrow for your project (${project?.name}) has been confirmed. Your deal is now advancing to Step 8: Transfer to Agent.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
       project_name: project?.name || 'N/A'
     });
   }
