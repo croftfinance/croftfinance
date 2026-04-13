@@ -1151,6 +1151,7 @@ body {
     <button class="btn btn-primary btn-md" onclick="login()" style="width:100%">Sign In</button>
     <div style="text-align:center;margin-top:8px;"><a href="#" onclick="showForgotPassword()" style="color:var(--gray-400);font-size:12px;">Forgot password?</a></div>
     <div style="text-align:center;margin-top:4px;"><a href="#" onclick="showRegisterForm()" style="color:var(--navy);font-size:12px;font-weight:500;">Request portal access →</a></div>
+    <div style="text-align:center;margin-top:4px;"><a href="#" onclick="showBrokerRegisterForm()" style="color:var(--navy);font-size:12px;font-weight:500;">Register as broker →</a></div>
     <div style="text-align:center;margin-top:8px;">
       <a href="#" onclick="showBrokerLoginForm()" style="color:var(--gray-400);font-size:12px;">Broker access</a> | 
       <a href="#" onclick="showAdminLogin()" style="color:var(--gray-400);font-size:12px;">Admin access</a>
@@ -1351,7 +1352,7 @@ body {
       <div id="admin-projects-admin" class="admin-tab"><div class="admin-page-title">Projects</div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Project</th><th>Industry</th><th>Funds Needed</th><th>Step</th><th>Broker</th><th>CF</th><th>ECF</th><th>Data Room</th><th>Actions</th></tr></thead><tbody id="adminProjectsTable"></tbody></table></div></div>
 
       <!-- Documents Tab -->
-      <div id="admin-documents-admin" class="admin-tab"><div class="admin-page-title">Documents</div><div class="table-wrap"><table class="documents-table"><thead><tr><th>Client</th><th>Project</th><th>Document</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="adminDocumentsTableBody"></tbody></table></div></div>
+      <div id="admin-documents-admin" class="admin-tab"><div class="admin-page-title">Documents</div><div style="margin-bottom:16px;"><button class="btn btn-primary btn-sm" onclick="showUploadDocumentModal()">+ Upload Document</button></div><div class="table-wrap"><table class="documents-table"><thead><tr><th>Client</th><th>Project</th><th>Document</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="adminDocumentsTableBody"></tbody></table></div></div>
 
       <!-- Brokers Tab -->
       <div id="admin-brokers" class="admin-tab"><div class="admin-page-title">Brokers</div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Broker</th><th>Firm</th><th>Commission</th><th>Submitted</th><th>Funded</th><th>Est. Commission</th><th>Status</th><th>Engagement</th><th>Actions</th></tr></thead><tbody id="adminBrokersTable"></tbody></table></div><div class="card" style="margin-top:20px;"><div class="card-header"><div class="card-title">Broker Update Requests</div></div><div class="card-body"><div id="brokerUpdateRequestsList"></div></div></div></div>
@@ -1392,7 +1393,7 @@ body {
       <div id="admin-inbox" class="admin-tab"><div class="admin-page-title">Inbox</div><div class="inbox-filter"><button class="filter-chip active" data-filter="all">All</button><button class="filter-chip" data-filter="client">Clients</button><button class="filter-chip" data-filter="broker">Brokers</button><button class="filter-chip" data-filter="unread">Unread</button></div><div id="inboxContainer"></div></div>
 
       <!-- Meetings Tab -->
-      <div id="admin-meetings" class="admin-tab"><div class="admin-page-title">Meeting Requests</div><div style="margin-bottom:16px;"><button class="btn btn-primary btn-sm" onclick="showScheduleMeetingModal()">+ Schedule Meeting</button></div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Date</th><th>Client</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead><tbody id="meetingsTableBody"></tbody></tr></div></div>
+      <div id="admin-meetings" class="admin-tab"><div class="admin-page-title">Meeting Requests</div><div style="margin-bottom:16px;"><button class="btn btn-primary btn-sm" onclick="showScheduleMeetingModal()">+ Schedule Meeting</button></div><div class="table-wrap"><table class="admin-table"><thead><tr><th>Date</th><th>Client</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead><tbody id="meetingsTableBody"></tbody></table></div></div>
 
       <!-- Settings Tab -->
       <div id="admin-settings" class="admin-tab"><div class="admin-page-title">Settings</div><div class="card"><div class="card-header"><div class="card-title">Deal Appetite</div></div><div class="card-body"><textarea id="dealAppetiteText" rows="4" class="form-textarea" placeholder="Describe current deal preferences, preferred industries, min/max facility size, geographic focus..."></textarea><button class="btn btn-primary btn-sm" onclick="saveDealAppetite()" style="margin-top:12px;">Save Deal Appetite</button></div></div><div class="card"><div class="card-header"><div class="card-title">Platform Announcement</div></div><div class="card-body"><textarea id="announcementText" rows="2" class="form-textarea" placeholder="Brief announcement shown to all users..."></textarea><button class="btn btn-primary btn-sm" onclick="saveAnnouncement()" style="margin-top:12px;">Publish Announcement</button></div></div><div class="card"><div class="card-header"><div class="card-title">Admin Profile</div></div><div class="card-body"><div class="form-grid-2"><div class="form-group"><label class="form-label">Display Name</label><input type="text" id="adminDisplayName" class="form-input"></div><div class="form-group"><label class="form-label">Title</label><input type="text" id="adminTitle" class="form-input"></div><div class="form-group"><label class="form-label">Email</label><input type="email" id="adminProfileEmail" class="form-input"></div><div class="form-group"><label class="form-label">Phone</label><input type="text" id="adminPhone" class="form-input"></div><div class="form-group"><label class="form-label">Availability Hours</label><input type="text" id="adminAvailability" class="form-input" placeholder="Mon–Fri, 9:00–18:00 CET"></div></div><button class="btn btn-primary btn-sm" onclick="saveAdminProfile()">Save Profile</button></div></div></div>
@@ -1434,7 +1435,7 @@ body {
           <div class="stat-card"><div class="data-label">Active Deals</div><div class="stat-value" id="brokerActiveDeals">0</div></div>
           <div class="stat-card commission-rate-card"><div class="data-label">Your Commission Rate</div><div class="stat-value" id="brokerCommRate">0%</div><div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:4px;">Per funded facility</div></div>
         </div>
-        <div class="card"><div class="card-header"><div class="card-title">Commission History</div></div><div class="card-body"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Project</th><th>Client</th><th>Funded Date</th><th>Facility Amount</th><th>Commission Rate</th><th>Commission Amount</th></tr></thead><tbody id="brokerCommissionHistory"></tbody></table></div></div></div>
+        <div class="card"><div class="card-header"><div class="card-title">Commission History</div></div><div class="card-body"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Project</th><th>Client</th><th>Funded Date</th><th>Facility Amount</th><th>Commission Rate</th><th>Commission Amount</th></tr></thead><tbody id="brokerCommissionHistory"></tbody></tr></div></div></div>
       </div>
 
       <!-- Submit Deal Tab (Extended Form) -->
@@ -1525,18 +1526,27 @@ body {
  * service cloud.firestore {
  *   match /databases/{database}/documents {
  *     match /admins/{uid} { allow read: if request.auth.uid == uid; }
- *     match /clients/{uid} { allow read, write: if request.auth.uid == uid || exists(/databases/$(database)/documents/admins/$(request.auth.uid)); }
+ *     match /clients/{uid} {
+ *       allow read, write: if request.auth.uid == uid
+ *         || exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+ *     }
  *     match /projects/{pid} { allow read, write: if request.auth != null; }
  *     match /documents/{did} { allow read, write: if request.auth != null; }
  *     match /messages/{mid} { allow read, write: if request.auth != null; }
  *     match /meetings/{mid} { allow read, write: if request.auth != null; }
- *     match /brokers/{uid} { allow read, write: if request.auth.uid == uid || exists(/databases/$(database)/documents/admins/$(request.auth.uid)); }
+ *     match /brokers/{uid} {
+ *       allow read, write: if request.auth.uid == uid
+ *         || exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+ *     }
  *     match /brokerSubmissions/{sid} { allow read, write: if request.auth != null; }
  *     match /brokerMessages/{mid} { allow read, write: if request.auth != null; }
  *     match /brokerUpdateRequests/{rid} { allow read, write: if request.auth != null; }
  *     match /activityLog/{lid} { allow read, write: if request.auth != null; }
- *     match /settings/{sid} { allow read: if request.auth != null; allow write: if exists(/databases/$(database)/documents/admins/$(request.auth.uid)); }
- *     match /contactRequests/{rid} { allow write: if true; }
+ *     match /settings/{sid} {
+ *       allow read: if request.auth != null;
+ *       allow write: if exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+ *     }
+ *     match /contactRequests/{rid} { allow create: if true; }
  *   }
  * }
  *
@@ -1546,7 +1556,9 @@ body {
  *   match /b/{bucket}/o {
  *     match /documents/{allPaths=**} {
  *       allow read: if request.auth != null;
- *       allow write: if request.auth != null && request.resource.size < 10 * 1024 * 1024;
+ *       allow write: if request.auth != null
+ *         && request.resource.size < 10 * 1024 * 1024
+ *         && request.resource.contentType == 'application/pdf';
  *     }
  *   }
  * }
@@ -1846,7 +1858,12 @@ function setupListeners() {
         const bDoc = await db.collection('brokers').doc(user.uid).get();
         if (bDoc.exists) {
           currentBroker = {id:user.uid, ...bDoc.data()};
-          if(currentBroker.status === 'pending') { showToast('Broker account under review.', true); return logout(); }
+          if(currentBroker.status === 'pending') {
+            showToast('Broker account under review. Please wait for approval.', true);
+            await auth.signOut();
+            showView('home');
+            return;
+          }
           if(currentBroker.engagementStatus !== 'active') {
             document.getElementById('broker-tab-portfolio').innerHTML = '<div class="card"><div class="card-body"><div class="action-banner warning"><i class="fas fa-file-contract"></i><div><strong>Introducer agreement pending</strong><br>Your introducer agreement is not yet on file. Detailed deal terms and commission figures will be visible once your engagement letter is received by Croft Finance. Please contact suzana.aleksic@croftfinance.com.</div></div></div></div>';
           }
@@ -1910,7 +1927,18 @@ window.doAdminLogin = async function() {
 window.requestPasswordReset = function() {
   const email = document.getElementById('forgotEmail').value.trim().toLowerCase(); 
   if(!email) return;
-  auth.sendPasswordResetEmail(email).then(() => { showToast('Password reset email sent.'); showLoginForm(); }).catch((e) => { showToast(e.message, true); });
+  const errEl = document.getElementById('forgotError');
+  errEl.style.display = 'none';
+  auth.sendPasswordResetEmail(email).then(() => {
+    errEl.style.color = 'var(--success)';
+    errEl.innerText = 'Password reset email sent! Please check your inbox.';
+    errEl.style.display = 'block';
+    setTimeout(() => showLoginForm(), 3000);
+  }).catch((e) => {
+    errEl.style.color = 'var(--error)';
+    errEl.innerText = e.message;
+    errEl.style.display = 'block';
+  });
 };
 window.register = async function() {
   const name = document.getElementById('regName').value.trim();
@@ -1953,7 +1981,11 @@ window.brokerRegister = async function() {
   try {
     const cred = await auth.createUserWithEmailAndPassword(email, pass);
     await db.collection('brokers').doc(cred.user.uid).set({ id:cred.user.uid, name, email, firm, commissionRate:0, status:'pending', engagementStatus:'none', createdAt: new Date().toISOString() });
-    showToast('Broker application submitted for approval.');
+    
+    // Show success message inside the modal before closing
+    const regContainer = document.getElementById('brokerRegisterForm');
+    regContainer.innerHTML = '<div style="text-align:center;padding:20px;"><i class="fas fa-check-circle" style="font-size:48px;color:var(--success);"></i><h3 style="margin-top:16px;">Application Submitted</h3><p>Your broker application has been received. You will receive an email once your account is approved.</p><button class="btn btn-primary btn-md" onclick="showLoginForm()">Back to Login</button></div>';
+    
     await sendEmailNotification({
       to_name: 'Croft Finance Team',
       to_email: EMAILJS_CONFIG.adminEmail,
@@ -1962,10 +1994,11 @@ window.brokerRegister = async function() {
       message: `New broker registration:\n\nName: ${name}\nFirm: ${firm}\nEmail: ${email}\n\nPlease review and approve this broker account in the admin portal.`,
       project_name: 'Broker Registration'
     });
-    logout();
+    
+    await auth.signOut();
   } catch(e) { showToast(e.message, true); }
 };
-window.showLoginForm = function() { document.getElementById('loginForm').style.display = 'block'; document.getElementById('brokerLoginForm').style.display = 'none'; document.getElementById('adminLoginForm').style.display = 'none'; document.getElementById('registerForm').style.display = 'none'; document.getElementById('forgotPasswordForm').style.display = 'none'; document.getElementById('brokerRegisterForm').style.display = 'none'; };
+window.showLoginForm = function() { document.getElementById('loginForm').style.display = 'block'; document.getElementById('brokerLoginForm').style.display = 'none'; document.getElementById('adminLoginForm').style.display = 'none'; document.getElementById('registerForm').style.display = 'none'; document.getElementById('forgotPasswordForm').style.display = 'none'; document.getElementById('brokerRegisterForm').style.display = 'block'; document.getElementById('brokerRegisterForm').innerHTML = document.getElementById('brokerRegisterForm').innerHTML; };
 window.showBrokerLoginForm = function() { document.getElementById('loginForm').style.display = 'none'; document.getElementById('brokerLoginForm').style.display = 'block'; document.getElementById('adminLoginForm').style.display = 'none'; document.getElementById('registerForm').style.display = 'none'; document.getElementById('forgotPasswordForm').style.display = 'none'; document.getElementById('brokerRegisterForm').style.display = 'none'; };
 window.showAdminLogin = function() { document.getElementById('loginForm').style.display = 'none'; document.getElementById('brokerLoginForm').style.display = 'none'; document.getElementById('adminLoginForm').style.display = 'block'; document.getElementById('registerForm').style.display = 'none'; document.getElementById('forgotPasswordForm').style.display = 'none'; document.getElementById('brokerRegisterForm').style.display = 'none'; };
 window.showRegisterForm = function() { document.getElementById('loginForm').style.display = 'none'; document.getElementById('brokerLoginForm').style.display = 'none'; document.getElementById('adminLoginForm').style.display = 'none'; document.getElementById('registerForm').style.display = 'block'; document.getElementById('forgotPasswordForm').style.display = 'none'; document.getElementById('brokerRegisterForm').style.display = 'none'; };
@@ -1989,6 +2022,12 @@ document.addEventListener('click', function(e) {
   if(adminBtn && adminBtn.closest('#view-admin')) { e.preventDefault(); switchAdminTab(adminBtn.dataset.adminTab); }
   const brokerBtn = e.target.closest('[data-broker-tab]');
   if(brokerBtn && brokerBtn.closest('#view-broker')) { e.preventDefault(); switchBrokerTab(brokerBtn.dataset.brokerTab); }
+  const chip = e.target.closest('.filter-chip');
+  if(chip && chip.closest('#admin-inbox')) {
+    document.querySelectorAll('#admin-inbox .filter-chip').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    renderInbox();
+  }
 });
 
 function switchPortalTab(tabName) {
@@ -2067,6 +2106,16 @@ function loadCurrentProjectData() {
   document.getElementById('progressPercentage').innerHTML = percent + '%';
   const circle = document.querySelector('.progress-circle-fill');
   if(circle) circle.style.strokeDashoffset = (2 * Math.PI * 45) - (percent/100)*(2 * Math.PI * 45);
+  document.getElementById('stepNumber').innerHTML = `Step ${step} of 9`;
+  document.getElementById('stepName').innerHTML = STEP_NAMES[step];
+  document.getElementById('welcomeTitle').innerHTML = `Welcome back, ${currentClient.name.split(' ')[0]}.`;
+  const d = new Date(); document.getElementById('dashboardDate').innerHTML = d.toLocaleDateString('en-GB', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  if(p.closeDate) {
+    const days = Math.ceil((new Date(p.closeDate)-new Date())/(1000*60*60*24));
+    document.getElementById('daysRemainingDisplay').innerHTML = days;
+    document.getElementById('closingDateDisplay').innerHTML = formatDate(p.closeDate);
+    document.getElementById('nextActionText').innerHTML = STEP_CONFIG[step]?.clientAction || '—';
+  }
   const bannerDiv = document.getElementById('actionBannerDisplay');
   if(step === 1) {
     document.getElementById('actionBannerDisplay').innerHTML = `<div class="action-banner" style="background:var(--navy);border:none;color:white;"><i class="fas fa-search" style="color:#c9a96e;"></i><div><strong style="color:#c9a96e;">Mandate Under Review</strong><br><span style="opacity:0.8;">Croft Finance is evaluating your project. You will be notified within 5 business days.</span></div></div>`;
@@ -2580,6 +2629,23 @@ window.approveClient = async function(id) {
   }
 };
 
+window.declineClient = async function(id) {
+  if(!confirm('Decline this client registration? They will be notified.')) return;
+  await db.collection('clients').doc(id).update({ status: 'declined' });
+  const client = clients.find(c => c.id === id);
+  if(client) {
+    await sendEmailNotification({
+      to_name: client.name,
+      to_email: client.email,
+      from_name: 'Croft Finance',
+      subject: `Update on your Croft Finance application`,
+      message: `Dear ${client.name},\n\nThank you for your interest in Croft Finance. After reviewing your registration, we regret to inform you that we cannot approve your portal access at this time.\n\nIf you have any questions, please contact us directly.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
+      project_name: 'Client Registration'
+    });
+  }
+  showToast('Client registration declined');
+};
+
 window.approveBroker = async function(id) {
   await db.collection('brokers').doc(id).update({ status: 'active' });
   showToast('Broker approved and activated');
@@ -2596,8 +2662,33 @@ window.approveBroker = async function(id) {
   }
 };
 
+window.declineBroker = async function(id) {
+  if(!confirm('Decline this broker registration? They will be notified.')) return;
+  await db.collection('brokers').doc(id).update({ status: 'declined' });
+  const broker = brokers.find(b => b.id === id);
+  if(broker) {
+    await sendEmailNotification({
+      to_name: broker.name,
+      to_email: broker.email,
+      from_name: 'Croft Finance',
+      subject: `Update on your Croft Finance broker application`,
+      message: `Dear ${broker.name},\n\nThank you for your interest in becoming a Croft Finance broker partner. After reviewing your application, we regret to inform you that we cannot approve your registration at this time.\n\nIf you have any questions, please contact us directly.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
+      project_name: 'Broker Registration'
+    });
+  }
+  showToast('Broker registration declined');
+};
+
 window.saveClientNote = async function(clientId, note) {
   await db.collection('clients').doc(clientId).update({ adminNote: note });
+};
+
+window.showUploadDocumentModal = function() {
+  const sel = document.getElementById('uploadClientId');
+  sel.innerHTML = '<option value="">Select Client</option>' + clients.filter(c=>c.status==='active').map(c=>`<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+  sel.onchange = () => updateProjectSelectForUpload(sel.value);
+  document.getElementById('uploadProjectId').innerHTML = '<option value="">Select Project</option>';
+  openModal('uploadDocumentModal');
 };
 
 function renderDealHealthSummary() {
@@ -2637,13 +2728,13 @@ function renderAdminTables() {
         <td><strong>${escapeHtml(c.name)}</strong></td>
         <td>${escapeHtml(c.email)}</div></td>
         <td>${projectCount}</div></td>
-        <td><span class="badge ${c.status === 'active' ? 'badge-success' : 'badge-warning'}">${c.status}</span></td>
+        <td><span class="badge ${c.status === 'active' ? 'badge-success' : (c.status === 'pending' ? 'badge-warning' : 'badge-danger')}">${c.status}</span></td>
         <td><input type="text" class="form-input" style="font-size:11px;padding:4px 8px;" placeholder="Add note..." value="${escapeHtml(c.adminNote || '')}" onblur="saveClientNote('${c.id}', this.value)"></td>
         <td>${c.createdAt ? c.createdAt.split('T')[0] : '—'}</div></td>
         <td>
-          ${c.status === 'pending' ? `<button class="btn btn-ghost btn-sm" onclick="approveClient('${c.id}')">Approve</button>` : ''}
+          ${c.status === 'pending' ? `<button class="btn btn-success btn-sm" onclick="approveClient('${c.id}')">Approve</button><button class="btn btn-danger btn-sm" onclick="declineClient('${c.id}')">Decline</button>` : ''}
           <button class="btn btn-ghost btn-sm" onclick="editClientProject('${c.id}')">Edit</button>
-          <button class="btn btn-ghost btn-sm" onclick="deleteClient('${c.id}')">Delete</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteClient('${c.id}')">Delete</button>
          </div></td>
       </tr>`;
     }).join('');
@@ -2663,7 +2754,11 @@ function renderAdminTables() {
         <td><span class="badge ${p.commitmentFeeStatus === 'paid' ? 'badge-success' : 'badge-warning'}">${p.commitmentFeeStatus === 'paid' ? 'Paid' : 'Pending'}</span></div></td>
         <td><span class="badge ${p.ecfStatus === 'escrowed' ? 'badge-success' : 'badge-warning'}">${p.ecfStatus === 'escrowed' ? 'Escrowed' : 'Pending'}</span></div></td>
         <td>${p.dataRoomLink ? `<a href="${escapeHtml(p.dataRoomLink)}" target="_blank" class="btn btn-ghost btn-sm" style="font-size:10px;"><i class="fas fa-external-link-alt"></i> Open</a>` : '—'}</div></td>
-        <td><button class="btn btn-ghost btn-sm" onclick="editProject('${p.id}')">Edit</button><button class="btn btn-ghost btn-sm btn-danger" onclick="deleteProject('${p.id}')">Delete</button></div></td>
+        <td>
+          <button class="btn btn-ghost btn-sm" onclick="editProject('${p.id}')">Edit</button>
+          <button class="btn btn-success btn-sm" onclick="markStepCompletedQuick('${p.id}', ${p.step})">Confirm Step</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteProject('${p.id}')">Delete</button>
+         </div></td>
       </tr>`;
     }).join('');
   }
@@ -2678,6 +2773,13 @@ function renderAdminTables() {
   const el3 = document.getElementById('pendingReviewCount');
   if(el3) el3.innerHTML = projects.filter(p => (p.step||1) === 1 && p.status === 'active').length;
 }
+
+window.markStepCompletedQuick = async function(projectId, currentStep) {
+  if(currentStep === 3) { showCommitmentFeeModal(projectId); return; }
+  if(currentStep === 7) { showECFEscrowModal(projectId); return; }
+  if(!confirm(`Mark Step ${currentStep} (${STEP_NAMES[currentStep]}) as complete?`)) return;
+  await markStepCompleted(projectId, currentStep);
+};
 
 function editClientProject(clientId) { const p = projects.find(x => x.clientId === clientId); if(p) editProject(p.id); else showToast('No project found', true); }
 
@@ -2778,10 +2880,10 @@ function renderBrokerAdminTable() {
         <td>${submissions.length}</div></td>
         <td>${fundedProjects.length}</div></td>
         <td>${formatCurrency(estCommission)}</div></td>
-        <td><span class="badge ${b.status === 'active' ? 'badge-success' : 'badge-warning'}">${b.status}</span></div></td>
+        <td><span class="badge ${b.status === 'active' ? 'badge-success' : (b.status === 'pending' ? 'badge-warning' : 'badge-danger')}">${b.status}</span></div></td>
         <td><select class="form-select" style="width:100px;" onchange="updateBrokerEngagement('${b.id}', this.value)"><option value="none" ${b.engagementStatus === 'none' ? 'selected' : ''}>None</option><option value="pending" ${b.engagementStatus === 'pending' ? 'selected' : ''}>Pending</option><option value="active" ${b.engagementStatus === 'active' ? 'selected' : ''}>Active</option></select></div></td>
         <td>
-          ${b.status === 'pending' ? `<button class="btn btn-success btn-sm" onclick="approveBroker('${b.id}')">Approve</button>` : ''}
+          ${b.status === 'pending' ? `<button class="btn btn-success btn-sm" onclick="approveBroker('${b.id}')">Approve</button><button class="btn btn-danger btn-sm" onclick="declineBroker('${b.id}')">Decline</button>` : ''}
           <button class="btn btn-ghost btn-sm" onclick="setBrokerCommission('${b.id}')">Set Rate</button>
           <button class="btn btn-danger btn-sm" onclick="deleteBroker('${b.id}')">Delete</button>
           ${pendingRequests ? `<span class="badge badge-warning" style="margin-left:8px;">${pendingRequests} updates</span>` : ''}
@@ -2865,7 +2967,7 @@ window.rejectBrokerUpdate = async function(id) {
 function renderAdminDocumentsTable() {
   const tbody = document.getElementById('adminDocumentsTableBody');
   if(!tbody) return;
-  if(!documents.length) { tbody.innerHTML = '<td><td colspan="6" style="text-align:center;color:var(--gray-400);padding:24px;">No documents uploaded yet. </td>'; return; }
+  if(!documents.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--gray-400);padding:24px;">No documents uploaded yet. </tr>'; return; }
   tbody.innerHTML = documents.map(d => {
     const client = clients.find(c => c.id === d.clientId);
     const project = projects.find(p => p.id === d.projectId);
@@ -2930,7 +3032,7 @@ window.createMeeting = async function() {
 function renderInbox() {
   const container = document.getElementById('inboxContainer');
   if(!container) return;
-  const activeFilter = document.querySelector('.filter-chip.active')?.dataset.filter || 'all';
+  const activeFilter = document.querySelector('#admin-inbox .filter-chip.active')?.dataset.filter || 'all';
   const clientThreads = {};
   messages.forEach(m => { if(!clientThreads[m.clientId]) clientThreads[m.clientId] = []; clientThreads[m.clientId].push(m); });
   const brokerThreads = {};
@@ -3492,7 +3594,6 @@ window.deleteClient = async function(id) {
   showToast('Client and all associated data deleted');
 };
 
-window.showUploadDocumentModal = function() { openModal('uploadDocumentModal'); };
 window.updateProjectSelectForUpload = function(clientId) {
   const projectSelect = document.getElementById('uploadProjectId');
   if(!projectSelect) return;
