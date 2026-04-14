@@ -2080,14 +2080,27 @@ function escapeHtml(str) {
 
 function showToast(msg, isError = false) {
   if (!msg) return;
-  const t = document.createElement('div');
+  // Remove existing toasts
+  var existingToasts = document.querySelectorAll('.toast');
+  for (var i = 0; i < existingToasts.length; i++) {
+    existingToasts[i].remove();
+  }
+  
+  var t = document.createElement('div');
   t.className = 'toast';
-  t.style.background = isError ? 'var(--error)' : 'var(--navy)';
+  t.style.background = isError ? '#b91c1c' : '#06091a';
   t.style.position = 'fixed';
   t.style.bottom = '24px';
   t.style.right = '24px';
+  t.style.padding = '12px 20px';
+  t.style.borderRadius = '8px';
+  t.style.color = 'white';
+  t.style.fontSize = '13px';
   t.style.zIndex = '9999';
-  t.innerHTML = `<span>${escapeHtml(msg)}</span><button onclick="this.parentElement.remove()">×</button>`;
+  t.style.display = 'flex';
+  t.style.alignItems = 'center';
+  t.style.gap = '12px';
+  t.innerHTML = '<span>' + escapeHtml(msg) + '</span><button style="background:rgba(255,255,255,0.2);border:none;color:white;cursor:pointer;width:20px;height:20px;border-radius:4px;" onclick="this.parentElement.remove()">×</button>';
   document.body.appendChild(t);
   setTimeout(function() { if(t && t.remove) t.remove(); }, 3500);
 }
@@ -2131,41 +2144,70 @@ function animateNumber(element, target, isCurrency = false, duration = 800) {
 // ============================================================
 async function initFirebase() {
   try {
-    if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    if (!firebase.apps.length) {
+      firebase.initializeApp(FIREBASE_CONFIG);
+    }
     db = firebase.firestore();
     auth = firebase.auth();
     storage = firebase.storage();
-    console.log('Firebase initialized successfully');
+    console.log('Firebase initialized');
   } catch(e) {
     console.error('Firebase init error:', e);
     showToast('Failed to connect. Please refresh.', true);
     return;
   }
   
-  emailjs.init(EMAILJS_CONFIG.publicKey).catch(function(e) {
-    console.warn('EmailJS init error:', e);
-  });
+  // EmailJS - safely initialize
+  if (typeof emailjs !== 'undefined' && emailjs.init) {
+    try {
+      emailjs.init(EMAILJS_CONFIG.publicKey);
+    } catch(e) {
+      console.warn('EmailJS not available:', e);
+    }
+  } else {
+    console.warn('EmailJS not loaded');
+  }
   
-  emailjs.init(EMAILJS_CONFIG.publicKey);
-  
+  // Session ID
   if(!sessionStorage.getItem('croftSessionId')) {
-    sessionStorage.setItem('croftSessionId', crypto.randomUUID());
+    sessionStorage.setItem('croftSessionId', crypto.randomUUID ? crypto.randomUUID() : Date.now().toString());
   }
   
   setupListeners();
+  
   const overlay = document.getElementById('loadingOverlay');
-  if(overlay) { overlay.style.opacity = '0'; setTimeout(() => overlay.style.display = 'none', 400); }
+  if(overlay) { 
+    overlay.style.opacity = '0'; 
+    setTimeout(function() { 
+      if(overlay) overlay.style.display = 'none'; 
+    }, 400); 
+  }
   
-  window.addEventListener('scroll', () => { const nav = document.getElementById('homeNav'); if(nav) nav.classList.toggle('scrolled', window.scrollY > 20); });
-  document.addEventListener('keydown', (e) => { if(e.key === 'Escape') document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active')); });
+  // Activity tracking
+  window.addEventListener('scroll', function() { 
+    const nav = document.getElementById('homeNav'); 
+    if(nav) nav.classList.toggle('scrolled', window.scrollY > 20); 
+  });
   
-  ['mousemove','keypress','click','scroll','touchstart'].forEach(evt =>
-    document.addEventListener(evt, () => {
-      lastActivity = Date.now();
-      sessionWarningShown = false;
-    })
-  );
-  setInterval(() => {
+  document.addEventListener('keydown', function(e) { 
+    if(e.key === 'Escape') {
+      document.querySelectorAll('.modal-overlay.active').forEach(function(m) { 
+        m.classList.remove('active'); 
+      });
+    }
+  });
+  
+  // Reset inactivity timer
+  function resetInactivity() {
+    lastActivity = Date.now();
+    sessionWarningShown = false;
+  }
+  
+  ['mousemove','keypress','click','scroll','touchstart'].forEach(function(evt) {
+    document.addEventListener(evt, resetInactivity);
+  });
+  
+  setInterval(function() {
     const idle = Date.now() - lastActivity;
     if (idle > 25 * 60 * 1000 && !sessionWarningShown) {
       sessionWarningShown = true;
@@ -2181,8 +2223,8 @@ async function initFirebase() {
   setInterval(updateAdvisorAvailability, 60000);
   
   // Load webhooks and custom fields
-  loadWebhooks();
-  loadCustomFields();
+  if (typeof loadWebhooks === 'function') loadWebhooks();
+  if (typeof loadCustomFields === 'function') loadCustomFields();
   
   // Client search debounced listener
   const clientSearchEl = document.getElementById('clientSearch');
@@ -2191,27 +2233,26 @@ async function initFirebase() {
       const term = this.value.toLowerCase();
       const tbody = document.getElementById('adminClientsTable');
       if(!tbody) return;
-      const filtered = clients.filter(c =>
-        c.name.toLowerCase().includes(term) ||
-        (c.email || '').toLowerCase().includes(term)
-      );
-      const newRowsHtml = filtered.map(c => {
-        const projectCount = projects.filter(p => p.clientId === c.id).length;
+      const filtered = clients.filter(function(c) {
+        return c.name.toLowerCase().includes(term) || (c.email || '').toLowerCase().includes(term);
+      });
+      const newRowsHtml = filtered.map(function(c) {
+        const projectCount = projects.filter(function(p) { return p.clientId === c.id; }).length;
         return `<tr>
           <td><strong>${escapeHtml(c.name)}</strong></td>
-          <td>${escapeHtml(c.email)}</div></td>
-          <td>${projectCount}</div></td>
+          <td>${escapeHtml(c.email)}</td>
+          <td>${projectCount}</td>
           <td><span class="badge ${c.status === 'active' ? 'badge-success' : (c.status === 'pending' ? 'badge-warning' : 'badge-danger')}">${c.status}</span></td>
           <td><input type="text" class="form-input" style="font-size:11px;padding:4px 8px;" placeholder="Add note..." value="${escapeHtml(c.adminNote || '')}" onblur="saveClientNote('${c.id}', this.value)"></td>
-          <td>${c.createdAt ? c.createdAt.split('T')[0] : '—'}</div></td>
+          <td>${c.createdAt ? c.createdAt.split('T')[0] : '—'}</td>
           <td>
             ${c.status === 'pending' ? `<button class="btn btn-success btn-sm" onclick="approveClient('${c.id}')">Approve</button><button class="btn btn-danger btn-sm" onclick="declineClient('${c.id}')">Decline</button>` : ''}
             <button class="btn btn-ghost btn-sm" onclick="editClientProject('${c.id}')">Edit</button>
             <button class="btn btn-danger btn-sm" onclick="deleteClient('${c.id}')">Delete</button>
-          </div></td>
+          </td>
         </tr>`;
       }).join('');
-      patchTable('adminClientsTable', newRowsHtml);
+      if (tbody) tbody.innerHTML = newRowsHtml;
     }, 250));
   }
 }
