@@ -1174,6 +1174,7 @@ body {
       </div>
     </aside>
     <main class="main-content">
+      <div id="loadingSpinner" style="display:none; text-align:center; padding:40px;"><div class="spinner"></div><p>Loading...</p></div>
       <div id="tab-dashboard" class="portal-tab active">
         <div id="expiryBannersContainer"></div>
         <div id="adminNoteDisplay"></div>
@@ -1216,6 +1217,7 @@ body {
         </div>
         <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-chart-pie"></i> Capital Stack</div></div><div class="card-body"><canvas id="capitalStackChart" height="300" style="max-height:300px;"></canvas></div></div>
         <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-clock"></i> Recent Activity</div></div><div class="card-body"><div id="recentActivity"><p class="data-label" style="text-align:center;">No recent activity.</p></div></div></div>
+        <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-chart-simple"></i> Deal Milestones</div></div><div class="card-body"><div id="milestoneProgress"></div></div></div>
         <div class="advisor-card"><div class="advisor-header"><div class="advisor-avatar">SA</div><div class="advisor-info"><h4>Suzana Aleksić</h4><p>Principal, Croft Finance</p></div></div><div class="advisor-details"><div class="advisor-detail"><div class="advisor-detail-label">Availability</div><div class="advisor-detail-value">Mon–Fri, 9:00–18:00 CET</div></div><div class="advisor-detail"><div class="advisor-detail-label">Response Time</div><div class="advisor-detail-value">Typically within 4 hours</div></div></div><div class="advisor-note" id="advisorNote">Looking forward to helping you close your deal successfully.</div><div class="advisor-actions"><div class="advisor-btn" onclick="switchPortalTab('messages')">Send Message</div><div class="advisor-btn" onclick="switchPortalTab('schedule')">Schedule Call</div></div></div>
       </div>
       <div id="tab-process" class="portal-tab"><div class="client-page-title">Closing Process</div><div id="stepAccordionContainer"></div></div>
@@ -1241,6 +1243,7 @@ body {
       </div>
       <div id="tab-projects" class="portal-tab"><div class="client-page-title">Deal Sheet</div><div style="text-align:right;margin-bottom:16px;"><button class="btn btn-secondary btn-sm" onclick="printDealSummary()"><i class="fas fa-print"></i> Print Deal Summary</button></div><div id="projectsList"></div></div>
       <div id="tab-activity" class="portal-tab"><div class="client-page-title">Activity Log</div><div class="card"><div class="card-body"><div class="activity-timeline" id="activityTimeline"></div></div></div></div>
+      <div id="recentActivityContainer" style="display:none;"></div>
     </main>
   </div>
 </div>
@@ -1256,6 +1259,7 @@ body {
         <button class="btn-sm btn-sm-outline" id="adminNotificationBell" onclick="toggleAdminNotificationDropdown()"><i class="fas fa-bell"></i><span id="adminNotificationBadge" style="position:absolute;top:-5px;right:-5px;background:var(--error);color:white;border-radius:10px;padding:0 5px;font-size:9px;display:none;">0</span></button>
         <div id="adminNotificationDropdown" class="notification-center"><div class="notification-header"><h4>Notifications</h4><button onclick="closeAdminNotificationDropdown()">×</button></div><div class="notification-list" id="adminNotificationList"></div></div>
       </div>
+      <div id="notificationBadge" style="position:relative; display:none;"><span class="notification-count" id="notificationCount">0</span></div>
       <button class="btn-sm btn-sm-ghost" onclick="logout()">Sign Out</button>
     </div>
   </nav>
@@ -1281,6 +1285,7 @@ body {
       </div>
     </aside>
     <main class="main-content">
+      <div id="loadingSpinner" style="display:none; text-align:center; padding:40px;"><div class="spinner"></div><p>Loading...</p></div>
       <div id="admin-overview" class="admin-tab active">
         <div class="admin-page-title" id="adminGreeting">Deal Pipeline</div>
         <div class="stats-grid">
@@ -1296,6 +1301,7 @@ body {
         <div class="view-toggle"><button class="view-toggle-btn active" onclick="setPipelineView('board')">Board</button><button class="view-toggle-btn" onclick="setPipelineView('list')">List</button></div>
         <div id="pipelineBoard" class="pipeline-board"></div>
         <div id="pipelineList" style="display:none;"></div>
+        <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-chart-line"></i> Pipeline Chart</div></div><div class="card-body"><canvas id="pipelineChart" height="200" style="max-height:200px;"></canvas></div></div>
       </div>
       <div id="admin-analytics" class="admin-tab">
         <div class="admin-page-title">Analytics</div>
@@ -1325,8 +1331,31 @@ body {
       </div>
       <div id="admin-brokers" class="admin-tab">
         <div class="admin-page-title">Brokers</div>
-        <div class="table-wrap"><table class="admin-table"><thead><tr><th>Broker</th><th>Firm</th><th>Commission</th><th>Submitted</th><th>Funded</th><th>Est. Commission</th><th>Status</th><th>Engagement</th><th>Actions</th></tr></thead><tbody id="adminBrokersTable"></tbody></table></div>
-        <div class="card" style="margin-top:20px;"><div class="card-header"><div class="card-title">Broker Update Requests</div></div><div class="card-body"><div id="brokerUpdateRequestsList"></div></div></div>
+        <div class="table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr><th>Broker</th><th>Firm</th><th>Commission</th><th>Submitted</th><th>Funded</th><th>Est. Commission</th><th>Status</th><th>Engagement</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="adminBrokersTable"></tbody>
+          </table>
+        </div>
+        <div class="card" style="margin-top:20px;">
+          <div class="card-header"><div class="card-title">Broker Performance</div></div>
+          <div class="card-body">
+            <div class="table-wrap">
+              <table class="admin-table" id="brokerPerformanceTableDetails">
+                <thead>
+                  <tr><th>Broker</th><th>Submissions</th><th>Accepted</th><th>Funded</th><th>Conversion %</th><th>Total Volume</th><th>Est. Commission</th></tr>
+                </thead>
+                <tbody id="brokerPerformanceTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Broker Update Requests</div></div>
+          <div class="card-body"><div id="brokerUpdateRequestsList"></div></div>
+        </div>
       </div>
       <div id="admin-submissions" class="admin-tab">
         <div class="admin-page-title">Deal Submissions</div>
@@ -1376,6 +1405,7 @@ body {
       </div>
     </aside>
     <main class="main-content">
+      <div id="loadingSpinner" style="display:none; text-align:center; padding:40px;"><div class="spinner"></div><p>Loading...</p></div>
       <div id="broker-tab-dashboard" class="portal-tab active">
         <div class="admin-page-title" id="brokerDashGreeting">Welcome.</div>
         <div id="dealAppetiteCard" class="card"><div class="card-header"><div class="card-title">Current Deal Focus</div></div><div class="card-body" id="dealAppetiteContent">Loading...</div></div>
@@ -1385,7 +1415,8 @@ body {
           <div class="stat-card"><div class="data-label">Active Deals</div><div class="stat-value" id="brokerActiveDeals">0</div></div>
           <div class="stat-card commission-rate-card"><div class="data-label">Your Commission Rate</div><div class="stat-value" id="brokerCommRate">0%</div><div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:4px;">Per funded facility</div></div>
         </div>
-        <div class="card"><div class="card-header"><div class="card-title">Commission History</div></div><div class="card-body"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Project</th><th>Client</th><th>Funded Date</th><th>Facility Amount</th><th>Commission Rate</th><th>Commission Amount</th></tr></thead><tbody id="brokerCommissionHistory"></tbody></table></div></div></div>
+        <div class="card"><div class="card-header"><div class="card-title">Commission History</div></div><div class="card-body"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Project</th><th>Client</th><th>Funded Date</th><th>Facility Amount</th><th>Commission Rate</th><th>Commission Amount</th></tr></thead><tbody id="brokerCommissionHistory"></tbody><tr></div></div></div>
+        <div class="card"><div class="card-header"><div class="card-title">Recent Activity</div></div><div class="card-body"><div id="brokerActivityFeed"><p class="data-label" style="text-align:center;">No recent activity</p></div></div></div>
       </div>
       <div id="broker-tab-submit-deal" class="portal-tab">
         <div class="admin-page-title">Submit a Deal</div>
@@ -1420,6 +1451,7 @@ body {
       </div>
       <div id="broker-tab-portfolio" class="portal-tab"><div class="admin-page-title">Client Progress</div><div id="brokerPortfolioContainer"></div></div>
       <div id="broker-tab-messages" class="portal-tab"><div class="admin-page-title">Messages</div><div class="card"><div class="card-body"><div class="messages-container"><div class="messages-list" id="brokerMessagesList"></div><div class="message-input"><input type="text" id="brokerMessageInput" placeholder="Write a message..." onkeypress="if(event.key==='Enter')sendBrokerMessage()"><button class="btn btn-primary btn-sm" onclick="sendBrokerMessage()">Send</button></div></div></div></div></div>
+      <div id="brokerDashboardExtra" style="display:none;"></div>
     </main>
   </div>
 </div>
@@ -1437,6 +1469,7 @@ body {
 <div id="termsModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Confidentiality & Portal Access Terms</h3><button class="modal-close" onclick="closeModal('termsModal')">✕</button></div><div class="modal-body" style="font-size:13px;line-height:1.8;color:var(--gray-700);"><p><strong>1. Confidentiality.</strong> All information shared through this portal is strictly confidential. You agree not to disclose any information to third parties without the prior written consent of Croft Finance.</p><p style="margin-top:12px;"><strong>2. Permitted Use.</strong> Access is granted solely for the purpose of managing your financing mandate with Croft Finance.</p><p style="margin-top:12px;"><strong>3. Investor Confidentiality.</strong> The identity of Croft Finance's capital partners is not disclosed as a condition of their participation.</p><p style="margin-top:12px;"><strong>4. Governing Law.</strong> These terms are governed by the laws of the Republic of Serbia.</p><p style="margin-top:12px;"><strong>5. Acceptance.</strong> By registering for portal access, you confirm that you have read, understood, and agree to be bound by these terms.</p></div></div></div>
 <div id="commitmentFeeModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Confirm Commitment Fee</h3><button class="modal-close" onclick="closeModal('commitmentFeeModal')">✕</button></div><div class="modal-body"><div class="form-group"><label class="form-label">Amount (USD)</label><input type="text" id="feeAmount" class="form-input"></div><div class="form-group"><label class="form-label">Reference</label><input type="text" id="feeReference" class="form-input"></div><div class="form-group"><label class="form-label">Date</label><input type="date" id="feeDate" class="form-input"></div><div class="form-group"><label class="form-label">Method</label><select id="feeMethod" class="form-select"><option>Wire</option><option>SWIFT</option></select></div><button class="btn btn-primary btn-md" id="feeConfirmBtn" style="width:100%">Confirm</button></div></div></div>
 <div id="ecfEscrowModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Confirm ECF Escrow</h3><button class="modal-close" onclick="closeModal('ecfEscrowModal')">✕</button></div><div class="modal-body"><div class="form-group"><label class="form-label">ECF Amount (USD)</label><input type="text" id="ecfAmount" class="form-input"></div><div class="form-group"><label class="form-label">Institution</label><input type="text" id="ecfInstitution" class="form-input"></div><div class="form-group"><label class="form-label">Reference</label><input type="text" id="ecfReference" class="form-input"></div><div class="form-group"><label class="form-label">Date</label><input type="date" id="ecfDate" class="form-input"></div><button class="btn btn-primary btn-md" id="ecfConfirmBtn" style="width:100%">Confirm</button></div></div></div>
+<div id="tooltip" style="position:fixed; display:none; background:var(--navy); color:white; padding:4px 8px; border-radius:4px; font-size:11px; z-index:10000;"></div>
 
 <script>
 // ============================================================
@@ -3184,7 +3217,7 @@ function renderAnalytics() {
       </tr>`;
   }).join('');
   
-  const emptyCommissionHtml = '<td><td colspan="9" style="text-align:center;padding:24px;color:var(--gray-400);">No funded projects yet. </td>';
+  const emptyCommissionHtml = '<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--gray-400);">No funded projects yet. </td>';
   document.getElementById('commissionTableBody').innerHTML = commissionHtml || emptyCommissionHtml;
   
   const totalAmount = fundedProjects.reduce((s,p)=> s + (parseFloat(String(p.amount||'0').replace(/[^0-9.-]/g,''))||0),0);
@@ -3209,8 +3242,10 @@ function renderBrokerPerformance() {
     return { id: b.id, name: b.name, firm: b.firm, country: b.country, submissions: submissions.length, accepted: accepted.length, funded: funded.length, conversion, volume, commission };
   });
   brokerStats.sort((a,b) => brokerSortDesc ? b[brokerSortField] - a[brokerSortField] : a[brokerSortField] - b[brokerSortField]);
-  document.getElementById('brokerPerformanceBody').innerHTML = brokerStats.map(s => {
-    return `<tr>
+  const tbody = document.getElementById('brokerPerformanceBody');
+  if(tbody) {
+    tbody.innerHTML = brokerStats.map(s => {
+      return `<tr>
         <td><strong>${escapeHtml(s.name)}</strong><br><span class="data-label">${escapeHtml(s.firm)}</span></div></td>
         <td>${escapeHtml(s.country || '—')}</div></td>
         <td>${s.submissions}</div></td>
@@ -3220,9 +3255,24 @@ function renderBrokerPerformance() {
         <td>${formatCurrency(s.volume)}</div></td>
         <td>${formatCurrency(s.commission)}</div></td>
       </tr>`;
-  }).join('');
+    }).join('');
+  }
+  const tbody2 = document.getElementById('brokerPerformanceTableBody');
+  if(tbody2) {
+    tbody2.innerHTML = brokerStats.map(s => {
+      return `<tr>
+        <td><strong>${escapeHtml(s.name)}</strong><br><span class="data-label">${escapeHtml(s.firm)}</span></div></td>
+        <td>${s.submissions}</div></td>
+        <td>${s.accepted}</div></td>
+        <td>${s.funded}</div></td>
+        <td>${s.conversion}%</div></td>
+        <td>${formatCurrency(s.volume)}</div></td>
+        <td>${formatCurrency(s.commission)}</div></td>
+      </tr>`;
+    }).join('');
+  }
   
-  document.querySelectorAll('#brokerPerformanceTable th[data-sort]').forEach(th => {
+  document.querySelectorAll('#brokerPerformanceTable th[data-sort], #brokerPerformanceTableDetails th[data-sort]').forEach(th => {
     th.style.cursor = 'pointer';
     th.onclick = () => {
       const field = th.dataset.sort;
