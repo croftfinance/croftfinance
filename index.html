@@ -3144,13 +3144,24 @@ window.sendInboxReply = async function(id, type) {
 };
 
 function renderAnalytics() {
-  const activeProjects = projects.filter(p => p.status === 'active');
-  const pipelineCount = activeProjects.filter(p => (p.step || 1) < 9).length;
-  const fundedCount = activeProjects.filter(p => (p.step || 1) === 9).length;
-  let totalCapital = 0;
-  activeProjects.filter(p => (p.step || 1) === 9).forEach(p => { totalCapital += parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g, '')) || 0; });
-  const commission2pc = totalCapital * ADMIN_ONLY_COMMISSION_RATE;
-  const avgFacility = activeProjects.length ? totalCapital / activeProjects.length : 0;
+const activeProjects = projects.filter(p => p.status === 'active');
+const pipelineCount = activeProjects.filter(p => (p.step || 1) < 9).length;
+const fundedCount = activeProjects.filter(p => (p.step || 1) === 9).length;
+
+// NEW: Calculate capital for projects at Step 2+ (Term Sheet issued)
+const step2PlusProjects = activeProjects.filter(p => (p.step || 1) >= 2);
+let totalCapitalCommitted = 0;
+step2PlusProjects.forEach(p => { totalCapitalCommitted += parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g, '')) || 0; });
+
+// Calculate commission on Step 2+ projects (not just funded)
+const commission2pc = totalCapitalCommitted * ADMIN_ONLY_COMMISSION_RATE;
+
+// Average facility size based on Step 2+ projects
+const avgFacility = step2PlusProjects.length ? totalCapitalCommitted / step2PlusProjects.length : 0;
+
+// Keep original totalCapital for funded projects if needed elsewhere
+let totalCapitalFunded = 0;
+activeProjects.filter(p => (p.step || 1) === 9).forEach(p => { totalCapitalFunded += parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g, '')) || 0; });
   const brokerProjects = projects.filter(p => p.brokerId && p.brokerId !== '');
   const brokerVolume = brokerProjects.reduce((sum, p) => sum + (parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g, '')) || 0), 0);
   const directVolume = activeProjects.reduce((sum, p) => sum + (parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g, '')) || 0), 0) - brokerVolume;
@@ -3158,12 +3169,13 @@ function renderAnalytics() {
   const activeBrokers = brokers.filter(b => b.status === 'active' && b.engagementStatus === 'active').length;
   const pendingActions = clients.filter(c => c.status === 'pending').length + meetings.filter(m => m.status === 'pending').length + brokerSubmissions.filter(s => s.status === 'pending').length;
   
-  document.getElementById('analyticsKPI').innerHTML = `
+document.getElementById('analyticsKPI').innerHTML = `
     <div class="kpi-card navy"><span class="kpi-label">Pipeline Projects</span><div class="kpi-value" id="kpiPipeline">${formatNumber(pipelineCount)}</div><div class="kpi-sub">Active deals in progress</div></div>
     <div class="kpi-card success"><span class="kpi-label">Funded Projects</span><div class="kpi-value" id="kpiFunded">${formatNumber(fundedCount)}</div><div class="kpi-sub">Successfully closed</div></div>
-    <div class="kpi-card blue"><span class="kpi-label">Total Capital Raised</span><div class="kpi-value" id="kpiCapital">${formatCurrency(totalCapital)}</div><div class="kpi-sub">Across all funded deals</div></div>
-    <div class="kpi-card warning"><span class="kpi-label">Suzana's Commission (2%)</span><div class="kpi-value" id="kpiCommission">${formatCurrency(commission2pc)}</div><div class="kpi-sub">Net of broker fees</div></div>
-    <div class="kpi-card navy"><span class="kpi-label">Average Facility Size</span><div class="kpi-value" id="kpiAvgFacility">${formatCurrency(avgFacility)}</div><div class="kpi-sub">Per funded project</div></div>
+    <div class="kpi-card blue"><span class="kpi-label">Total Capital Committed</span><div class="kpi-value" id="kpiCapital">${formatCurrency(totalCapitalCommitted)}</div><div class="kpi-sub">Across all active deals (Step 2+)</div></div>
+    <div class="kpi-card success"><span class="kpi-label">Total Capital Funded</span><div class="kpi-value" id="kpiCapitalFunded">${formatCurrency(totalCapitalFunded)}</div><div class="kpi-sub">Actual deployed capital (Step 9)</div></div>
+    <div class="kpi-card warning"><span class="kpi-label">Suzana's Commission (2%)</span><div class="kpi-value" id="kpiCommission">${formatCurrency(commission2pc)}</div><div class="kpi-sub">On active deals from Term Sheet</div></div>
+    <div class="kpi-card navy"><span class="kpi-label">Average Facility Size</span><div class="kpi-value" id="kpiAvgFacility">${formatCurrency(avgFacility)}</div><div class="kpi-sub">Per active project (Step 2+)</div></div>
     <div class="kpi-card blue"><span class="kpi-label">Broker vs Direct</span><div class="kpi-value" id="kpiBrokerSplit">${formatNumber(brokerPercent)}%</div><div class="kpi-sub">Broker-originated volume</div></div>
     <div class="kpi-card success"><span class="kpi-label">Active Brokers</span><div class="kpi-value" id="kpiActiveBrokers">${formatNumber(activeBrokers)}</div><div class="kpi-sub">With signed engagement</div></div>
     <div class="kpi-card warning"><span class="kpi-label">Pending Actions</span><div class="kpi-value" id="kpiPending">${formatNumber(pendingActions)}</div><div class="kpi-sub">Require your attention</div></div>
@@ -3173,7 +3185,7 @@ function renderAnalytics() {
   animateNumber(document.getElementById('kpiFunded'), fundedCount, false);
   animateNumber(document.getElementById('kpiActiveBrokers'), activeBrokers, false);
   animateNumber(document.getElementById('kpiPending'), pendingActions, false);
-  animateNumber(document.getElementById('kpiCapital'), totalCapital, true);
+  animateNumber(document.getElementById('kpiCapital'), totalCapitalCommitted, true);
   animateNumber(document.getElementById('kpiCommission'), commission2pc, true);
   animateNumber(document.getElementById('kpiAvgFacility'), avgFacility, true);
   const bsEl = document.getElementById('kpiBrokerSplit');
@@ -3184,7 +3196,7 @@ function renderAnalytics() {
   let cumulative = 0;
   const funnelHtml = STEP_NAMES.slice(1).map((name, i) => {
     cumulative += stepCounts[i];
-    const widthPercent = i === 0 ? 100 : Math.max(20, Math.min(100, Math.round((cumulative / projects.length) * 100)));
+    const widthPercent = i === 0 ? 100 : (projects.length > 0 ? Math.max(20, Math.min(100, Math.round((cumulative / projects.length) * 100))) : 0);
     const opacity = 1 - (i * 0.08);
     return `<div class="funnel-step"><div class="funnel-step-label">${name}</div><div class="funnel-step-bar" style="width:${widthPercent}%;background:rgba(6,9,26,${opacity});">${cumulative}</div><div class="funnel-step-count">${cumulative}</div></div>`;
   }).join('');
@@ -3212,39 +3224,53 @@ function renderAnalytics() {
   const quarterlyCtx = document.getElementById('quarterlyTrendChart')?.getContext('2d');
   if(quarterlyCtx) { if(quarterlyChart) quarterlyChart.destroy(); quarterlyChart = new Chart(quarterlyCtx, { type: 'bar', data: { labels: last6Quarters, datasets: [{ label: 'Deals Entered', data: last6Quarters.map(q => quarters[q]?.entered || 0), backgroundColor: '#2c5f8a', borderRadius: 4 }, { label: 'Deals Funded', data: last6Quarters.map(q => quarters[q]?.funded || 0), backgroundColor: '#06091a', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: true, scales: { y: { grid: { display: false } }, x: { grid: { display: false } } }, plugins: { tooltip: { backgroundColor: 'white', titleColor: '#374151', bodyColor: '#6b7280', borderColor: '#e5e7eb', borderWidth: 0.5 } } } }); }
   
-  const fundedProjects = projects.filter(p => (p.step || 1) === 9);
-  let totalCommission = 0;
-  const commissionHtml = fundedProjects.map(p => {
-    const client = clients.find(c => c.id === p.clientId);
-    const broker = brokers.find(b => b.id === p.brokerId);
-    const amount = parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g, '')) || 0;
-    const brokerComm = amount * ((broker?.commissionRate || 0) / 100);
-    totalCommission += brokerComm;
-    return `<tr>
-        <td>${escapeHtml(client?.name || 'Unknown')}</td>
-        <td>${escapeHtml(p.name)}</strong></td>
-        <td>${escapeHtml(p.industry || '—')}</td>
-        <td>${escapeHtml(p.location || '—')}</td>
-        <td>${formatCurrency(amount)}</div></td>
-        <td>${formatCurrency(brokerComm)}</div></td>
-        <td>${formatCurrency(amount * ADMIN_ONLY_COMMISSION_RATE)}</div></td>
-        <td>${p.closeDate ? Math.ceil((new Date(p.fundedDate || p.closeDate) - new Date(p.createdAt)) / (1000*60*60*24)) : '—'}</div></td>
-        <td>${p.fundedDate || formatDate(p.fundedDate) || '—'}</div></td>
-      </tr>`;
-  }).join('');
+// Calculate commission for ALL projects that have reached Step 2 (Term Sheet) or beyond
+const commissionedProjects = projects.filter(p => (p.step || 1) >= 2 && p.status === 'active');
+let totalCommission = 0;
+const commissionHtml = commissionedProjects.map(p => {
+  const client = clients.find(c => c.id === p.clientId);
+  const broker = brokers.find(b => b.id === p.brokerId);
+  const amount = parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g, '')) || 0;
+  const brokerComm = amount * ((broker?.commissionRate || 0) / 100);
+  const suzanaComm = amount * ADMIN_ONLY_COMMISSION_RATE;
+  totalCommission += brokerComm;
   
-  const emptyCommissionHtml = '<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--gray-400);">No funded projects yet. </td>';
-  document.getElementById('commissionTableBody').innerHTML = commissionHtml || emptyCommissionHtml;
+  // Get the date when Term Sheet (Step 2) was issued/completed
+  const termSheetDate = p.step2CompletedAt || p.termSheetIssuedAt || p.createdAt;
   
-  const totalAmount = fundedProjects.reduce((s,p)=> s + (parseFloat(String(p.amount||'0').replace(/[^0-9.-]/g,''))||0),0);
-  document.getElementById('commissionTotalRow').innerHTML = `
-    <td colspan="4"><strong>Total</strong></td>
-    <td><strong>${formatCurrency(totalAmount)}</strong></td>
-    <td><strong>${formatCurrency(totalCommission)}</strong></td>
-    <td><strong>${formatCurrency(totalAmount * ADMIN_ONLY_COMMISSION_RATE)}</strong></td>
-    <td colspan="2"></td>
-  `;
-}
+  return `<tr>
+      <td>${escapeHtml(client?.name || 'Unknown')}</td>
+      <td>${escapeHtml(p.name)}</strong></td>
+      <td>${escapeHtml(p.industry || '—')}</td>
+      <td>${escapeHtml(p.location || '—')}</td>
+      <td>${formatCurrency(amount)}</div></td>
+      <td>${formatCurrency(brokerComm)}</div></td>
+      <td>${formatCurrency(suzanaComm)}</div></td>
+      <td>${p.step || 1} / 9</div></td>
+      <td>${termSheetDate ? formatDate(termSheetDate) : 'Term Sheet not issued'}</div></td>
+    </tr>`;
+}).join('');
+  
+const totalAmount = commissionedProjects.reduce((s,p)=> s + (parseFloat(String(p.amount||'0').replace(/[^0-9.-]/g,''))||0),0);
+const totalBrokerComm = commissionedProjects.reduce((s,p)=> {
+  const broker = brokers.find(b => b.id === p.brokerId);
+  const amt = parseFloat(String(p.amount||'0').replace(/[^0-9.-]/g,''))||0;
+  return s + (amt * ((broker?.commissionRate || 0) / 100));
+}, 0);
+const totalSuzanaComm = totalAmount * ADMIN_ONLY_COMMISSION_RATE;
+
+document.getElementById('commissionTotalRow').innerHTML = `
+  <td colspan="4"><strong>Total (Active Projects Step 2+)</strong></td>
+  <td><strong>${formatCurrency(totalAmount)}</strong></td>
+  <td><strong>${formatCurrency(totalBrokerComm)}</strong></td>
+  <td><strong>${formatCurrency(totalSuzanaComm)}</strong></td>
+  <td colspan="2"></td>
+  <tr>
+    <td colspan="4"><strong>Total Funded (Step 9)</strong></td>
+    <td><strong>${formatCurrency(totalCapitalFunded)}</strong></td>
+    <td colspan="4"></td>
+  </tr>
+`;
 
 function renderBrokerPerformance() {
   const brokerStats = brokers.map(b => {
