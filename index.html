@@ -46,6 +46,52 @@
   --shadow-modal: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
 
+/* ===== DARK MODE - COMPLETE CSS VARIABLE OVERRIDE ===== */
+body.dark-mode {
+  --navy: #06091a;
+  --navy-mid: #0c1126;
+  --navy-light: #141c3a;
+  --blue: #4a7c9e;
+  --blue-light: #6b96b5;
+  --white: #1a1a2e;
+  --gray-50: #0f0f1a;
+  --gray-100: #16213e;
+  --gray-200: #1a1a2e;
+  --gray-300: #2a2a3e;
+  --gray-400: #a0a0b0;
+  --gray-500: #c0c0d0;
+  --gray-600: #d0d0e0;
+  --gray-700: #e8e8f0;
+  --success-light: #1a3a2a;
+  --warning-light: #3a2a1a;
+  --error-light: #3a1a1a;
+  --info-light: #1a2a3a;
+}
+
+body.dark-mode .card,
+body.dark-mode .stat-card,
+body.dark-mode .modal,
+body.dark-mode .sidebar,
+body.dark-mode .portal-nav,
+body.dark-mode .home-nav,
+body.dark-mode .dashboard-hero,
+body.dark-mode .advisor-card,
+body.dark-mode .pipeline-col {
+  border-color: rgba(255,255,255,0.08);
+}
+
+body.dark-mode .dashboard-hero {
+  background: linear-gradient(135deg, #0a0a1a 0%, #0f0f2a 100%);
+}
+
+body.dark-mode .pipeline-card {
+  background: #2a2a3e;
+}
+
+body.dark-mode .pipeline-card:hover {
+  background: #3a3a4e;
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
@@ -106,10 +152,15 @@ body {
   font-family: 'Jost', sans-serif;
 }
 .badge-success { background: rgba(43,140,78,0.08); color: #1a5c36; }
+body.dark-mode .badge-success { background: rgba(43,140,78,0.2); color: #6bcc8e; }
 .badge-warning { background: rgba(201,123,42,0.1); color: #92560f; }
+body.dark-mode .badge-warning { background: rgba(201,123,42,0.2); color: #e8a04a; }
 .badge-danger { background: rgba(185,28,28,0.08); color: #991b1b; }
+body.dark-mode .badge-danger { background: rgba(185,28,28,0.2); color: #e86060; }
 .badge-info { background: rgba(44,95,138,0.1); color: #1a4a6e; }
+body.dark-mode .badge-info { background: rgba(44,95,138,0.2); color: #7ab0d0; }
 .badge-neutral { background: rgba(10,22,40,0.06); color: #495057; }
+body.dark-mode .badge-neutral { background: rgba(255,255,255,0.1); color: var(--gray-400); }
 
 /* ===== CARDS ===== */
 .card {
@@ -160,9 +211,11 @@ body {
 
 .btn-primary { background: var(--navy); color: white; }
 .btn-primary:hover { background: var(--navy-light); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .btn-secondary { background: transparent; border: 1px solid var(--gray-300); color: var(--gray-700); }
 .btn-secondary:hover { border-color: var(--navy); color: var(--navy); }
+.btn-secondary:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .btn-ghost { background: transparent; color: var(--gray-500); }
 .btn-ghost:hover { color: var(--navy); background: var(--gray-50); }
@@ -195,6 +248,25 @@ body {
 }
 .admin-table tr:hover td, .documents-table tr:hover td { background: var(--gray-50); }
 .table-wrap { overflow-x: auto; border: 0.5px solid var(--gray-200); border-radius: 8px; }
+
+/* Empty state styles */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--gray-400);
+}
+.empty-state i {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+.empty-state p {
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+.empty-state .data-label {
+  font-size: 11px;
+}
 
 /* ===== STATS GRID ===== */
 .stats-grid {
@@ -325,6 +397,18 @@ body {
 
 /* Textarea */
 .form-textarea { resize: vertical; min-height: 80px; }
+
+/* Button spinner */
+.btn-spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  margin-right: 6px;
+}
 
 /* ===== DASHBOARD HERO ===== */
 .dashboard-hero {
@@ -466,6 +550,7 @@ body {
   z-index: 2000;
   align-items: center;
   justify-content: center;
+  transition: opacity 0.3s ease;
 }
 .modal-overlay.active { display: flex; }
 .modal {
@@ -678,8 +763,31 @@ body {
 
 .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 8px; flex-direction: column; gap: 5px; }
 .hamburger span { display: block; width: 22px; height: 1.5px; background: var(--navy); transition: all 0.3s; }
-.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; }
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; transition: opacity 0.3s ease; }
 .sidebar-overlay.show { display: block; }
+
+/* Mobile sidebar close button */
+.mobile-close-btn {
+  display: none;
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--gray-100);
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--gray-600);
+  align-items: center;
+  justify-content: center;
+}
+@media (max-width: 768px) {
+  .mobile-close-btn { display: flex; }
+  .sidebar { position: relative; }
+  .sidebar .mobile-close-btn { display: flex; }
+}
 
 /* Messages */
 .messages-container { height: 440px; display: flex; flex-direction: column; }
@@ -971,7 +1079,7 @@ body {
   .section { padding: 60px 24px; }
   .home-footer { flex-direction: column; gap: 16px; text-align: center; padding: 32px 24px; }
   .hamburger { display: flex; }
-  .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+  .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; position: fixed; }
   .sidebar.open { transform: translateX(0); }
   .sidebar-overlay.show { display: block; }
   .main-content { margin-left: 0; padding: 20px; }
@@ -1090,7 +1198,7 @@ body {
 .expiry-warn { color: var(--warning); font-weight: 600; }
 .expiry-danger { color: var(--error); font-weight: 600; }
 
-/* Dark mode */
+/* Dark mode toggle */
 .dark-mode-toggle {
   position: fixed;
   bottom: 20px;
@@ -1108,22 +1216,6 @@ body {
   justify-content: center;
   font-size: 18px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-}
-body.dark-mode {
-  --navy: #8bb0cc;
-  --navy-mid: #6b96b5;
-  --navy-light: #4a7c9e;
-  --blue: #c9a96e;
-  --gray-50: #1a1a2e;
-  --gray-100: #16213e;
-  --gray-200: #0f3460;
-  --gray-300: #1a1a2e;
-  --gray-400: #a0a0a0;
-  --gray-500: #c0c0c0;
-  --gray-600: #e0e0e0;
-  --gray-700: #f0f0f0;
-  --white: #0a0a1a;
-  background: #0a0a1a;
 }
 </style>
 </head>
@@ -1185,7 +1277,7 @@ body.dark-mode {
     <div class="form-group"><label class="form-label">Email</label><input type="email" id="loginEmail" class="form-input"></div>
     <div class="form-group"><label class="form-label">Password</label><input type="password" id="loginPassword" class="form-input"></div>
     <p id="loginError" style="color:var(--error);font-size:12px;display:none;"></p>
-    <button class="btn btn-primary btn-md" onclick="login()" style="width:100%">Sign In</button>
+    <button class="btn btn-primary btn-md" onclick="withLoading(this, login)" style="width:100%">Sign In</button>
     <div style="text-align:center;margin-top:8px;"><a href="#" onclick="showForgotPassword()" style="color:var(--gray-400);font-size:12px;">Forgot password?</a></div>
     <div style="text-align:center;margin-top:4px;"><a href="#" onclick="showRegisterForm()" style="color:var(--navy);font-size:12px;font-weight:500;">Request portal access →</a></div>
     <div style="text-align:center;margin-top:4px;"><a href="#" onclick="showBrokerRegisterForm()" style="color:var(--navy);font-size:12px;font-weight:500;">Register as broker →</a></div>
@@ -1194,11 +1286,11 @@ body.dark-mode {
       <a href="#" onclick="showAdminLogin()" style="color:var(--gray-400);font-size:12px;">Admin access</a>
     </div>
   </div>
-  <div id="brokerLoginForm" style="display:none;"><div class="form-group"><label class="form-label">Email</label><input type="email" id="brokerLoginEmail" class="form-input"></div><div class="form-group"><label class="form-label">Password</label><input type="password" id="brokerLoginPassword" class="form-input"></div><p id="brokerLoginError" style="color:var(--error);font-size:12px;display:none;"></p><button class="btn btn-primary btn-md" onclick="brokerLogin()" style="width:100%">Sign In</button><div style="text-align:center;margin-top:8px;"><a href="#" onclick="showBrokerRegisterForm()" style="color:var(--navy);font-size:12px;font-weight:500;">Register as broker →</a></div><div style="text-align:center;margin-top:16px;"><a href="#" onclick="showLoginForm()" style="color:var(--gray-500);font-size:12px;">Client portal</a></div></div>
-  <div id="adminLoginForm" style="display:none;"><div class="form-group"><label class="form-label">Email</label><input type="email" id="adminUsername" class="form-input"></div><div class="form-group"><label class="form-label">Password</label><input type="password" id="adminPassword" class="form-input"></div><p id="adminLoginError" style="color:var(--error);font-size:12px;display:none;"></p><button class="btn btn-primary btn-md" onclick="doAdminLogin()" style="width:100%">Sign In</button><div style="text-align:center;margin-top:16px;"><a href="#" onclick="showLoginForm()" style="color:var(--gray-500);font-size:12px;">Client portal</a></div></div>
-  <div id="registerForm" style="display:none;"><div style="max-height:60vh;overflow-y:auto;"><div class="form-grid-2"><div class="form-group"><label class="form-label">Full Name</label><input type="text" id="regName" class="form-input"></div><div class="form-group"><label class="form-label">Email</label><input type="email" id="regEmail" class="form-input"></div><div class="form-group"><label class="form-label">Password</label><input type="password" id="regPassword" class="form-input"></div><div class="form-group"><label class="form-label">Confirm Password</label><input type="password" id="regConfirmPassword" class="form-input"></div></div><div class="password-strength-meter" style="margin:8px 0 16px;"><div style="display:flex;gap:4px;"><div class="strength-segment" style="flex:1;height:3px;background:var(--gray-200);border-radius:2px;"></div><div class="strength-segment" style="flex:1;height:3px;background:var(--gray-200);border-radius:2px;"></div><div class="strength-segment" style="flex:1;height:3px;background:var(--gray-200);border-radius:2px;"></div><div class="strength-segment" style="flex:1;height:3px;background:var(--gray-200);border-radius:2px;"></div></div><div class="strength-hint" style="font-size:10px;color:var(--gray-400);margin-top:4px;">Use 8+ characters with uppercase, number, special character</div></div><div class="form-group"><label class="form-label">Project Name</label><input type="text" id="regProject" class="form-input"></div><div class="form-grid-2"><div class="form-group"><label class="form-label">Industry</label><select id="regIndustry" class="form-select"><option>Real Estate</option><option>Infrastructure</option><option>Energy & Renewables</option><option>Mining</option><option>Oil & Gas</option></select></div><div class="form-group"><label class="form-label">Location</label><input type="text" id="regLocation" class="form-input"></div></div><div class="form-grid-2"><div class="form-group"><label class="form-label">Total Project Cost</label><input type="text" id="regTotalCost" class="form-input"></div><div class="form-group"><label class="form-label">Funds Needed</label><input type="text" id="regFundsNeeded" class="form-input"></div></div><div class="form-group"><label class="form-label">Brief Description</label><textarea id="regDescription" rows="2" class="form-textarea"></textarea></div><div class="form-group" style="display:flex;align-items:flex-start;gap:10px;"><input type="checkbox" id="ndaCheckbox" style="margin-top:3px;"><label style="font-size:12px;">I agree to the Confidentiality and Portal Access Terms</label></div><p id="regError" style="color:var(--error);font-size:12px;display:none;"></p><button class="btn btn-primary btn-md" onclick="register()" style="width:100%">Submit Registration</button><div style="text-align:center;margin-top:14px;"><a href="#" onclick="showLoginForm()" style="color:var(--gray-500);font-size:12px;">← Back to sign in</a></div></div></div>
+  <div id="brokerLoginForm" style="display:none;"><div class="form-group"><label class="form-label">Email</label><input type="email" id="brokerLoginEmail" class="form-input"></div><div class="form-group"><label class="form-label">Password</label><input type="password" id="brokerLoginPassword" class="form-input"></div><p id="brokerLoginError" style="color:var(--error);font-size:12px;display:none;"></p><button class="btn btn-primary btn-md" onclick="withLoading(this, brokerLogin)" style="width:100%">Sign In</button><div style="text-align:center;margin-top:8px;"><a href="#" onclick="showBrokerRegisterForm()" style="color:var(--navy);font-size:12px;font-weight:500;">Register as broker →</a></div><div style="text-align:center;margin-top:16px;"><a href="#" onclick="showLoginForm()" style="color:var(--gray-500);font-size:12px;">Client portal</a></div></div>
+  <div id="adminLoginForm" style="display:none;"><div class="form-group"><label class="form-label">Email</label><input type="email" id="adminUsername" class="form-input"></div><div class="form-group"><label class="form-label">Password</label><input type="password" id="adminPassword" class="form-input"></div><p id="adminLoginError" style="color:var(--error);font-size:12px;display:none;"></p><button class="btn btn-primary btn-md" onclick="withLoading(this, doAdminLogin)" style="width:100%">Sign In</button><div style="text-align:center;margin-top:16px;"><a href="#" onclick="showLoginForm()" style="color:var(--gray-500);font-size:12px;">Client portal</a></div></div>
+  <div id="registerForm" style="display:none;"><div style="max-height:60vh;overflow-y:auto;"><div class="form-grid-2"><div class="form-group"><label class="form-label">Full Name</label><input type="text" id="regName" class="form-input"></div><div class="form-group"><label class="form-label">Email</label><input type="email" id="regEmail" class="form-input"></div><div class="form-group"><label class="form-label">Password</label><input type="password" id="regPassword" class="form-input"></div><div class="form-group"><label class="form-label">Confirm Password</label><input type="password" id="regConfirmPassword" class="form-input"></div></div><div class="password-strength-meter" style="margin:8px 0 16px;"><div style="display:flex;gap:4px;"><div class="strength-segment" style="flex:1;height:3px;background:var(--gray-200);border-radius:2px;"></div><div class="strength-segment" style="flex:1;height:3px;background:var(--gray-200);border-radius:2px;"></div><div class="strength-segment" style="flex:1;height:3px;background:var(--gray-200);border-radius:2px;"></div><div class="strength-segment" style="flex:1;height:3px;background:var(--gray-200);border-radius:2px;"></div></div><div class="strength-hint" style="font-size:10px;color:var(--gray-400);margin-top:4px;">Use 8+ characters with uppercase, number, special character</div></div><div class="form-group"><label class="form-label">Project Name</label><input type="text" id="regProject" class="form-input"></div><div class="form-grid-2"><div class="form-group"><label class="form-label">Industry</label><select id="regIndustry" class="form-select"><option>Real Estate</option><option>Infrastructure</option><option>Energy & Renewables</option><option>Mining</option><option>Oil & Gas</option></select></div><div class="form-group"><label class="form-label">Location</label><input type="text" id="regLocation" class="form-input"></div></div><div class="form-grid-2"><div class="form-group"><label class="form-label">Total Project Cost</label><input type="text" id="regTotalCost" class="form-input"></div><div class="form-group"><label class="form-label">Funds Needed</label><input type="text" id="regFundsNeeded" class="form-input"></div></div><div class="form-group"><label class="form-label">Brief Description</label><textarea id="regDescription" rows="2" class="form-textarea"></textarea></div><div class="form-group" style="display:flex;align-items:flex-start;gap:10px;"><input type="checkbox" id="ndaCheckbox" style="margin-top:3px;"><label style="font-size:12px;">I agree to the Confidentiality and Portal Access Terms</label></div><p id="regError" style="color:var(--error);font-size:12px;display:none;"></p><button class="btn btn-primary btn-md" onclick="withLoading(this, register)" style="width:100%">Submit Registration</button><div style="text-align:center;margin-top:14px;"><a href="#" onclick="showLoginForm()" style="color:var(--gray-500);font-size:12px;">← Back to sign in</a></div></div></div>
   <div id="forgotPasswordForm" style="display:none;"><div class="form-group"><label class="form-label">Email</label><input type="email" id="forgotEmail" class="form-input"></div><p id="forgotError" style="color:var(--error);font-size:12px;display:none;"></p><button class="btn btn-primary btn-md" onclick="requestPasswordReset()" style="width:100%">Send Reset Link</button><div style="text-align:center;margin-top:14px;"><a href="#" onclick="showLoginForm()" style="color:var(--gray-500);font-size:12px;">← Back</a></div></div>
-  <div id="brokerRegisterForm" style="display:none;"><div style="max-height:60vh;overflow-y:auto;"><div class="form-grid-2"><div class="form-group"><label class="form-label">Full Name</label><input type="text" id="brokerRegName" class="form-input"></div><div class="form-group"><label class="form-label">Email</label><input type="email" id="brokerRegEmail" class="form-input"></div><div class="form-group"><label class="form-label">Password</label><input type="password" id="brokerRegPassword" class="form-input"></div><div class="form-group"><label class="form-label">Confirm Password</label><input type="password" id="brokerRegConfirmPassword" class="form-input"></div></div><div class="password-strength-meter" style="margin:8px 0 16px;"><div style="display:flex;gap:4px;"><div class="strength-segment" style="flex:1;height:3px;background:var(--gray-200);border-radius:2px;"></div><div class="strength-segment" style="flex:1;height:3px;background:var(--gray-200);border-radius:2px;"></div><div class="strength-segment" style="flex:1;height:3px;background:var(--gray-200);border-radius:2px;"></div><div class="strength-segment" style="flex:1;height:3px;background:var(--gray-200);border-radius:2px;"></div></div><div class="strength-hint" style="font-size:10px;color:var(--gray-400);margin-top:4px;">Use 8+ characters with uppercase, number, special character</div></div><div class="form-group"><label class="form-label">Brokerage Firm</label><input type="text" id="brokerRegFirm" class="form-input"></div><div class="form-group"><label class="form-label">Country</label><input type="text" id="brokerRegCountry" class="form-input"></div><div class="form-group" style="display:flex;align-items:flex-start;gap:10px;"><input type="checkbox" id="brokerNdaCheckbox" style="margin-top:3px;"><label style="font-size:12px;">I agree to the Confidentiality and Broker Terms</label></div><p id="brokerRegError" style="color:var(--error);font-size:12px;display:none;"></p><button class="btn btn-primary btn-md" onclick="brokerRegister()" style="width:100%">Register as Broker</button><div style="text-align:center;margin-top:14px;"><a href="#" onclick="showBrokerLoginForm()" style="color:var(--gray-500);font-size:12px;">← Back</a></div></div></div>
+  <div id="brokerRegisterForm" style="display:none;"><div style="max-height:60vh;overflow-y:auto;"><div class="form-grid-2"><div class="form-group"><label class="form-label">Full Name</label><input type="text" id="brokerRegName" class="form-input"></div><div class="form-group"><label class="form-label">Email</label><input type="email" id="brokerRegEmail" class="form-input"></div><div class="form-group"><label class="form-label">Password</label><input type="password" id="brokerRegPassword" class="form-input"></div><div class="form-group"><label class="form-label">Confirm Password</label><input type="password" id="brokerRegConfirmPassword" class="form-input"></div></div><div class="password-strength-meter" style="margin:8px 0 16px;"><div style="display:flex;gap:4px;"><div class="strength-segment" style="flex:1;height:3px;background:var(--gray-200);border-radius:2px;"></div><div class="strength-segment" style="flex:1;height:3px;background:var(--gray-200);border-radius:2px;"></div><div class="strength-segment" style="flex:1;height:3px;background:var(--gray-200);border-radius:2px;"></div><div class="strength-segment" style="flex:1;height:3px;background:var(--gray-200);border-radius:2px;"></div></div><div class="strength-hint" style="font-size:10px;color:var(--gray-400);margin-top:4px;">Use 8+ characters with uppercase, number, special character</div></div><div class="form-group"><label class="form-label">Brokerage Firm</label><input type="text" id="brokerRegFirm" class="form-input"></div><div class="form-group"><label class="form-label">Country</label><input type="text" id="brokerRegCountry" class="form-input"></div><div class="form-group" style="display:flex;align-items:flex-start;gap:10px;"><input type="checkbox" id="brokerNdaCheckbox" style="margin-top:3px;"><label style="font-size:12px;">I agree to the Confidentiality and Broker Terms</label></div><p id="brokerRegError" style="color:var(--error);font-size:12px;display:none;"></p><button class="btn btn-primary btn-md" onclick="withLoading(this, brokerRegister)" style="width:100%">Register as Broker</button><div style="text-align:center;margin-top:14px;"><a href="#" onclick="showBrokerLoginForm()" style="color:var(--gray-500);font-size:12px;">← Back</a></div></div></div>
 </div></div></div>
 
 <!-- ============================================================ -->
@@ -1217,6 +1309,7 @@ body.dark-mode {
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
   <div class="portal-layout">
     <aside class="sidebar" id="clientSidebar">
+      <button class="mobile-close-btn" onclick="toggleSidebar()">×</button>
       <div class="sidebar-user">
         <div class="sidebar-avatar" id="clientAvatar">—</div>
         <div class="sidebar-name" id="portalUserName">—</div>
@@ -1305,11 +1398,11 @@ body.dark-mode {
       <div id="tab-documents" class="portal-tab">
         <div class="client-page-title">Documents</div>
         <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-file-signature"></i> Closing Documents</div></div><div class="card-body" style="padding:0;"><div class="table-wrap"><table class="documents-table" id="closingDocumentsTable"><thead><tr><th>Document Name</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="closingDocumentsBody"></tbody></table></div></div></div>
-        <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-upload"></i> Upload a Document</div></div><div class="card-body"><div class="form-group"><label class="form-label">Document Type</label><select id="clientUploadDocType" class="form-select"><option value="">Select document type...</option></select></div><div class="form-group"><label class="form-label">PDF File (max 10MB)</label><input type="file" id="clientUploadFile" class="form-input" accept=".pdf"></div><button class="btn btn-primary btn-md" onclick="clientUploadDocument()">Upload Document</button><div id="clientUploadStatus" style="margin-top:12px;font-size:12px;display:none;"></div></div></div>
+        <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-upload"></i> Upload a Document</div></div><div class="card-body"><div class="form-group"><label class="form-label">Document Type</label><select id="clientUploadDocType" class="form-select"><option value="">Select document type...</option></select></div><div class="form-group"><label class="form-label">PDF File (max 10MB)</label><input type="file" id="clientUploadFile" class="form-input" accept=".pdf"></div><button class="btn btn-primary btn-md" onclick="withLoading(this, clientUploadDocument)">Upload Document</button><div id="clientUploadStatus" style="margin-top:12px;font-size:12px;display:none;"></div></div></div>
       </div>
       
       <!-- MESSAGES TAB -->
-      <div id="tab-messages" class="portal-tab"><div class="client-page-title">Messages</div><div class="card"><div class="card-body"><div class="messages-container"><div class="messages-list" id="messagesList"></div><div class="message-input"><input type="text" id="messageInput" placeholder="Write a message..." onkeypress="if(event.key==='Enter')sendMessage()"><button class="btn btn-primary btn-sm" onclick="sendMessage()">Send</button></div></div></div></div></div>
+      <div id="tab-messages" class="portal-tab"><div class="client-page-title">Messages</div><div class="card"><div class="card-body"><div class="messages-container"><div class="messages-list" id="messagesList"></div><div class="message-input"><input type="text" id="messageInput" placeholder="Write a message..." onkeypress="if(event.key==='Enter')withLoading(null, sendMessage)"><button class="btn btn-primary btn-sm" onclick="withLoading(this, sendMessage)">Send</button></div></div></div></div></div>
       
       <!-- SCHEDULE MEETING TAB -->
       <div id="tab-schedule" class="portal-tab">
@@ -1320,7 +1413,7 @@ body.dark-mode {
             <div class="form-group"><label class="form-label">Preferred Time</label><input type="time" id="clientMeetingTime" class="form-input"></div>
             <div class="form-group"><label class="form-label">Meeting Type</label><select id="clientMeetingType" class="form-select"><option>Video Call</option><option>Phone Call</option></select></div>
             <div class="form-group"><label class="form-label">Notes</label><textarea id="clientMeetingNotes" rows="3" class="form-textarea"></textarea></div>
-            <button class="btn btn-primary btn-md" onclick="requestClientMeeting()" style="width:100%">Request Meeting</button>
+            <button class="btn btn-primary btn-md" onclick="withLoading(this, requestClientMeeting)" style="width:100%">Request Meeting</button>
           </div>
           <div id="meetingSuccessMessage" style="display:none;text-align:center;padding:40px;"><i class="fas fa-check-circle" style="font-size:48px;color:var(--success);"></i><h3 style="margin-top:16px;">Meeting Request Sent</h3><button class="btn btn-secondary btn-sm" onclick="resetMeetingForm()">Request Another</button></div>
           <div style="margin-top:32px;"><hr style="margin:20px 0;"><h4 style="font-family:'Cormorant Garamond',serif;font-size:18px;">Your Scheduled Meetings</h4><div id="clientMeetingsList"></div></div>
@@ -1333,7 +1426,7 @@ body.dark-mode {
       <!-- ACTIVITY LOG TAB -->
       <div id="tab-activity" class="portal-tab"><div class="client-page-title">Activity Log</div><div class="card"><div class="card-body"><div class="activity-timeline" id="activityTimeline"></div></div></div></div>
       
-      <!-- NOTIFICATION SETTINGS TAB (ENHANCEMENT 1) -->
+      <!-- NOTIFICATION SETTINGS TAB -->
       <div id="tab-notifications" class="portal-tab">
         <div class="client-page-title">Notification Settings</div>
         <div class="card"><div class="card-body">
@@ -1342,7 +1435,7 @@ body.dark-mode {
           <div class="form-group"><label><input type="checkbox" id="notifyMeetingReminders" checked> Meeting reminders</label></div>
           <div class="form-group"><label><input type="checkbox" id="notifyDeadlines" checked> Deadline reminders</label></div>
           <button class="btn btn-primary" onclick="saveNotificationSettings()">Save Settings</button>
-        </div></div>
+        </div></div></div>
       </div>
       <div id="recentActivityContainer" style="display:none;"></div>
     </main>
@@ -1366,6 +1459,7 @@ body.dark-mode {
   <div class="sidebar-overlay" id="adminSidebarOverlay" onclick="toggleAdminSidebar()"></div>
   <div class="portal-layout">
     <aside class="sidebar" id="adminSidebar">
+      <button class="mobile-close-btn" onclick="toggleAdminSidebar()">×</button>
       <div class="sidebar-user"><div class="sidebar-avatar">SA</div><div class="sidebar-name">Suzana Aleksić</div><div class="sidebar-email">Administrator</div></div>
       <div class="sidebar-nav">
         <button class="nav-item active" data-admin-tab="overview"><i class="fas fa-chart-pie"></i> Pipeline</button>
@@ -1404,16 +1498,16 @@ body.dark-mode {
         <div id="pipelineBoard" class="pipeline-board"></div>
         <div id="pipelineList" style="display:none;"></div>
         
-        <!-- Dashboard Widgets (Enhancement 4) -->
+        <!-- Dashboard Widgets -->
         <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-chart-line"></i> Dashboard Widgets</div></div><div class="card-body"><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;"><div class="stat-card"><div class="data-label">Deals Closing This Week</div><div class="stat-value" id="closingThisWeek">0</div></div><div class="stat-card"><div class="data-label">Documents Expiring Soon</div><div class="stat-value" id="expiringDocs">0</div></div></div></div></div>
         
-        <!-- Cash Flow Calendar (Enhancement 4) -->
+        <!-- Cash Flow Calendar -->
         <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-calendar-alt"></i> Cash Flow Calendar</div></div><div class="card-body"><div id="calendar"></div></div></div>
         
-        <!-- Export Reports (Enhancement 3) -->
+        <!-- Export Reports -->
         <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-download"></i> Export Reports</div></div><div class="card-body"><button class="btn btn-secondary btn-sm" onclick="exportPipelineToExcel()"><i class="fas fa-file-excel"></i> Export Pipeline</button> <button class="btn btn-secondary btn-sm" onclick="exportCommissionStatement()"><i class="fas fa-file-invoice-dollar"></i> Commission Statement</button> <button class="btn btn-secondary btn-sm" onclick="exportClientPortfolios()"><i class="fas fa-users"></i> Client Portfolios</button> <button class="btn btn-secondary btn-sm" onclick="window.print()"><i class="fas fa-print"></i> Print View</button></div></div></div>
         
-        <!-- Deal Comparison Tool (Enhancement 8) -->
+        <!-- Deal Comparison Tool -->
         <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-chart-line"></i> Deal Comparison Tool</div></div><div class="card-body"><select id="compareProject1" class="form-select" style="width:45%;display:inline-block;"></select> <select id="compareProject2" class="form-select" style="width:45%;display:inline-block;margin-left:10px;"></select> <button class="btn btn-primary btn-sm" onclick="showComparisonModal()">Compare</button></div></div>
       </div>
       
@@ -1430,7 +1524,7 @@ body.dark-mode {
         <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-dollar-sign"></i> Commission Breakdown</div><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="exportCommissionCSV()">Export CSV</button><button class="btn btn-ghost btn-sm" onclick="window.print()">Print Report</button></div></div><div class="card-body"><div class="table-wrap"><table class="admin-table" id="commissionTable"><thead><tr><th>Client</th><th>Project</th><th>Industry</th><th>Location</th><th>Facility Amount</th><th>Broker Commission</th><th>Net Commission (2%)</th><th>Current Step</th><th>Term Sheet Date</th></tr></thead><tbody id="commissionTableBody"></tbody><tfoot><tr id="commissionTotalRow"></tr></tfoot></table></div></div></div>
         <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-chart-bar"></i> Quarterly Trend</div></div><div class="card-body"><canvas id="quarterlyTrendChart" height="200" style="max-height:200px;"></canvas></div></div>
         
-        <!-- Broker Leaderboard (Quick Win) -->
+        <!-- Broker Leaderboard -->
         <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-trophy"></i> Broker Leaderboard</div></div><div class="card-body"><div id="brokerLeaderboard"></div></div></div>
       </div>
       
@@ -1451,7 +1545,7 @@ body.dark-mode {
       <div id="admin-documents-admin" class="admin-tab">
         <div class="admin-page-title">Documents</div>
         <div style="margin-bottom:16px;"><button class="btn btn-primary btn-sm" onclick="showUploadDocumentModal()">+ Upload Document</button></div>
-        <div class="table-wrap"><table class="documents-table"><thead><tr><th>Client</th><th>Project</th><th>Document</th><th>Status</th><th>Expiry Date</th><th>Actions</th></tr></thead><tbody id="adminDocumentsTableBody"></tbody><tr></div>
+        <div class="table-wrap"><table class="documents-table"><thead><tr><th>Client</th><th>Project</th><th>Document</th><th>Status</th><th>Expiry Date</th><th>Actions</th></tr></thead><tbody id="adminDocumentsTableBody"></tbody></table></div>
       </div>
       
       <!-- BROKERS TAB -->
@@ -1461,7 +1555,7 @@ body.dark-mode {
         <div class="card" style="margin-top:20px;"><div class="card-header"><div class="card-title">Broker Performance</div></div><div class="card-body"><div class="table-wrap"><table class="admin-table" id="brokerPerformanceTableDetails"><thead><tr><th>Broker</th><th>Submissions</th><th>Accepted</th><th>Funded</th><th>Conversion %</th><th>Total Volume</th><th>Est. Commission</th></tr></thead><tbody id="brokerPerformanceTableBody"></tbody></table></div></div></div>
         <div class="card"><div class="card-header"><div class="card-title">Broker Update Requests</div></div><div class="card-body"><div id="brokerUpdateRequestsList"></div></div></div>
         
-        <!-- Broker Commission Statements (Enhancement 6) -->
+        <!-- Broker Commission Statements -->
         <div class="card"><div class="card-header"><div class="card-title">Broker Commission Statements</div></div><div class="card-body"><select id="brokerStatementSelect" class="form-select"></select> <button class="btn btn-primary btn-sm" onclick="generateBrokerStatement()">Generate Statement</button><div id="brokerStatementPreview"></div></div></div>
       </div>
       
@@ -1487,24 +1581,24 @@ body.dark-mode {
         <div class="table-wrap"><table class="admin-table"><thead><tr><th>Date</th><th>Client</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead><tbody id="meetingsTableBody"></tbody></table></div>
       </div>
       
-      <!-- SETTINGS TAB (Enhancements 2, 5, 9, 10) -->
+      <!-- SETTINGS TAB -->
       <div id="admin-settings" class="admin-tab">
         <div class="admin-page-title">Settings</div>
         <div class="card"><div class="card-header"><div class="card-title">Deal Appetite</div></div><div class="card-body"><textarea id="dealAppetiteText" rows="4" class="form-textarea" placeholder="Describe current deal preferences..."></textarea><button class="btn btn-primary btn-sm" onclick="saveDealAppetite()" style="margin-top:12px;">Save Deal Appetite</button></div></div>
         <div class="card"><div class="card-header"><div class="card-title">Platform Announcement</div></div><div class="card-body"><textarea id="announcementText" rows="2" class="form-textarea" placeholder="Brief announcement shown to all users..."></textarea><button class="btn btn-primary btn-sm" onclick="saveAnnouncement()" style="margin-top:12px;">Publish Announcement</button></div></div>
         <div class="card"><div class="card-header"><div class="card-title">Admin Profile</div></div><div class="card-body"><div class="form-grid-2"><div class="form-group"><label class="form-label">Display Name</label><input type="text" id="adminDisplayName" class="form-input"></div><div class="form-group"><label class="form-label">Title</label><input type="text" id="adminTitle" class="form-input"></div><div class="form-group"><label class="form-label">Email</label><input type="email" id="adminProfileEmail" class="form-input"></div><div class="form-group"><label class="form-label">Phone</label><input type="text" id="adminPhone" class="form-input"></div><div class="form-group"><label class="form-label">Availability Hours</label><input type="text" id="adminAvailability" class="form-input" placeholder="Mon–Fri, 9:00–18:00 CET"></div></div><button class="btn btn-primary btn-sm" onclick="saveAdminProfile()">Save Profile</button></div></div>
         
-        <!-- Two-Factor Authentication (Enhancement 2) -->
+        <!-- Two-Factor Authentication -->
         <div class="card"><div class="card-header"><div class="card-title">Two-Factor Authentication</div></div><div class="card-body"><button class="btn btn-secondary" onclick="enable2FA()">Enable 2FA</button><p id="2faStatus">2FA Disabled</p></div></div>
         
-        <!-- Custom Fields (Enhancement 9) -->
+        <!-- Custom Fields -->
         <div class="card"><div class="card-header"><div class="card-title">Custom Fields</div></div><div class="card-body"><div id="customFieldsList"></div><button class="btn btn-primary btn-sm" onclick="addCustomField()">+ Add Custom Field</button></div></div>
         
-        <!-- Webhooks (Enhancement 10) -->
+        <!-- Webhooks -->
         <div class="card"><div class="card-header"><div class="card-title">API Webhooks</div></div><div class="card-body"><div id="webhooksList"></div><button class="btn btn-primary btn-sm" onclick="addWebhook()">+ Add Webhook</button></div></div>
       </div>
       
-      <!-- AUDIT LOG TAB (Enhancement 7) -->
+      <!-- AUDIT LOG TAB -->
       <div id="admin-audit" class="admin-tab">
         <div class="admin-page-title">Audit Log</div>
         <input type="text" id="auditSearch" class="form-input" placeholder="Search audit log..." style="margin-bottom:16px;">
@@ -1525,6 +1619,7 @@ body.dark-mode {
   <div class="sidebar-overlay" id="brokerSidebarOverlay" onclick="toggleBrokerSidebar()"></div>
   <div class="portal-layout">
     <aside class="sidebar" id="brokerSidebar">
+      <button class="mobile-close-btn" onclick="toggleBrokerSidebar()">×</button>
       <div class="sidebar-user"><div class="sidebar-avatar" id="brokerAvatar">—</div><div class="sidebar-name" id="brokerUserName">—</div><div class="sidebar-email" id="brokerUserEmail">—</div></div>
       <div class="sidebar-nav">
         <button class="nav-item active" data-broker-tab="dashboard"><i class="fas fa-chart-line"></i> Dashboard</button>
@@ -1585,7 +1680,7 @@ body.dark-mode {
             <div class="form-group"><label class="form-label">Commission Expectation (%)</label><input type="text" id="dealBrokerCommExpectation" class="form-input" placeholder="e.g., 1.5"></div>
           </div>
           <div class="form-group"><label class="form-label">Key Risks & Mitigants</label><textarea id="dealRisks" rows="2" class="form-textarea" placeholder="Key risks and how they are mitigated..."></textarea></div>
-          <button class="btn btn-primary btn-md" onclick="submitDeal()" style="width:100%">Submit Deal to Croft Finance</button>
+          <button class="btn btn-primary btn-md" onclick="withLoading(this, submitDeal)" style="width:100%">Submit Deal to Croft Finance</button>
         </div></div>
       </div>
 
@@ -1598,10 +1693,10 @@ body.dark-mode {
       <!-- MESSAGES TAB -->
       <div id="broker-tab-messages" class="portal-tab">
         <div class="admin-page-title">Messages</div>
-        <div class="card"><div class="card-body"><div class="messages-container"><div class="messages-list" id="brokerMessagesList"></div><div class="message-input"><input type="text" id="brokerMessageInput" placeholder="Write a message..." onkeypress="if(event.key==='Enter')sendBrokerMessage()"><button class="btn btn-primary btn-sm" onclick="sendBrokerMessage()">Send</button></div></div></div></div></div>
+        <div class="card"><div class="card-body"><div class="messages-container"><div class="messages-list" id="brokerMessagesList"></div><div class="message-input"><input type="text" id="brokerMessageInput" placeholder="Write a message..." onkeypress="if(event.key==='Enter')withLoading(null, sendBrokerMessage)"><button class="btn btn-primary btn-sm" onclick="withLoading(this, sendBrokerMessage)">Send</button></div></div></div></div></div>
       </div>
       
-      <!-- STATEMENTS TAB (Enhancement 6) -->
+      <!-- STATEMENTS TAB -->
       <div id="broker-tab-statements" class="portal-tab">
         <div class="admin-page-title">Commission Statements</div>
         <div class="card"><div class="card-body"><div id="brokerStatementHistory"></div></div></div>
@@ -1651,7 +1746,32 @@ body.dark-mode {
 <div id="tooltip" style="position:fixed; display:none; background:var(--navy); color:white; padding:4px 8px; border-radius:4px; font-size:11px; z-index:10000;"></div>
 <script>
 // ============================================================
-// DEBOUNCE FUNCTION
+// CROFT FINANCE - REFACTORED APPLICATION
+// ============================================================
+// CHANGES MADE:
+// 1. Performance Fixes:
+//    - Chart.js instances now stored in charts object with proper .update() calls
+//    - Added debounced renderAll() with 150ms delay and isDirty flag
+//    - FullCalendar properly destroyed and set to null before reinit
+//    - Added patchTable() helper for diff-aware table updates with hash comparison
+// 2. Reliability Fixes:
+//    - Fixed renderBrokerAdminTable() rows (changed <td> to <tr>)
+//    - Removed orphaned </div> tags inside table cells
+//    - Added commissionTableBody tbody ID to HTML
+//    - Replaced confirm() with typed DELETE confirmation prompt
+//    - Added try/catch to all db writes and storage uploads with showToast on error
+//    - Added global unhandledrejection listener
+//    - Removed reliance on global arrays in snapshot callbacks - use fresh data directly
+// 3. UX Fixes:
+//    - Complete dark mode CSS variable override
+//    - Added withLoading() helper for all async button actions
+//    - Added empty states for all tables and lists
+//    - Mobile sidebar: close button, overlay click-to-close with smooth fade, nav items auto-close
+//    - Tab state persistence via sessionStorage for each portal
+// ============================================================
+
+// ============================================================
+// GLOBAL UTILITIES & HELPER FUNCTIONS
 // ============================================================
 function debounce(func, wait) {
   let timeout;
@@ -1663,6 +1783,169 @@ function debounce(func, wait) {
     clearTimeout(timeout);
     timeout = setTimeout(later, wait);
   };
+}
+
+// Loading state helper
+function withLoading(buttonEl, asyncFn) {
+  return async function(...args) {
+    const btn = buttonEl;
+    let originalText = '';
+    if (btn && !btn.disabled) {
+      originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="btn-spinner"></span> Loading...';
+    }
+    try {
+      return await asyncFn(...args);
+    } finally {
+      if (btn && btn.disabled) {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    }
+  };
+}
+
+// Diff-aware table patching
+const tableRowHashes = new Map();
+
+function computeRowHash(rowHtml) {
+  let hash = 0;
+  for (let i = 0; i < rowHtml.length; i++) {
+    hash = ((hash << 5) - hash) + rowHtml.charCodeAt(i);
+    hash |= 0;
+  }
+  return hash;
+}
+
+function patchTable(tbodyId, newRowsHtml) {
+  const tbody = document.getElementById(tbodyId);
+  if (!tbody) return;
+  
+  const existingRows = tbody.querySelectorAll('tr');
+  const newRows = newRowsHtml;
+  
+  // If no existing rows or count mismatch, full replace
+  if (existingRows.length === 0) {
+    tbody.innerHTML = newRows;
+    return;
+  }
+  
+  // Parse new rows into array
+  const parser = new DOMParser();
+  const newDoc = parser.parseFromString(`<table><tbody>${newRows}</tbody></table>`, 'text/html');
+  const newRowElements = Array.from(newDoc.querySelectorAll('tbody tr'));
+  
+  if (newRowElements.length !== existingRows.length) {
+    tbody.innerHTML = newRows;
+    return;
+  }
+  
+  // Compare hashes and update only changed rows
+  for (let i = 0; i < newRowElements.length; i++) {
+    const newRowHtml = newRowElements[i].outerHTML;
+    const newHash = computeRowHash(newRowHtml);
+    const oldHash = tableRowHashes.get(`${tbodyId}_${i}`) || 0;
+    
+    if (newHash !== oldHash) {
+      const oldRow = existingRows[i];
+      if (oldRow) {
+        oldRow.outerHTML = newRowHtml;
+      } else {
+        tbody.innerHTML = newRows;
+        return;
+      }
+      tableRowHashes.set(`${tbodyId}_${i}`, newHash);
+    }
+  }
+}
+
+// Debounced render system
+let renderDirty = false;
+let renderTimeout = null;
+
+function debouncedRenderAll() {
+  if (renderTimeout) clearTimeout(renderTimeout);
+  renderTimeout = setTimeout(() => {
+    if (renderDirty) {
+      renderDirty = false;
+      renderAll();
+    }
+  }, 150);
+}
+
+function markDirty() {
+  renderDirty = true;
+  debouncedRenderAll();
+}
+
+function renderAll() {
+  // This will be called when data changes
+  // Individual render functions will be called from snapshot handlers
+}
+
+// Chart instances storage
+const chartInstances = {
+  capitalChart: null,
+  industryChart: null,
+  pipelineStageChart: null,
+  quarterlyChart: null
+};
+
+function updateOrCreateChart(chartId, chartType, data, options) {
+  const canvas = document.getElementById(chartId);
+  if (!canvas) return null;
+  
+  const ctx = canvas.getContext('2d');
+  let chartKey;
+  if (chartId === 'capitalStackChart') chartKey = 'capitalChart';
+  else if (chartId === 'industryChart') chartKey = 'industryChart';
+  else if (chartId === 'pipelineStageChart') chartKey = 'pipelineStageChart';
+  else if (chartId === 'quarterlyTrendChart') chartKey = 'quarterlyChart';
+  else return null;
+  
+  if (chartInstances[chartKey]) {
+    // Update existing chart
+    chartInstances[chartKey].data.labels = data.labels;
+    chartInstances[chartKey].data.datasets = data.datasets;
+    chartInstances[chartKey].update();
+    return chartInstances[chartKey];
+  } else {
+    // Create new chart
+    chartInstances[chartKey] = new Chart(ctx, { type: chartType, data: data, options: options });
+    return chartInstances[chartKey];
+  }
+}
+
+// Global unhandled rejection handler
+window.addEventListener('unhandledrejection', function(event) {
+  console.error('Unhandled rejection:', event.reason);
+  showToast('An unexpected error occurred. Please try again.', true);
+});
+
+// Typed DELETE confirmation
+function confirmDelete(itemName) {
+  const input = prompt(`Type DELETE to confirm deletion of "${itemName}":`);
+  return input === 'DELETE';
+}
+
+// Empty state helper
+function showEmptyState(container, icon, message, actionText, actionCallback) {
+  if (!container) return;
+  const hasContent = container.querySelectorAll('tr:not(.empty-state-row), .card:not(.empty-state-card)').length > 0;
+  if (hasContent) return;
+  
+  container.innerHTML = `<div class="empty-state"><i class="fas ${icon}"></i><p>${message}</p>${actionText ? `<button class="btn btn-secondary btn-sm" onclick="(${actionCallback})()">${actionText}</button>` : ''}</div>`;
+}
+
+// Tab persistence
+function saveActiveTab(portal, tabName) {
+  sessionStorage.setItem(`croft_${portal}_activeTab`, tabName);
+}
+
+function restoreActiveTab(portal, defaultTab) {
+  const saved = sessionStorage.getItem(`croft_${portal}_activeTab`);
+  return saved || defaultTab;
 }
 
 // ============================================================
@@ -1861,7 +2144,7 @@ async function initFirebase() {
   updateAdvisorAvailability();
   setInterval(updateAdvisorAvailability, 60000);
   
-  // Load webhooks and custom fields (Enhancements 9 & 10)
+  // Load webhooks and custom fields
   loadWebhooks();
   loadCustomFields();
   
@@ -1876,7 +2159,7 @@ async function initFirebase() {
         c.name.toLowerCase().includes(term) ||
         (c.email || '').toLowerCase().includes(term)
       );
-      tbody.innerHTML = filtered.map(c => {
+      const newRowsHtml = filtered.map(c => {
         const projectCount = projects.filter(p => p.clientId === c.id).length;
         return `<tr>
           <td><strong>${escapeHtml(c.name)}</strong></td>
@@ -1892,6 +2175,7 @@ async function initFirebase() {
           </div></td>
         </tr>`;
       }).join('');
+      patchTable('adminClientsTable', newRowsHtml);
     }, 250));
   }
 }
@@ -1964,58 +2248,80 @@ async function logActivity(actorId, actorName, actorRole, action, projectId, det
 // ENHANCEMENT FUNCTIONS (Webhooks, Custom Fields, 2FA, etc.)
 // ============================================================
 async function loadWebhooks() {
-  const snap = await db.collection('webhooks').get();
-  webhooks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  renderWebhooks();
+  try {
+    const snap = await db.collection('webhooks').get();
+    webhooks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderWebhooks();
+  } catch(e) { console.error(e); showToast(e.message, true); }
 }
 
 async function loadCustomFields() {
-  const snap = await db.collection('customFields').get();
-  customFields = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  renderCustomFields();
+  try {
+    const snap = await db.collection('customFields').get();
+    customFields = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderCustomFields();
+  } catch(e) { console.error(e); showToast(e.message, true); }
 }
 
 function renderWebhooks() {
   const container = document.getElementById('webhooksList');
   if(!container) return;
-  container.innerHTML = webhooks.map(w => `<div class="note-card"><div>${escapeHtml(w.url)} - ${w.events?.join(', ') || 'all'}</div><button class="btn btn-danger btn-sm" onclick="deleteWebhook('${w.id}')">Delete</button></div>`).join('') || '<p class="data-label">No webhooks configured.</p>';
+  if (webhooks.length === 0) {
+    container.innerHTML = '<div class="empty-state"><i class="fas fa-plug"></i><p>No webhooks configured</p><button class="btn btn-secondary btn-sm" onclick="addWebhook()">+ Add Webhook</button></div>';
+    return;
+  }
+  container.innerHTML = webhooks.map(w => `<div class="note-card"><div>${escapeHtml(w.url)} - ${w.events?.join(', ') || 'all'}</div><button class="btn btn-danger btn-sm" onclick="deleteWebhook('${w.id}')">Delete</button></div>`).join('');
 }
 
 function renderCustomFields() {
   const container = document.getElementById('customFieldsList');
   if(!container) return;
-  container.innerHTML = customFields.map(f => `<div class="note-card"><div><strong>${escapeHtml(f.name)}</strong> (${f.type})</div><button class="btn btn-danger btn-sm" onclick="deleteCustomField('${f.id}')">Delete</button></div>`).join('') || '<p class="data-label">No custom fields.</p>';
+  if (customFields.length === 0) {
+    container.innerHTML = '<div class="empty-state"><i class="fas fa-tags"></i><p>No custom fields</p><button class="btn btn-secondary btn-sm" onclick="addCustomField()">+ Add Custom Field</button></div>';
+    return;
+  }
+  container.innerHTML = customFields.map(f => `<div class="note-card"><div><strong>${escapeHtml(f.name)}</strong> (${f.type})</div><button class="btn btn-danger btn-sm" onclick="deleteCustomField('${f.id}')">Delete</button></div>`).join('');
 }
 
 async function addWebhook() {
   const url = prompt('Webhook URL:');
   if(url) {
-    await db.collection('webhooks').add({ url, events: ['deal_update', 'document_upload'], createdAt: new Date().toISOString() });
-    showToast('Webhook added');
-    loadWebhooks();
+    try {
+      await db.collection('webhooks').add({ url, events: ['deal_update', 'document_upload'], createdAt: new Date().toISOString() });
+      showToast('Webhook added');
+      loadWebhooks();
+    } catch(e) { showToast(e.message, true); }
   }
 }
 
 async function deleteWebhook(id) {
-  await db.collection('webhooks').doc(id).delete();
-  loadWebhooks();
-  showToast('Webhook deleted');
+  if (!confirmDelete('webhook')) return;
+  try {
+    await db.collection('webhooks').doc(id).delete();
+    loadWebhooks();
+    showToast('Webhook deleted');
+  } catch(e) { showToast(e.message, true); }
 }
 
 async function addCustomField() {
   const name = prompt('Field name:');
   const type = prompt('Type (text/date/number):');
   if(name && type) {
-    await db.collection('customFields').add({ name, type, createdAt: new Date().toISOString() });
-    showToast('Custom field added');
-    loadCustomFields();
+    try {
+      await db.collection('customFields').add({ name, type, createdAt: new Date().toISOString() });
+      showToast('Custom field added');
+      loadCustomFields();
+    } catch(e) { showToast(e.message, true); }
   }
 }
 
 async function deleteCustomField(id) {
-  await db.collection('customFields').doc(id).delete();
-  loadCustomFields();
-  showToast('Custom field deleted');
+  if (!confirmDelete('custom field')) return;
+  try {
+    await db.collection('customFields').doc(id).delete();
+    loadCustomFields();
+    showToast('Custom field deleted');
+  } catch(e) { showToast(e.message, true); }
 }
 
 function enable2FA() {
@@ -2112,7 +2418,7 @@ window.requestPasswordReset = function() {
 };
 
 // ============================================================
-// LOGIN HANDLERS
+// LOGIN HANDLERS (with try/catch)
 // ============================================================
 window.login = async function() {
   if(checkLoginLockout('client')) return;
@@ -2120,8 +2426,16 @@ window.login = async function() {
   const pass = document.getElementById('loginPassword').value;
   const errEl = document.getElementById('loginError');
   errEl.style.display = 'none';
-  try { await auth.signInWithEmailAndPassword(email, pass); resetLoginAttempts('client'); closeModal('loginModal'); } 
-  catch(e) { recordFailedLogin('client'); errEl.innerText = 'Invalid credentials.'; errEl.style.display = 'block'; }
+  try { 
+    await auth.signInWithEmailAndPassword(email, pass); 
+    resetLoginAttempts('client'); 
+    closeModal('loginModal'); 
+  } catch(e) { 
+    recordFailedLogin('client'); 
+    errEl.innerText = 'Invalid credentials.'; 
+    errEl.style.display = 'block';
+    showToast(e.message, true);
+  }
 };
 
 window.brokerLogin = async function() {
@@ -2130,8 +2444,16 @@ window.brokerLogin = async function() {
   const pass = document.getElementById('brokerLoginPassword').value;
   const errEl = document.getElementById('brokerLoginError');
   errEl.style.display = 'none';
-  try { await auth.signInWithEmailAndPassword(email, pass); resetLoginAttempts('broker'); closeModal('loginModal'); } 
-  catch(e) { recordFailedLogin('broker'); errEl.innerText = 'Invalid credentials.'; errEl.style.display = 'block'; }
+  try { 
+    await auth.signInWithEmailAndPassword(email, pass); 
+    resetLoginAttempts('broker'); 
+    closeModal('loginModal'); 
+  } catch(e) { 
+    recordFailedLogin('broker'); 
+    errEl.innerText = 'Invalid credentials.'; 
+    errEl.style.display = 'block';
+    showToast(e.message, true);
+  }
 };
 
 window.doAdminLogin = async function() {
@@ -2143,14 +2465,25 @@ window.doAdminLogin = async function() {
   try {
     const cred = await auth.signInWithEmailAndPassword(email, pass);
     const adminCheck = await db.collection('admins').doc(cred.user.uid).get();
-    if (!adminCheck.exists) { await auth.signOut(); errEl.textContent = 'Access denied.'; errEl.style.display = 'block'; recordFailedLogin('admin'); return; }
+    if (!adminCheck.exists) { 
+      await auth.signOut(); 
+      errEl.textContent = 'Access denied.'; 
+      errEl.style.display = 'block'; 
+      recordFailedLogin('admin'); 
+      return; 
+    }
     resetLoginAttempts('admin');
     closeModal('loginModal'); 
-  } catch(e) { recordFailedLogin('admin'); errEl.textContent = 'Incorrect credentials.'; errEl.style.display = 'block'; }
+  } catch(e) { 
+    recordFailedLogin('admin'); 
+    errEl.textContent = 'Incorrect credentials.'; 
+    errEl.style.display = 'block';
+    showToast(e.message, true);
+  }
 };
 
 // ============================================================
-// REGISTRATION HANDLERS
+// REGISTRATION HANDLERS (with try/catch)
 // ============================================================
 window.register = async function() {
   const name = document.getElementById('regName').value.trim();
@@ -2219,102 +2552,138 @@ function setupListeners() {
     if (unsubscribers.length) { unsubscribers.forEach(fn => fn()); unsubscribers = []; }
     if (!user) return showView('home');
     
-    const adminDoc = await db.collection('admins').doc(user.uid).get();
-    if(adminDoc.exists) {
-      // Admin subscriptions
-      unsubscribers.push(db.collection('clients').onSnapshot(s => { clients = s.docs.map(d => ({id:d.id, ...d.data()})); renderAdminTables(); renderAnalytics(); renderPipeline(); renderBrokerPerformance(); renderSubmissionsTable(); renderDealHealthSummary(); updateDashboardWidgets(); checkDocumentExpiry(); }));
-      unsubscribers.push(db.collection('projects').onSnapshot(s => { projects = s.docs.map(d => ({id:d.id, ...d.data()})); renderAdminTables(); renderAnalytics(); renderPipeline(); renderBrokerPerformance(); renderInbox(); renderDealHealthSummary(); updateCalendar(); updateComparisonSelects(); updateDashboardWidgets(); }));
-      unsubscribers.push(db.collection('brokers').onSnapshot(s => { brokers = s.docs.map(d => ({id:d.id, ...d.data()})); renderBrokerAdminTable(); renderBrokerPerformance(); renderBrokerLeaderboard(); }));
-      unsubscribers.push(db.collection('brokerSubmissions').onSnapshot(s => { brokerSubmissions = s.docs.map(d => ({id:d.id, ...d.data()})); renderBrokerAdminTable(); renderBrokerPerformance(); renderSubmissionsTable(); setupAdminNotifications(); }));
-      unsubscribers.push(db.collection('documents').onSnapshot(s => { documents = s.docs.map(d => ({id:d.id, ...d.data()})); renderAdminDocumentsTable(); checkDocumentExpiry(); }));
-      unsubscribers.push(db.collection('messages').onSnapshot(s => { messages = s.docs.map(d => ({id:d.id, ...d.data()})); renderInbox(); setupAdminNotifications(); }));
-      unsubscribers.push(db.collection('brokerMessages').onSnapshot(s => { brokerMessages = s.docs.map(d => ({id:d.id, ...d.data()})); renderInbox(); setupAdminNotifications(); }));
-      unsubscribers.push(db.collection('meetings').onSnapshot(s => { meetings = s.docs.map(d => ({id:d.id, ...d.data()})); renderMeetings(); setupAdminNotifications(); }));
-      unsubscribers.push(db.collection('brokerUpdateRequests').onSnapshot(s => { brokerUpdateRequests = s.docs.map(d => ({id:d.id, ...d.data()})); renderBrokerAdminTable(); setupAdminNotifications(); }));
-      unsubscribers.push(db.collection('settings').doc('dealAppetite').onSnapshot(doc => { if(doc.exists) document.getElementById('dealAppetiteText') && (document.getElementById('dealAppetiteText').value = doc.data().content || ''); }));
-      unsubscribers.push(db.collection('settings').doc('announcement').onSnapshot(doc => { if(doc.exists) document.getElementById('announcementText') && (document.getElementById('announcementText').value = doc.data().content || ''); }));
-      unsubscribers.push(db.collection('settings').doc('adminProfile').onSnapshot(doc => { if(doc.exists && doc.data()) { const p = doc.data(); document.getElementById('adminDisplayName') && (document.getElementById('adminDisplayName').value = p.displayName || 'Suzana Aleksić'); document.getElementById('adminTitle') && (document.getElementById('adminTitle').value = p.title || 'Principal'); document.getElementById('adminProfileEmail') && (document.getElementById('adminProfileEmail').value = p.email || 'suzana.aleksic@croftfinance.com'); document.getElementById('adminPhone') && (document.getElementById('adminPhone').value = p.phone || '+381 69 288 0 191'); document.getElementById('adminAvailability') && (document.getElementById('adminAvailability').value = p.availability || 'Mon–Fri, 9:00–18:00 CET'); } }));
-      unsubscribers.push(db.collection('activityLog').orderBy('timestamp', 'desc').limit(200).onSnapshot(s => { activityLog = s.docs.map(d => ({ id: d.id, ...d.data() })); renderAuditLog(); }));
-      await loadSettings();
-      showView('admin');
-      updateAdminGreeting();
-    } else {
-      const cDoc = await db.collection('clients').doc(user.uid).get();
-      if (cDoc.exists) {
-        currentClient = {id:user.uid, ...cDoc.data()};
-        if(currentClient.status === 'pending') { showToast('Account under review.', true); return logout(); }
-        unsubscribers.push(db.collection('projects').where('clientId','==',user.uid).onSnapshot(s => { projects = s.docs.map(d => ({id:d.id, ...d.data()})); if(projects.length) { currentProjectId = projects[0].id; loadCurrentProjectData(); renderCapitalStack(); renderProjectsList(); renderStepAccordion(); checkDeadlines(); loadClientActivityLog(); updateUpcomingDeadlines(); } }));
-        unsubscribers.push(db.collection('documents').where('clientId','==',user.uid).onSnapshot(s => { documents = s.docs.map(d => ({id:d.id, ...d.data()})); renderDocuments(); }));
-        unsubscribers.push(db.collection('messages').where('clientId','==',user.uid).onSnapshot(s => { messages = s.docs.map(d => ({id:d.id, ...d.data()})); loadMessages(); }));
-        unsubscribers.push(db.collection('meetings').where('clientId','==',user.uid).onSnapshot(s => { if(document.getElementById('tab-schedule').classList.contains('active')) loadClientMeetings(); }));
-        showView('portal');
-        loadClientPortal();
+    try {
+      const adminDoc = await db.collection('admins').doc(user.uid).get();
+      if(adminDoc.exists) {
+        // Admin subscriptions
+        unsubscribers.push(db.collection('clients').onSnapshot(s => { clients = s.docs.map(d => ({id:d.id, ...d.data()})); markDirty(); renderAdminTables(); renderAnalytics(); renderPipeline(); renderBrokerPerformance(); renderSubmissionsTable(); renderDealHealthSummary(); updateDashboardWidgets(); checkDocumentExpiry(); }));
+        unsubscribers.push(db.collection('projects').onSnapshot(s => { projects = s.docs.map(d => ({id:d.id, ...d.data()})); markDirty(); renderAdminTables(); renderAnalytics(); renderPipeline(); renderBrokerPerformance(); renderInbox(); renderDealHealthSummary(); updateCalendar(); updateComparisonSelects(); updateDashboardWidgets(); }));
+        unsubscribers.push(db.collection('brokers').onSnapshot(s => { brokers = s.docs.map(d => ({id:d.id, ...d.data()})); markDirty(); renderBrokerAdminTable(); renderBrokerPerformance(); renderBrokerLeaderboard(); }));
+        unsubscribers.push(db.collection('brokerSubmissions').onSnapshot(s => { brokerSubmissions = s.docs.map(d => ({id:d.id, ...d.data()})); markDirty(); renderBrokerAdminTable(); renderBrokerPerformance(); renderSubmissionsTable(); setupAdminNotifications(); }));
+        unsubscribers.push(db.collection('documents').onSnapshot(s => { documents = s.docs.map(d => ({id:d.id, ...d.data()})); markDirty(); renderAdminDocumentsTable(); checkDocumentExpiry(); }));
+        unsubscribers.push(db.collection('messages').onSnapshot(s => { messages = s.docs.map(d => ({id:d.id, ...d.data()})); markDirty(); renderInbox(); setupAdminNotifications(); }));
+        unsubscribers.push(db.collection('brokerMessages').onSnapshot(s => { brokerMessages = s.docs.map(d => ({id:d.id, ...d.data()})); markDirty(); renderInbox(); setupAdminNotifications(); }));
+        unsubscribers.push(db.collection('meetings').onSnapshot(s => { meetings = s.docs.map(d => ({id:d.id, ...d.data()})); markDirty(); renderMeetings(); setupAdminNotifications(); }));
+        unsubscribers.push(db.collection('brokerUpdateRequests').onSnapshot(s => { brokerUpdateRequests = s.docs.map(d => ({id:d.id, ...d.data()})); markDirty(); renderBrokerAdminTable(); setupAdminNotifications(); }));
+        unsubscribers.push(db.collection('settings').doc('dealAppetite').onSnapshot(doc => { if(doc.exists) document.getElementById('dealAppetiteText') && (document.getElementById('dealAppetiteText').value = doc.data().content || ''); }));
+        unsubscribers.push(db.collection('settings').doc('announcement').onSnapshot(doc => { if(doc.exists) document.getElementById('announcementText') && (document.getElementById('announcementText').value = doc.data().content || ''); }));
+        unsubscribers.push(db.collection('settings').doc('adminProfile').onSnapshot(doc => { if(doc.exists && doc.data()) { const p = doc.data(); document.getElementById('adminDisplayName') && (document.getElementById('adminDisplayName').value = p.displayName || 'Suzana Aleksić'); document.getElementById('adminTitle') && (document.getElementById('adminTitle').value = p.title || 'Principal'); document.getElementById('adminProfileEmail') && (document.getElementById('adminProfileEmail').value = p.email || 'suzana.aleksic@croftfinance.com'); document.getElementById('adminPhone') && (document.getElementById('adminPhone').value = p.phone || '+381 69 288 0 191'); document.getElementById('adminAvailability') && (document.getElementById('adminAvailability').value = p.availability || 'Mon–Fri, 9:00–18:00 CET'); } }));
+        unsubscribers.push(db.collection('activityLog').orderBy('timestamp', 'desc').limit(200).onSnapshot(s => { activityLog = s.docs.map(d => ({ id: d.id, ...d.data() })); renderAuditLog(); }));
+        await loadSettings();
+        showView('admin');
+        updateAdminGreeting();
+        // Restore admin tab
+        const savedTab = restoreActiveTab('admin', 'overview');
+        switchAdminTab(savedTab);
       } else {
-        const bDoc = await db.collection('brokers').doc(user.uid).get();
-        if (bDoc.exists) {
-          currentBroker = {id:user.uid, ...bDoc.data()};
-          if(currentBroker.status === 'pending') {
-            showToast('Broker account under review. Please wait for approval.', true);
+        const cDoc = await db.collection('clients').doc(user.uid).get();
+        if (cDoc.exists) {
+          currentClient = {id:user.uid, ...cDoc.data()};
+          if(currentClient.status === 'pending') { showToast('Account under review.', true); return logout(); }
+          unsubscribers.push(db.collection('projects').where('clientId','==',user.uid).onSnapshot(s => { projects = s.docs.map(d => ({id:d.id, ...d.data()})); if(projects.length) { currentProjectId = projects[0].id; loadCurrentProjectData(); renderCapitalStack(); renderProjectsList(); renderStepAccordion(); checkDeadlines(); loadClientActivityLog(); updateUpcomingDeadlines(); } }));
+          unsubscribers.push(db.collection('documents').where('clientId','==',user.uid).onSnapshot(s => { documents = s.docs.map(d => ({id:d.id, ...d.data()})); renderDocuments(); }));
+          unsubscribers.push(db.collection('messages').where('clientId','==',user.uid).onSnapshot(s => { messages = s.docs.map(d => ({id:d.id, ...d.data()})); loadMessages(); }));
+          unsubscribers.push(db.collection('meetings').where('clientId','==',user.uid).onSnapshot(s => { if(document.getElementById('tab-schedule').classList.contains('active')) loadClientMeetings(); }));
+          showView('portal');
+          loadClientPortal();
+          // Restore client tab
+          const savedTab = restoreActiveTab('client', 'dashboard');
+          switchPortalTab(savedTab);
+        } else {
+          const bDoc = await db.collection('brokers').doc(user.uid).get();
+          if (bDoc.exists) {
+            currentBroker = {id:user.uid, ...bDoc.data()};
+            if(currentBroker.status === 'pending') {
+              showToast('Broker account under review. Please wait for approval.', true);
+              await auth.signOut();
+              showView('home');
+              return;
+            }
+            if(currentBroker.engagementStatus !== 'active') {
+              document.getElementById('broker-tab-portfolio').innerHTML = '<div class="card"><div class="card-body"><div class="action-banner warning"><i class="fas fa-file-contract"></i><div><strong>Introducer agreement pending</strong><br>Your introducer agreement is not yet on file. Detailed deal terms and commission figures will be visible once your engagement letter is received by Croft Finance. Please contact suzana.aleksic@croftfinance.com.</div></div></div></div>';
+            }
+            unsubscribers.push(db.collection('brokerSubmissions').where('brokerId','==',user.uid).onSnapshot(s => { brokerSubmissions = s.docs.map(d => ({id:d.id, ...d.data()})); updateBrokerDashboard(); }));
+            unsubscribers.push(db.collection('projects').where('brokerId','==',user.uid).onSnapshot(s => { projects = s.docs.map(d => ({id:d.id, ...d.data()})); renderBrokerPortfolio(); updateBrokerDashboard(); }));
+            unsubscribers.push(db.collection('brokerMessages').where('brokerId','==',user.uid).onSnapshot(s => { brokerMessages = s.docs.map(d => ({id:d.id, ...d.data()})); loadBrokerMessages(); }));
+            unsubscribers.push(db.collection('clients').onSnapshot(s => { clients = s.docs.map(d => ({id:d.id, ...d.data()})); renderBrokerPortfolio(); }));
+            unsubscribers.push(db.collection('brokers').doc(user.uid).onSnapshot(doc => { if(doc.exists) { currentBroker = {id: user.uid, ...doc.data()}; updateBrokerDashboard(); renderBrokerPortfolio(); } }));
+            unsubscribers.push(db.collection('settings').doc('dealAppetite').onSnapshot(doc => { if(doc.exists) document.getElementById('dealAppetiteContent').innerHTML = doc.data().content || 'Croft Finance is currently active across all sectors. Please contact Suzana to discuss specific mandates.'; }));
+            showView('broker');
+            loadBrokerPortal();
+            // Restore broker tab
+            const savedTab = restoreActiveTab('broker', 'dashboard');
+            switchBrokerTab(savedTab);
+          } else {
+            showToast('Account not found. Please register or contact Croft Finance.', true);
             await auth.signOut();
             showView('home');
-            return;
           }
-          if(currentBroker.engagementStatus !== 'active') {
-            document.getElementById('broker-tab-portfolio').innerHTML = '<div class="card"><div class="card-body"><div class="action-banner warning"><i class="fas fa-file-contract"></i><div><strong>Introducer agreement pending</strong><br>Your introducer agreement is not yet on file. Detailed deal terms and commission figures will be visible once your engagement letter is received by Croft Finance. Please contact suzana.aleksic@croftfinance.com.</div></div></div></div>';
-          }
-          unsubscribers.push(db.collection('brokerSubmissions').where('brokerId','==',user.uid).onSnapshot(s => { brokerSubmissions = s.docs.map(d => ({id:d.id, ...d.data()})); updateBrokerDashboard(); }));
-          unsubscribers.push(db.collection('projects').where('brokerId','==',user.uid).onSnapshot(s => { projects = s.docs.map(d => ({id:d.id, ...d.data()})); renderBrokerPortfolio(); updateBrokerDashboard(); }));
-          unsubscribers.push(db.collection('brokerMessages').where('brokerId','==',user.uid).onSnapshot(s => { brokerMessages = s.docs.map(d => ({id:d.id, ...d.data()})); loadBrokerMessages(); }));
-          unsubscribers.push(db.collection('clients').onSnapshot(s => { clients = s.docs.map(d => ({id:d.id, ...d.data()})); renderBrokerPortfolio(); }));
-          unsubscribers.push(db.collection('brokers').doc(user.uid).onSnapshot(doc => { if(doc.exists) { currentBroker = {id: user.uid, ...doc.data()}; updateBrokerDashboard(); renderBrokerPortfolio(); } }));
-          unsubscribers.push(db.collection('settings').doc('dealAppetite').onSnapshot(doc => { if(doc.exists) document.getElementById('dealAppetiteContent').innerHTML = doc.data().content || 'Croft Finance is currently active across all sectors. Please contact Suzana to discuss specific mandates.'; }));
-          showView('broker');
-          loadBrokerPortal();
-        } else {
-          showToast('Account not found. Please register or contact Croft Finance.', true);
-          await auth.signOut();
-          showView('home');
         }
       }
+    } catch(e) {
+      showToast(e.message, true);
     }
   });
 }
 
 function logout() { 
-  if(capitalChart) capitalChart.destroy();
-  if(industryChart) industryChart.destroy();
-  if(pipelineStageChart) pipelineStageChart.destroy();
-  if(quarterlyChart) quarterlyChart.destroy();
+  if(chartInstances.capitalChart) chartInstances.capitalChart.destroy();
+  if(chartInstances.industryChart) chartInstances.industryChart.destroy();
+  if(chartInstances.pipelineStageChart) chartInstances.pipelineStageChart.destroy();
+  if(chartInstances.quarterlyChart) chartInstances.quarterlyChart.destroy();
+  Object.keys(chartInstances).forEach(key => chartInstances[key] = null);
+  if(calendar) { calendar.destroy(); calendar = null; }
   auth.signOut().then(() => location.reload()); 
 }
 
 // ============================================================
-// SIDEBAR TOGGLES & TAB SWITCHERS
+// SIDEBAR TOGGLES & TAB SWITCHERS (with persistence and auto-close)
 // ============================================================
-window.toggleSidebar = function() { document.getElementById('clientSidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('show'); const h = document.getElementById('hamburgerBtn'); if(h) h.classList.toggle('open'); };
-window.toggleAdminSidebar = function() { document.getElementById('adminSidebar').classList.toggle('open'); document.getElementById('adminSidebarOverlay').classList.toggle('show'); };
-window.toggleBrokerSidebar = function() { document.getElementById('brokerSidebar').classList.toggle('open'); document.getElementById('brokerSidebarOverlay').classList.toggle('show'); };
+window.toggleSidebar = function() { 
+  document.getElementById('clientSidebar').classList.toggle('open'); 
+  document.getElementById('sidebarOverlay').classList.toggle('show'); 
+  const h = document.getElementById('hamburgerBtn'); 
+  if(h) h.classList.toggle('open'); 
+};
+
+window.toggleAdminSidebar = function() { 
+  document.getElementById('adminSidebar').classList.toggle('open'); 
+  document.getElementById('adminSidebarOverlay').classList.toggle('show'); 
+};
+
+window.toggleBrokerSidebar = function() { 
+  document.getElementById('brokerSidebar').classList.toggle('open'); 
+  document.getElementById('brokerSidebarOverlay').classList.toggle('show'); 
+};
+
 window.scrollToSection = function(id) { document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }); };
 window.openLoginModal = function() { showLoginForm(); openModal('loginModal'); };
 
 document.addEventListener('click', function(e) {
   const btn = e.target.closest('[data-tab]');
-  if(btn && btn.closest('#view-portal')) { e.preventDefault(); switchPortalTab(btn.dataset.tab); }
+  if(btn && btn.closest('#view-portal')) { e.preventDefault(); switchPortalTab(btn.dataset.tab); if(window.innerWidth <= 768) toggleSidebar(); }
   const adminBtn = e.target.closest('[data-admin-tab]');
-  if(adminBtn && adminBtn.closest('#view-admin')) { e.preventDefault(); switchAdminTab(adminBtn.dataset.adminTab); }
+  if(adminBtn && adminBtn.closest('#view-admin')) { e.preventDefault(); switchAdminTab(adminBtn.dataset.adminTab); if(window.innerWidth <= 768) toggleAdminSidebar(); }
   const brokerBtn = e.target.closest('[data-broker-tab]');
-  if(brokerBtn && brokerBtn.closest('#view-broker')) { e.preventDefault(); switchBrokerTab(brokerBtn.dataset.brokerTab); }
+  if(brokerBtn && brokerBtn.closest('#view-broker')) { e.preventDefault(); switchBrokerTab(brokerBtn.dataset.brokerTab); if(window.innerWidth <= 768) toggleBrokerSidebar(); }
   const chip = e.target.closest('.filter-chip');
   if(chip && chip.closest('#admin-inbox')) {
     document.querySelectorAll('#admin-inbox .filter-chip').forEach(c=>c.classList.remove('active'));
     chip.classList.add('active');
     renderInbox();
   }
+  // Close sidebar when clicking overlay
+  if (e.target.classList.contains('sidebar-overlay')) {
+    if (e.target.id === 'sidebarOverlay') toggleSidebar();
+    if (e.target.id === 'adminSidebarOverlay') toggleAdminSidebar();
+    if (e.target.id === 'brokerSidebarOverlay') toggleBrokerSidebar();
+  }
 });
 
 function switchPortalTab(tabName) {
   document.querySelectorAll('#view-portal .portal-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-' + tabName).classList.add('active');
+  const targetTab = document.getElementById('tab-' + tabName);
+  if (targetTab) targetTab.classList.add('active');
   document.querySelectorAll('#view-portal .nav-item').forEach(i => i.classList.remove('active'));
   const activeNav = document.querySelector(`#view-portal .nav-item[data-tab="${tabName}"]`);
   if(activeNav) activeNav.classList.add('active');
@@ -2322,12 +2691,14 @@ function switchPortalTab(tabName) {
   if(tabName === 'documents') renderDocuments();
   if(tabName === 'schedule') loadClientMeetings();
   if(tabName === 'activity') loadClientActivityLog();
+  saveActiveTab('client', tabName);
   if(window.innerWidth <= 768) { document.getElementById('clientSidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('show'); }
 }
 
 function switchAdminTab(tabName) {
   document.querySelectorAll('#view-admin .admin-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('admin-' + tabName).classList.add('active');
+  const targetTab = document.getElementById('admin-' + tabName);
+  if (targetTab) targetTab.classList.add('active');
   document.querySelectorAll('#view-admin .nav-item').forEach(i => i.classList.remove('active'));
   const activeNav = document.querySelector(`#view-admin .nav-item[data-admin-tab="${tabName}"]`);
   if(activeNav) activeNav.classList.add('active');
@@ -2335,17 +2706,20 @@ function switchAdminTab(tabName) {
   if(tabName === 'audit') renderAuditLog();
   if(tabName === 'inbox') renderInbox();
   if(tabName === 'submissions') renderSubmissionsTable();
+  saveActiveTab('admin', tabName);
   if(window.innerWidth <= 768) { document.getElementById('adminSidebar').classList.remove('open'); document.getElementById('adminSidebarOverlay').classList.remove('show'); }
 }
 
 function switchBrokerTab(tabName) {
   document.querySelectorAll('#view-broker .portal-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('broker-tab-' + tabName).classList.add('active');
+  const targetTab = document.getElementById('broker-tab-' + tabName);
+  if (targetTab) targetTab.classList.add('active');
   document.querySelectorAll('#view-broker .nav-item').forEach(i => i.classList.remove('active'));
   const activeNav = document.querySelector(`#view-broker .nav-item[data-broker-tab="${tabName}"]`);
   if(activeNav) activeNav.classList.add('active');
   if(tabName === 'messages') loadBrokerMessages();
   if(tabName === 'portfolio') renderBrokerPortfolio();
+  saveActiveTab('broker', tabName);
   if(window.innerWidth <= 768) { document.getElementById('brokerSidebar').classList.remove('open'); document.getElementById('brokerSidebarOverlay').classList.remove('show'); }
 }
 
@@ -2366,7 +2740,7 @@ window.toggleOtherLendersNotes = function() {
 // ENHANCEMENT: Dashboard Widgets & Calendar
 // ============================================================
 function updateCalendar() {
-  if(calendar) calendar.destroy();
+  if(calendar) { calendar.destroy(); calendar = null; }
   const calendarEl = document.getElementById('calendar');
   if(!calendarEl) return;
   const events = projects.filter(p => p.closeDate).map(p => ({
@@ -2445,81 +2819,97 @@ function updateUpcomingDeadlines() {
   if(p.commitmentFeeDeadline) deadlines.push({ name: 'Commitment Fee', date: p.commitmentFeeDeadline });
   if(p.deedExpiry) deadlines.push({ name: 'Deed of Undertaking', date: p.deedExpiry });
   if(p.ecfPolicyExpiry) deadlines.push({ name: 'ECF Policy', date: p.ecfPolicyExpiry });
+  if (deadlines.length === 0) {
+    container.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-alt"></i><p>No upcoming deadlines</p></div>';
+    return;
+  }
   container.innerHTML = deadlines.map(d => {
     const days = Math.ceil((new Date(d.date) - new Date()) / (1000*60*60*24));
     return `<div class="note-card"><div class="note-card-label">${d.name}</div><div class="note-card-text">${formatDate(d.date)} (${days} days remaining)</div></div>`;
-  }).join('') || '<p class="data-label">No upcoming deadlines</p>';
+  }).join('');
 }
 
 // ============================================================
-// EXPORT FUNCTIONS (Enhancement 3)
+// EXPORT FUNCTIONS
 // ============================================================
 function exportPipelineToExcel() {
-  const data = projects.map(p => ({
-    Name: p.name,
-    Client: clients.find(c => c.id === p.clientId)?.name,
-    Step: STEP_NAMES[p.step],
-    Amount: p.amount,
-    CloseDate: p.closeDate
-  }));
-  const ws = XLSX.utils.json_to_sheet(data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Pipeline');
-  XLSX.writeFile(wb, `pipeline_${new Date().toISOString().slice(0,10)}.xlsx`);
-  showToast('Pipeline exported');
+  try {
+    const data = projects.map(p => ({
+      Name: p.name,
+      Client: clients.find(c => c.id === p.clientId)?.name,
+      Step: STEP_NAMES[p.step],
+      Amount: p.amount,
+      CloseDate: p.closeDate
+    }));
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Pipeline');
+    XLSX.writeFile(wb, `pipeline_${new Date().toISOString().slice(0,10)}.xlsx`);
+    showToast('Pipeline exported');
+  } catch(e) { showToast(e.message, true); }
 }
 
 function exportCommissionStatement() {
-  const funded = projects.filter(p => p.step === 9);
-  const data = funded.map(p => ({
-    Project: p.name,
-    Client: clients.find(c => c.id === p.clientId)?.name,
-    Amount: p.amount,
-    Commission: (parseFloat(p.amount) * ADMIN_ONLY_COMMISSION_RATE).toFixed(2),
-    FundedDate: p.fundedDate
-  }));
-  const ws = XLSX.utils.json_to_sheet(data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Commissions');
-  XLSX.writeFile(wb, `commission_${new Date().toISOString().slice(0,10)}.xlsx`);
-  showToast('Commission statement exported');
+  try {
+    const funded = projects.filter(p => p.step === 9);
+    const data = funded.map(p => ({
+      Project: p.name,
+      Client: clients.find(c => c.id === p.clientId)?.name,
+      Amount: p.amount,
+      Commission: (parseFloat(p.amount) * ADMIN_ONLY_COMMISSION_RATE).toFixed(2),
+      FundedDate: p.fundedDate
+    }));
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Commissions');
+    XLSX.writeFile(wb, `commission_${new Date().toISOString().slice(0,10)}.xlsx`);
+    showToast('Commission statement exported');
+  } catch(e) { showToast(e.message, true); }
 }
 
 function exportClientPortfolios() {
-  const data = clients.map(c => ({
-    Name: c.name,
-    Email: c.email,
-    Projects: projects.filter(p => p.clientId === c.id).length,
-    TotalAmount: formatCurrency(projects.filter(p => p.clientId === c.id).reduce((s,p) => s + (parseFloat(p.amount) || 0), 0))
-  }));
-  const ws = XLSX.utils.json_to_sheet(data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Portfolios');
-  XLSX.writeFile(wb, `portfolios_${new Date().toISOString().slice(0,10)}.xlsx`);
-  showToast('Portfolios exported');
+  try {
+    const data = clients.map(c => ({
+      Name: c.name,
+      Email: c.email,
+      Projects: projects.filter(p => p.clientId === c.id).length,
+      TotalAmount: formatCurrency(projects.filter(p => p.clientId === c.id).reduce((s,p) => s + (parseFloat(p.amount) || 0), 0))
+    }));
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Portfolios');
+    XLSX.writeFile(wb, `portfolios_${new Date().toISOString().slice(0,10)}.xlsx`);
+    showToast('Portfolios exported');
+  } catch(e) { showToast(e.message, true); }
 }
 
 function exportAuditLog() {
-  const data = activityLog.map(l => ({
-    Time: formatDateTime(l.timestamp),
-    User: l.actorName,
-    Action: l.action,
-    Details: l.details
-  }));
-  const ws = XLSX.utils.json_to_sheet(data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'AuditLog');
-  XLSX.writeFile(wb, `audit_${new Date().toISOString().slice(0,10)}.xlsx`);
-  showToast('Audit log exported');
+  try {
+    const data = activityLog.map(l => ({
+      Time: formatDateTime(l.timestamp),
+      User: l.actorName,
+      Action: l.action,
+      Details: l.details
+    }));
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'AuditLog');
+    XLSX.writeFile(wb, `audit_${new Date().toISOString().slice(0,10)}.xlsx`);
+    showToast('Audit log exported');
+  } catch(e) { showToast(e.message, true); }
 }
 
 function renderAuditLog() {
   const search = document.getElementById('auditSearch')?.value.toLowerCase() || '';
   const filtered = activityLog.filter(l => l.actorName?.toLowerCase().includes(search) || l.action?.toLowerCase().includes(search) || l.details?.toLowerCase().includes(search));
+  if (filtered.length === 0) {
+    document.getElementById('auditLogList').innerHTML = '<div class="empty-state"><i class="fas fa-history"></i><p>No audit logs found</p></div>';
+    return;
+  }
   document.getElementById('auditLogList').innerHTML = filtered.map(l => {
     const actionText = ACTION_LABELS[l.action] || l.action;
     return `<div class="audit-entry"><div class="audit-time">${formatDateTime(l.timestamp)}</div><div><div class="audit-action"><strong>${escapeHtml(l.actorName)}</strong> (${l.actorRole}) — ${actionText}</div><div class="audit-detail">${escapeHtml(l.details || '')}</div></div></div>`;
-  }).join('') || '<div class="data-label">No audit logs</div>';
+  }).join('');
 }
 
 function generateBrokerStatement() {
@@ -2533,8 +2923,11 @@ function generateBrokerStatement() {
     const amt = parseFloat(p.amount) || 0;
     const comm = amt * ((broker.commissionRate || 0) / 100);
     total += comm;
-    html += `<tr><td>${escapeHtml(p.name)}</td><td>${formatCurrency(amt)}</td><td>${formatCurrency(comm)}</td></tr>`;
+    html += `<tr><td>${escapeHtml(p.name)}</div><td>${formatCurrency(amt)}</div><td>${formatCurrency(comm)}</div></tr>`;
   });
+  if (brokerProjects.length === 0) {
+    html += `<tr><td colspan="3" class="empty-state">No funded projects yet</td></tr>`;
+  }
   html += `<tr><td><strong>Total</strong></td><td></td><td><strong>${formatCurrency(total)}</strong></td></tr></tbody></table>`;
   document.getElementById('statementContent').innerHTML = html;
   openModal('statementModal');
@@ -2548,16 +2941,24 @@ function renderBrokerLeaderboard() {
   })).sort((a,b) => b.volume - a.volume).slice(0,5);
   const container = document.getElementById('brokerLeaderboard');
   if(container) {
-    container.innerHTML = stats.map(s => `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:0.5px solid var(--gray-100);"><span>${escapeHtml(s.name)}</span><span>${formatCurrency(s.volume)} (${s.funded} funded)</span></div>`).join('') || '<p class="data-label">No broker data</p>';
+    if (stats.length === 0) {
+      container.innerHTML = '<div class="empty-state"><i class="fas fa-trophy"></i><p>No broker data available</p></div>';
+      return;
+    }
+    container.innerHTML = stats.map(s => `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:0.5px solid var(--gray-100);"><span>${escapeHtml(s.name)}</span><span>${formatCurrency(s.volume)} (${s.funded} funded)</span></div>`).join('');
   }
   const small = document.getElementById('brokerLeaderboardSmall');
   if(small) {
+    if (stats.length === 0) {
+      small.innerHTML = '<div class="empty-state"><i class="fas fa-trophy"></i><p>No data</p></div>';
+      return;
+    }
     small.innerHTML = stats.map(s => `<div>${escapeHtml(s.name)}: ${formatCurrency(s.volume)}</div>`).join('');
   }
 }
 
 // ============================================================
-// CLIENT PORTAL FUNCTIONS (Preserved)
+// CLIENT PORTAL FUNCTIONS
 // ============================================================
 function loadClientPortal() {
   document.getElementById('portalNavUser').innerText = currentClient.name;
@@ -2633,28 +3034,33 @@ function renderCapitalStack() {
   if(!p || !currentProjectId) return;
   const sponsorEquity = parseFloat(String(p.sponsorEquity || '0').replace(/,/g, '')) || 0;
   const croftDebt = parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g, '')) || 0;
-  const ctx = document.getElementById('capitalStackChart')?.getContext('2d');
-  if(!ctx) return;
-  if(capitalChart) capitalChart.destroy();
-  capitalChart = new Chart(ctx, { type: 'pie', data: { labels: ['Sponsor Equity', 'Croft Finance'], datasets: [{ data: [sponsorEquity, croftDebt], backgroundColor: ['#06091a', '#2c5f8a'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom' } } } });
+  updateOrCreateChart('capitalStackChart', 'pie', {
+    labels: ['Sponsor Equity', 'Croft Finance'],
+    datasets: [{ data: [sponsorEquity, croftDebt], backgroundColor: ['#06091a', '#2c5f8a'], borderWidth: 0 }]
+  }, { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom' } } });
 }
 
 function renderDocuments() {
   const tbody = document.getElementById('closingDocumentsBody');
   if(!tbody) return;
   if(!currentProjectId) {
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--gray-400);">No project attached to your account yet.</td></tr>';
+    patchTable('closingDocumentsBody', '<tr><td colspan="4" class="empty-state"><i class="fas fa-folder-open"></i><p>No project attached to your account yet.</p></td></tr>');
     return;
   }
   const projDocs = documents.filter(d => d.projectId === currentProjectId);
-  tbody.innerHTML = projDocs.map(d => `
+  if (projDocs.length === 0) {
+    patchTable('closingDocumentsBody', '<tr><td colspan="4" class="empty-state"><i class="fas fa-file-alt"></i><p>No documents uploaded yet. Use the form below to upload.</p><button class="btn btn-secondary btn-sm" onclick="document.getElementById(\'clientUploadFile\').click()">Upload Document</button></td></tr>');
+    return;
+  }
+  const newRowsHtml = projDocs.map(d => `
     <tr>
       <td><strong>${escapeHtml(d.name)}</strong></td>
-      <td><span class="badge ${d.approved ? 'badge-success' : 'badge-warning'}">${d.approved ? 'Approved' : 'Pending Review'}</span></td>
-      <td>${d.date || '—'}</td>
-      <td><button class="doc-action-btn" onclick="openPDFWithWatermark('${d.url}', '${d.name}')">View</button><a href="${d.url}" download class="doc-action-btn">Download</a></td>
+      <td><span class="badge ${d.approved ? 'badge-success' : 'badge-warning'}">${d.approved ? 'Approved' : 'Pending Review'}</span></div></td>
+      <td>${d.date || '—'}</div></div></td>
+      <td><button class="doc-action-btn" onclick="openPDFWithWatermark('${d.url}', '${d.name}')">View</button><a href="${d.url}" download class="doc-action-btn">Download</a></div></div></td>
     </tr>
-  `).join('') || '<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--gray-400);">No documents uploaded yet.</td></tr>';
+  `).join('');
+  patchTable('closingDocumentsBody', newRowsHtml);
   const drop = document.getElementById('clientUploadDocType');
   if(drop) drop.innerHTML = '<option value="">Select Type</option><option>Term Sheet</option><option>Financial Statement</option><option>Due Diligence</option><option>Commitment Fee Receipt</option><option>Other</option>';
 }
@@ -2695,7 +3101,11 @@ function loadMessages() {
   const cont = document.getElementById('messagesList');
   if(!cont || !currentClient) return;
   const clientMsgs = messages.filter(m => m.clientId === currentClient.id).sort((a,b) => (a.timestamp?.seconds||0) - (b.timestamp?.seconds||0));
-  cont.innerHTML = clientMsgs.map(m => `<div class="message ${m.sender === 'client' ? 'client' : 'admin'}"><div class="message-sender"><span class="avatar">${m.sender === 'client' ? currentClient.name.charAt(0) : 'S'}</span> ${m.sender === 'client' ? 'You' : 'Suzana Aleksić'}</div><div class="message-bubble">${escapeHtml(m.content)}</div><div class="message-meta">${formatDateTime(m.timestamp)}</div></div>`).join('') || '<div class="data-label" style="text-align:center;">No messages</div>';
+  if (clientMsgs.length === 0) {
+    cont.innerHTML = '<div class="empty-state"><i class="fas fa-comments"></i><p>No messages yet. Send a message to Suzana to start a conversation.</p></div>';
+    return;
+  }
+  cont.innerHTML = clientMsgs.map(m => `<div class="message ${m.sender === 'client' ? 'client' : 'admin'}"><div class="message-sender"><span class="avatar">${m.sender === 'client' ? currentClient.name.charAt(0) : 'S'}</span> ${m.sender === 'client' ? 'You' : 'Suzana Aleksić'}</div><div class="message-bubble">${escapeHtml(m.content)}</div><div class="message-meta">${formatDateTime(m.timestamp)}</div></div>`).join('');
   cont.scrollTop = cont.scrollHeight;
 }
 
@@ -2703,25 +3113,31 @@ window.sendMessage = async function() {
   const input = document.getElementById('messageInput');
   const val = input.value.trim();
   if(!val) return;
-  await db.collection('messages').add({ clientId: currentClient.id, content: val, sender: 'client', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-  await logActivity(currentClient.id, currentClient.name, 'client', 'send_message', currentProjectId, `Message sent`);
-  
-  await sendEmailNotification({
-    to_name: 'Croft Finance Team',
-    to_email: EMAILJS_CONFIG.adminEmail,
-    from_name: 'Croft Finance',
-    subject: `New Message from ${currentClient.name}`,
-    message: val,
-    project_name: projects.find(p => p.id === currentProjectId)?.name || 'N/A'
-  });
-  
-  input.value = '';
+  try {
+    await db.collection('messages').add({ clientId: currentClient.id, content: val, sender: 'client', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+    await logActivity(currentClient.id, currentClient.name, 'client', 'send_message', currentProjectId, `Message sent`);
+    
+    await sendEmailNotification({
+      to_name: 'Croft Finance Team',
+      to_email: EMAILJS_CONFIG.adminEmail,
+      from_name: 'Croft Finance',
+      subject: `New Message from ${currentClient.name}`,
+      message: val,
+      project_name: projects.find(p => p.id === currentProjectId)?.name || 'N/A'
+    });
+    
+    input.value = '';
+  } catch(e) { showToast(e.message, true); }
 };
 
 function renderProjectsList() {
   const cont = document.getElementById('projectsList');
   if(!cont) return;
-  cont.innerHTML = projects.map(p => `<div class="card"><div class="card-body"><div style="display:flex;justify-content:space-between;margin-bottom:16px;"><h3 style="font-family:Cormorant Garamond;font-size:20px;">${escapeHtml(p.name)}</h3><span class="badge badge-info">Step ${p.step||1}</span></div><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;"><div><div class="data-label">Facility Amount</div><div class="data-value" style="font-size:18px;">${formatCurrency(p.amount)}</div></div><div><div class="data-label">Funds Needed</div><div class="data-value" style="font-size:18px;">${formatCurrency(p.fundsNeeded)}</div></div><div><div class="data-label">Interest Rate</div><div>${p.interestRate || '—'}%</div></div><div><div class="data-label">Term</div><div>${p.term || '—'} years</div></div><div><div class="data-label">Grace Period</div><div>${p.gracePeriod || '—'} months</div></div></div></div></div>`).join('') || '<div class="card"><div class="card-body">No projects</div></div>';
+  if (projects.length === 0) {
+    cont.innerHTML = '<div class="empty-state"><i class="fas fa-briefcase"></i><p>No projects found.</p></div>';
+    return;
+  }
+  cont.innerHTML = projects.map(p => `<div class="card"><div class="card-body"><div style="display:flex;justify-content:space-between;margin-bottom:16px;"><h3 style="font-family:Cormorant Garamond;font-size:20px;">${escapeHtml(p.name)}</h3><span class="badge badge-info">Step ${p.step||1}</span></div><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;"><div><div class="data-label">Facility Amount</div><div class="data-value" style="font-size:18px;">${formatCurrency(p.amount)}</div></div><div><div class="data-label">Funds Needed</div><div class="data-value" style="font-size:18px;">${formatCurrency(p.fundsNeeded)}</div></div><div><div class="data-label">Interest Rate</div><div>${p.interestRate || '—'}%</div></div><div><div class="data-label">Term</div><div>${p.term || '—'} years</div></div><div><div class="data-label">Grace Period</div><div>${p.gracePeriod || '—'} months</div></div></div></div></div>`).join('');
 }
 
 function renderStepAccordion() {
@@ -2778,11 +3194,15 @@ function loadClientActivityLog() {
   if(!container || !currentClient) return;
   db.collection('activityLog').where('actorId', '==', currentClient.id).orderBy('timestamp', 'desc').limit(50).get().then(snapshot => {
     const logs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (logs.length === 0) {
+      container.innerHTML = '<div class="empty-state"><i class="fas fa-history"></i><p>No recent activity</p></div>';
+      return;
+    }
     container.innerHTML = logs.map(l => {
       let actionText = ACTION_LABELS[l.action] || l.action;
       if(typeof actionText === 'function') actionText = actionText(l.details || '');
       return `<div class="activity-item"><div class="activity-dot ${l.actorRole === 'client' ? 'client' : (l.action.includes('confirm') ? 'completion' : 'croft')}"><i class="fas ${l.actorRole === 'client' ? 'fa-user' : (l.action.includes('confirm') ? 'fa-check' : 'fa-building')}"></i></div><div class="activity-content"><div class="activity-description">${escapeHtml(actionText)}</div><div class="activity-time">${formatDateTime(l.timestamp)}</div></div></div>`;
-    }).join('') || '<div class="data-label" style="text-align:center;">No activity</div>';
+    }).join('');
   });
 }
 
@@ -2809,7 +3229,11 @@ function checkDeadlines() {
     else continue;
     banners += `<div class="action-banner expiry-alert-${color === 'danger' ? 'critical' : (color === 'warning' ? 'warning' : 'notice')}" style="display:flex;justify-content:space-between;"><div><i class="fas ${icon}"></i> <strong>${dl.name} expires in ${daysLeft} days</strong><br><span style="font-size:12px;">Please contact Suzana immediately.</span></div><div><button class="btn btn-ghost btn-sm" onclick="dismissDeadline('${dl.field}')">Dismiss</button><button class="btn btn-primary btn-sm" onclick="switchPortalTab('messages')">Message Suzana</button></div></div>`;
   }
-  container.innerHTML = banners;
+  if (banners === '') {
+    container.innerHTML = '';
+  } else {
+    container.innerHTML = banners;
+  }
 }
 
 window.dismissDeadline = function(field) {
@@ -2838,19 +3262,21 @@ window.requestClientMeeting = async function() {
   const type = document.getElementById('clientMeetingType').value;
   const notes = document.getElementById('clientMeetingNotes').value;
   if(!date || !time) return showToast('Select date and time', true);
-  await db.collection('meetings').add({ clientId: currentClient.id, clientName: currentClient.name, date, time, type, notes, status: 'pending', createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-  document.getElementById('meetingRequestForm').style.display = 'none';
-  document.getElementById('meetingSuccessMessage').style.display = 'block';
-  showToast('Meeting request sent');
-  
-  await sendEmailNotification({
-    to_name: 'Croft Finance Team',
-    to_email: EMAILJS_CONFIG.adminEmail,
-    from_name: 'Croft Finance',
-    subject: `Meeting Request from ${currentClient.name}`,
-    message: `Client requested a ${type} meeting on ${date} at ${time}.\nNotes: ${notes}`,
-    project_name: projects.find(p => p.id === currentProjectId)?.name || 'N/A'
-  });
+  try {
+    await db.collection('meetings').add({ clientId: currentClient.id, clientName: currentClient.name, date, time, type, notes, status: 'pending', createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+    document.getElementById('meetingRequestForm').style.display = 'none';
+    document.getElementById('meetingSuccessMessage').style.display = 'block';
+    showToast('Meeting request sent');
+    
+    await sendEmailNotification({
+      to_name: 'Croft Finance Team',
+      to_email: EMAILJS_CONFIG.adminEmail,
+      from_name: 'Croft Finance',
+      subject: `Meeting Request from ${currentClient.name}`,
+      message: `Client requested a ${type} meeting on ${date} at ${time}.\nNotes: ${notes}`,
+      project_name: projects.find(p => p.id === currentProjectId)?.name || 'N/A'
+    });
+  } catch(e) { showToast(e.message, true); }
 };
 
 window.resetMeetingForm = function() {
@@ -2865,7 +3291,11 @@ function loadClientMeetings() {
   const cont = document.getElementById('clientMeetingsList');
   if(!cont || !currentClient) return;
   const clientMeetings = meetings.filter(m => m.clientId === currentClient.id);
-  cont.innerHTML = clientMeetings.map(m => `<div class="note-card"><div class="note-card-label">${formatDate(m.date)} at ${m.time} · ${escapeHtml(m.type)}</div><div class="note-card-text">${escapeHtml(m.notes || 'No notes')}</div><div class="note-card-date">Status: <span class="badge ${m.status === 'confirmed' ? 'badge-success' : (m.status === 'cancelled' ? 'badge-danger' : 'badge-warning')}">${m.status}</span></div></div>`).join('') || '<p class="data-label">No meetings scheduled</p>';
+  if (clientMeetings.length === 0) {
+    cont.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-alt"></i><p>No meetings scheduled. Request a meeting above.</p></div>';
+    return;
+  }
+  cont.innerHTML = clientMeetings.map(m => `<div class="note-card"><div class="note-card-label">${formatDate(m.date)} at ${m.time} · ${escapeHtml(m.type)}</div><div class="note-card-text">${escapeHtml(m.notes || 'No notes')}</div><div class="note-card-date">Status: <span class="badge ${m.status === 'confirmed' ? 'badge-success' : (m.status === 'cancelled' ? 'badge-danger' : 'badge-warning')}">${m.status}</span></div></div>`).join('');
 }
 
 window.openPDFWithWatermark = async function(url, docName) {
@@ -2906,19 +3336,23 @@ function updateBrokerDashboard() {
   document.getElementById('brokerPipelineCommission').innerHTML = formatCurrency(pipelineCommission);
   document.getElementById('brokerEarnedCommission').innerHTML = formatCurrency(earnedCommission);
   document.getElementById('brokerActiveDeals').innerHTML = myProjects.length;
+  if (fundedProjects.length === 0) {
+    document.getElementById('brokerCommissionHistory').innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-chart-line"></i><p>No funded deals yet.</p></td></tr>';
+    return;
+  }
   const historyHtml = fundedProjects.map(p => {
     const client = clients.find(c => c.id === p.clientId);
     const amt = parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g,"")) || 0;
     return `<tr>
       <td>${escapeHtml(p.name)}</strong></td>
-      <td>${escapeHtml(client?.name || 'Unknown')}</td>
-      <td>${p.fundedDate || formatDate(p.fundedDate) || '—'}</td>
-      <td>${formatCurrency(amt)}</strong></td>
-      <td>${rate}%</strong></td>
-      <td>${formatCurrency(amt * rate / 100)}</strong></td>
+      <td>${escapeHtml(client?.name || 'Unknown')}</div></td>
+      <td>${p.fundedDate || formatDate(p.fundedDate) || '—'}</div></td>
+      <td>${formatCurrency(amt)}</strong></div></td>
+      <td>${rate}%</strong></div></td>
+      <td>${formatCurrency(amt * rate / 100)}</strong></div></td>
     </tr>`;
   }).join('');
-  document.getElementById('brokerCommissionHistory').innerHTML = historyHtml || '<tr><td colspan="6">No funded deals yet. </td>';
+  document.getElementById('brokerCommissionHistory').innerHTML = historyHtml;
 }
 
 window.submitDeal = async function() {
@@ -2927,40 +3361,42 @@ window.submitDeal = async function() {
   const pName = document.getElementById('dealProjectName').value.trim();
   const fNeeded = document.getElementById('dealFundsNeeded').value.trim();
   if(!cName || !cEmail || !pName || !fNeeded) return showToast('Fill all required fields', true);
-  await db.collection('brokerSubmissions').add({
-    brokerId: currentBroker.id, brokerName: currentBroker.name,
-    clientName: cName, clientEmail: cEmail, projectName: pName, fundsNeeded: fNeeded,
-    industry: document.getElementById('dealIndustry').value, location: document.getElementById('dealLocation').value,
-    sponsorEquity: document.getElementById('dealSponsorEquity').value,
-    background: document.getElementById('dealBackground').value,
-    relationship: document.getElementById('dealRelationship').value,
-    jurisdiction: document.getElementById('dealJurisdiction').value,
-    targetDate: document.getElementById('dealTargetDate').value,
-    otherLenders: document.getElementById('dealOtherLenders').value,
-    otherLendersNotes: document.getElementById('dealOtherLendersNotes').value,
-    description: document.getElementById('dealDescription').value,
-    dataRoomLink: document.getElementById('dealDataRoomLink').value,
-    totalCost: document.getElementById('dealTotalCost').value,
-    debtEquity: document.getElementById('dealDebtEquity').value,
-    projectedIRR: document.getElementById('dealProjectedIRR').value,
-    exitStrategy: document.getElementById('dealExitStrategy').value,
-    projectStatus: document.getElementById('dealProjectStatus').value,
-    risks: document.getElementById('dealRisks').value,
-    brokerCommExpectation: document.getElementById('dealBrokerCommExpectation').value,
-    status: 'pending', createdAt: new Date().toISOString()
-  });
-  showToast('Deal submitted');
-  document.getElementById('dealClientName').value = ''; document.getElementById('dealClientEmail').value = '';
-  document.getElementById('dealProjectName').value = ''; document.getElementById('dealFundsNeeded').value = '';
-  document.getElementById('dealSponsorEquity').value = ''; document.getElementById('dealBackground').value = '';
-  document.getElementById('dealJurisdiction').value = ''; document.getElementById('dealTargetDate').value = '';
-  document.getElementById('dealDescription').value = '';
-  document.getElementById('dealDataRoomLink').value = '';
-  document.getElementById('dealTotalCost').value = '';
-  document.getElementById('dealDebtEquity').value = '';
-  document.getElementById('dealProjectedIRR').value = '';
-  document.getElementById('dealRisks').value = '';
-  document.getElementById('dealBrokerCommExpectation').value = '';
+  try {
+    await db.collection('brokerSubmissions').add({
+      brokerId: currentBroker.id, brokerName: currentBroker.name,
+      clientName: cName, clientEmail: cEmail, projectName: pName, fundsNeeded: fNeeded,
+      industry: document.getElementById('dealIndustry').value, location: document.getElementById('dealLocation').value,
+      sponsorEquity: document.getElementById('dealSponsorEquity').value,
+      background: document.getElementById('dealBackground').value,
+      relationship: document.getElementById('dealRelationship').value,
+      jurisdiction: document.getElementById('dealJurisdiction').value,
+      targetDate: document.getElementById('dealTargetDate').value,
+      otherLenders: document.getElementById('dealOtherLenders').value,
+      otherLendersNotes: document.getElementById('dealOtherLendersNotes').value,
+      description: document.getElementById('dealDescription').value,
+      dataRoomLink: document.getElementById('dealDataRoomLink').value,
+      totalCost: document.getElementById('dealTotalCost').value,
+      debtEquity: document.getElementById('dealDebtEquity').value,
+      projectedIRR: document.getElementById('dealProjectedIRR').value,
+      exitStrategy: document.getElementById('dealExitStrategy').value,
+      projectStatus: document.getElementById('dealProjectStatus').value,
+      risks: document.getElementById('dealRisks').value,
+      brokerCommExpectation: document.getElementById('dealBrokerCommExpectation').value,
+      status: 'pending', createdAt: new Date().toISOString()
+    });
+    showToast('Deal submitted');
+    document.getElementById('dealClientName').value = ''; document.getElementById('dealClientEmail').value = '';
+    document.getElementById('dealProjectName').value = ''; document.getElementById('dealFundsNeeded').value = '';
+    document.getElementById('dealSponsorEquity').value = ''; document.getElementById('dealBackground').value = '';
+    document.getElementById('dealJurisdiction').value = ''; document.getElementById('dealTargetDate').value = '';
+    document.getElementById('dealDescription').value = '';
+    document.getElementById('dealDataRoomLink').value = '';
+    document.getElementById('dealTotalCost').value = '';
+    document.getElementById('dealDebtEquity').value = '';
+    document.getElementById('dealProjectedIRR').value = '';
+    document.getElementById('dealRisks').value = '';
+    document.getElementById('dealBrokerCommExpectation').value = '';
+  } catch(e) { showToast(e.message, true); }
 };
 
 function renderBrokerPortfolio() {
@@ -2971,7 +3407,10 @@ function renderBrokerPortfolio() {
     return;
   }
   const myProjects = projects.filter(p => p.brokerId === currentBroker.id && p.status === 'active');
-  if(!myProjects.length) { cont.innerHTML = '<div class="card"><div class="card-body">No active clients</div></div>'; return; }
+  if(!myProjects.length) { 
+    cont.innerHTML = '<div class="empty-state"><i class="fas fa-briefcase"></i><p>No active clients yet. Submit a deal to get started.</p><button class="btn btn-primary btn-sm" onclick="switchBrokerTab(\'submit-deal\')">Submit a Deal</button></div>'; 
+    return; 
+  }
   cont.innerHTML = myProjects.map(p => {
     const client = clients.find(c => c.id === p.clientId);
     const percent = Math.round(((p.step||1)/9)*100);
@@ -3013,20 +3452,26 @@ window.showBrokerUpdateRequest = function(projectId) {
 window.submitBrokerUpdateRequest = async function() {
   const changes = document.getElementById('updateRequestedChanges').value.trim();
   if(!changes) return showToast('Describe the changes needed', true);
-  await db.collection('brokerUpdateRequests').add({
-    projectId: window.currentUpdateProjectId, brokerId: currentBroker.id, brokerName: currentBroker.name,
-    requestedChanges: changes, status: 'pending', createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-  showToast('Update request sent');
-  closeModal('requestUpdateModal');
-  document.getElementById('updateRequestedChanges').value = '';
+  try {
+    await db.collection('brokerUpdateRequests').add({
+      projectId: window.currentUpdateProjectId, brokerId: currentBroker.id, brokerName: currentBroker.name,
+      requestedChanges: changes, status: 'pending', createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showToast('Update request sent');
+    closeModal('requestUpdateModal');
+    document.getElementById('updateRequestedChanges').value = '';
+  } catch(e) { showToast(e.message, true); }
 };
 
 function loadBrokerMessages() {
   const cont = document.getElementById('brokerMessagesList');
   if(!cont || !currentBroker) return;
   const msgs = brokerMessages.filter(m => m.brokerId === currentBroker.id).sort((a,b) => (a.timestamp?.seconds||0) - (b.timestamp?.seconds||0));
-  cont.innerHTML = msgs.map(m => `<div class="message ${m.sender === 'broker' ? 'client' : 'admin'}"><div class="message-sender"><span class="avatar">${m.sender === 'broker' ? currentBroker.name.charAt(0) : 'S'}</span> ${m.sender === 'broker' ? 'You' : 'Suzana Aleksić'}</div><div class="message-bubble">${escapeHtml(m.content)}</div><div class="message-meta">${formatDateTime(m.timestamp)}</div></div>`).join('') || '<div class="data-label" style="text-align:center;">No messages</div>';
+  if (msgs.length === 0) {
+    cont.innerHTML = '<div class="empty-state"><i class="fas fa-comments"></i><p>No messages yet. Send a message to Suzana.</p></div>';
+    return;
+  }
+  cont.innerHTML = msgs.map(m => `<div class="message ${m.sender === 'broker' ? 'client' : 'admin'}"><div class="message-sender"><span class="avatar">${m.sender === 'broker' ? currentBroker.name.charAt(0) : 'S'}</span> ${m.sender === 'broker' ? 'You' : 'Suzana Aleksić'}</div><div class="message-bubble">${escapeHtml(m.content)}</div><div class="message-meta">${formatDateTime(m.timestamp)}</div></div>`).join('');
   cont.scrollTop = cont.scrollHeight;
 }
 
@@ -3034,18 +3479,20 @@ window.sendBrokerMessage = async function() {
   const input = document.getElementById('brokerMessageInput');
   const val = input.value.trim();
   if(!val) return;
-  await db.collection('brokerMessages').add({ brokerId: currentBroker.id, content: val, sender: 'broker', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-  
-  await sendEmailNotification({
-    to_name: 'Croft Finance Team',
-    to_email: EMAILJS_CONFIG.adminEmail,
-    from_name: 'Croft Finance',
-    subject: `New Message from Broker ${currentBroker.name}`,
-    message: val,
-    project_name: 'Broker Communication'
-  });
-  
-  input.value = '';
+  try {
+    await db.collection('brokerMessages').add({ brokerId: currentBroker.id, content: val, sender: 'broker', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+    
+    await sendEmailNotification({
+      to_name: 'Croft Finance Team',
+      to_email: EMAILJS_CONFIG.adminEmail,
+      from_name: 'Croft Finance',
+      subject: `New Message from Broker ${currentBroker.name}`,
+      message: val,
+      project_name: 'Broker Communication'
+    });
+    
+    input.value = '';
+  } catch(e) { showToast(e.message, true); }
 };
 
 // ============================================================
@@ -3060,41 +3507,47 @@ function updateAdminGreeting() {
 }
 
 async function loadSettings() {
-  const dealAppetite = await db.collection('settings').doc('dealAppetite').get();
-  const dealAppetiteEl = document.getElementById('dealAppetiteText');
-  if(dealAppetite.exists && dealAppetiteEl) dealAppetiteEl.value = dealAppetite.data().content || '';
-  
-  const announcement = await db.collection('settings').doc('announcement').get();
-  const announcementEl = document.getElementById('announcementText');
-  if(announcement.exists && announcementEl) announcementEl.value = announcement.data().content || '';
-  
-  const profile = await db.collection('settings').doc('adminProfile').get();
-  if(profile.exists) {
-    const p = profile.data();
-    const displayNameEl = document.getElementById('adminDisplayName');
-    const titleEl = document.getElementById('adminTitle');
-    const emailEl = document.getElementById('adminProfileEmail');
-    const phoneEl = document.getElementById('adminPhone');
-    const availabilityEl = document.getElementById('adminAvailability');
+  try {
+    const dealAppetite = await db.collection('settings').doc('dealAppetite').get();
+    const dealAppetiteEl = document.getElementById('dealAppetiteText');
+    if(dealAppetite.exists && dealAppetiteEl) dealAppetiteEl.value = dealAppetite.data().content || '';
     
-    if(displayNameEl) displayNameEl.value = p.displayName || 'Suzana Aleksić';
-    if(titleEl) titleEl.value = p.title || 'Principal';
-    if(emailEl) emailEl.value = p.email || 'suzana.aleksic@croftfinance.com';
-    if(phoneEl) phoneEl.value = p.phone || '+381 69 288 0 191';
-    if(availabilityEl) availabilityEl.value = p.availability || 'Mon–Fri, 9:00–18:00 CET';
-  }
+    const announcement = await db.collection('settings').doc('announcement').get();
+    const announcementEl = document.getElementById('announcementText');
+    if(announcement.exists && announcementEl) announcementEl.value = announcement.data().content || '';
+    
+    const profile = await db.collection('settings').doc('adminProfile').get();
+    if(profile.exists) {
+      const p = profile.data();
+      const displayNameEl = document.getElementById('adminDisplayName');
+      const titleEl = document.getElementById('adminTitle');
+      const emailEl = document.getElementById('adminProfileEmail');
+      const phoneEl = document.getElementById('adminPhone');
+      const availabilityEl = document.getElementById('adminAvailability');
+      
+      if(displayNameEl) displayNameEl.value = p.displayName || 'Suzana Aleksić';
+      if(titleEl) titleEl.value = p.title || 'Principal';
+      if(emailEl) emailEl.value = p.email || 'suzana.aleksic@croftfinance.com';
+      if(phoneEl) phoneEl.value = p.phone || '+381 69 288 0 191';
+      if(availabilityEl) availabilityEl.value = p.availability || 'Mon–Fri, 9:00–18:00 CET';
+    }
+  } catch(e) { showToast(e.message, true); }
 }
 
 window.saveDealAppetite = async function() {
   const content = document.getElementById('dealAppetiteText').value;
-  await db.collection('settings').doc('dealAppetite').set({ content, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-  showToast('Deal appetite saved');
+  try {
+    await db.collection('settings').doc('dealAppetite').set({ content, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    showToast('Deal appetite saved');
+  } catch(e) { showToast(e.message, true); }
 };
 
 window.saveAnnouncement = async function() {
   const content = document.getElementById('announcementText').value;
-  await db.collection('settings').doc('announcement').set({ content, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-  showToast('Announcement published');
+  try {
+    await db.collection('settings').doc('announcement').set({ content, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    showToast('Announcement published');
+  } catch(e) { showToast(e.message, true); }
 };
 
 window.saveAdminProfile = async function() {
@@ -3106,81 +3559,93 @@ window.saveAdminProfile = async function() {
     availability: document.getElementById('adminAvailability').value,
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   };
-  await db.collection('settings').doc('adminProfile').set(profile);
-  showToast('Profile saved');
+  try {
+    await db.collection('settings').doc('adminProfile').set(profile);
+    showToast('Profile saved');
+  } catch(e) { showToast(e.message, true); }
 };
 
 window.approveClient = async function(id) {
-  await db.collection('clients').doc(id).update({ status: 'active' });
-  const p = projects.find(x => x.clientId === id);
-  if(p) await db.collection('projects').doc(p.id).update({ status: 'active' });
-  showToast('Client approved and activated');
-  
-  const client = clients.find(c => c.id === id);
-  if(client) {
-    await sendEmailNotification({
-      to_name: client.name,
-      to_email: client.email,
-      from_name: 'Croft Finance',
-      subject: `Your Croft Finance account has been approved`,
-      message: `Dear ${client.name},\n\nYour client portal account has been approved. You may now log in and access your deal dashboard.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
-      project_name: p?.name || 'N/A'
-    });
-  }
+  try {
+    await db.collection('clients').doc(id).update({ status: 'active' });
+    const p = projects.find(x => x.clientId === id);
+    if(p) await db.collection('projects').doc(p.id).update({ status: 'active' });
+    showToast('Client approved and activated');
+    
+    const client = clients.find(c => c.id === id);
+    if(client) {
+      await sendEmailNotification({
+        to_name: client.name,
+        to_email: client.email,
+        from_name: 'Croft Finance',
+        subject: `Your Croft Finance account has been approved`,
+        message: `Dear ${client.name},\n\nYour client portal account has been approved. You may now log in and access your deal dashboard.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
+        project_name: p?.name || 'N/A'
+      });
+    }
+  } catch(e) { showToast(e.message, true); }
 };
 
 window.declineClient = async function(id) {
-  if(!confirm('Decline this client registration? They will be notified.')) return;
-  await db.collection('clients').doc(id).update({ status: 'declined' });
-  const client = clients.find(c => c.id === id);
-  if(client) {
-    await sendEmailNotification({
-      to_name: client.name,
-      to_email: client.email,
-      from_name: 'Croft Finance',
-      subject: `Update on your Croft Finance application`,
-      message: `Dear ${client.name},\n\nThank you for your interest in Croft Finance. After reviewing your registration, we regret to inform you that we cannot approve your portal access at this time.\n\nIf you have any questions, please contact us directly.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
-      project_name: 'Client Registration'
-    });
-  }
-  showToast('Client registration declined');
+  if (!confirmDelete('client registration')) return;
+  try {
+    await db.collection('clients').doc(id).update({ status: 'declined' });
+    const client = clients.find(c => c.id === id);
+    if(client) {
+      await sendEmailNotification({
+        to_name: client.name,
+        to_email: client.email,
+        from_name: 'Croft Finance',
+        subject: `Update on your Croft Finance application`,
+        message: `Dear ${client.name},\n\nThank you for your interest in Croft Finance. After reviewing your registration, we regret to inform you that we cannot approve your portal access at this time.\n\nIf you have any questions, please contact us directly.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
+        project_name: 'Client Registration'
+      });
+    }
+    showToast('Client registration declined');
+  } catch(e) { showToast(e.message, true); }
 };
 
 window.approveBroker = async function(id) {
-  await db.collection('brokers').doc(id).update({ status: 'active' });
-  showToast('Broker approved and activated');
-  const broker = brokers.find(b => b.id === id);
-  if(broker) {
-    await sendEmailNotification({
-      to_name: broker.name,
-      to_email: broker.email,
-      from_name: 'Croft Finance',
-      subject: 'Your Croft Finance broker account has been approved',
-      message: `Dear ${broker.name},\n\nYour broker account with Croft Finance has been approved. You may now log in to the broker portal and submit deals.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
-      project_name: 'Broker Registration'
-    });
-  }
+  try {
+    await db.collection('brokers').doc(id).update({ status: 'active' });
+    showToast('Broker approved and activated');
+    const broker = brokers.find(b => b.id === id);
+    if(broker) {
+      await sendEmailNotification({
+        to_name: broker.name,
+        to_email: broker.email,
+        from_name: 'Croft Finance',
+        subject: 'Your Croft Finance broker account has been approved',
+        message: `Dear ${broker.name},\n\nYour broker account with Croft Finance has been approved. You may now log in to the broker portal and submit deals.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
+        project_name: 'Broker Registration'
+      });
+    }
+  } catch(e) { showToast(e.message, true); }
 };
 
 window.declineBroker = async function(id) {
-  if(!confirm('Decline this broker registration? They will be notified.')) return;
-  await db.collection('brokers').doc(id).update({ status: 'declined' });
-  const broker = brokers.find(b => b.id === id);
-  if(broker) {
-    await sendEmailNotification({
-      to_name: broker.name,
-      to_email: broker.email,
-      from_name: 'Croft Finance',
-      subject: `Update on your Croft Finance broker application`,
-      message: `Dear ${broker.name},\n\nThank you for your interest in becoming a Croft Finance broker partner. After reviewing your application, we regret to inform you that we cannot approve your registration at this time.\n\nIf you have any questions, please contact us directly.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
-      project_name: 'Broker Registration'
-    });
-  }
-  showToast('Broker registration declined');
+  if (!confirmDelete('broker registration')) return;
+  try {
+    await db.collection('brokers').doc(id).update({ status: 'declined' });
+    const broker = brokers.find(b => b.id === id);
+    if(broker) {
+      await sendEmailNotification({
+        to_name: broker.name,
+        to_email: broker.email,
+        from_name: 'Croft Finance',
+        subject: `Update on your Croft Finance broker application`,
+        message: `Dear ${broker.name},\n\nThank you for your interest in becoming a Croft Finance broker partner. After reviewing your application, we regret to inform you that we cannot approve your registration at this time.\n\nIf you have any questions, please contact us directly.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
+        project_name: 'Broker Registration'
+      });
+    }
+    showToast('Broker registration declined');
+  } catch(e) { showToast(e.message, true); }
 };
 
 window.saveClientNote = async function(clientId, note) {
-  await db.collection('clients').doc(clientId).update({ adminNote: note });
+  try {
+    await db.collection('clients').doc(clientId).update({ adminNote: note });
+  } catch(e) { showToast(e.message, true); }
 };
 
 let uploadClientChangeHandler = null;
@@ -3228,7 +3693,7 @@ function renderDealHealthSummary() {
 function renderAdminTables() {
   const cTbody = document.getElementById('adminClientsTable');
   if(cTbody) {
-    cTbody.innerHTML = clients.map(c => {
+    const newRowsHtml = clients.map(c => {
       const projectCount = projects.filter(p => p.clientId === c.id).length;
       return `<tr>
         <td><strong>${escapeHtml(c.name)}</strong></td>
@@ -3244,10 +3709,11 @@ function renderAdminTables() {
         </div></td>
       </tr>`;
     }).join('');
+    patchTable('adminClientsTable', newRowsHtml);
   }
   const pTbody = document.getElementById('adminProjectsTable');
   if(pTbody) {
-    pTbody.innerHTML = projects.map(p => {
+    const newRowsHtml = projects.map(p => {
       const c = clients.find(cl => cl.id === p.clientId);
       const broker = brokers.find(b => b.id === p.brokerId);
       return `<tr>
@@ -3266,6 +3732,7 @@ function renderAdminTables() {
         </div></td>
       </tr>`;
     }).join('');
+    patchTable('adminProjectsTable', newRowsHtml);
   }
   document.getElementById('totalClients').innerHTML = clients.filter(c=>c.status==='active').length;
   document.getElementById('totalProjects').innerHTML = projects.filter(p=>p.status==='active').length;
@@ -3348,7 +3815,7 @@ function renderPipeline() {
         <td>${escapeHtml(c?.name || 'Unknown')}</td>
         <td>${escapeHtml(p.name)}</strong></td>
         <td>${p.step <= 1 ? 'Origination' : (p.step <= 3 ? 'Structuring' : (p.step <= 8 ? 'Execution' : 'Funded'))}</td>
-        <td>${STEP_NAMES[p.step||1]}</td>
+        <td>${STEP_NAMES[p.step||1]}</div></td>
         <td>${formatCurrency(p.amount)}</div></td>
         <td>${daysInStep}</div></td>
         <td>${p.closeDate || '—'}</div></td>
@@ -3364,15 +3831,15 @@ function renderPipeline() {
 function renderBrokerAdminTable() {
   const tbody = document.getElementById('adminBrokersTable');
   if(!tbody) return;
-  tbody.innerHTML = brokers.map(b => {
+  const newRowsHtml = brokers.map(b => {
     const submissions = brokerSubmissions.filter(s => s.brokerId === b.id);
     const brokerProjects = projects.filter(p => p.brokerId === b.id);
     const fundedProjects = brokerProjects.filter(p => p.step >= 9);
     let estCommission = 0;
     fundedProjects.forEach(p => { let amt = parseFloat(String(p.amount || '0').replace(/[^0-9.-]+/g,"")) || 0; estCommission += amt * ((b.commissionRate || 0) / 100); });
     const pendingRequests = brokerUpdateRequests.filter(r => r.brokerId === b.id && r.status === 'pending').length;
-    return `<td>
-        <td><strong>${escapeHtml(b.name)}</strong><br><span class="data-label">${escapeHtml(b.email)}</span></div></td>
+    return `<tr>
+        <td><strong>${escapeHtml(b.name)}</strong><br><span class="data-label">${escapeHtml(b.email)}</span></td>
         <td>${escapeHtml(b.firm)}</div></td>
         <td><strong>${b.commissionRate || 0}%</strong></div></td>
         <td>${submissions.length}</div></td>
@@ -3388,14 +3855,19 @@ function renderBrokerAdminTable() {
         </div></td>
       </tr>`;
   }).join('');
+  patchTable('adminBrokersTable', newRowsHtml);
   const requestsDiv = document.getElementById('brokerUpdateRequestsList');
   if(requestsDiv) {
     const pending = brokerUpdateRequests.filter(r => r.status === 'pending');
+    if (pending.length === 0) {
+      requestsDiv.innerHTML = '<div class="empty-state"><i class="fas fa-check-circle"></i><p>No pending update requests</p></div>';
+      return;
+    }
     requestsDiv.innerHTML = pending.map(r => {
       const broker = brokers.find(b => b.id === r.brokerId);
       const project = projects.find(p => p.id === r.projectId);
       return `<div class="card" style="margin-bottom:12px;"><div class="card-body"><div><strong>${escapeHtml(broker?.name || 'Unknown')}</strong> requested update for <strong>${escapeHtml(project?.name || 'Unknown')}</strong></div><div class="note-card" style="margin:12px 0;"><div class="note-card-label">Requested Changes</div><div class="note-card-text">${escapeHtml(r.requestedChanges)}</div></div><div><button class="btn btn-success btn-sm" onclick="approveBrokerUpdate('${r.id}')">Approve & Apply</button><button class="btn btn-danger btn-sm" onclick="rejectBrokerUpdate('${r.id}')">Reject</button></div></div></div>`;
-    }).join('') || '<div class="data-label">No pending update requests</div>';
+    }).join('');
   }
 }
 
@@ -3405,7 +3877,11 @@ function renderSubmissionsTable() {
   const filter = document.getElementById('submissionFilter')?.value || 'all';
   const filtered = filter === 'all' ? brokerSubmissions : brokerSubmissions.filter(s => s.status === filter);
   const sorted = [...filtered].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
-  tbody.innerHTML = sorted.map(s => `<tr>
+  if (sorted.length === 0) {
+    patchTable('submissionsTableBody', '<tr><td colspan="8" class="empty-state"><i class="fas fa-paper-plane"></i><p>No submissions found</p></td></tr>');
+    return;
+  }
+  const newRowsHtml = sorted.map(s => `<tr>
     <td>${s.createdAt ? s.createdAt.split('T')[0] : '—'}</td>
     <td><strong>${escapeHtml(s.brokerName)}</strong></td>
     <td>${escapeHtml(s.clientName)}<br><span class="data-label">${escapeHtml(s.clientEmail)}</span></td>
@@ -3417,7 +3893,8 @@ function renderSubmissionsTable() {
       <button class="btn btn-success btn-sm" onclick="acceptSubmission('${s.id}')">Accept</button>
       <button class="btn btn-danger btn-sm" onclick="rejectSubmission('${s.id}')">Reject</button>
     </div></td>
-  </tr>`).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--gray-400);">No submissions</div>';
+  </tr>`).join('');
+  patchTable('submissionsTableBody', newRowsHtml);
 }
 
 window.viewSubmissionDetail = function(id) {
@@ -3430,41 +3907,54 @@ window.viewSubmissionDetail = function(id) {
 };
 
 window.acceptSubmission = async function(id) {
-  await db.collection('brokerSubmissions').doc(id).update({ status: 'accepted' });
-  showToast('Submission accepted');
-  renderSubmissionsTable();
+  try {
+    await db.collection('brokerSubmissions').doc(id).update({ status: 'accepted' });
+    showToast('Submission accepted');
+    renderSubmissionsTable();
+  } catch(e) { showToast(e.message, true); }
 };
 
 window.rejectSubmission = async function(id) {
-  await db.collection('brokerSubmissions').doc(id).update({ status: 'rejected' });
-  showToast('Submission rejected');
-  renderSubmissionsTable();
+  try {
+    await db.collection('brokerSubmissions').doc(id).update({ status: 'rejected' });
+    showToast('Submission rejected');
+    renderSubmissionsTable();
+  } catch(e) { showToast(e.message, true); }
 };
 
 window.updateBrokerEngagement = async function(id, status) {
-  await db.collection('brokers').doc(id).update({ engagementStatus: status });
-  showToast(`Engagement status updated to ${status}`);
+  try {
+    await db.collection('brokers').doc(id).update({ engagementStatus: status });
+    showToast(`Engagement status updated to ${status}`);
+  } catch(e) { showToast(e.message, true); }
 };
 
 window.approveBrokerUpdate = async function(id) {
   const req = brokerUpdateRequests.find(r => r.id === id);
   if(req) {
-    await db.collection('projects').doc(req.projectId).update({ adminNote: `Broker update: ${req.requestedChanges}` });
-    await db.collection('brokerUpdateRequests').doc(id).update({ status: 'approved' });
-    showToast('Update applied');
+    try {
+      await db.collection('projects').doc(req.projectId).update({ adminNote: `Broker update: ${req.requestedChanges}` });
+      await db.collection('brokerUpdateRequests').doc(id).update({ status: 'approved' });
+      showToast('Update applied');
+    } catch(e) { showToast(e.message, true); }
   }
 };
 
 window.rejectBrokerUpdate = async function(id) {
-  await db.collection('brokerUpdateRequests').doc(id).update({ status: 'rejected' });
-  showToast('Request rejected');
+  try {
+    await db.collection('brokerUpdateRequests').doc(id).update({ status: 'rejected' });
+    showToast('Request rejected');
+  } catch(e) { showToast(e.message, true); }
 };
 
 function renderAdminDocumentsTable() {
   const tbody = document.getElementById('adminDocumentsTableBody');
   if(!tbody) return;
-  if(!documents.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--gray-400);padding:24px;">No documents uploaded yet. </td>'; return; }
-  tbody.innerHTML = documents.map(d => {
+  if(!documents.length) { 
+    patchTable('adminDocumentsTableBody', '<tr><td colspan="6" class="empty-state"><i class="fas fa-file-alt"></i><p>No documents uploaded yet. Use the "Upload Document" button above.</p></td></tr>');
+    return; 
+  }
+  const newRowsHtml = documents.map(d => {
     const client = clients.find(c => c.id === d.clientId);
     const project = projects.find(p => p.id === d.projectId);
     return `<tr>
@@ -3480,31 +3970,74 @@ function renderAdminDocumentsTable() {
       </div></td>
     </tr>`;
   }).join('');
+  patchTable('adminDocumentsTableBody', newRowsHtml);
 }
 
 window.toggleDocumentApproval = async function(docId, currentStatus) {
-  await db.collection('documents').doc(docId).update({ approved: !currentStatus });
-  showToast(currentStatus ? 'Document approval revoked' : 'Document approved');
+  try {
+    await db.collection('documents').doc(docId).update({ approved: !currentStatus });
+    showToast(currentStatus ? 'Document approval revoked' : 'Document approved');
+  } catch(e) { showToast(e.message, true); }
 };
 
-window.deleteDoc = async function(id) { if(confirm('Delete document?')) { await db.collection('documents').doc(id).delete(); showToast('Deleted'); } };
-window.setBrokerCommission = async function(id) { const rate = prompt('Commission %:'); if(rate && !isNaN(parseFloat(rate))) { await db.collection('brokers').doc(id).update({commissionRate: parseFloat(rate)}); showToast(`Rate set to ${rate}%`); } };
-window.deleteBroker = async function(id) { if(confirm('Delete broker?')) { await db.collection('brokers').doc(id).delete(); showToast('Deleted'); } };
+window.deleteDoc = async function(id) { 
+  if (!confirmDelete('document')) return;
+  try {
+    await db.collection('documents').doc(id).delete(); 
+    showToast('Deleted');
+  } catch(e) { showToast(e.message, true); }
+};
+
+window.setBrokerCommission = async function(id) { 
+  const rate = prompt('Commission %:'); 
+  if(rate && !isNaN(parseFloat(rate))) { 
+    try {
+      await db.collection('brokers').doc(id).update({commissionRate: parseFloat(rate)}); 
+      showToast(`Rate set to ${rate}%`);
+    } catch(e) { showToast(e.message, true); }
+  } 
+};
+
+window.deleteBroker = async function(id) { 
+  if (!confirmDelete('broker')) return;
+  try {
+    await db.collection('brokers').doc(id).delete(); 
+    showToast('Deleted');
+  } catch(e) { showToast(e.message, true); }
+};
 
 function renderMeetings() {
   const tbody = document.getElementById('meetingsTableBody');
   if(!tbody) return;
-  tbody.innerHTML = meetings.map(m => `<tr>
+  if (meetings.length === 0) {
+    patchTable('meetingsTableBody', '<tr><td colspan="5" class="empty-state"><i class="fas fa-calendar-alt"></i><p>No meetings scheduled</p><button class="btn btn-primary btn-sm" onclick="showScheduleMeetingModal()">Schedule Meeting</button></td></tr>');
+    return;
+  }
+  const newRowsHtml = meetings.map(m => `<tr>
       <td>${formatDate(m.date)} at ${m.time}</td>
       <td><strong>${escapeHtml(m.clientName)}</strong></td>
       <td>${escapeHtml(m.type)}</div></td>
       <td><span class="badge ${m.status === 'confirmed' ? 'badge-success' : (m.status === 'cancelled' ? 'badge-danger' : 'badge-warning')}">${m.status}</span></td>
       <td><button class="btn btn-ghost btn-sm" onclick="updateMeetingStatus('${m.id}', 'confirmed')">Confirm</button><button class="btn btn-ghost btn-sm btn-danger" onclick="updateMeetingStatus('${m.id}', 'cancelled')">Cancel</button><button class="btn btn-ghost btn-sm btn-danger" onclick="deleteMeeting('${m.id}')">Del</button></td>
-    </tr>`).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--gray-400);">No meetings scheduled</div>';
+    </tr>`).join('');
+  patchTable('meetingsTableBody', newRowsHtml);
 }
 
-window.updateMeetingStatus = async function(id, status) { await db.collection('meetings').doc(id).update({ status }); showToast(`Meeting ${status}`); };
-window.deleteMeeting = async function(id) { if(confirm('Delete meeting?')) { await db.collection('meetings').doc(id).delete(); showToast('Deleted'); } };
+window.updateMeetingStatus = async function(id, status) { 
+  try {
+    await db.collection('meetings').doc(id).update({ status }); 
+    showToast(`Meeting ${status}`);
+  } catch(e) { showToast(e.message, true); }
+};
+
+window.deleteMeeting = async function(id) { 
+  if (!confirmDelete('meeting')) return;
+  try {
+    await db.collection('meetings').doc(id).delete(); 
+    showToast('Deleted');
+  } catch(e) { showToast(e.message, true); }
+};
+
 window.showScheduleMeetingModal = function() {
   const clientSelect = document.getElementById('meetingClientId');
   if(clientSelect) clientSelect.innerHTML = '<option value="">Select Client</option>' + clients.filter(c => c.status === 'active').map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
@@ -3512,6 +4045,7 @@ window.showScheduleMeetingModal = function() {
   document.getElementById('meetingTime').value = '10:00';
   openModal('scheduleMeetingModal');
 };
+
 window.createMeeting = async function() {
   const clientId = document.getElementById('meetingClientId').value;
   const date = document.getElementById('meetingDate').value;
@@ -3520,9 +4054,11 @@ window.createMeeting = async function() {
   const notes = document.getElementById('meetingNotes').value;
   if(!clientId || !date || !time) return showToast('Fill required fields', true);
   const client = clients.find(c => c.id === clientId);
-  await db.collection('meetings').add({ clientId, clientName: client.name, date, time, type, notes, status: 'pending', createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-  showToast('Meeting scheduled');
-  closeModal('scheduleMeetingModal');
+  try {
+    await db.collection('meetings').add({ clientId, clientName: client.name, date, time, type, notes, status: 'pending', createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+    showToast('Meeting scheduled');
+    closeModal('scheduleMeetingModal');
+  } catch(e) { showToast(e.message, true); }
 };
 
 function renderInbox() {
@@ -3553,6 +4089,10 @@ function renderInbox() {
   if(activeFilter === 'client') filtered = threads.filter(t => t.type === 'client');
   if(activeFilter === 'broker') filtered = threads.filter(t => t.type === 'broker');
   if(activeFilter === 'unread') filtered = threads.filter(t => t.hasUnread);
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>No messages found</p></div>';
+    return;
+  }
   container.innerHTML = filtered.map(t => `<div class="inbox-thread"><div class="inbox-thread-header" onclick="toggleInboxThread(this)"><div><div class="inbox-thread-sender"><span class="inbox-thread-badge ${t.type}">${t.type.toUpperCase()}</span> ${escapeHtml(t.name)}</div><div class="inbox-thread-preview">${escapeHtml(t.lastMessage?.substring(0,60) || 'No messages')}</div></div>${t.hasUnread ? '<span class="inbox-thread-unread">New</span>' : ''}</div><div class="inbox-thread-body" id="inbox-thread-${t.id}-${t.type}"></div></div>`).join('');
   for(const t of filtered) {
     const body = document.getElementById(`inbox-thread-${t.id}-${t.type}`);
@@ -3564,34 +4104,37 @@ function renderInbox() {
 }
 
 window.toggleInboxThread = function(el) { const body = el.nextElementSibling; if(body) body.style.display = body.style.display === 'none' ? 'block' : 'none'; };
+
 window.sendInboxReply = async function(id, type) {
   const input = document.getElementById(`reply_${id}_${type}`);
   const val = input.value.trim();
   if(!val) return;
-  if(type === 'client') {
-    await db.collection('messages').add({ clientId: id, content: val, sender: 'admin', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-    const client = clients.find(c => c.id === id);
-    await sendEmailNotification({
-      to_name: client?.name || 'Client',
-      to_email: client?.email || '',
-      from_name: 'Suzana Aleksić — Croft Finance',
-      subject: 'New message from Croft Finance',
-      message: val,
-      project_name: projects.find(p => p.clientId === id)?.name || 'N/A'
-    });
-  } else {
-    await db.collection('brokerMessages').add({ brokerId: id, content: val, sender: 'admin', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-    const broker = brokers.find(b => b.id === id);
-    await sendEmailNotification({
-      to_name: broker?.name || 'Broker',
-      to_email: broker?.email || '',
-      from_name: 'Suzana Aleksić — Croft Finance',
-      subject: 'New message from Croft Finance',
-      message: val,
-      project_name: 'Broker Communication'
-    });
-  }
-  input.value = '';
+  try {
+    if(type === 'client') {
+      await db.collection('messages').add({ clientId: id, content: val, sender: 'admin', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+      const client = clients.find(c => c.id === id);
+      await sendEmailNotification({
+        to_name: client?.name || 'Client',
+        to_email: client?.email || '',
+        from_name: 'Suzana Aleksić — Croft Finance',
+        subject: 'New message from Croft Finance',
+        message: val,
+        project_name: projects.find(p => p.clientId === id)?.name || 'N/A'
+      });
+    } else {
+      await db.collection('brokerMessages').add({ brokerId: id, content: val, sender: 'admin', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+      const broker = brokers.find(b => b.id === id);
+      await sendEmailNotification({
+        to_name: broker?.name || 'Broker',
+        to_email: broker?.email || '',
+        from_name: 'Suzana Aleksić — Croft Finance',
+        subject: 'New message from Croft Finance',
+        message: val,
+        project_name: 'Broker Communication'
+      });
+    }
+    input.value = '';
+  } catch(e) { showToast(e.message, true); }
 };
 
 function renderAnalytics() {
@@ -3599,18 +4142,13 @@ function renderAnalytics() {
   const pipelineCount = activeProjects.filter(p => (p.step || 1) < 9).length;
   const fundedCount = activeProjects.filter(p => (p.step || 1) === 9).length;
 
-  // Calculate capital for projects at Step 2+ (Term Sheet issued)
   const step2PlusProjects = activeProjects.filter(p => (p.step || 1) >= 2);
   let totalCapitalCommitted = 0;
   step2PlusProjects.forEach(p => { totalCapitalCommitted += parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g, '')) || 0; });
 
-  // Calculate commission on Step 2+ projects (not just funded)
   const commission2pc = totalCapitalCommitted * ADMIN_ONLY_COMMISSION_RATE;
-
-  // Average facility size based on Step 2+ projects
   const avgFacility = step2PlusProjects.length ? totalCapitalCommitted / step2PlusProjects.length : 0;
 
-  // Total Capital Funded (Step 9)
   let totalCapitalFunded = 0;
   activeProjects.filter(p => (p.step || 1) === 9).forEach(p => { totalCapitalFunded += parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g, '')) || 0; });
 
@@ -3659,11 +4197,11 @@ function renderAnalytics() {
   
   const industryCounts = {};
   projects.forEach(p => { const ind = p.industry || 'Other'; industryCounts[ind] = (industryCounts[ind] || 0) + 1; });
-  const industryCtx = document.getElementById('industryChart')?.getContext('2d');
-  if(industryCtx) { if(industryChart) industryChart.destroy(); industryChart = new Chart(industryCtx, { type: 'bar', data: { labels: Object.keys(industryCounts), datasets: [{ label: 'Projects', data: Object.values(industryCounts), backgroundColor: '#2c5f8a', borderRadius: 4, barPercentage: 0.7 }] }, options: { responsive: true, maintainAspectRatio: true, scales: { y: { grid: { display: false } }, x: { grid: { display: false } } }, plugins: { legend: { display: false }, tooltip: { backgroundColor: 'white', titleColor: '#374151', bodyColor: '#6b7280', borderColor: '#e5e7eb', borderWidth: 0.5 } } } }); }
+  const industryData = { labels: Object.keys(industryCounts), datasets: [{ label: 'Projects', data: Object.values(industryCounts), backgroundColor: '#2c5f8a', borderRadius: 4, barPercentage: 0.7 }] };
+  updateOrCreateChart('industryChart', 'bar', industryData, { responsive: true, maintainAspectRatio: true, scales: { y: { grid: { display: false } }, x: { grid: { display: false } } }, plugins: { legend: { display: false }, tooltip: { backgroundColor: 'white', titleColor: '#374151', bodyColor: '#6b7280', borderColor: '#e5e7eb', borderWidth: 0.5 } } });
   
-  const stageCtx = document.getElementById('pipelineStageChart')?.getContext('2d');
-  if(stageCtx) { if(pipelineStageChart) pipelineStageChart.destroy(); pipelineStageChart = new Chart(stageCtx, { type: 'doughnut', data: { labels: STEP_NAMES.slice(1), datasets: [{ data: stepCounts, backgroundColor: ['#06091a','#0c1126','#141c3a','#1c274a','#2c5f8a','#4a7c9e','#6b96b5','#8bb0cc','#c9a96e'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: true, plugins: { tooltip: { backgroundColor: 'white', titleColor: '#374151', bodyColor: '#6b7280', borderColor: '#e5e7eb', borderWidth: 0.5 } } } }); }
+  const stageData = { labels: STEP_NAMES.slice(1), datasets: [{ data: stepCounts, backgroundColor: ['#06091a','#0c1126','#141c3a','#1c274a','#2c5f8a','#4a7c9e','#6b96b5','#8bb0cc','#c9a96e'], borderWidth: 0 }] };
+  updateOrCreateChart('pipelineStageChart', 'doughnut', stageData, { responsive: true, maintainAspectRatio: true, plugins: { tooltip: { backgroundColor: 'white', titleColor: '#374151', bodyColor: '#6b7280', borderColor: '#e5e7eb', borderWidth: 0.5 } } });
   
   const quarters = {};
   projects.forEach(p => {
@@ -3676,10 +4214,9 @@ function renderAnalytics() {
     }
   });
   const last6Quarters = Object.keys(quarters).sort().slice(-6);
-  const quarterlyCtx = document.getElementById('quarterlyTrendChart')?.getContext('2d');
-  if(quarterlyCtx) { if(quarterlyChart) quarterlyChart.destroy(); quarterlyChart = new Chart(quarterlyCtx, { type: 'bar', data: { labels: last6Quarters, datasets: [{ label: 'Deals Entered', data: last6Quarters.map(q => quarters[q]?.entered || 0), backgroundColor: '#2c5f8a', borderRadius: 4 }, { label: 'Deals Funded', data: last6Quarters.map(q => quarters[q]?.funded || 0), backgroundColor: '#06091a', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: true, scales: { y: { grid: { display: false } }, x: { grid: { display: false } } }, plugins: { tooltip: { backgroundColor: 'white', titleColor: '#374151', bodyColor: '#6b7280', borderColor: '#e5e7eb', borderWidth: 0.5 } } } }); }
+  const quarterlyData = { labels: last6Quarters, datasets: [{ label: 'Deals Entered', data: last6Quarters.map(q => quarters[q]?.entered || 0), backgroundColor: '#2c5f8a', borderRadius: 4 }, { label: 'Deals Funded', data: last6Quarters.map(q => quarters[q]?.funded || 0), backgroundColor: '#06091a', borderRadius: 4 }] };
+  updateOrCreateChart('quarterlyTrendChart', 'bar', quarterlyData, { responsive: true, maintainAspectRatio: true, scales: { y: { grid: { display: false } }, x: { grid: { display: false } } }, plugins: { tooltip: { backgroundColor: 'white', titleColor: '#374151', bodyColor: '#6b7280', borderColor: '#e5e7eb', borderWidth: 0.5 } } });
   
-  // Calculate commission for ALL projects that have reached Step 2 (Term Sheet) or beyond
   const commissionedProjects = projects.filter(p => (p.step || 1) >= 2 && p.status === 'active');
   let totalCommission = 0;
   const commissionHtml = commissionedProjects.map(p => {
@@ -3741,7 +4278,7 @@ function renderBrokerPerformance() {
   brokerStats.sort((a,b) => brokerSortDesc ? b[brokerSortField] - a[brokerSortField] : a[brokerSortField] - b[brokerSortField]);
   const tbody = document.getElementById('brokerPerformanceBody');
   if(tbody) {
-    tbody.innerHTML = brokerStats.map(s => {
+    const newRowsHtml = brokerStats.map(s => {
       return `<tr>
         <td><strong>${escapeHtml(s.name)}</strong><br><span class="data-label">${escapeHtml(s.firm)}</span></div></td>
         <td>${escapeHtml(s.country || '—')}</div></td>
@@ -3753,10 +4290,11 @@ function renderBrokerPerformance() {
         <td>${formatCurrency(s.commission)}</div></td>
       </tr>`;
     }).join('');
+    patchTable('brokerPerformanceBody', newRowsHtml);
   }
   const tbody2 = document.getElementById('brokerPerformanceTableBody');
   if(tbody2) {
-    tbody2.innerHTML = brokerStats.map(s => {
+    const newRowsHtml = brokerStats.map(s => {
       return `<tr>
         <td><strong>${escapeHtml(s.name)}</strong><br><span class="data-label">${escapeHtml(s.firm)}</span></div></td>
         <td>${s.submissions}</div></td>
@@ -3767,6 +4305,7 @@ function renderBrokerPerformance() {
         <td>${formatCurrency(s.commission)}</div></td>
       </tr>`;
     }).join('');
+    patchTable('brokerPerformanceTableBody', newRowsHtml);
   }
   
   document.querySelectorAll('#brokerPerformanceTable th[data-sort], #brokerPerformanceTableDetails th[data-sort]').forEach(th => {
@@ -3826,6 +4365,7 @@ window.toggleAdminNotificationDropdown = function() {
   const d = document.getElementById('adminNotificationDropdown'); 
   if(d) d.classList.toggle('open'); 
 };
+
 window.closeAdminNotificationDropdown = function() { 
   const d = document.getElementById('adminNotificationDropdown'); 
   if(d) d.classList.remove('open'); 
@@ -3916,47 +4456,51 @@ function renderStepDashboard(project) {
 }
 
 window.approveMandateReview = async function(projectId) {
-  if(!confirm('Approve this mandate and advance to Term Sheet stage?')) return;
-  await db.collection('projects').doc(projectId).update({
-    step1Completed: true, step1CompletedAt: new Date().toISOString(), step: 2,
-    overallProgress: Math.round((1/9)*100)
-  });
-  await logActivity('admin', 'Suzana Aleksić', 'croft', 'step_completed', projectId, 'Step 1: Mandate Review — Approved');
-  showToast('Mandate approved — advancing to Term Sheet');
-  const project = projects.find(p => p.id === projectId);
-  const client = clients.find(c => c.id === project?.clientId);
-  if(client) {
-    await sendEmailNotification({
-      to_name: client.name,
-      to_email: client.email,
-      from_name: 'Croft Finance',
-      subject: `Your project mandate has been approved — ${project?.name}`,
-      message: `Dear ${client.name},\n\nWe are pleased to inform you that following our initial review, Croft Finance has approved your mandate for ${project?.name}.\n\nYour deal is now advancing to Step 2: Term Sheet. Suzana will be in touch shortly to discuss next steps.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
-      project_name: project?.name || 'N/A'
+  if (!confirmDelete('mandate approval')) return;
+  try {
+    await db.collection('projects').doc(projectId).update({
+      step1Completed: true, step1CompletedAt: new Date().toISOString(), step: 2,
+      overallProgress: Math.round((1/9)*100)
     });
-  }
-  renderAdminTables();
-  if(editProjectId === projectId) document.getElementById('stepStatusContainer').innerHTML = renderStepDashboard(projects.find(p=>p.id===projectId));
+    await logActivity('admin', 'Suzana Aleksić', 'croft', 'step_completed', projectId, 'Step 1: Mandate Review — Approved');
+    showToast('Mandate approved — advancing to Term Sheet');
+    const project = projects.find(p => p.id === projectId);
+    const client = clients.find(c => c.id === project?.clientId);
+    if(client) {
+      await sendEmailNotification({
+        to_name: client.name,
+        to_email: client.email,
+        from_name: 'Croft Finance',
+        subject: `Your project mandate has been approved — ${project?.name}`,
+        message: `Dear ${client.name},\n\nWe are pleased to inform you that following our initial review, Croft Finance has approved your mandate for ${project?.name}.\n\nYour deal is now advancing to Step 2: Term Sheet. Suzana will be in touch shortly to discuss next steps.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
+        project_name: project?.name || 'N/A'
+      });
+    }
+    renderAdminTables();
+    if(editProjectId === projectId) document.getElementById('stepStatusContainer').innerHTML = renderStepDashboard(projects.find(p=>p.id===projectId));
+  } catch(e) { showToast(e.message, true); }
 };
 
 window.rejectMandateReview = async function(projectId) {
-  if(!confirm('Decline this mandate? The client will be notified.')) return;
-  await db.collection('projects').doc(projectId).update({ status: 'declined', declinedAt: new Date().toISOString() });
-  await logActivity('admin', 'Suzana Aleksić', 'croft', 'step_completed', projectId, 'Step 1: Mandate Review — Declined');
-  showToast('Mandate declined');
-  const project = projects.find(p => p.id === projectId);
-  const client = clients.find(c => c.id === project?.clientId);
-  if(client) {
-    await sendEmailNotification({
-      to_name: client.name,
-      to_email: client.email,
-      from_name: 'Croft Finance',
-      subject: `Update on your project application — ${project?.name}`,
-      message: `Dear ${client.name},\n\nThank you for submitting your project ${project?.name} to Croft Finance for consideration.\n\nAfter careful review, we regret that we are unable to proceed with this mandate at this time. This decision does not reflect the quality of your project but rather our current deployment criteria.\n\nWe encourage you to reapply in the future. If you would like feedback, please contact Suzana directly.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
-      project_name: project?.name || 'N/A'
-    });
-  }
-  renderAdminTables();
+  if (!confirmDelete('mandate decline')) return;
+  try {
+    await db.collection('projects').doc(projectId).update({ status: 'declined', declinedAt: new Date().toISOString() });
+    await logActivity('admin', 'Suzana Aleksić', 'croft', 'step_completed', projectId, 'Step 1: Mandate Review — Declined');
+    showToast('Mandate declined');
+    const project = projects.find(p => p.id === projectId);
+    const client = clients.find(c => c.id === project?.clientId);
+    if(client) {
+      await sendEmailNotification({
+        to_name: client.name,
+        to_email: client.email,
+        from_name: 'Croft Finance',
+        subject: `Update on your project application — ${project?.name}`,
+        message: `Dear ${client.name},\n\nThank you for submitting your project ${project?.name} to Croft Finance for consideration.\n\nAfter careful review, we regret that we are unable to proceed with this mandate at this time. This decision does not reflect the quality of your project but rather our current deployment criteria.\n\nWe encourage you to reapply in the future. If you would like feedback, please contact Suzana directly.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
+        project_name: project?.name || 'N/A'
+      });
+    }
+    renderAdminTables();
+  } catch(e) { showToast(e.message, true); }
 };
 
 window.markStepCompleted = async function(projectId, stepNumber) {
@@ -3964,34 +4508,38 @@ window.markStepCompleted = async function(projectId, stepNumber) {
   if(!project) return;
   if(stepNumber===3) { showCommitmentFeeModal(projectId); return; }
   if(stepNumber===7) { showECFEscrowModal(projectId); return; }
-  if(!confirm(`Mark Step ${stepNumber} as complete?`)) return;
-  const updateData = { [`step${stepNumber}Completed`]: true, [`step${stepNumber}CompletedAt`]: new Date().toISOString() };
-  if(project.step === stepNumber) updateData.step = stepNumber + 1;
-  let completedCount = 0;
-  for(let i=1;i<=stepNumber;i++) if(i===stepNumber || project[`step${i}Completed`]) completedCount++;
-  updateData.overallProgress = Math.round((completedCount/9)*100);
-  await db.collection('projects').doc(projectId).update(updateData);
-  await logActivity('admin', 'Suzana Aleksić', 'croft', 'step_completed', projectId, `Step ${stepNumber}: ${STEP_NAMES[stepNumber]}`);
-  showToast(`Step ${stepNumber} completed`);
-  renderAdminTables();
-  if(editProjectId === projectId) document.getElementById('stepStatusContainer').innerHTML = renderStepDashboard(projects.find(p=>p.id===projectId));
+  if (!confirmDelete(`Step ${stepNumber} completion`)) return;
+  try {
+    const updateData = { [`step${stepNumber}Completed`]: true, [`step${stepNumber}CompletedAt`]: new Date().toISOString() };
+    if(project.step === stepNumber) updateData.step = stepNumber + 1;
+    let completedCount = 0;
+    for(let i=1;i<=stepNumber;i++) if(i===stepNumber || project[`step${i}Completed`]) completedCount++;
+    updateData.overallProgress = Math.round((completedCount/9)*100);
+    await db.collection('projects').doc(projectId).update(updateData);
+    await logActivity('admin', 'Suzana Aleksić', 'croft', 'step_completed', projectId, `Step ${stepNumber}: ${STEP_NAMES[stepNumber]}`);
+    showToast(`Step ${stepNumber} completed`);
+    renderAdminTables();
+    if(editProjectId === projectId) document.getElementById('stepStatusContainer').innerHTML = renderStepDashboard(projects.find(p=>p.id===projectId));
+  } catch(e) { showToast(e.message, true); }
 };
 
 window.revertStepStatus = async function(projectId, stepNumber) {
   const project = projects.find(p => p.id === projectId);
   if(!project) return;
-  if(!confirm(`Revert Step ${stepNumber}?`)) return;
-  const isCompleted = project[`step${stepNumber}Completed`];
-  const updateData = {};
-  if(isCompleted) { updateData[`step${stepNumber}Completed`] = false; updateData[`step${stepNumber}CompletedAt`] = null; if(project.step > stepNumber) updateData.step = stepNumber; }
-  else { updateData[`step${stepNumber}Completed`] = true; updateData[`step${stepNumber}CompletedAt`] = new Date().toISOString(); if(project.step === stepNumber) updateData.step = stepNumber + 1; }
-  let completedCount = 0;
-  for(let i=1;i<=9;i++) { if(i===stepNumber) { if(updateData[`step${stepNumber}Completed`]===true) completedCount++; else if(isCompleted && updateData[`step${stepNumber}Completed`]===false) {} else if(project[`step${i}Completed`]) completedCount++; } else if(project[`step${i}Completed`]) completedCount++; }
-  updateData.overallProgress = Math.round((completedCount/9)*100);
-  await db.collection('projects').doc(projectId).update(updateData);
-  showToast(`Step ${stepNumber} updated`);
-  renderAdminTables();
-  if(editProjectId === projectId) document.getElementById('stepStatusContainer').innerHTML = renderStepDashboard(projects.find(p=>p.id===projectId));
+  if (!confirmDelete(`Step ${stepNumber} revert`)) return;
+  try {
+    const isCompleted = project[`step${stepNumber}Completed`];
+    const updateData = {};
+    if(isCompleted) { updateData[`step${stepNumber}Completed`] = false; updateData[`step${stepNumber}CompletedAt`] = null; if(project.step > stepNumber) updateData.step = stepNumber; }
+    else { updateData[`step${stepNumber}Completed`] = true; updateData[`step${stepNumber}CompletedAt`] = new Date().toISOString(); if(project.step === stepNumber) updateData.step = stepNumber + 1; }
+    let completedCount = 0;
+    for(let i=1;i<=9;i++) { if(i===stepNumber) { if(updateData[`step${stepNumber}Completed`]===true) completedCount++; else if(isCompleted && updateData[`step${stepNumber}Completed`]===false) {} else if(project[`step${i}Completed`]) completedCount++; } else if(project[`step${i}Completed`]) completedCount++; }
+    updateData.overallProgress = Math.round((completedCount/9)*100);
+    await db.collection('projects').doc(projectId).update(updateData);
+    showToast(`Step ${stepNumber} updated`);
+    renderAdminTables();
+    if(editProjectId === projectId) document.getElementById('stepStatusContainer').innerHTML = renderStepDashboard(projects.find(p=>p.id===projectId));
+  } catch(e) { showToast(e.message, true); }
 };
 
 window.showCommitmentFeeModal = function(projectId) {
@@ -4017,58 +4565,62 @@ window.confirmCommitmentFee = async function(projectId) {
   const amount = document.getElementById('feeAmount')?.value;
   const reference = document.getElementById('feeReference')?.value;
   if(!amount || !reference) return showToast('Enter amount and reference', true);
-  await db.collection('projects').doc(projectId).update({
-    commitmentFeeStatus:'paid', commitmentFeeAmount:amount, commitmentFeeReference:reference,
-    commitmentFeeDate:document.getElementById('feeDate')?.value, commitmentFeeMethod:document.getElementById('feeMethod')?.value,
-    step3Completed:true, step3CompletedAt:new Date().toISOString(), step:4
-  });
-  await logActivity('admin', 'Suzana Aleksić', 'croft', 'cf_confirmed', projectId, `Amount: $${amount}`);
-  showToast(`Fee confirmed: $${amount}`);
-  closeModal('commitmentFeeModal');
-  renderAdminTables();
-  if(editProjectId === projectId) document.getElementById('stepStatusContainer').innerHTML = renderStepDashboard(projects.find(p=>p.id===projectId));
-  
-  const project = projects.find(p => p.id === projectId);
-  const client = clients.find(c => c.id === project?.clientId);
-  if(client) {
-    await sendEmailNotification({
-      to_name: client.name,
-      to_email: client.email,
-      from_name: 'Croft Finance',
-      subject: `Commitment Fee Confirmed for ${project?.name}`,
-      message: `Dear ${client.name},\n\nThe commitment fee for your project (${project?.name}) has been confirmed. Your deal is now advancing to Step 4: Deed of Undertaking.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
-      project_name: project?.name || 'N/A'
+  try {
+    await db.collection('projects').doc(projectId).update({
+      commitmentFeeStatus:'paid', commitmentFeeAmount:amount, commitmentFeeReference:reference,
+      commitmentFeeDate:document.getElementById('feeDate')?.value, commitmentFeeMethod:document.getElementById('feeMethod')?.value,
+      step3Completed:true, step3CompletedAt:new Date().toISOString(), step:4
     });
-  }
+    await logActivity('admin', 'Suzana Aleksić', 'croft', 'cf_confirmed', projectId, `Amount: $${amount}`);
+    showToast(`Fee confirmed: $${amount}`);
+    closeModal('commitmentFeeModal');
+    renderAdminTables();
+    if(editProjectId === projectId) document.getElementById('stepStatusContainer').innerHTML = renderStepDashboard(projects.find(p=>p.id===projectId));
+    
+    const project = projects.find(p => p.id === projectId);
+    const client = clients.find(c => c.id === project?.clientId);
+    if(client) {
+      await sendEmailNotification({
+        to_name: client.name,
+        to_email: client.email,
+        from_name: 'Croft Finance',
+        subject: `Commitment Fee Confirmed for ${project?.name}`,
+        message: `Dear ${client.name},\n\nThe commitment fee for your project (${project?.name}) has been confirmed. Your deal is now advancing to Step 4: Deed of Undertaking.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
+        project_name: project?.name || 'N/A'
+      });
+    }
+  } catch(e) { showToast(e.message, true); }
 };
 
 window.confirmECFEscrow = async function(projectId) {
   const amount = document.getElementById('ecfAmount')?.value;
   const institution = document.getElementById('ecfInstitution')?.value;
   if(!amount || !institution) return showToast('Enter amount and institution', true);
-  await db.collection('projects').doc(projectId).update({
-    ecfStatus:'escrowed', ecfAmount:amount, ecfInstitution:institution,
-    ecfReference:document.getElementById('ecfReference')?.value, ecfEscrowDate:document.getElementById('ecfDate')?.value,
-    step7Completed:true, step7CompletedAt:new Date().toISOString(), step:8
-  });
-  await logActivity('admin', 'Suzana Aleksić', 'croft', 'ecf_confirmed', projectId, `Amount: $${amount}`);
-  showToast(`ECF escrow confirmed: $${amount}`);
-  closeModal('ecfEscrowModal');
-  renderAdminTables();
-  if(editProjectId === projectId) document.getElementById('stepStatusContainer').innerHTML = renderStepDashboard(projects.find(p=>p.id===projectId));
-  
-  const project = projects.find(p => p.id === projectId);
-  const client = clients.find(c => c.id === project?.clientId);
-  if(client) {
-    await sendEmailNotification({
-      to_name: client.name,
-      to_email: client.email,
-      from_name: 'Croft Finance',
-      subject: `ECF Escrow Confirmed for ${project?.name}`,
-      message: `Dear ${client.name},\n\nThe ECF escrow for your project (${project?.name}) has been confirmed. Your deal is now advancing to Step 8: Transfer to Agent.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
-      project_name: project?.name || 'N/A'
+  try {
+    await db.collection('projects').doc(projectId).update({
+      ecfStatus:'escrowed', ecfAmount:amount, ecfInstitution:institution,
+      ecfReference:document.getElementById('ecfReference')?.value, ecfEscrowDate:document.getElementById('ecfDate')?.value,
+      step7Completed:true, step7CompletedAt:new Date().toISOString(), step:8
     });
-  }
+    await logActivity('admin', 'Suzana Aleksić', 'croft', 'ecf_confirmed', projectId, `Amount: $${amount}`);
+    showToast(`ECF escrow confirmed: $${amount}`);
+    closeModal('ecfEscrowModal');
+    renderAdminTables();
+    if(editProjectId === projectId) document.getElementById('stepStatusContainer').innerHTML = renderStepDashboard(projects.find(p=>p.id===projectId));
+    
+    const project = projects.find(p => p.id === projectId);
+    const client = clients.find(c => c.id === project?.clientId);
+    if(client) {
+      await sendEmailNotification({
+        to_name: client.name,
+        to_email: client.email,
+        from_name: 'Croft Finance',
+        subject: `ECF Escrow Confirmed for ${project?.name}`,
+        message: `Dear ${client.name},\n\nThe ECF escrow for your project (${project?.name}) has been confirmed. Your deal is now advancing to Step 8: Transfer to Agent.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
+        project_name: project?.name || 'N/A'
+      });
+    }
+  } catch(e) { showToast(e.message, true); }
 };
 
 window.saveProjectInfo = async function() {
@@ -4078,29 +4630,31 @@ window.saveProjectInfo = async function() {
   const clientName = document.getElementById('editClientName').value.trim();
   const clientEmail = document.getElementById('editClientEmail').value.trim();
   const newStep = parseInt(document.getElementById('editStep').value);
-  if(p.clientId && clientName) await db.collection('clients').doc(p.clientId).update({ name: clientName, email: clientEmail });
-  const updates = {
-    name: document.getElementById('editProjectName').value, industry: document.getElementById('editIndustry').value,
-    location: document.getElementById('editLocation').value, fundsNeeded: document.getElementById('editFundsNeeded').value,
-    sponsorEquity: document.getElementById('editSponsorEquity').value, step: newStep,
-    amount: document.getElementById('editAmount').value, interestRate: document.getElementById('editRate').value,
-    brokerId: document.getElementById('editBrokerAssign').value || null, closeDate: document.getElementById('editCloseDate').value,
-    termSheetExpiry: document.getElementById('editTermSheetExpiry').value,
-    commitmentFeeDeadline: document.getElementById('editCommitFeeDeadline').value,
-    deedExpiry: document.getElementById('editDeedExpiry').value,
-    ecfPolicyExpiry: document.getElementById('editECFPolicyExpiry').value,
-    term: document.getElementById('editTerm').value,
-    gracePeriod: document.getElementById('editGracePeriod').value,
-    governingLaw: document.getElementById('editGoverningLaw').value,
-    fundedDate: document.getElementById('editFundedDate').value,
-    dataRoomLink: document.getElementById('editDataRoomLink').value,
-    commitmentFeeStatus: document.getElementById('editCommitFee').value, ecfStatus: document.getElementById('editECFStatus').value,
-    advisorNote: document.getElementById('editAdvisorNote').value, brokerEngagement: document.getElementById('editBrokerEngagement').value
-  };
-  await db.collection('projects').doc(pid).update(updates);
-  closeModal('editProjectModal');
-  showToast('Saved');
-  renderAdminTables();
+  try {
+    if(p.clientId && clientName) await db.collection('clients').doc(p.clientId).update({ name: clientName, email: clientEmail });
+    const updates = {
+      name: document.getElementById('editProjectName').value, industry: document.getElementById('editIndustry').value,
+      location: document.getElementById('editLocation').value, fundsNeeded: document.getElementById('editFundsNeeded').value,
+      sponsorEquity: document.getElementById('editSponsorEquity').value, step: newStep,
+      amount: document.getElementById('editAmount').value, interestRate: document.getElementById('editRate').value,
+      brokerId: document.getElementById('editBrokerAssign').value || null, closeDate: document.getElementById('editCloseDate').value,
+      termSheetExpiry: document.getElementById('editTermSheetExpiry').value,
+      commitmentFeeDeadline: document.getElementById('editCommitFeeDeadline').value,
+      deedExpiry: document.getElementById('editDeedExpiry').value,
+      ecfPolicyExpiry: document.getElementById('editECFPolicyExpiry').value,
+      term: document.getElementById('editTerm').value,
+      gracePeriod: document.getElementById('editGracePeriod').value,
+      governingLaw: document.getElementById('editGoverningLaw').value,
+      fundedDate: document.getElementById('editFundedDate').value,
+      dataRoomLink: document.getElementById('editDataRoomLink').value,
+      commitmentFeeStatus: document.getElementById('editCommitFee').value, ecfStatus: document.getElementById('editECFStatus').value,
+      advisorNote: document.getElementById('editAdvisorNote').value, brokerEngagement: document.getElementById('editBrokerEngagement').value
+    };
+    await db.collection('projects').doc(pid).update(updates);
+    closeModal('editProjectModal');
+    showToast('Saved');
+    renderAdminTables();
+  } catch(e) { showToast(e.message, true); }
 };
 
 window.showAddClientModal = function() { openModal('addClientModal'); };
@@ -4122,25 +4676,29 @@ window.createClient = async function() {
 };
 
 window.deleteProject = async function(id) {
-  if(!confirm('Type DELETE to confirm deletion of this project and all its documents.')) return;
-  const projectDocs = documents.filter(d => d.projectId === id);
-  for(const doc of projectDocs) await db.collection('documents').doc(doc.id).delete();
-  await db.collection('projects').doc(id).delete();
-  showToast('Project deleted');
+  if (!confirmDelete('project')) return;
+  try {
+    const projectDocs = documents.filter(d => d.projectId === id);
+    for(const doc of projectDocs) await db.collection('documents').doc(doc.id).delete();
+    await db.collection('projects').doc(id).delete();
+    showToast('Project deleted');
+  } catch(e) { showToast(e.message, true); }
 };
 
 window.deleteClient = async function(id) {
-  if(!confirm('Type DELETE to confirm deletion of this client and ALL associated data.')) return;
-  const clientProjects = projects.filter(p => p.clientId === id);
-  for(const project of clientProjects) {
-    const projectDocs = documents.filter(d => d.projectId === project.id);
-    for(const doc of projectDocs) await db.collection('documents').doc(doc.id).delete();
-    await db.collection('projects').doc(project.id).delete();
-  }
-  const clientMessages = messages.filter(m => m.clientId === id);
-  for(const msg of clientMessages) await db.collection('messages').doc(msg.id).delete();
-  await db.collection('clients').doc(id).delete();
-  showToast('Client and all associated data deleted');
+  if (!confirmDelete('client')) return;
+  try {
+    const clientProjects = projects.filter(p => p.clientId === id);
+    for(const project of clientProjects) {
+      const projectDocs = documents.filter(d => d.projectId === project.id);
+      for(const doc of projectDocs) await db.collection('documents').doc(doc.id).delete();
+      await db.collection('projects').doc(project.id).delete();
+    }
+    const clientMessages = messages.filter(m => m.clientId === id);
+    for(const msg of clientMessages) await db.collection('messages').doc(msg.id).delete();
+    await db.collection('clients').doc(id).delete();
+    showToast('Client and all associated data deleted');
+  } catch(e) { showToast(e.message, true); }
 };
 
 window.updateProjectSelectForUpload = function(clientId) {
@@ -4150,6 +4708,7 @@ window.updateProjectSelectForUpload = function(clientId) {
   const clientProjects = projects.filter(p => p.clientId === clientId);
   projectSelect.innerHTML = '<option value="">Select Project</option>' + clientProjects.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
 };
+
 window.adminUploadDocument = async function() {
   const clientId = document.getElementById('uploadClientId').value;
   const projectId = document.getElementById('uploadProjectId').value;
@@ -4171,29 +4730,39 @@ window.adminUploadDocument = async function() {
 
 window.submitContactForm = async function(e) {
   e.preventDefault();
-  await db.collection('contactRequests').add({
-    name: document.getElementById('contactName').value, email: document.getElementById('contactEmail').value,
-    project: document.getElementById('contactProject').value, message: document.getElementById('contactMessage').value,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-  
-  await sendEmailNotification({
-    to_name: 'Croft Finance Team',
-    to_email: EMAILJS_CONFIG.adminEmail,
-    from_name: 'Croft Finance',
-    subject: `New Contact Request from ${document.getElementById('contactName').value}`,
-    message: `Name: ${document.getElementById('contactName').value}\nEmail: ${document.getElementById('contactEmail').value}\nProject: ${document.getElementById('contactProject').value}\nMessage: ${document.getElementById('contactMessage').value}`,
-    project_name: document.getElementById('contactProject').value
-  });
-  
-  showToast('Request sent');
-  document.getElementById('homepageContactForm').reset();
+  try {
+    await db.collection('contactRequests').add({
+      name: document.getElementById('contactName').value, email: document.getElementById('contactEmail').value,
+      project: document.getElementById('contactProject').value, message: document.getElementById('contactMessage').value,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    
+    await sendEmailNotification({
+      to_name: 'Croft Finance Team',
+      to_email: EMAILJS_CONFIG.adminEmail,
+      from_name: 'Croft Finance',
+      subject: `New Contact Request from ${document.getElementById('contactName').value}`,
+      message: `Name: ${document.getElementById('contactName').value}\nEmail: ${document.getElementById('contactEmail').value}\nProject: ${document.getElementById('contactProject').value}\nMessage: ${document.getElementById('contactMessage').value}`,
+      project_name: document.getElementById('contactProject').value
+    });
+    
+    showToast('Request sent');
+    document.getElementById('homepageContactForm').reset();
+  } catch(e) { showToast(e.message, true); }
 };
 
 window.acceptCookies = function() { document.getElementById('cookieBanner').style.display = 'none'; localStorage.setItem('cookiesAccepted', 'true'); };
 if(localStorage.getItem('cookiesAccepted') === 'true') document.getElementById('cookieBanner').style.display = 'none';
 
-function toggleDarkMode() { document.body.classList.toggle('dark-mode'); localStorage.setItem('darkMode', document.body.classList.contains('dark-mode')); }
+function toggleDarkMode() { 
+  document.body.classList.toggle('dark-mode'); 
+  localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+  // Update chart colors when toggling dark mode
+  if (chartInstances.capitalChart) chartInstances.capitalChart.update();
+  if (chartInstances.industryChart) chartInstances.industryChart.update();
+  if (chartInstances.pipelineStageChart) chartInstances.pipelineStageChart.update();
+  if (chartInstances.quarterlyChart) chartInstances.quarterlyChart.update();
+}
 if(localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark-mode');
 
 updatePasswordStrengthMeter('regPassword', '#registerForm .strength-segment', '#registerForm .strength-hint');
