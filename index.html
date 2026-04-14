@@ -1136,32 +1136,307 @@ body {
 <!-- ============================================================ -->
 <!-- CLIENT PORTAL VIEW -->
 <!-- ============================================================ -->
-<div id="view-portal" class="view">...</div>
+<div id="view-portal" class="view">
+  <nav class="portal-nav">
+    <div style="display:flex;align-items:center;height:100%;"><button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()"><span></span><span></span><span></span></button><div class="portal-nav-brand">CROFT <span>FINANCE</span></div></div>
+    <div class="portal-nav-right"><span class="portal-nav-user" id="portalNavUser"></span><button class="btn-sm btn-sm-ghost" onclick="logout()">Sign Out</button></div>
+  </nav>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+  <div class="portal-layout">
+    <aside class="sidebar" id="clientSidebar">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar" id="clientAvatar">—</div>
+        <div class="sidebar-name" id="portalUserName">—</div>
+        <div class="sidebar-email" id="portalUserEmail">—</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+          <div id="dealHealthDot" style="width:8px;height:8px;border-radius:50%;background:var(--gray-300);flex-shrink:0;"></div>
+          <span style="font-size:10px;color:var(--gray-400);letter-spacing:1px;text-transform:uppercase;">Deal Health</span>
+        </div>
+      </div>
+      <div class="sidebar-nav">
+        <button class="nav-item active" data-tab="dashboard"><i class="fas fa-chart-line"></i> Dashboard</button>
+        <button class="nav-item" data-tab="process"><i class="fas fa-tasks"></i> Closing Process</button>
+        <button class="nav-item" data-tab="documents"><i class="fas fa-folder-open"></i> Documents</button>
+        <button class="nav-item" data-tab="messages"><i class="fas fa-comments"></i> Messages</button>
+        <button class="nav-item" data-tab="schedule"><i class="fas fa-calendar"></i> Schedule Meeting</button>
+        <button class="nav-item" data-tab="projects"><i class="fas fa-briefcase"></i> Deal Sheet</button>
+        <div class="sidebar-divider"></div>
+        <button class="nav-item" data-tab="activity"><i class="fas fa-history"></i> Activity Log</button>
+      </div>
+      <div class="sidebar-advisor">
+        <div class="advisor-label">Your Advisor</div>
+        <div class="advisor-name">Suzana Aleksić</div>
+        <div class="advisor-title">Principal, Croft Finance</div>
+        <div class="advisor-contact"><i class="fas fa-envelope"></i> suzana.aleksic@croftfinance.com</div>
+        <div class="advisor-contact"><i class="fas fa-phone"></i> +381 69 288 0 191</div>
+        <div class="advisor-availability" id="advisorAvailability"></div>
+        <div class="advisor-actions"><button class="btn-secondary btn-sm" onclick="switchPortalTab('messages')">Message Suzana</button></div>
+      </div>
+    </aside>
+    <main class="main-content">
+      <div id="tab-dashboard" class="portal-tab active">
+        <div id="expiryBannersContainer"></div>
+        <div id="adminNoteDisplay"></div>
+        <div id="actionBannerDisplay"></div>
+        <div class="dashboard-hero">
+          <div class="dashboard-hero-left">
+            <div class="welcome-title" id="welcomeTitle">Welcome back.</div>
+            <div class="welcome-date" id="dashboardDate"></div>
+            <div style="display:flex;align-items:center;gap:24px;margin-top:16px;">
+              <div class="progress-circle-container">
+                <div class="progress-circle"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" class="progress-circle-bg"></circle><circle cx="50" cy="50" r="45" class="progress-circle-fill" id="progressCircleFill"></circle></svg><div class="progress-circle-text"><div class="progress-percentage" id="progressPercentage">0%</div><div class="progress-label">Complete</div></div></div>
+              </div>
+              <div>
+                <div class="step-number" id="stepNumber">Step 1 of 9</div>
+                <div class="step-name" id="stepName">Mandate Review</div>
+                <div style="margin-top:8px;font-size:11px;color:rgba(255,255,255,0.5);">Overall progress</div>
+              </div>
+            </div>
+          </div>
+          <div class="dashboard-hero-right">
+            <div class="estimated-closing">Estimated Closing</div>
+            <div class="closing-date" id="closingDateDisplay">—</div>
+            <div class="days-remaining" id="daysRemainingDisplay">—</div>
+            <div class="days-label">days remaining</div>
+            <div class="next-action"><div class="next-action-label">Next Action</div><div class="next-action-text" id="nextActionText">—</div></div>
+          </div>
+        </div>
+        <div class="quick-actions-bar">
+          <div class="quick-action-btn" data-tab="documents"><i class="fas fa-upload quick-action-icon"></i><div class="quick-action-label">Upload Document</div></div>
+          <div class="quick-action-btn" data-tab="messages"><i class="fas fa-comment quick-action-icon"></i><div class="quick-action-label">Message Suzana</div></div>
+          <div class="quick-action-btn" data-tab="schedule"><i class="fas fa-calendar-alt quick-action-icon"></i><div class="quick-action-label">Schedule Meeting</div></div>
+          <div class="quick-action-btn" data-tab="projects"><i class="fas fa-chart-simple quick-action-icon"></i><div class="quick-action-label">Deal Sheet</div></div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="data-label">Deal Stage</div><div class="stat-value" id="dashStage">—</div></div>
+          <div class="stat-card"><div class="data-label">Facility Amount</div><div class="stat-value" id="dashAmount">—</div></div>
+          <div class="stat-card"><div class="data-label">Interest Rate</div><div class="stat-value" id="dashRate">—</div></div>
+          <div class="stat-card"><div class="data-label">Target Closing</div><div class="stat-value" id="dashCountdown">—</div></div>
+          <div class="stat-card"><div class="data-label">Funds Needed</div><div class="stat-value" id="dashFundsNeeded">—</div></div>
+        </div>
+        <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-chart-pie"></i> Capital Stack</div></div><div class="card-body"><canvas id="capitalStackChart" height="300" style="max-height:300px;"></canvas></div></div>
+        <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-clock"></i> Recent Activity</div></div><div class="card-body"><div id="recentActivity"><p class="data-label" style="text-align:center;">No recent activity.</p></div></div></div>
+        <div class="advisor-card"><div class="advisor-header"><div class="advisor-avatar">SA</div><div class="advisor-info"><h4>Suzana Aleksić</h4><p>Principal, Croft Finance</p></div></div><div class="advisor-details"><div class="advisor-detail"><div class="advisor-detail-label">Availability</div><div class="advisor-detail-value">Mon–Fri, 9:00–18:00 CET</div></div><div class="advisor-detail"><div class="advisor-detail-label">Response Time</div><div class="advisor-detail-value">Typically within 4 hours</div></div></div><div class="advisor-note" id="advisorNote">Looking forward to helping you close your deal successfully.</div><div class="advisor-actions"><div class="advisor-btn" onclick="switchPortalTab('messages')">Send Message</div><div class="advisor-btn" onclick="switchPortalTab('schedule')">Schedule Call</div></div></div>
+      </div>
+      <div id="tab-process" class="portal-tab"><div class="client-page-title">Closing Process</div><div id="stepAccordionContainer"></div></div>
+      <div id="tab-documents" class="portal-tab">
+        <div class="client-page-title">Documents</div>
+        <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-file-signature"></i> Closing Documents</div></div><div class="card-body" style="padding:0;"><div class="table-wrap"><table class="documents-table" id="closingDocumentsTable"><thead><tr><th>Document Name</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="closingDocumentsBody"></tbody></table></div></div></div>
+        <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-upload"></i> Upload a Document</div></div><div class="card-body"><div class="form-group"><label class="form-label">Document Type</label><select id="clientUploadDocType" class="form-select"><option value="">Select document type...</option></select></div><div class="form-group"><label class="form-label">PDF File (max 10MB)</label><input type="file" id="clientUploadFile" class="form-input" accept=".pdf"></div><button class="btn btn-primary btn-md" onclick="clientUploadDocument()">Upload Document</button><div id="clientUploadStatus" style="margin-top:12px;font-size:12px;display:none;"></div></div></div>
+      </div>
+      <div id="tab-messages" class="portal-tab"><div class="client-page-title">Messages</div><div class="card"><div class="card-body"><div class="messages-container"><div class="messages-list" id="messagesList"></div><div class="message-input"><input type="text" id="messageInput" placeholder="Write a message..." onkeypress="if(event.key==='Enter')sendMessage()"><button class="btn btn-primary btn-sm" onclick="sendMessage()">Send</button></div></div></div></div></div>
+      <div id="tab-schedule" class="portal-tab">
+        <div class="client-page-title">Schedule a Meeting</div>
+        <div class="card"><div class="card-body">
+          <div id="meetingRequestForm">
+            <div class="form-group"><label class="form-label">Preferred Date</label><input type="date" id="clientMeetingDate" class="form-input"></div>
+            <div class="form-group"><label class="form-label">Preferred Time</label><input type="time" id="clientMeetingTime" class="form-input"></div>
+            <div class="form-group"><label class="form-label">Meeting Type</label><select id="clientMeetingType" class="form-select"><option>Video Call</option><option>Phone Call</option></select></div>
+            <div class="form-group"><label class="form-label">Notes</label><textarea id="clientMeetingNotes" rows="3" class="form-textarea"></textarea></div>
+            <button class="btn btn-primary btn-md" onclick="requestClientMeeting()" style="width:100%">Request Meeting</button>
+          </div>
+          <div id="meetingSuccessMessage" style="display:none;text-align:center;padding:40px;"><i class="fas fa-check-circle" style="font-size:48px;color:var(--success);"></i><h3 style="margin-top:16px;">Meeting Request Sent</h3><button class="btn btn-secondary btn-sm" onclick="resetMeetingForm()">Request Another</button></div>
+          <div style="margin-top:32px;"><hr style="margin:20px 0;"><h4 style="font-family:'Cormorant Garamond',serif;font-size:18px;">Your Scheduled Meetings</h4><div id="clientMeetingsList"></div></div>
+        </div></div>
+      </div>
+      <div id="tab-projects" class="portal-tab"><div class="client-page-title">Deal Sheet</div><div style="text-align:right;margin-bottom:16px;"><button class="btn btn-secondary btn-sm" onclick="printDealSummary()"><i class="fas fa-print"></i> Print Deal Summary</button></div><div id="projectsList"></div></div>
+      <div id="tab-activity" class="portal-tab"><div class="client-page-title">Activity Log</div><div class="card"><div class="card-body"><div class="activity-timeline" id="activityTimeline"></div></div></div></div>
+    </main>
+  </div>
+</div>
 
 <!-- ============================================================ -->
 <!-- ADMIN PORTAL VIEW -->
 <!-- ============================================================ -->
-<div id="view-admin" class="view">...</div>
+<div id="view-admin" class="view">
+  <nav class="portal-nav">
+    <div><button class="hamburger" onclick="toggleAdminSidebar()"><span></span><span></span><span></span></button><div class="portal-nav-brand">CROFT <span>FINANCE</span> <span style="font-size:9px;color:var(--blue);">ADMIN</span></div></div>
+    <div class="portal-nav-right">
+      <div style="position:relative;">
+        <button class="btn-sm btn-sm-outline" id="adminNotificationBell" onclick="toggleAdminNotificationDropdown()"><i class="fas fa-bell"></i><span id="adminNotificationBadge" style="position:absolute;top:-5px;right:-5px;background:var(--error);color:white;border-radius:10px;padding:0 5px;font-size:9px;display:none;">0</span></button>
+        <div id="adminNotificationDropdown" class="notification-center"><div class="notification-header"><h4>Notifications</h4><button onclick="closeAdminNotificationDropdown()">×</button></div><div class="notification-list" id="adminNotificationList"></div></div>
+      </div>
+      <button class="btn-sm btn-sm-ghost" onclick="logout()">Sign Out</button>
+    </div>
+  </nav>
+  <div class="sidebar-overlay" id="adminSidebarOverlay" onclick="toggleAdminSidebar()"></div>
+  <div class="portal-layout">
+    <aside class="sidebar" id="adminSidebar">
+      <div class="sidebar-user"><div class="sidebar-avatar">SA</div><div class="sidebar-name">Suzana Aleksić</div><div class="sidebar-email">Administrator</div></div>
+      <div class="sidebar-nav">
+        <button class="nav-item active" data-admin-tab="overview"><i class="fas fa-chart-pie"></i> Pipeline</button>
+        <button class="nav-item" data-admin-tab="analytics"><i class="fas fa-chart-bar"></i> Analytics</button>
+        <div class="sidebar-divider"></div>
+        <button class="nav-item" data-admin-tab="clients"><i class="fas fa-users"></i> Clients</button>
+        <button class="nav-item" data-admin-tab="projects-admin"><i class="fas fa-briefcase"></i> Projects</button>
+        <button class="nav-item" data-admin-tab="documents-admin"><i class="fas fa-file-alt"></i> Documents</button>
+        <button class="nav-item" data-admin-tab="brokers"><i class="fas fa-handshake"></i> Brokers</button>
+        <button class="nav-item" data-admin-tab="submissions"><i class="fas fa-paper-plane"></i> Deal Submissions</button>
+        <div class="sidebar-divider"></div>
+        <button class="nav-item" data-admin-tab="inbox"><i class="fas fa-inbox"></i> Inbox</button>
+        <button class="nav-item" data-admin-tab="meetings"><i class="fas fa-calendar"></i> Meetings</button>
+        <div class="sidebar-divider"></div>
+        <button class="nav-item" data-admin-tab="settings"><i class="fas fa-cog"></i> Settings</button>
+        <button class="nav-item" data-admin-tab="audit"><i class="fas fa-history"></i> Audit Log</button>
+      </div>
+    </aside>
+    <main class="main-content">
+      <div id="admin-overview" class="admin-tab active">
+        <div class="admin-page-title" id="adminGreeting">Deal Pipeline</div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="data-label">Active Clients</div><div class="stat-value" id="totalClients">0</div></div>
+          <div class="stat-card"><div class="data-label">Active Projects</div><div class="stat-value" id="totalProjects">0</div></div>
+          <div class="stat-card"><div class="data-label">Total Documents</div><div class="stat-value" id="totalDocuments">0</div></div>
+          <div class="stat-card"><div class="data-label" style="color:var(--warning);">New Registrations</div><div class="stat-value" id="pendingClientsCount" style="color:var(--warning);">0</div></div>
+          <div class="stat-card"><div class="data-label">Unread Messages</div><div class="stat-value" id="pendingMessages">0</div></div>
+          <div class="stat-card"><div class="data-label">Pending Meetings</div><div class="stat-value" id="scheduledMeetings">0</div></div>
+          <div class="stat-card"><div class="data-label" style="color:var(--blue);">Pending Review</div><div class="stat-value" id="pendingReviewCount" style="color:var(--blue);">0</div></div>
+        </div>
+        <div id="dealHealthSummary" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;"></div>
+        <div class="view-toggle"><button class="view-toggle-btn active" onclick="setPipelineView('board')">Board</button><button class="view-toggle-btn" onclick="setPipelineView('list')">List</button></div>
+        <div id="pipelineBoard" class="pipeline-board"></div>
+        <div id="pipelineList" style="display:none;"></div>
+      </div>
+      <div id="admin-analytics" class="admin-tab">
+        <div class="admin-page-title">Analytics</div>
+        <div class="stats-grid" id="analyticsKPI"></div>
+        <div class="pipeline-funnel" id="pipelineFunnel"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+          <div class="card"><div class="card-header"><div class="card-title">Projects by Industry</div></div><div class="card-body"><canvas id="industryChart" height="220" style="max-height:220px;"></canvas></div></div>
+          <div class="card"><div class="card-header"><div class="card-title">Pipeline Stage Distribution</div></div><div class="card-body"><canvas id="pipelineStageChart" height="220" style="max-height:220px;"></canvas></div></div>
+        </div>
+        <div class="card"><div class="card-header"><div class="card-title">Broker Performance</div><button class="btn btn-ghost btn-sm" onclick="exportBrokerPerformanceCSV()">Export CSV</button></div><div class="card-body"><div class="table-wrap"><table class="admin-table" id="brokerPerformanceTable"><thead><tr><th data-sort="name">Broker Name</th><th>Firm</th><th>Market</th><th data-sort="submissions">Submissions</th><th data-sort="accepted">Accepted</th><th data-sort="funded">Funded</th><th data-sort="conversion">Conversion %</th><th data-sort="volume">Total Volume</th><th data-sort="commission">Est. Commission</th></tr></thead><tbody id="brokerPerformanceBody"></tbody></table></div></div></div>
+        <div class="card"><div class="card-header"><div class="card-title">Commission Breakdown</div><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="exportCommissionCSV()">Export CSV</button><button class="btn btn-ghost btn-sm" onclick="window.print()">Print Report</button></div></div><div class="card-body"><div class="table-wrap"><table class="admin-table" id="commissionTable"><thead><tr><th>Client</th><th>Project</th><th>Industry</th><th>Location</th><th>Facility Amount</th><th>Broker Commission</th><th>Net Commission (2%)</th><th>Days to Close</th><th>Funded Date</th></tr></thead><tbody id="commissionTableBody"></tbody><tfoot><tr id="commissionTotalRow"></tr></tfoot></table></div></div></div>
+        <div class="card"><div class="card-header"><div class="card-title">Quarterly Trend</div></div><div class="card-body"><canvas id="quarterlyTrendChart" height="200" style="max-height:200px;"></canvas></div></div>
+      </div>
+      <div id="admin-clients" class="admin-tab">
+        <div class="admin-page-title">Clients</div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:16px;"><input type="text" id="clientSearch" class="form-input" placeholder="Search clients..." style="max-width:300px;"><button class="btn btn-primary btn-sm" onclick="showAddClientModal()">+ Add Client</button></div>
+        <div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Email</th><th>Projects</th><th>Status</th><th>Notes</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="adminClientsTable"></tbody></table></div>
+      </div>
+      <div id="admin-projects-admin" class="admin-tab">
+        <div class="admin-page-title">Projects</div>
+        <div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Project</th><th>Industry</th><th>Funds Needed</th><th>Step</th><th>Broker</th><th>CF</th><th>ECF</th><th>Data Room</th><th>Actions</th></tr></thead><tbody id="adminProjectsTable"></tbody></table></div>
+      </div>
+      <div id="admin-documents-admin" class="admin-tab">
+        <div class="admin-page-title">Documents</div>
+        <div style="margin-bottom:16px;"><button class="btn btn-primary btn-sm" onclick="showUploadDocumentModal()">+ Upload Document</button></div>
+        <div class="table-wrap"><table class="documents-table"><thead><tr><th>Client</th><th>Project</th><th>Document</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="adminDocumentsTableBody"></tbody></table></div>
+      </div>
+      <div id="admin-brokers" class="admin-tab">
+        <div class="admin-page-title">Brokers</div>
+        <div class="table-wrap"><table class="admin-table"><thead><tr><th>Broker</th><th>Firm</th><th>Commission</th><th>Submitted</th><th>Funded</th><th>Est. Commission</th><th>Status</th><th>Engagement</th><th>Actions</th></tr></thead><tbody id="adminBrokersTable"></tbody></table></div>
+        <div class="card" style="margin-top:20px;"><div class="card-header"><div class="card-title">Broker Update Requests</div></div><div class="card-body"><div id="brokerUpdateRequestsList"></div></div></div>
+      </div>
+      <div id="admin-submissions" class="admin-tab">
+        <div class="admin-page-title">Deal Submissions</div>
+        <div style="margin-bottom:16px;"><select id="submissionFilter" class="form-select" style="max-width:200px;" onchange="renderSubmissionsTable()"><option value="all">All Submissions</option><option value="pending">Pending</option><option value="accepted">Accepted</option><option value="rejected">Rejected</option></select></div>
+        <div class="table-wrap"><table class="admin-table"><thead><tr><th>Date</th><th>Broker</th><th>Client</th><th>Project</th><th>Data Room</th><th>Status</th><th>Actions</th></tr></thead><tbody id="submissionsTableBody"></tbody></table></div>
+        <div id="submissionDetailPanel" style="display:none;margin-top:20px;"></div>
+      </div>
+      <div id="admin-inbox" class="admin-tab">
+        <div class="admin-page-title">Inbox</div>
+        <div class="inbox-filter"><button class="filter-chip active" data-filter="all">All</button><button class="filter-chip" data-filter="client">Clients</button><button class="filter-chip" data-filter="broker">Brokers</button><button class="filter-chip" data-filter="unread">Unread</button></div>
+        <div id="inboxContainer"></div>
+      </div>
+      <div id="admin-meetings" class="admin-tab">
+        <div class="admin-page-title">Meeting Requests</div>
+        <div style="margin-bottom:16px;"><button class="btn btn-primary btn-sm" onclick="showScheduleMeetingModal()">+ Schedule Meeting</button></div>
+        <div class="table-wrap"><table class="admin-table"><thead><tr><th>Date</th><th>Client</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead><tbody id="meetingsTableBody"></tbody></table></div>
+      </div>
+      <div id="admin-settings" class="admin-tab">
+        <div class="admin-page-title">Settings</div>
+        <div class="card"><div class="card-header"><div class="card-title">Deal Appetite</div></div><div class="card-body"><textarea id="dealAppetiteText" rows="4" class="form-textarea" placeholder="Describe current deal preferences..."></textarea><button class="btn btn-primary btn-sm" onclick="saveDealAppetite()" style="margin-top:12px;">Save Deal Appetite</button></div></div>
+        <div class="card"><div class="card-header"><div class="card-title">Platform Announcement</div></div><div class="card-body"><textarea id="announcementText" rows="2" class="form-textarea" placeholder="Brief announcement shown to all users..."></textarea><button class="btn btn-primary btn-sm" onclick="saveAnnouncement()" style="margin-top:12px;">Publish Announcement</button></div></div>
+        <div class="card"><div class="card-header"><div class="card-title">Admin Profile</div></div><div class="card-body"><div class="form-grid-2"><div class="form-group"><label class="form-label">Display Name</label><input type="text" id="adminDisplayName" class="form-input"></div><div class="form-group"><label class="form-label">Title</label><input type="text" id="adminTitle" class="form-input"></div><div class="form-group"><label class="form-label">Email</label><input type="email" id="adminProfileEmail" class="form-input"></div><div class="form-group"><label class="form-label">Phone</label><input type="text" id="adminPhone" class="form-input"></div><div class="form-group"><label class="form-label">Availability Hours</label><input type="text" id="adminAvailability" class="form-input" placeholder="Mon–Fri, 9:00–18:00 CET"></div></div><button class="btn btn-primary btn-sm" onclick="saveAdminProfile()">Save Profile</button></div></div>
+      </div>
+      <div id="admin-audit" class="admin-tab"><div class="admin-page-title">Audit Log</div><div id="auditLogList"></div></div>
+    </main>
+  </div>
+</div>
 
 <!-- ============================================================ -->
 <!-- BROKER PORTAL VIEW -->
 <!-- ============================================================ -->
-<div id="view-broker" class="view">...</div>
+<div id="view-broker" class="view">
+  <nav class="portal-nav">
+    <div><button class="hamburger" onclick="toggleBrokerSidebar()"><span></span><span></span><span></span></button><div class="portal-nav-brand">CROFT <span>FINANCE</span> <span style="font-size:9px;color:var(--blue);">BROKER</span></div></div>
+    <div class="portal-nav-right"><span class="portal-nav-user" id="brokerNavUser"></span><button class="btn-sm btn-sm-ghost" onclick="logout()">Sign Out</button></div>
+  </nav>
+  <div class="sidebar-overlay" id="brokerSidebarOverlay" onclick="toggleBrokerSidebar()"></div>
+  <div class="portal-layout">
+    <aside class="sidebar" id="brokerSidebar">
+      <div class="sidebar-user"><div class="sidebar-avatar" id="brokerAvatar">—</div><div class="sidebar-name" id="brokerUserName">—</div><div class="sidebar-email" id="brokerUserEmail">—</div></div>
+      <div class="sidebar-nav">
+        <button class="nav-item active" data-broker-tab="dashboard"><i class="fas fa-chart-line"></i> Dashboard</button>
+        <button class="nav-item" data-broker-tab="submit-deal"><i class="fas fa-file-contract"></i> Submit Deal</button>
+        <button class="nav-item" data-broker-tab="portfolio"><i class="fas fa-briefcase"></i> Client Progress</button>
+        <div class="sidebar-divider"></div>
+        <button class="nav-item" data-broker-tab="messages"><i class="fas fa-comments"></i> Messages</button>
+      </div>
+    </aside>
+    <main class="main-content">
+      <div id="broker-tab-dashboard" class="portal-tab active">
+        <div class="admin-page-title" id="brokerDashGreeting">Welcome.</div>
+        <div id="dealAppetiteCard" class="card"><div class="card-header"><div class="card-title">Current Deal Focus</div></div><div class="card-body" id="dealAppetiteContent">Loading...</div></div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="data-label">Pipeline Commission</div><div class="stat-value" id="brokerPipelineCommission">$0</div></div>
+          <div class="stat-card"><div class="data-label">Earned Commission</div><div class="stat-value" id="brokerEarnedCommission">$0</div></div>
+          <div class="stat-card"><div class="data-label">Active Deals</div><div class="stat-value" id="brokerActiveDeals">0</div></div>
+          <div class="stat-card commission-rate-card"><div class="data-label">Your Commission Rate</div><div class="stat-value" id="brokerCommRate">0%</div><div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:4px;">Per funded facility</div></div>
+        </div>
+        <div class="card"><div class="card-header"><div class="card-title">Commission History</div></div><div class="card-body"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Project</th><th>Client</th><th>Funded Date</th><th>Facility Amount</th><th>Commission Rate</th><th>Commission Amount</th></tr></thead><tbody id="brokerCommissionHistory"></tbody></table></div></div></div>
+      </div>
+      <div id="broker-tab-submit-deal" class="portal-tab">
+        <div class="admin-page-title">Submit a Deal</div>
+        <div class="card"><div class="card-body">
+          <div class="form-group"><label class="form-label">Client Name *</label><input type="text" id="dealClientName" class="form-input"></div>
+          <div class="form-group"><label class="form-label">Client Email *</label><input type="email" id="dealClientEmail" class="form-input"></div>
+          <div class="form-group"><label class="form-label">Project Name *</label><input type="text" id="dealProjectName" class="form-input"></div>
+          <div class="form-grid-2">
+            <div class="form-group"><label class="form-label">Industry</label><select id="dealIndustry" class="form-select"><option>Real Estate</option><option>Infrastructure</option><option>Energy & Renewables</option><option>Mining</option><option>Oil & Gas</option></select></div>
+            <div class="form-group"><label class="form-label">Location</label><input type="text" id="dealLocation" class="form-input"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Funds Needed (USD) *</label><input type="text" id="dealFundsNeeded" class="form-input"></div>
+          <div class="form-group"><label class="form-label">Sponsor Equity Committed (USD)</label><input type="text" id="dealSponsorEquity" class="form-input"></div>
+          <div class="form-group"><label class="form-label">Sponsor/Borrower Background</label><textarea id="dealBackground" rows="2" class="form-textarea" placeholder="Describe the sponsor's track record..."></textarea></div>
+          <div class="form-group"><label class="form-label">Relationship to Borrower</label><select id="dealRelationship" class="form-select"><option>Owner</option><option>Advisor</option><option>Referral</option><option>Other</option></select></div>
+          <div class="form-grid-2">
+            <div class="form-group"><label class="form-label">Target Jurisdiction</label><input type="text" id="dealJurisdiction" class="form-input"></div>
+            <div class="form-group"><label class="form-label">Target Funding Date</label><input type="date" id="dealTargetDate" class="form-input"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Has the borrower approached other lenders?</label><select id="dealOtherLenders" class="form-select" onchange="toggleOtherLendersNotes()"><option>No</option><option>Yes</option></select><textarea id="dealOtherLendersNotes" rows="2" class="form-textarea" style="margin-top:8px;display:none;" placeholder="Please provide details..."></textarea></div>
+          <div class="form-group"><label class="form-label">Brief Description</label><textarea id="dealDescription" rows="3" class="form-textarea" placeholder="Project overview, use of funds, timeline..."></textarea></div>
+          <div class="form-group"><label class="form-label">Data Room Link</label><input type="url" id="dealDataRoomLink" class="form-input" placeholder="https://..."></div>
+          <div class="form-group"><label class="form-label">Total Project Cost (USD)</label><input type="text" id="dealTotalCost" class="form-input"></div>
+          <div class="form-group"><label class="form-label">Debt-to-Equity Ratio</label><input type="text" id="dealDebtEquity" class="form-input" placeholder="e.g. 70:30"></div>
+          <div class="form-group"><label class="form-label">Projected IRR / Return</label><input type="text" id="dealProjectedIRR" class="form-input" placeholder="e.g. 18% IRR over 5 years"></div>
+          <div class="form-group"><label class="form-label">Exit Strategy</label><select id="dealExitStrategy" class="form-select"><option>Sale of Asset</option><option>Refinancing</option><option>IPO</option><option>Revenue / Cash Flow</option><option>Other</option></select></div>
+          <div class="form-group"><label class="form-label">Current Project Status</label><select id="dealProjectStatus" class="form-select"><option>Pre-Development</option><option>Planning / Permitting</option><option>Under Construction</option><option>Operational</option><option>Stabilized</option></select></div>
+          <div class="form-group"><label class="form-label">Key Risks & Mitigants</label><textarea id="dealRisks" rows="2" class="form-textarea" placeholder="Briefly describe key risks and how they are mitigated..."></textarea></div>
+          <div class="form-group"><label class="form-label">Broker Commission Expectation (%)</label><input type="text" id="dealBrokerCommExpectation" class="form-input" placeholder="e.g. 1.5%"></div>
+          <button class="btn btn-primary btn-md" onclick="submitDeal()" style="width:100%">Submit Deal to Croft Finance</button>
+        </div></div>
+      </div>
+      <div id="broker-tab-portfolio" class="portal-tab"><div class="admin-page-title">Client Progress</div><div id="brokerPortfolioContainer"></div></div>
+      <div id="broker-tab-messages" class="portal-tab"><div class="admin-page-title">Messages</div><div class="card"><div class="card-body"><div class="messages-container"><div class="messages-list" id="brokerMessagesList"></div><div class="message-input"><input type="text" id="brokerMessageInput" placeholder="Write a message..." onkeypress="if(event.key==='Enter')sendBrokerMessage()"><button class="btn btn-primary btn-sm" onclick="sendBrokerMessage()">Send</button></div></div></div></div></div>
+    </main>
+  </div>
+</div>
 
 <!-- ============================================================ -->
 <!-- ADDITIONAL MODALS -->
 <!-- ============================================================ -->
-<div id="uploadDocumentModal" class="modal-overlay">...</div>
-<div id="scheduleMeetingModal" class="modal-overlay">...</div>
-<div id="editProjectModal" class="modal-overlay">...</div>
-<div id="addClientModal" class="modal-overlay">...</div>
-<div id="requestUpdateModal" class="modal-overlay">...</div>
-<div id="sessionWarningModal" class="modal-overlay">...</div>
-<div id="printArea" style="display:none;"></div>
-<div id="privacyModal" class="modal-overlay">...</div>
-<div id="termsModal" class="modal-overlay">...</div>
-<div id="commitmentFeeModal" class="modal-overlay">...</div>
-<div id="ecfEscrowModal" class="modal-overlay">...</div>
+<div id="uploadDocumentModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Upload Document</h3><button class="modal-close" onclick="closeModal('uploadDocumentModal')">✕</button></div><div class="modal-body"><div class="form-group"><label class="form-label">Client</label><select id="uploadClientId" class="form-select"></select></div><div class="form-group"><label class="form-label">Project</label><select id="uploadProjectId" class="form-select"></select></div><div class="form-group"><label class="form-label">Document Type</label><select id="documentType" class="form-select"><option>Term Sheet</option><option>Commitment Fee</option><option>Deed of Undertaking</option><option>ECF Confirmation</option><option>Other</option></select></div><div class="form-group"><label class="form-label">PDF File</label><input type="file" id="pdfFile" class="form-input" accept=".pdf"></div><button class="btn btn-primary btn-md" onclick="adminUploadDocument()" style="width:100%">Upload</button></div></div></div>
+<div id="scheduleMeetingModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Schedule Meeting</h3><button class="modal-close" onclick="closeModal('scheduleMeetingModal')">✕</button></div><div class="modal-body"><div class="form-group"><label class="form-label">Client</label><select id="meetingClientId" class="form-select"></select></div><div class="form-group"><label class="form-label">Date</label><input type="date" id="meetingDate" class="form-input"></div><div class="form-group"><label class="form-label">Time</label><input type="time" id="meetingTime" class="form-input"></div><div class="form-group"><label class="form-label">Type</label><select id="meetingType" class="form-select"><option>Video Call</option><option>Phone Call</option></select></div><div class="form-group"><label class="form-label">Notes</label><textarea id="meetingNotes" rows="3" class="form-textarea"></textarea></div><button class="btn btn-primary btn-md" onclick="createMeeting()" style="width:100%">Schedule</button></div></div></div>
+<div id="editProjectModal" class="modal-overlay"><div class="modal modal-lg"><div class="modal-header"><h3>Edit Project</h3><button class="modal-close" onclick="closeModal('editProjectModal')">✕</button></div><div class="modal-tabs"><button id="tabBtn-project" class="modal-tab-btn active" onclick="switchEditTab('project')">Details</button><button id="tabBtn-process" class="modal-tab-btn" onclick="switchEditTab('process')">Process</button></div><div class="modal-body"><div id="edit-tab-project" class="modal-tab-pane active"><div class="form-section-header">Client Information</div><div class="form-grid-2"><div class="form-group"><label class="form-label">Client Name</label><input type="text" id="editClientName" class="form-input"></div><div class="form-group"><label class="form-label">Client Email</label><input type="email" id="editClientEmail" class="form-input"></div></div><div class="form-section-header">Project Details</div><div class="form-grid-2"><div class="form-group"><label class="form-label">Project Name</label><input type="text" id="editProjectName" class="form-input"></div><div class="form-group"><label class="form-label">Industry</label><select id="editIndustry" class="form-select"><option>Real Estate</option><option>Infrastructure</option><option>Energy</option><option>Mining</option><option>Oil & Gas</option></select></div><div class="form-group"><label class="form-label">Location</label><input type="text" id="editLocation" class="form-input"></div><div class="form-group"><label class="form-label">Data Room Link</label><input type="url" id="editDataRoomLink" class="form-input" placeholder="https://..."></div></div><div class="form-section-header">Facility Terms</div><div class="form-grid-2"><div class="form-group"><label class="form-label">Facility Amount</label><input type="text" id="editAmount" class="form-input"></div><div class="form-group"><label class="form-label">Interest Rate</label><input type="text" id="editRate" class="form-input"></div><div class="form-group"><label class="form-label">Funds Needed</label><input type="text" id="editFundsNeeded" class="form-input"></div><div class="form-group"><label class="form-label">Sponsor Equity</label><input type="text" id="editSponsorEquity" class="form-input"></div><div class="form-group"><label class="form-label">Term (years)</label><input type="text" id="editTerm" class="form-input"></div><div class="form-group"><label class="form-label">Grace Period (months)</label><input type="text" id="editGracePeriod" class="form-input"></div><div class="form-group"><label class="form-label">Governing Law</label><input type="text" id="editGoverningLaw" class="form-input" placeholder="England and Wales"></div></div><div class="form-section-header">Key Dates</div><div class="form-grid-2"><div class="form-group"><label class="form-label">Target Close Date</label><input type="date" id="editCloseDate" class="form-input"></div><div class="form-group"><label class="form-label">Term Sheet Expiry</label><input type="date" id="editTermSheetExpiry" class="form-input"></div><div class="form-group"><label class="form-label">Commitment Fee Deadline</label><input type="date" id="editCommitFeeDeadline" class="form-input"></div><div class="form-group"><label class="form-label">Deed Expiry</label><input type="date" id="editDeedExpiry" class="form-input"></div><div class="form-group"><label class="form-label">ECF Policy Expiry</label><input type="date" id="editECFPolicyExpiry" class="form-input"></div><div class="form-group"><label class="form-label">Funded Date</label><input type="date" id="editFundedDate" class="form-input"></div></div><div class="form-section-header">Broker Assignment</div><div class="form-grid-2"><div class="form-group"><label class="form-label">Assign Broker</label><select id="editBrokerAssign" class="form-select"></select></div><div class="form-group"><label class="form-label">Broker Engagement Status</label><select id="editBrokerEngagement" class="form-select"><option value="none">None</option><option value="pending">Pending</option><option value="active">Active</option></select></div></div></div><div id="edit-tab-process" class="modal-tab-pane"><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;"><div id="cfStatusDisplay" style="padding:16px;border-radius:8px;border:0.5px solid var(--gray-200);"></div><div id="ecfStatusDisplay" style="padding:16px;border-radius:8px;border:0.5px solid var(--gray-200);"></div></div><div class="form-grid-2"><div class="form-group"><label class="form-label">Current Step</label><select id="editStep" class="form-select"><option value="1">Step 1: Mandate Review</option><option value="2">Step 2: Term Sheet</option><option value="3">Step 3: Commitment Fee</option><option value="4">Step 4: Deed of Undertaking</option><option value="5">Step 5: Credit Support</option><option value="6">Step 6: Hard-Copy Submission</option><option value="7">Step 7: ECF Escrow</option><option value="8">Step 8: Transfer to Agent</option><option value="9">Step 9: Funded</option></select></div><div class="form-group"><label class="form-label">CF Status</label><select id="editCommitFee" class="form-select"><option value="pending">Pending</option><option value="paid">Paid</option></select></div><div class="form-group"><label class="form-label">ECF Status</label><select id="editECFStatus" class="form-select"><option value="pending">Pending</option><option value="escrowed">Escrowed</option></select></div><div class="form-group"><label class="form-label">Advisor Note</label><textarea id="editAdvisorNote" rows="2" class="form-textarea"></textarea></div></div><div id="stepStatusContainer"></div></div></div><div class="modal-footer"><button class="btn btn-secondary btn-md" onclick="closeModal('editProjectModal')" style="flex:1">Cancel</button><button class="btn btn-primary btn-md" onclick="saveProjectInfo()" style="flex:2">Save Changes</button></div></div></div>
+<div id="addClientModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Add Client</h3><button class="modal-close" onclick="closeModal('addClientModal')">✕</button></div><div class="modal-body"><div class="form-grid-2"><div class="form-group"><label class="form-label">Full Name</label><input type="text" id="ncName" class="form-input"></div><div class="form-group"><label class="form-label">Email</label><input type="email" id="ncEmail" class="form-input"></div><div class="form-group"><label class="form-label">Password</label><input type="password" id="ncPassword" class="form-input"></div><div class="form-group"><label class="form-label">Project Name</label><input type="text" id="ncProject" class="form-input"></div></div><button class="btn btn-primary btn-md" onclick="createClient()" style="width:100%">Create Client</button></div></div></div>
+<div id="requestUpdateModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Request Project Update</h3><button class="modal-close" onclick="closeModal('requestUpdateModal')">✕</button></div><div class="modal-body"><div class="form-group"><label class="form-label">Project</label><input type="text" id="updateProjectName" class="form-input" disabled></div><div class="form-group"><label class="form-label">Requested Changes</label><textarea id="updateRequestedChanges" rows="4" class="form-textarea" placeholder="Describe the updates needed..."></textarea></div><button class="btn btn-primary btn-md" onclick="submitBrokerUpdateRequest()">Submit Request</button></div></div></div>
+<div id="sessionWarningModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Session Expiring Soon</h3><button class="modal-close" onclick="closeModal('sessionWarningModal')">✕</button></div><div class="modal-body"><p>Your session will expire in 5 minutes due to inactivity. Click below to stay logged in.</p><button class="btn btn-primary btn-md" onclick="refreshSession()">Stay Logged In</button></div></div></div>
+<div id="privacyModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Privacy Policy</h3><button class="modal-close" onclick="closeModal('privacyModal')">✕</button></div><div class="modal-body" style="font-size:13px;line-height:1.8;color:var(--gray-700);"><p><strong>Data Controller:</strong> Croft Finance, represented by Suzana Aleksić. Contact: suzana.aleksic@croftfinance.com</p><p style="margin-top:12px;"><strong>Data Collected:</strong> Name, email, project information, messages, meeting requests, and document metadata.</p><p style="margin-top:12px;"><strong>Purpose:</strong> To provide secure client portal access and facilitate deal management.</p><p style="margin-top:12px;"><strong>Data Storage:</strong> Stored securely on Google Firebase infrastructure with encryption at rest and in transit.</p><p style="margin-top:12px;"><strong>Third Parties:</strong> Firebase (Google) for data storage. No data is sold or shared with any other third parties.</p></div></div></div>
+<div id="termsModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Confidentiality & Portal Access Terms</h3><button class="modal-close" onclick="closeModal('termsModal')">✕</button></div><div class="modal-body" style="font-size:13px;line-height:1.8;color:var(--gray-700);"><p><strong>1. Confidentiality.</strong> All information shared through this portal is strictly confidential. You agree not to disclose any information to third parties without the prior written consent of Croft Finance.</p><p style="margin-top:12px;"><strong>2. Permitted Use.</strong> Access is granted solely for the purpose of managing your financing mandate with Croft Finance.</p><p style="margin-top:12px;"><strong>3. Investor Confidentiality.</strong> The identity of Croft Finance's capital partners is not disclosed as a condition of their participation.</p><p style="margin-top:12px;"><strong>4. Governing Law.</strong> These terms are governed by the laws of the Republic of Serbia.</p><p style="margin-top:12px;"><strong>5. Acceptance.</strong> By registering for portal access, you confirm that you have read, understood, and agree to be bound by these terms.</p></div></div></div>
+<div id="commitmentFeeModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Confirm Commitment Fee</h3><button class="modal-close" onclick="closeModal('commitmentFeeModal')">✕</button></div><div class="modal-body"><div class="form-group"><label class="form-label">Amount (USD)</label><input type="text" id="feeAmount" class="form-input"></div><div class="form-group"><label class="form-label">Reference</label><input type="text" id="feeReference" class="form-input"></div><div class="form-group"><label class="form-label">Date</label><input type="date" id="feeDate" class="form-input"></div><div class="form-group"><label class="form-label">Method</label><select id="feeMethod" class="form-select"><option>Wire</option><option>SWIFT</option></select></div><button class="btn btn-primary btn-md" id="feeConfirmBtn" style="width:100%">Confirm</button></div></div></div>
+<div id="ecfEscrowModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Confirm ECF Escrow</h3><button class="modal-close" onclick="closeModal('ecfEscrowModal')">✕</button></div><div class="modal-body"><div class="form-group"><label class="form-label">ECF Amount (USD)</label><input type="text" id="ecfAmount" class="form-input"></div><div class="form-group"><label class="form-label">Institution</label><input type="text" id="ecfInstitution" class="form-input"></div><div class="form-group"><label class="form-label">Reference</label><input type="text" id="ecfReference" class="form-input"></div><div class="form-group"><label class="form-label">Date</label><input type="date" id="ecfDate" class="form-input"></div><button class="btn btn-primary btn-md" id="ecfConfirmBtn" style="width:100%">Confirm</button></div></div></div>
 
 <script>
 // ============================================================
@@ -2141,7 +2416,6 @@ function updateBrokerDashboard() {
   document.getElementById('brokerPipelineCommission').innerHTML = formatCurrency(pipelineCommission);
   document.getElementById('brokerEarnedCommission').innerHTML = formatCurrency(earnedCommission);
   document.getElementById('brokerActiveDeals').innerHTML = myProjects.length;
-  // FIXED: brokerCommissionHistory fallback - added closing tag
   const historyHtml = fundedProjects.map(p => {
     const client = clients.find(c => c.id === p.clientId);
     const amt = parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g,"")) || 0;
@@ -2717,7 +2991,6 @@ window.deleteDoc = async function(id) { if(confirm('Delete document?')) { await 
 window.setBrokerCommission = async function(id) { const rate = prompt('Commission %:'); if(rate && !isNaN(parseFloat(rate))) { await db.collection('brokers').doc(id).update({commissionRate: parseFloat(rate)}); showToast(`Rate set to ${rate}%`); } };
 window.deleteBroker = async function(id) { if(confirm('Delete broker?')) { await db.collection('brokers').doc(id).delete(); showToast('Deleted'); } };
 
-// FIXED: renderMeetings - proper row tag (changed from <td> to <tr>)
 function renderMeetings() {
   const tbody = document.getElementById('meetingsTableBody');
   if(!tbody) return;
