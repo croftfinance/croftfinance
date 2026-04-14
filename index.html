@@ -2632,17 +2632,27 @@ function updateAdminGreeting() {
 
 async function loadSettings() {
   const dealAppetite = await db.collection('settings').doc('dealAppetite').get();
-  if(dealAppetite.exists) document.getElementById('dealAppetiteText').value = dealAppetite.data().content || '';
+  const dealAppetiteEl = document.getElementById('dealAppetiteText');
+  if(dealAppetite.exists && dealAppetiteEl) dealAppetiteEl.value = dealAppetite.data().content || '';
+  
   const announcement = await db.collection('settings').doc('announcement').get();
-  if(announcement.exists) document.getElementById('announcementText').value = announcement.data().content || '';
+  const announcementEl = document.getElementById('announcementText');
+  if(announcement.exists && announcementEl) announcementEl.value = announcement.data().content || '';
+  
   const profile = await db.collection('settings').doc('adminProfile').get();
   if(profile.exists) {
     const p = profile.data();
-    document.getElementById('adminDisplayName').value = p.displayName || 'Suzana Aleksić';
-    document.getElementById('adminTitle').value = p.title || 'Principal';
-    document.getElementById('adminProfileEmail').value = p.email || 'suzana.aleksic@croftfinance.com';
-    document.getElementById('adminPhone').value = p.phone || '+381 69 288 0 191';
-    document.getElementById('adminAvailability').value = p.availability || 'Mon–Fri, 9:00–18:00 CET';
+    const displayNameEl = document.getElementById('adminDisplayName');
+    const titleEl = document.getElementById('adminTitle');
+    const emailEl = document.getElementById('adminProfileEmail');
+    const phoneEl = document.getElementById('adminPhone');
+    const availabilityEl = document.getElementById('adminAvailability');
+    
+    if(displayNameEl) displayNameEl.value = p.displayName || 'Suzana Aleksić';
+    if(titleEl) titleEl.value = p.title || 'Principal';
+    if(emailEl) emailEl.value = p.email || 'suzana.aleksic@croftfinance.com';
+    if(phoneEl) phoneEl.value = p.phone || '+381 69 288 0 191';
+    if(availabilityEl) availabilityEl.value = p.availability || 'Mon–Fri, 9:00–18:00 CET';
   }
 }
 
