@@ -408,6 +408,11 @@ body.dark-mode .badge-neutral { background: rgba(255,255,255,0.1); color: var(--
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
   margin-right: 6px;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 /* ===== DASHBOARD HERO ===== */
@@ -1277,7 +1282,7 @@ body.dark-mode .badge-neutral { background: rgba(255,255,255,0.1); color: var(--
     <div class="form-group"><label class="form-label">Email</label><input type="email" id="loginEmail" class="form-input"></div>
     <div class="form-group"><label class="form-label">Password</label><input type="password" id="loginPassword" class="form-input"></div>
     <p id="loginError" style="color:var(--error);font-size:12px;display:none;"></p>
-    <button class="btn btn-primary btn-md" onclick="withLoading(this, login)" style="width:100%">Sign In</button>
+    <button class="btn btn-primary btn-md" onclick="login()" style="width:100%">Sign In</button>
     <div style="text-align:center;margin-top:8px;"><a href="#" onclick="showForgotPassword()" style="color:var(--gray-400);font-size:12px;">Forgot password?</a></div>
     <div style="text-align:center;margin-top:4px;"><a href="#" onclick="showRegisterForm()" style="color:var(--navy);font-size:12px;font-weight:500;">Request portal access →</a></div>
     <div style="text-align:center;margin-top:4px;"><a href="#" onclick="showBrokerRegisterForm()" style="color:var(--navy);font-size:12px;font-weight:500;">Register as broker →</a></div>
@@ -1788,17 +1793,32 @@ function debounce(func, wait) {
 // Loading state helper
 function withLoading(buttonEl, asyncFn) {
   return async function(...args) {
-    const btn = buttonEl;
+    let btn = buttonEl;
+    // Try to find button if not provided
+    if (!btn && this && this.tagName === 'BUTTON') btn = this;
+    if (!btn && window.event && window.event.target) {
+      let el = window.event.target;
+      while (el && el.tagName !== 'BUTTON') el = el.parentElement;
+      btn = el;
+    }
+    
     let originalText = '';
-    if (btn && !btn.disabled) {
-      originalText = btn.innerHTML;
-      btn.disabled = true;
-      btn.innerHTML = '<span class="btn-spinner"></span> Loading...';
+    let originalDisabled = false;
+    if (btn) {
+      originalDisabled = btn.disabled;
+      if (!originalDisabled) {
+        originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="btn-spinner"></span> Loading...';
+      }
     }
     try {
-      return await asyncFn(...args);
+      return await asyncFn.apply(this, args);
+    } catch(e) {
+      console.error('Async function error:', e);
+      throw e;
     } finally {
-      if (btn && btn.disabled) {
+      if (btn && !originalDisabled) {
         btn.disabled = false;
         btn.innerHTML = originalText;
       }
@@ -2059,12 +2079,17 @@ function escapeHtml(str) {
 }
 
 function showToast(msg, isError = false) {
+  if (!msg) return;
   const t = document.createElement('div');
   t.className = 'toast';
   t.style.background = isError ? 'var(--error)' : 'var(--navy)';
+  t.style.position = 'fixed';
+  t.style.bottom = '24px';
+  t.style.right = '24px';
+  t.style.zIndex = '9999';
   t.innerHTML = `<span>${escapeHtml(msg)}</span><button onclick="this.parentElement.remove()">×</button>`;
   document.body.appendChild(t);
-  setTimeout(() => t.remove(), 3500);
+  setTimeout(function() { if(t && t.remove) t.remove(); }, 3500);
 }
 
 function openModal(id) { document.getElementById(id).classList.add('active'); }
@@ -2105,10 +2130,21 @@ function animateNumber(element, target, isCurrency = false, duration = 800) {
 // AUTHENTICATION
 // ============================================================
 async function initFirebase() {
-  if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
-  db = firebase.firestore();
-  auth = firebase.auth();
-  storage = firebase.storage();
+  try {
+    if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    db = firebase.firestore();
+    auth = firebase.auth();
+    storage = firebase.storage();
+    console.log('Firebase initialized successfully');
+  } catch(e) {
+    console.error('Firebase init error:', e);
+    showToast('Failed to connect. Please refresh.', true);
+    return;
+  }
+  
+  emailjs.init(EMAILJS_CONFIG.publicKey).catch(function(e) {
+    console.warn('EmailJS init error:', e);
+  });
   
   emailjs.init(EMAILJS_CONFIG.publicKey);
   
@@ -2426,15 +2462,29 @@ window.login = async function() {
   const pass = document.getElementById('loginPassword').value;
   const errEl = document.getElementById('loginError');
   errEl.style.display = 'none';
+  
+  if (!email || !pass) {
+    errEl.innerText = 'Please enter email and password.';
+    errEl.style.display = 'block';
+    return;
+  }
+  
   try { 
-    await auth.signInWithEmailAndPassword(email, pass); 
+    console.log('Attempting login for:', email);
+    const result = await auth.signInWithEmailAndPassword(email, pass); 
+    console.log('Login successful:', result.user.uid);
     resetLoginAttempts('client'); 
     closeModal('loginModal'); 
   } catch(e) { 
+    console.error('Login error:', e.code, e.message);
     recordFailedLogin('client'); 
-    errEl.innerText = 'Invalid credentials.'; 
+    let errorMsg = 'Invalid credentials.';
+    if (e.code === 'auth/user-not-found') errorMsg = 'No account found with this email.';
+    if (e.code === 'auth/wrong-password') errorMsg = 'Incorrect password.';
+    if (e.code === 'auth/too-many-requests') errorMsg = 'Too many failed attempts. Try again later.';
+    errEl.innerText = errorMsg; 
     errEl.style.display = 'block';
-    showToast(e.message, true);
+    showToast(errorMsg, true);
   }
 };
 
