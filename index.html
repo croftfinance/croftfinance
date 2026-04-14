@@ -1405,7 +1405,7 @@ body {
       </div>
     </aside>
     <main class="main-content">
-      <div id="loadingSpinner" style="display:none; text-align:center; padding:40px;"><div class="spinner"></div><p>Loading...</p></div>
+      <!-- DASHBOARD TAB -->
       <div id="broker-tab-dashboard" class="portal-tab active">
         <div class="admin-page-title" id="brokerDashGreeting">Welcome.</div>
         <div id="dealAppetiteCard" class="card"><div class="card-header"><div class="card-title">Current Deal Focus</div></div><div class="card-body" id="dealAppetiteContent">Loading...</div></div>
@@ -1415,43 +1415,59 @@ body {
           <div class="stat-card"><div class="data-label">Active Deals</div><div class="stat-value" id="brokerActiveDeals">0</div></div>
           <div class="stat-card commission-rate-card"><div class="data-label">Your Commission Rate</div><div class="stat-value" id="brokerCommRate">0%</div><div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:4px;">Per funded facility</div></div>
         </div>
-        <div class="card"><div class="card-header"><div class="card-title">Commission History</div></div><div class="card-body"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Project</th><th>Client</th><th>Funded Date</th><th>Facility Amount</th><th>Commission Rate</th><th>Commission Amount</th></tr></thead><tbody id="brokerCommissionHistory"></tbody><tr></div></div></div>
-        <div class="card"><div class="card-header"><div class="card-title">Recent Activity</div></div><div class="card-body"><div id="brokerActivityFeed"><p class="data-label" style="text-align:center;">No recent activity</p></div></div></div>
+        <div class="card"><div class="card-header"><div class="card-title">Commission History</div></div><div class="card-body"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Project</th><th>Client</th><th>Funded Date</th><th>Facility Amount</th><th>Commission Rate</th><th>Commission Amount</th></tr></thead><tbody id="brokerCommissionHistory"></tbody></table></div></div></div>
       </div>
+
+      <!-- SUBMIT DEAL TAB - COMPLETE FORM -->
       <div id="broker-tab-submit-deal" class="portal-tab">
         <div class="admin-page-title">Submit a Deal</div>
         <div class="card"><div class="card-body">
-          <div class="form-group"><label class="form-label">Client Name *</label><input type="text" id="dealClientName" class="form-input"></div>
-          <div class="form-group"><label class="form-label">Client Email *</label><input type="email" id="dealClientEmail" class="form-input"></div>
-          <div class="form-group"><label class="form-label">Project Name *</label><input type="text" id="dealProjectName" class="form-input"></div>
+          <div class="form-group"><label class="form-label">Client Name *</label><input type="text" id="dealClientName" class="form-input" placeholder="Full legal name"></div>
+          <div class="form-group"><label class="form-label">Client Email *</label><input type="email" id="dealClientEmail" class="form-input" placeholder="client@company.com"></div>
+          <div class="form-group"><label class="form-label">Project Name *</label><input type="text" id="dealProjectName" class="form-input" placeholder="Project name"></div>
           <div class="form-grid-2">
             <div class="form-group"><label class="form-label">Industry</label><select id="dealIndustry" class="form-select"><option>Real Estate</option><option>Infrastructure</option><option>Energy & Renewables</option><option>Mining</option><option>Oil & Gas</option></select></div>
-            <div class="form-group"><label class="form-label">Location</label><input type="text" id="dealLocation" class="form-input"></div>
+            <div class="form-group"><label class="form-label">Location</label><input type="text" id="dealLocation" class="form-input" placeholder="City, Country"></div>
           </div>
-          <div class="form-group"><label class="form-label">Funds Needed (USD) *</label><input type="text" id="dealFundsNeeded" class="form-input"></div>
-          <div class="form-group"><label class="form-label">Sponsor Equity Committed (USD)</label><input type="text" id="dealSponsorEquity" class="form-input"></div>
-          <div class="form-group"><label class="form-label">Sponsor/Borrower Background</label><textarea id="dealBackground" rows="2" class="form-textarea" placeholder="Describe the sponsor's track record..."></textarea></div>
+          <div class="form-group"><label class="form-label">Funds Needed (USD) *</label><input type="text" id="dealFundsNeeded" class="form-input" placeholder="e.g., 50,000,000"></div>
+          <div class="form-group"><label class="form-label">Sponsor Equity Committed (USD)</label><input type="text" id="dealSponsorEquity" class="form-input" placeholder="e.g., 25,000,000"></div>
+          <div class="form-group"><label class="form-label">Sponsor/Borrower Background</label><textarea id="dealBackground" rows="2" class="form-textarea" placeholder="Track record, experience..."></textarea></div>
           <div class="form-group"><label class="form-label">Relationship to Borrower</label><select id="dealRelationship" class="form-select"><option>Owner</option><option>Advisor</option><option>Referral</option><option>Other</option></select></div>
           <div class="form-grid-2">
-            <div class="form-group"><label class="form-label">Target Jurisdiction</label><input type="text" id="dealJurisdiction" class="form-input"></div>
+            <div class="form-group"><label class="form-label">Target Jurisdiction</label><input type="text" id="dealJurisdiction" class="form-input" placeholder="Legal jurisdiction"></div>
             <div class="form-group"><label class="form-label">Target Funding Date</label><input type="date" id="dealTargetDate" class="form-input"></div>
           </div>
-          <div class="form-group"><label class="form-label">Has the borrower approached other lenders?</label><select id="dealOtherLenders" class="form-select" onchange="toggleOtherLendersNotes()"><option>No</option><option>Yes</option></select><textarea id="dealOtherLendersNotes" rows="2" class="form-textarea" style="margin-top:8px;display:none;" placeholder="Please provide details..."></textarea></div>
-          <div class="form-group"><label class="form-label">Brief Description</label><textarea id="dealDescription" rows="3" class="form-textarea" placeholder="Project overview, use of funds, timeline..."></textarea></div>
+          <div class="form-group"><label class="form-label">Other Lenders Approached?</label><select id="dealOtherLenders" class="form-select" onchange="toggleOtherLendersNotes()"><option>No</option><option>Yes</option></select><textarea id="dealOtherLendersNotes" rows="2" class="form-textarea" style="margin-top:8px;display:none;" placeholder="Please provide details..."></textarea></div>
+          <div class="form-group"><label class="form-label">Project Description</label><textarea id="dealDescription" rows="3" class="form-textarea" placeholder="Overview, use of funds, timeline..."></textarea></div>
           <div class="form-group"><label class="form-label">Data Room Link</label><input type="url" id="dealDataRoomLink" class="form-input" placeholder="https://..."></div>
-          <div class="form-group"><label class="form-label">Total Project Cost (USD)</label><input type="text" id="dealTotalCost" class="form-input"></div>
-          <div class="form-group"><label class="form-label">Debt-to-Equity Ratio</label><input type="text" id="dealDebtEquity" class="form-input" placeholder="e.g. 70:30"></div>
-          <div class="form-group"><label class="form-label">Projected IRR / Return</label><input type="text" id="dealProjectedIRR" class="form-input" placeholder="e.g. 18% IRR over 5 years"></div>
-          <div class="form-group"><label class="form-label">Exit Strategy</label><select id="dealExitStrategy" class="form-select"><option>Sale of Asset</option><option>Refinancing</option><option>IPO</option><option>Revenue / Cash Flow</option><option>Other</option></select></div>
-          <div class="form-group"><label class="form-label">Current Project Status</label><select id="dealProjectStatus" class="form-select"><option>Pre-Development</option><option>Planning / Permitting</option><option>Under Construction</option><option>Operational</option><option>Stabilized</option></select></div>
-          <div class="form-group"><label class="form-label">Key Risks & Mitigants</label><textarea id="dealRisks" rows="2" class="form-textarea" placeholder="Briefly describe key risks and how they are mitigated..."></textarea></div>
-          <div class="form-group"><label class="form-label">Broker Commission Expectation (%)</label><input type="text" id="dealBrokerCommExpectation" class="form-input" placeholder="e.g. 1.5%"></div>
+          <div class="form-grid-2">
+            <div class="form-group"><label class="form-label">Total Project Cost (USD)</label><input type="text" id="dealTotalCost" class="form-input"></div>
+            <div class="form-group"><label class="form-label">Debt-to-Equity Ratio</label><input type="text" id="dealDebtEquity" class="form-input" placeholder="e.g., 70:30"></div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group"><label class="form-label">Projected IRR</label><input type="text" id="dealProjectedIRR" class="form-input" placeholder="e.g., 18%"></div>
+            <div class="form-group"><label class="form-label">Exit Strategy</label><select id="dealExitStrategy" class="form-select"><option>Sale of Asset</option><option>Refinancing</option><option>IPO</option><option>Revenue / Cash Flow</option><option>Other</option></select></div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group"><label class="form-label">Project Status</label><select id="dealProjectStatus" class="form-select"><option>Pre-Development</option><option>Planning / Permitting</option><option>Under Construction</option><option>Operational</option><option>Stabilized</option></select></div>
+            <div class="form-group"><label class="form-label">Commission Expectation (%)</label><input type="text" id="dealBrokerCommExpectation" class="form-input" placeholder="e.g., 1.5"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Key Risks & Mitigants</label><textarea id="dealRisks" rows="2" class="form-textarea" placeholder="Key risks and how they are mitigated..."></textarea></div>
           <button class="btn btn-primary btn-md" onclick="submitDeal()" style="width:100%">Submit Deal to Croft Finance</button>
         </div></div>
       </div>
-      <div id="broker-tab-portfolio" class="portal-tab"><div class="admin-page-title">Client Progress</div><div id="brokerPortfolioContainer"></div></div>
-      <div id="broker-tab-messages" class="portal-tab"><div class="admin-page-title">Messages</div><div class="card"><div class="card-body"><div class="messages-container"><div class="messages-list" id="brokerMessagesList"></div><div class="message-input"><input type="text" id="brokerMessageInput" placeholder="Write a message..." onkeypress="if(event.key==='Enter')sendBrokerMessage()"><button class="btn btn-primary btn-sm" onclick="sendBrokerMessage()">Send</button></div></div></div></div></div>
-      <div id="brokerDashboardExtra" style="display:none;"></div>
+
+      <!-- CLIENT PROGRESS TAB -->
+      <div id="broker-tab-portfolio" class="portal-tab">
+        <div class="admin-page-title">Client Progress</div>
+        <div id="brokerPortfolioContainer"><div class="card"><div class="card-body"><p class="data-label" style="text-align:center;">Loading your referred clients...</p></div></div></div>
+      </div>
+
+      <!-- MESSAGES TAB -->
+      <div id="broker-tab-messages" class="portal-tab">
+        <div class="admin-page-title">Messages</div>
+        <div class="card"><div class="card-body"><div class="messages-container"><div class="messages-list" id="brokerMessagesList"></div><div class="message-input"><input type="text" id="brokerMessageInput" placeholder="Write a message..." onkeypress="if(event.key==='Enter')sendBrokerMessage()"><button class="btn btn-primary btn-sm" onclick="sendBrokerMessage()">Send</button></div></div></div></div>
+      </div>
     </main>
   </div>
 </div>
