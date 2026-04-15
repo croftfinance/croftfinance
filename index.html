@@ -816,9 +816,136 @@ body.dark-mode .badge-neutral { background: rgba(255,255,255,0.1); color: var(--
   justify-content: center;
 }
 @media (max-width: 768px) {
+  /* Mobile close button */
   .mobile-close-btn { display: flex; }
-  .sidebar { position: relative; }
+  .sidebar { position: fixed; left: -280px; top: 0; bottom: 0; width: 280px; z-index: 1001; transition: left 0.3s ease; }
+  .sidebar.open { left: 0; box-shadow: 2px 0 20px rgba(0,0,0,0.15); }
   .sidebar .mobile-close-btn { display: flex; }
+  .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; }
+  .sidebar-overlay.show { display: block; }
+  
+  /* Navigation */
+  .home-nav { padding: 0 16px; }
+  .nav-links { display: none; }
+  .hero { padding: 100px 20px 60px; min-height: auto; }
+  .hero-h1 { font-size: 36px; }
+  .hero-stats { display: none; }
+  
+  /* Sections */
+  .section { padding: 50px 20px !important; }
+  .section-about, .section-terms, .section-suzana { padding: 50px 20px !important; }
+  .section-suzana > div { grid-template-columns: 1fr !important; gap: 40px !important; }
+  
+  /* Contact form */
+  .contact-form-container { padding: 30px 20px !important; margin: 0 16px !important; }
+  
+  /* Footer */
+  .home-footer { flex-direction: column; gap: 16px; text-align: center; padding: 32px 20px !important; }
+  .hero-actions { flex-direction: column; gap: 16px; }
+  .btn-hero { width: 100%; text-align: center; }
+  
+  /* Portal Layout */
+  .portal-nav-brand { width: auto; border-right: none; font-size: 14px; padding-left: 12px; }
+  .portal-nav-right { gap: 8px; }
+  .portal-nav-user { font-size: 11px; display: none; }
+  
+  /* Main content */
+  .main-content { margin-left: 0 !important; padding: 16px !important; }
+  
+  /* Dashboard Hero */
+  .dashboard-hero { grid-template-columns: 1fr !important; gap: 24px !important; padding: 20px !important; }
+  .dashboard-hero-right { text-align: center; }
+  .days-remaining { font-size: 32px; }
+  
+  /* Stats Grid */
+  .stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; }
+  .stat-card { padding: 16px; }
+  .stat-value { font-size: 24px; }
+  
+  /* Quick Actions - horizontal scroll */
+  .quick-actions-bar { display: flex; flex-direction: row; overflow-x: auto; gap: 12px; padding-bottom: 8px; -webkit-overflow-scrolling: touch; }
+  .quick-action-btn { min-width: 100px; flex: 0 0 auto; padding: 12px; }
+  
+  /* Cards */
+  .card-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .card-body { padding: 16px; }
+  
+  /* Tables - horizontal scroll */
+  .table-wrap { overflow-x: auto !important; -webkit-overflow-scrolling: touch; margin: 0 -16px; padding: 0 16px; border: none; border-radius: 0; }
+  .admin-table, .documents-table { min-width: 700px; }
+  .admin-table th, .admin-table td, .documents-table th, .documents-table td { padding: 10px 12px; font-size: 12px; }
+  
+  /* Pipeline Board */
+  .pipeline-board { grid-template-columns: 1fr !important; gap: 16px !important; }
+  .pipeline-col { margin-bottom: 8px; }
+  
+  /* Funnel */
+  .funnel-step { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .funnel-step-label { width: 100%; }
+  .funnel-step-bar { width: 100% !important; height: 40px; }
+  
+  /* Forms */
+  .form-grid-2 { grid-template-columns: 1fr !important; gap: 12px; }
+  .form-input, .form-select, .form-textarea { font-size: 16px; }
+  
+  /* Modals */
+  .modal { width: 95% !important; max-height: 90vh !important; margin: 0 auto; }
+  .modal-body { padding: 16px !important; }
+  .modal-header { padding: 16px !important; }
+  .modal-header h3 { font-size: 16px; }
+  
+  /* Edit Project Modal */
+  .modal-tabs { flex-wrap: wrap; }
+  .modal-tab-btn { flex: 1; text-align: center; padding: 10px 8px; font-size: 10px; }
+  
+  /* Analytics */
+  .kpi-card { padding: 16px; }
+  .kpi-value { font-size: 24px; }
+  
+  /* Notification center */
+  .notification-center { position: fixed; top: auto; bottom: 0; left: 0; right: 0; width: 100%; max-height: 70vh; border-radius: 16px 16px 0 0; }
+  
+  /* Advisor card */
+  .advisor-details { flex-direction: column; gap: 12px; }
+  .advisor-actions { flex-direction: column; }
+  .advisor-btn { width: 100%; text-align: center; }
+  
+  /* Messages */
+  .message-bubble { max-width: 85%; font-size: 13px; }
+  .message-input input { font-size: 16px; }
+  
+  /* Activity timeline */
+  .activity-timeline { padding-left: 24px; }
+  .activity-dot { left: -28px; width: 20px; height: 20px; }
+  .activity-dot i { font-size: 8px; }
+  
+  /* Inbox */
+  .inbox-thread-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .inbox-thread-preview { margin-left: 0; display: block; width: 100%; }
+  .admin-reply-box { flex-direction: column; }
+  
+  /* Buttons */
+  .btn-sm, .btn-md { padding: 8px 14px; }
+  
+  /* Dark mode toggle */
+  .dark-mode-toggle { bottom: 16px; right: 16px; width: 40px; height: 40px; font-size: 16px; }
+  
+  /* Toast */
+  .toast { bottom: 16px; right: 16px; left: 16px; width: auto; font-size: 12px; }
+}
+
+/* Extra small devices (under 480px) */
+@media (max-width: 480px) {
+  .stats-grid { grid-template-columns: 1fr !important; }
+  .dashboard-hero-left .progress-circle { transform: scale(0.8); }
+  .welcome-title { font-size: 22px; }
+  .client-page-title { font-size: 22px; }
+  .admin-page-title { font-size: 18px; }
+  .hero-h1 { font-size: 28px; }
+  .modal-footer { flex-direction: column; gap: 8px; }
+  .modal-footer .btn { width: 100%; text-align: center; }
+  .main-content { padding: 12px !important; }
+  .card-body { padding: 12px; }
 }
 
 /* Messages */
@@ -3048,6 +3175,13 @@ function switchPortalTab(tabName) {
   if(tabName === 'activity') loadClientActivityLog();
   saveActiveTab('client', tabName);
   if(window.innerWidth <= 768) { document.getElementById('clientSidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('show'); }
+}
+
+  // Auto-close sidebar on mobile after navigation
+  if (window.innerWidth <= 768) {
+    document.getElementById('clientSidebar')?.classList.remove('open');
+    document.getElementById('sidebarOverlay')?.classList.remove('show');
+  }
 }
 
 function switchAdminTab(tabName) {
