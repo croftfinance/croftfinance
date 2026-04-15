@@ -1417,11 +1417,53 @@ body.dark-mode .badge-neutral { background: rgba(255,255,255,0.1); color: var(--
       <!-- CLOSING PROCESS TAB -->
       <div id="tab-process" class="portal-tab"><div class="client-page-title">Closing Process</div><div id="stepAccordionContainer"></div></div>
       
-      <!-- DOCUMENTS TAB -->
+       <!-- DOCUMENTS TAB -->
       <div id="tab-documents" class="portal-tab">
         <div class="client-page-title">Documents</div>
-        <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-file-signature"></i> Closing Documents</div></div><div class="card-body" style="padding:0;"><div class="table-wrap"><table class="documents-table" id="closingDocumentsTable"><thead><tr><th>Document Name</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="closingDocumentsBody"></tbody></table></div></div></div>
-<select id="clientUploadDocType" class="form-select">   <option value="">Select document type...</option>   <option value="Term Sheet">Term Sheet</option>   <option value="Financial Statement">Financial Statement</option>   <option value="Due Diligence">Due Diligence</option>   <option value="Commitment Fee Receipt">Commitment Fee Receipt</option>   <option value="Other">Other</option> </select>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fas fa-file-signature"></i> Closing Documents</div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <div class="table-wrap">
+              <table class="documents-table" id="closingDocumentsTable">
+                <thead>
+                  <tr>
+                    <th>Document Name</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="closingDocumentsBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fas fa-upload"></i> Upload a Document</div>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Document Type</label>
+              <select id="clientUploadDocType" class="form-select">
+                <option value="">Select document type...</option>
+                <option value="Term Sheet">Term Sheet</option>
+                <option value="Financial Statement">Financial Statement</option>
+                <option value="Due Diligence">Due Diligence</option>
+                <option value="Commitment Fee Receipt">Commitment Fee Receipt</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">PDF File (max 10MB)</label>
+              <input type="file" id="clientUploadFile" class="form-input" accept=".pdf">
+            </div>
+            <button class="btn btn-primary btn-md" onclick="clientUploadDocument()">Upload Document</button>
+            <div id="clientUploadStatus" style="margin-top:12px;font-size:12px;display:none;"></div>
+          </div>
+        </div>
       </div>
       
       <!-- MESSAGES TAB -->
@@ -2143,6 +2185,40 @@ function showToast(msg, isError = false) {
   setTimeout(function() { if(t && t.remove) t.remove(); }, 3500);
 }
 
+// ============================================================
+// SAFE HELPER FUNCTIONS
+// ============================================================
+
+function triggerFileUpload() {
+  const fileInput = document.getElementById('clientUploadFile');
+  if(fileInput) {
+    fileInput.click();
+  } else {
+    console.warn('File input element not found');
+    showToast('Please refresh the page and try again', true);
+  }
+}
+
+async function safeLoadWebhooks() {
+  try {
+    const snap = await db.collection('webhooks').get();
+    webhooks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (typeof renderWebhooks === 'function') renderWebhooks();
+  } catch(e) {
+    console.log('Webhooks collection not available - skipping');
+  }
+}
+
+async function safeLoadCustomFields() {
+  try {
+    const snap = await db.collection('customFields').get();
+    customFields = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (typeof renderCustomFields === 'function') renderCustomFields();
+  } catch(e) {
+    console.log('Custom fields collection not available - skipping');
+  }
+}
+
 function openModal(id) { document.getElementById(id).classList.add('active'); }
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 function showView(v) { document.querySelectorAll('.view').forEach(x => x.classList.remove('active')); document.getElementById('view-' + v).classList.add('active'); }
@@ -2224,8 +2300,8 @@ sessionResetInterval = setInterval(function() {
   updateAdvisorAvailability();
   setInterval(updateAdvisorAvailability, 60000);
   
-  loadWebhooks();
-  loadCustomFields();
+try { loadWebhooks(); } catch(e) { console.log('Webhooks not configured'); }
+try { loadCustomFields(); } catch(e) { console.log('Custom fields not configured'); }
   
   const clientSearchEl = document.getElementById('clientSearch');
   if(clientSearchEl) {
