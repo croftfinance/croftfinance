@@ -1421,7 +1421,7 @@ body.dark-mode .badge-neutral { background: rgba(255,255,255,0.1); color: var(--
       <div id="tab-documents" class="portal-tab">
         <div class="client-page-title">Documents</div>
         <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-file-signature"></i> Closing Documents</div></div><div class="card-body" style="padding:0;"><div class="table-wrap"><table class="documents-table" id="closingDocumentsTable"><thead><tr><th>Document Name</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="closingDocumentsBody"></tbody></table></div></div></div>
-        <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-upload"></i> Upload a Document</div></div><div class="card-body"><div class="form-group"><label class="form-label">Document Type</label><select id="clientUploadDocType" class="form-select"><option value="">Select document type...</option></select></div><div class="form-group"><label class="form-label">PDF File (max 10MB)</label><input type="file" id="clientUploadFile" class="form-input" accept=".pdf"></div><button class="btn btn-primary btn-md" onclick="clientUploadDocument()">Upload Document</button><div id="clientUploadStatus" style="margin-top:12px;font-size:12px;display:none;"></div></div></div>
+<select id="clientUploadDocType" class="form-select">   <option value="">Select document type...</option>   <option value="Term Sheet">Term Sheet</option>   <option value="Financial Statement">Financial Statement</option>   <option value="Due Diligence">Due Diligence</option>   <option value="Commitment Fee Receipt">Commitment Fee Receipt</option>   <option value="Other">Other</option> </select>
       </div>
       
       <!-- MESSAGES TAB -->
