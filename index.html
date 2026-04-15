@@ -4617,17 +4617,6 @@ let totalFacilityAmount = 0;
 let totalBrokerCommission = 0;
 let totalCroftCommission = 0;
 
-const commissionedProjects = projects.filter(p => (p.step || 1) >= 2 && p.status === 'active');
-commissionedProjects.sort((a, b) => {
-  const dateA = a.step2CompletedAt || a.termSheetIssuedAt || a.createdAt;
-  const dateB = b.step2CompletedAt || b.termSheetIssuedAt || b.createdAt;
-  return new Date(dateB) - new Date(dateA);
-});
-
-let totalFacilityAmount = 0;
-let totalBrokerCommission = 0;
-let totalCroftCommission = 0;
-
 const commissionHtml = commissionedProjects.map(p => {
   const client = clients.find(c => c.id === p.clientId);
   const broker = brokers.find(b => b.id === p.brokerId);
