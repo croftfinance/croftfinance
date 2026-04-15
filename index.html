@@ -4617,6 +4617,17 @@ let totalFacilityAmount = 0;
 let totalBrokerCommission = 0;
 let totalCroftCommission = 0;
 
+const commissionedProjects = projects.filter(p => (p.step || 1) >= 2 && p.status === 'active');
+commissionedProjects.sort((a, b) => {
+  const dateA = a.step2CompletedAt || a.termSheetIssuedAt || a.createdAt;
+  const dateB = b.step2CompletedAt || b.termSheetIssuedAt || b.createdAt;
+  return new Date(dateB) - new Date(dateA);
+});
+
+let totalFacilityAmount = 0;
+let totalBrokerCommission = 0;
+let totalCroftCommission = 0;
+
 const commissionHtml = commissionedProjects.map(p => {
   const client = clients.find(c => c.id === p.clientId);
   const broker = brokers.find(b => b.id === p.brokerId);
@@ -4630,9 +4641,6 @@ const commissionHtml = commissionedProjects.map(p => {
   totalCroftCommission += croftComm;
   
   const termSheetDate = p.step2CompletedAt || p.termSheetIssuedAt || p.createdAt;
-  const daysInStep = p[`step${p.step || 1}At`] 
-    ? Math.floor((new Date() - new Date(p[`step${p.step || 1}At`])) / (1000 * 60 * 60 * 24)) 
-    : '—';
   
   let stepBadgeClass = 'badge-info';
   let stepText = `${p.step || 1} / 9`;
@@ -4649,71 +4657,73 @@ const commissionHtml = commissionedProjects.map(p => {
   const croftCommDisplay = croftComm > 0 ? formatCurrency(croftComm) : '—';
   
   return `
-    <tr style="border-bottom: 0.5px solid var(--gray-100);">
-      <td style="padding: 12px 8px;"><strong>${escapeHtml(client?.name || 'Unknown')}</strong><br><span class="data-label" style="font-size: 8px;">${escapeHtml(client?.email?.split('@')[0] || '')}</span></td>
-      <td style="padding: 12px 8px;"><strong>${escapeHtml(p.name)}</strong><br><span class="data-label" style="font-size: 8px;">${escapeHtml(p.industry || '—')}</span></td>
-      <td style="padding: 12px 8px; color: var(--gray-500); font-size: 12px;">${escapeHtml(locationDisplay)}</td>
-      <td style="padding: 12px 8px; text-align: right; font-weight: 600; font-variant-numeric: tabular-nums;">${amountDisplay}</td>
-      <td style="padding: 12px 8px; text-align: right; font-variant-numeric: tabular-nums; color: var(--blue);">${brokerCommDisplay}${broker && broker.commissionRate ? `<br><span class="data-label" style="font-size: 8px;">@ ${broker.commissionRate}%</span>` : ''}</td>
-      <td style="padding: 12px 8px; text-align: right; font-variant-numeric: tabular-nums; color: var(--navy); font-weight: 500;">${croftCommDisplay}<br><span class="data-label" style="font-size: 8px;">@ 2%</span></td>
-      <td style="padding: 12px 8px; text-align: center;"><span class="badge ${stepBadgeClass}" style="font-size: 9px;">${stepText}</span><br><span class="data-label" style="font-size: 8px;">${daysInStep !== '—' ? daysInStep + ' days' : ''}</span></td>
-      <td style="padding: 12px 8px; font-size: 12px; font-variant-numeric: tabular-nums;">${termSheetDate ? formatDate(termSheetDate) : '<span class="data-label">Not issued</span>'}</td>
+    <tr>
+      <td><strong>${escapeHtml(client?.name || 'Unknown')}</strong><br><span class="data-label">${escapeHtml(client?.email || '')}</span></td>
+      <td><strong>${escapeHtml(p.name)}</strong><br><span class="data-label">${escapeHtml(p.industry || '—')}</span></td>
+      <td>${escapeHtml(locationDisplay)}</td>
+      <td style="text-align: right; font-weight: 600;">${amountDisplay}</td>
+      <td style="text-align: right;">${brokerCommDisplay}${broker && broker.commissionRate ? `<br><span class="data-label">@ ${broker.commissionRate}%</span>` : ''}</td>
+      <td style="text-align: right; font-weight: 500;">${croftCommDisplay}</td>
+      <td style="text-align: center;"><span class="badge ${stepBadgeClass}">${stepText}</span></td>
+      <td>${termSheetDate ? formatDate(termSheetDate) : '<span class="data-label">—</span>'}</td>
     </tr>
   `;
 }).join('');
 
-// Build the complete table HTML
-const commissionTableHtml = `
-  <div class="table-wrap" style="overflow-x: auto;">
-    <table class="admin-table" style="min-width: 800px;">
-      <thead>
-        <tr style="background: var(--gray-50);">
-          <th style="padding: 12px 8px;">Client</th>
-          <th style="padding: 12px 8px;">Project / Industry</th>
-          <th style="padding: 12px 8px;">Location</th>
-          <th style="padding: 12px 8px; text-align: right;">Facility Amount</th>
-          <th style="padding: 12px 8px; text-align: right;">Broker Commission</th>
-          <th style="padding: 12px 8px; text-align: right;">Croft Commission (2%)</th>
-          <th style="padding: 12px 8px; text-align: center;">Step</th>
-          <th style="padding: 12px 8px;">Term Sheet Date</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${commissionHtml || '<tr><td colspan="8" class="empty-state"><i class="fas fa-chart-line"></i><p>No active deals at Step 2+</p></td></tr>'}
-      </tbody>
-      <tfoot>
-        <tr style="background: var(--gray-100); border-top: 1px solid var(--gray-200);">
-          <td colspan="3" style="padding: 12px 8px; font-weight: 600;">TOTAL</td>
-          <td style="padding: 12px 8px; text-align: right; font-weight: 700; color: var(--navy);">${formatCurrency(totalFacilityAmount)}</td>
-          <td style="padding: 12px 8px; text-align: right; font-weight: 600; color: var(--blue);">${formatCurrency(totalBrokerCommission)}</td>
-          <td style="padding: 12px 8px; text-align: right; font-weight: 600; color: var(--navy);">${formatCurrency(totalCroftCommission)}</td>
-          <td colspan="2" style="padding: 12px 8px;"></td>
-        </tr>
-        <tr style="background: var(--success-light);">
-          <td colspan="3" style="padding: 12px 8px; font-weight: 600;">FUNDED ONLY</td>
-          <td style="padding: 12px 8px; text-align: right; font-weight: 700; color: var(--success);">${formatCurrency(projects.filter(p => (p.step || 1) === 9).reduce((s,p) => s + (parseFloat(String(p.amount||'0').replace(/[^0-9.-]/g,''))||0), 0))}</td>
-          <td colspan="4" style="padding: 12px 8px;"></td>
-        </tr>
-      </tfoot>
-    </table>
-  </div>
-`;
-
-// Apply to the DOM
-const commissionTableContainer = document.querySelector('#admin-analytics .card:has(.card-title:contains("Commission Breakdown")) .card-body');
-if (commissionTableContainer) {
-  commissionTableContainer.innerHTML = commissionTableHtml;
-} else {
-  // Fallback: find by title text
-  const cards = document.querySelectorAll('#admin-analytics .card');
-  for (const card of cards) {
-    const title = card.querySelector('.card-title');
-    if (title && title.innerText.includes('Commission Breakdown')) {
-      const body = card.querySelector('.card-body');
-      if (body) body.innerHTML = commissionTableHtml;
-      break;
-    }
-  }
+// Get the existing table body and replace its content
+const commissionTableBody = document.getElementById('commissionTableBody');
+if (commissionTableBody) {
+  // Clear and rebuild with proper structure
+  commissionTableBody.innerHTML = commissionHtml;
+  
+  // Add totals row if not present
+  let totalAmount = 0;
+  let totalBrokerComm = 0;
+  let totalCroftComm = 0;
+  
+  commissionedProjects.forEach(p => {
+    const amount = parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g, '')) || 0;
+    const broker = brokers.find(b => b.id === p.brokerId);
+    totalAmount += amount;
+    totalBrokerComm += amount * ((broker?.commissionRate || 0) / 100);
+    totalCroftComm += amount * ADMIN_ONLY_COMMISSION_RATE;
+  });
+  
+  // Add totals row to the same table body
+  const totalsRow = `
+    <tr style="background: var(--gray-100); border-top: 2px solid var(--gray-300);">
+      <td colspan="4"><strong>Total</strong></td>
+      <td style="text-align: right; font-weight: 700;">${formatCurrency(totalBrokerComm)}</td>
+      <td style="text-align: right; font-weight: 700;">${formatCurrency(totalCroftComm)}</td>
+      <td colspan="3"></td>
+    </tr>
+  `;
+  commissionTableBody.innerHTML += totalsRow;
+}
+  
+  // Add totals row to the same table
+  const totalsRow = document.createElement('tr');
+  totalsRow.style.background = 'var(--gray-100)';
+  totalsRow.style.borderTop = '1px solid var(--gray-200)';
+  totalsRow.innerHTML = `
+    <td colspan="3"><strong>TOTAL</strong></td>
+    <td style="text-align: right; font-weight: 700; color: var(--navy);">${formatCurrency(totalFacilityAmount)}</td>
+    <td style="text-align: right; font-weight: 600; color: var(--blue);">${formatCurrency(totalBrokerCommission)}</td>
+    <td style="text-align: right; font-weight: 600; color: var(--navy);">${formatCurrency(totalCroftCommission)}</td>
+    <td colspan="2"></td>
+  `;
+  commissionTableBody.appendChild(totalsRow);
+  
+  // Add funded-only row
+  const fundedAmount = projects.filter(p => (p.step || 1) === 9).reduce((s,p) => s + (parseFloat(String(p.amount||'0').replace(/[^0-9.-]/g,''))||0), 0);
+  const fundedRow = document.createElement('tr');
+  fundedRow.style.background = 'var(--success-light)';
+  fundedRow.innerHTML = `
+    <td colspan="3"><strong>FUNDED ONLY</strong></td>
+    <td style="text-align: right; font-weight: 700; color: var(--success);">${formatCurrency(fundedAmount)}</td>
+    <td colspan="4"></td>
+  `;
+  commissionTableBody.appendChild(fundedRow);
 }
 
 function exportBrokerPerformanceCSV() {
