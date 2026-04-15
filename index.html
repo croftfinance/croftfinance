@@ -3177,11 +3177,13 @@ function switchPortalTab(tabName) {
   if(window.innerWidth <= 768) { document.getElementById('clientSidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('show'); }
 }
 
-  // Auto-close sidebar on mobile after navigation
-  if (window.innerWidth <= 768) {
-    document.getElementById('clientSidebar')?.classList.remove('open');
-    document.getElementById('sidebarOverlay')?.classList.remove('show');
-  }
+// Auto-close sidebar on mobile after navigation
+if (window.innerWidth <= 768) {
+  var clientSidebar = document.getElementById('clientSidebar');
+  var sidebarOverlay = document.getElementById('sidebarOverlay');
+  if (clientSidebar) clientSidebar.classList.remove('open');
+  if (sidebarOverlay) sidebarOverlay.classList.remove('show');
+}
 
 function switchAdminTab(tabName) {
   document.querySelectorAll('#view-admin .admin-tab').forEach(t => t.classList.remove('active'));
@@ -4792,56 +4794,29 @@ const commissionHtml = commissionedProjects.map(p => {
     <tr>
       <td><strong>${escapeHtml(client?.name || 'Unknown')}</strong><br><span class="data-label">${escapeHtml(client?.email || '')}</span></td>
       <td><strong>${escapeHtml(p.name)}</strong><br><span class="data-label">${escapeHtml(p.industry || '—')}</span></td>
-      <td>${escapeHtml(locationDisplay)}</td>
-      <td style="text-align: right; font-weight: 600;">${amountDisplay}</td>
-      <td style="text-align: right;">${brokerCommDisplay}${broker && broker.commissionRate ? `<br><span class="data-label">@ ${broker.commissionRate}%</span>` : ''}</td>
-      <td style="text-align: right; font-weight: 500;">${croftCommDisplay}</td>
-      <td style="text-align: center;"><span class="badge ${stepBadgeClass}">${stepText}</span></td>
-      <td>${termSheetDate ? formatDate(termSheetDate) : '<span class="data-label">—</span>'}</td>
+      <td>${escapeHtml(locationDisplay)}</div></td>
+      <td style="text-align: right; font-weight: 600;">${amountDisplay}</div></td>
+      <td style="text-align: right;">${brokerCommDisplay}${broker && broker.commissionRate ? `<br><span class="data-label">@ ${broker.commissionRate}%</span>` : ''}</div></td>
+      <td style="text-align: right; font-weight: 500;">${croftCommDisplay}</div></div></td>
+      <td style="text-align: center;"><span class="badge ${stepBadgeClass}">${stepText}</span></div></td>
+      <td>${termSheetDate ? formatDate(termSheetDate) : '<span class="data-label">—</span>'}</div></td>
     </tr>
   `;
 }).join('');
 
-// Get the existing table body and replace its content
 const commissionTableBody = document.getElementById('commissionTableBody');
 if (commissionTableBody) {
-  // Clear and rebuild with proper structure
   commissionTableBody.innerHTML = commissionHtml;
   
-  // Add totals row if not present
-  let totalAmount = 0;
-  let totalBrokerComm = 0;
-  let totalCroftComm = 0;
-  
-  commissionedProjects.forEach(p => {
-    const amount = parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g, '')) || 0;
-    const broker = brokers.find(b => b.id === p.brokerId);
-    totalAmount += amount;
-    totalBrokerComm += amount * ((broker?.commissionRate || 0) / 100);
-    totalCroftComm += amount * ADMIN_ONLY_COMMISSION_RATE;
-  });
-  
-  // Add totals row to the same table body
-  const totalsRow = `
-    <tr style="background: var(--gray-100); border-top: 2px solid var(--gray-300);">
-      <td colspan="4"><strong>Total</strong></td>
-      <td style="text-align: right; font-weight: 700;">${formatCurrency(totalBrokerComm)}</td>
-      <td style="text-align: right; font-weight: 700;">${formatCurrency(totalCroftComm)}</td>
-      <td colspan="3"></td>
-    </tr>
-  `;
-  commissionTableBody.innerHTML += totalsRow;
-}
-  
-  // Add totals row to the same table
+  // Add totals row
   const totalsRow = document.createElement('tr');
   totalsRow.style.background = 'var(--gray-100)';
   totalsRow.style.borderTop = '1px solid var(--gray-200)';
   totalsRow.innerHTML = `
     <td colspan="3"><strong>TOTAL</strong></td>
-    <td style="text-align: right; font-weight: 700; color: var(--navy);">${formatCurrency(totalFacilityAmount)}</td>
-    <td style="text-align: right; font-weight: 600; color: var(--blue);">${formatCurrency(totalBrokerCommission)}</td>
-    <td style="text-align: right; font-weight: 600; color: var(--navy);">${formatCurrency(totalCroftCommission)}</td>
+    <td style="text-align: right; font-weight: 700; color: var(--navy);">${formatCurrency(totalFacilityAmount)}</div></td>
+    <td style="text-align: right; font-weight: 600; color: var(--blue);">${formatCurrency(totalBrokerCommission)}</div></td>
+    <td style="text-align: right; font-weight: 600; color: var(--navy);">${formatCurrency(totalCroftCommission)}</div></td>
     <td colspan="2"></td>
   `;
   commissionTableBody.appendChild(totalsRow);
@@ -4852,12 +4827,12 @@ if (commissionTableBody) {
   fundedRow.style.background = 'var(--success-light)';
   fundedRow.innerHTML = `
     <td colspan="3"><strong>FUNDED ONLY</strong></td>
-    <td style="text-align: right; font-weight: 700; color: var(--success);">${formatCurrency(fundedAmount)}</td>
+    <td style="text-align: right; font-weight: 700; color: var(--success);">${formatCurrency(fundedAmount)}</div></td>
     <td colspan="4"></td>
   `;
   commissionTableBody.appendChild(fundedRow);
 }
-
+  
 function exportBrokerPerformanceCSV() {
   let csv = 'Broker Name,Firm,Market,Submissions,Accepted,Funded,Conversion %,Total Volume,Est. Commission\n';
   document.querySelectorAll('#brokerPerformanceBody tr').forEach(row => {
