@@ -2706,7 +2706,7 @@ window.brokerRegister = async function() {
 };
 
 // ============================================================
-// SETUP LISTENERS
+// SETUP LISTENERS - COMPLETE WITH ROLE-BASED SEPARATION
 // ============================================================
 function setupListeners() {
   auth.onAuthStateChanged(async (user) => {
@@ -2715,60 +2715,241 @@ function setupListeners() {
     
     try {
       const adminDoc = await db.collection('admins').doc(user.uid).get();
-      if(adminDoc.exists) {
-        unsubscribers.push(db.collection('clients').onSnapshot(s => { clients = s.docs.map(d => ({id:d.id, ...d.data()})); markDirty(); renderAdminTables(); renderAnalytics(); renderPipeline(); renderBrokerPerformance(); renderSubmissionsTable(); renderDealHealthSummary(); updateDashboardWidgets(); checkDocumentExpiry(); }));
-        unsubscribers.push(db.collection('projects').onSnapshot(s => { projects = s.docs.map(d => ({id:d.id, ...d.data()})); markDirty(); renderAdminTables(); renderAnalytics(); renderPipeline(); renderBrokerPerformance(); renderInbox(); renderDealHealthSummary(); updateCalendar(); updateComparisonSelects(); updateDashboardWidgets(); }));
-        unsubscribers.push(db.collection('brokers').onSnapshot(s => { brokers = s.docs.map(d => ({id:d.id, ...d.data()})); markDirty(); renderBrokerAdminTable(); renderBrokerPerformance(); renderBrokerLeaderboard(); }));
-        unsubscribers.push(db.collection('brokerSubmissions').onSnapshot(s => { brokerSubmissions = s.docs.map(d => ({id:d.id, ...d.data()})); markDirty(); renderBrokerAdminTable(); renderBrokerPerformance(); renderSubmissionsTable(); setupAdminNotifications(); }));
-        unsubscribers.push(db.collection('documents').onSnapshot(s => { documents = s.docs.map(d => ({id:d.id, ...d.data()})); markDirty(); renderAdminDocumentsTable(); checkDocumentExpiry(); }));
-        unsubscribers.push(db.collection('messages').onSnapshot(s => { messages = s.docs.map(d => ({id:d.id, ...d.data()})); markDirty(); renderInbox(); setupAdminNotifications(); }));
-        unsubscribers.push(db.collection('brokerMessages').onSnapshot(s => { brokerMessages = s.docs.map(d => ({id:d.id, ...d.data()})); markDirty(); renderInbox(); setupAdminNotifications(); }));
-        unsubscribers.push(db.collection('meetings').onSnapshot(s => { meetings = s.docs.map(d => ({id:d.id, ...d.data()})); markDirty(); renderMeetings(); setupAdminNotifications(); }));
-        unsubscribers.push(db.collection('brokerUpdateRequests').onSnapshot(s => { brokerUpdateRequests = s.docs.map(d => ({id:d.id, ...d.data()})); markDirty(); renderBrokerAdminTable(); setupAdminNotifications(); }));
-        unsubscribers.push(db.collection('settings').doc('dealAppetite').onSnapshot(doc => { if(doc.exists) document.getElementById('dealAppetiteText') && (document.getElementById('dealAppetiteText').value = doc.data().content || ''); }));
-        unsubscribers.push(db.collection('settings').doc('announcement').onSnapshot(doc => { if(doc.exists) document.getElementById('announcementText') && (document.getElementById('announcementText').value = doc.data().content || ''); }));
-        unsubscribers.push(db.collection('settings').doc('adminProfile').onSnapshot(doc => { if(doc.exists && doc.data()) { const p = doc.data(); document.getElementById('adminDisplayName') && (document.getElementById('adminDisplayName').value = p.displayName || 'Suzana Aleksić'); document.getElementById('adminTitle') && (document.getElementById('adminTitle').value = p.title || 'Principal'); document.getElementById('adminProfileEmail') && (document.getElementById('adminProfileEmail').value = p.email || 'suzana.aleksic@croftfinance.com'); document.getElementById('adminPhone') && (document.getElementById('adminPhone').value = p.phone || '+381 69 288 0 191'); document.getElementById('adminAvailability') && (document.getElementById('adminAvailability').value = p.availability || 'Mon–Fri, 9:00–18:00 CET'); } }));
-        unsubscribers.push(db.collection('activityLog').orderBy('timestamp', 'desc').limit(200).onSnapshot(s => { activityLog = s.docs.map(d => ({ id: d.id, ...d.data() })); renderAuditLog(); }));
-
-         // Temporarily disabled - settings collection not configured
-         // await loadSettings();
-         
+      const isAdminUser = adminDoc.exists;
+      
+      // ============================================================
+      // ADMIN PORTAL LISTENERS (only for admin users)
+      // ============================================================
+      if (isAdminUser) {
+        // Clients collection - admins need full access
+        unsubscribers.push(db.collection('clients').onSnapshot(s => { 
+          clients = s.docs.map(d => ({id:d.id, ...d.data()})); 
+          markDirty(); 
+          renderAdminTables(); 
+          renderAnalytics(); 
+          renderPipeline(); 
+          renderBrokerPerformance(); 
+          renderSubmissionsTable(); 
+          renderDealHealthSummary(); 
+          updateDashboardWidgets(); 
+          checkDocumentExpiry(); 
+        }));
+        
+        // Projects collection - admins need full access
+        unsubscribers.push(db.collection('projects').onSnapshot(s => { 
+          projects = s.docs.map(d => ({id:d.id, ...d.data()})); 
+          markDirty(); 
+          renderAdminTables(); 
+          renderAnalytics(); 
+          renderPipeline(); 
+          renderBrokerPerformance(); 
+          renderInbox(); 
+          renderDealHealthSummary(); 
+          updateCalendar(); 
+          updateComparisonSelects(); 
+          updateDashboardWidgets(); 
+        }));
+        
+        // Brokers collection
+        unsubscribers.push(db.collection('brokers').onSnapshot(s => { 
+          brokers = s.docs.map(d => ({id:d.id, ...d.data()})); 
+          markDirty(); 
+          renderBrokerAdminTable(); 
+          renderBrokerPerformance(); 
+          renderBrokerLeaderboard(); 
+        }));
+        
+        // Broker Submissions collection
+        unsubscribers.push(db.collection('brokerSubmissions').onSnapshot(s => { 
+          brokerSubmissions = s.docs.map(d => ({id:d.id, ...d.data()})); 
+          markDirty(); 
+          renderBrokerAdminTable(); 
+          renderBrokerPerformance(); 
+          renderSubmissionsTable(); 
+          setupAdminNotifications(); 
+        }));
+        
+        // Documents collection
+        unsubscribers.push(db.collection('documents').onSnapshot(s => { 
+          documents = s.docs.map(d => ({id:d.id, ...d.data()})); 
+          markDirty(); 
+          renderAdminDocumentsTable(); 
+          checkDocumentExpiry(); 
+        }));
+        
+        // Messages collection (client messages)
+        unsubscribers.push(db.collection('messages').onSnapshot(s => { 
+          messages = s.docs.map(d => ({id:d.id, ...d.data()})); 
+          markDirty(); 
+          renderInbox(); 
+          setupAdminNotifications(); 
+        }));
+        
+        // Broker Messages collection
+        unsubscribers.push(db.collection('brokerMessages').onSnapshot(s => { 
+          brokerMessages = s.docs.map(d => ({id:d.id, ...d.data()})); 
+          markDirty(); 
+          renderInbox(); 
+          setupAdminNotifications(); 
+        }));
+        
+        // Meetings collection
+        unsubscribers.push(db.collection('meetings').onSnapshot(s => { 
+          meetings = s.docs.map(d => ({id:d.id, ...d.data()})); 
+          markDirty(); 
+          renderMeetings(); 
+          setupAdminNotifications(); 
+        }));
+        
+        // Broker Update Requests collection
+        unsubscribers.push(db.collection('brokerUpdateRequests').onSnapshot(s => { 
+          brokerUpdateRequests = s.docs.map(d => ({id:d.id, ...d.data()})); 
+          markDirty(); 
+          renderBrokerAdminTable(); 
+          setupAdminNotifications(); 
+        }));
+        
+        // Settings - Admin Profile (try-catch to prevent errors if collection doesn't exist)
+        try {
+          unsubscribers.push(db.collection('settings').doc('adminProfile').onSnapshot(doc => { 
+            if(doc.exists && doc.data()) { 
+              const p = doc.data(); 
+              if(document.getElementById('adminDisplayName')) document.getElementById('adminDisplayName').value = p.displayName || 'Suzana Aleksić'; 
+              if(document.getElementById('adminTitle')) document.getElementById('adminTitle').value = p.title || 'Principal'; 
+              if(document.getElementById('adminProfileEmail')) document.getElementById('adminProfileEmail').value = p.email || 'suzana.aleksic@croftfinance.com'; 
+              if(document.getElementById('adminPhone')) document.getElementById('adminPhone').value = p.phone || '+381 69 288 0 191'; 
+              if(document.getElementById('adminAvailability')) document.getElementById('adminAvailability').value = p.availability || 'Mon–Fri, 9:00–18:00 CET'; 
+            } 
+          }));
+        } catch(e) { console.log('Settings listener not available'); }
+        
+        // Activity Log - Admin only (wrap in try-catch)
+        try {
+          unsubscribers.push(db.collection('activityLog').orderBy('timestamp', 'desc').limit(200).onSnapshot(s => { 
+            activityLog = s.docs.map(d => ({ id: d.id, ...d.data() })); 
+            renderAuditLog(); 
+          }));
+        } catch(e) { console.log('ActivityLog not available'); }
+        
+        // Deal Appetite settings
+        unsubscribers.push(db.collection('settings').doc('dealAppetite').onSnapshot(doc => { 
+          if(doc.exists) document.getElementById('dealAppetiteText') && (document.getElementById('dealAppetiteText').value = doc.data().content || ''); 
+        }));
+        
+        // Announcement settings
+        unsubscribers.push(db.collection('settings').doc('announcement').onSnapshot(doc => { 
+          if(doc.exists) document.getElementById('announcementText') && (document.getElementById('announcementText').value = doc.data().content || ''); 
+        }));
+        
         showView('admin');
         updateAdminGreeting();
         const savedTab = restoreActiveTab('admin', 'overview');
         switchAdminTab(savedTab);
-      } else {
+      } 
+      
+      // ============================================================
+      // CLIENT PORTAL LISTENERS
+      // ============================================================
+      else {
         const cDoc = await db.collection('clients').doc(user.uid).get();
         if (cDoc.exists) {
           currentClient = {id:user.uid, ...cDoc.data()};
-          if(currentClient.status === 'pending') { showToast('Account under review.', true); return logout(); }
-          unsubscribers.push(db.collection('projects').where('clientId','==',user.uid).onSnapshot(s => { projects = s.docs.map(d => ({id:d.id, ...d.data()})); if(projects.length) { currentProjectId = projects[0].id; loadCurrentProjectData(); renderCapitalStack(); renderProjectsList(); renderStepAccordion(); checkDeadlines(); loadClientActivityLog(); updateUpcomingDeadlines(); } }));
-          unsubscribers.push(db.collection('documents').where('clientId','==',user.uid).onSnapshot(s => { documents = s.docs.map(d => ({id:d.id, ...d.data()})); renderDocuments(); }));
-          unsubscribers.push(db.collection('messages').where('clientId','==',user.uid).onSnapshot(s => { messages = s.docs.map(d => ({id:d.id, ...d.data()})); loadMessages(); }));
-          unsubscribers.push(db.collection('meetings').where('clientId','==',user.uid).onSnapshot(s => { if(document.getElementById('tab-schedule').classList.contains('active')) loadClientMeetings(); }));
+          if(currentClient.status === 'pending') { 
+            showToast('Account under review.', true); 
+            return logout(); 
+          }
+          
+          // Client's projects
+          unsubscribers.push(db.collection('projects').where('clientId','==',user.uid).onSnapshot(s => { 
+            projects = s.docs.map(d => ({id:d.id, ...d.data()})); 
+            if(projects.length) { 
+              currentProjectId = projects[0].id; 
+              loadCurrentProjectData(); 
+              renderCapitalStack(); 
+              renderProjectsList(); 
+              renderStepAccordion(); 
+              checkDeadlines(); 
+              loadClientActivityLog(); 
+              updateUpcomingDeadlines(); 
+            } 
+          }));
+          
+          // Client's documents
+          unsubscribers.push(db.collection('documents').where('clientId','==',user.uid).onSnapshot(s => { 
+            documents = s.docs.map(d => ({id:d.id, ...d.data()})); 
+            renderDocuments(); 
+          }));
+          
+          // Client's messages
+          unsubscribers.push(db.collection('messages').where('clientId','==',user.uid).onSnapshot(s => { 
+            messages = s.docs.map(d => ({id:d.id, ...d.data()})); 
+            loadMessages(); 
+          }));
+          
+          // Client's meetings
+          unsubscribers.push(db.collection('meetings').where('clientId','==',user.uid).onSnapshot(s => { 
+            if(document.getElementById('tab-schedule').classList.contains('active')) loadClientMeetings(); 
+          }));
+          
           showView('portal');
           loadClientPortal();
           const savedTab = restoreActiveTab('client', 'dashboard');
           switchPortalTab(savedTab);
-        } else {
+        } 
+        
+        // ============================================================
+        // BROKER PORTAL LISTENERS
+        // ============================================================
+        else {
           const bDoc = await db.collection('brokers').doc(user.uid).get();
           if (bDoc.exists) {
             currentBroker = {id:user.uid, ...bDoc.data()};
-            if(currentBroker.status === 'pending') {
-              showToast('Broker account under review. Please wait for approval.', true);
-              await auth.signOut();
-              showView('home');
-              return;
+            if(currentBroker.status === 'pending') { 
+              showToast('Broker account under review. Please wait for approval.', true); 
+              await auth.signOut(); 
+              showView('home'); 
+              return; 
             }
-            if(currentBroker.engagementStatus !== 'active') {
-              document.getElementById('broker-tab-portfolio').innerHTML = '<div class="card"><div class="card-body"><div class="action-banner warning"><i class="fas fa-file-contract"></i><div><strong>Introducer agreement pending</strong><br>Your introducer agreement is not yet on file. Detailed deal terms and commission figures will be visible once your engagement letter is received by Croft Finance. Please contact suzana.aleksic@croftfinance.com.</div></div></div></div>';
-            }
-            unsubscribers.push(db.collection('brokerSubmissions').where('brokerId','==',user.uid).onSnapshot(s => { brokerSubmissions = s.docs.map(d => ({id:d.id, ...d.data()})); updateBrokerDashboard(); }));
-            unsubscribers.push(db.collection('projects').where('brokerId','==',user.uid).onSnapshot(s => { projects = s.docs.map(d => ({id:d.id, ...d.data()})); renderBrokerPortfolio(); updateBrokerDashboard(); }));
-            unsubscribers.push(db.collection('brokerMessages').where('brokerId','==',user.uid).onSnapshot(s => { brokerMessages = s.docs.map(d => ({id:d.id, ...d.data()})); loadBrokerMessages(); }));
-            unsubscribers.push(db.collection('clients').onSnapshot(s => { clients = s.docs.map(d => ({id:d.id, ...d.data()})); renderBrokerPortfolio(); }));
-            unsubscribers.push(db.collection('brokers').doc(user.uid).onSnapshot(doc => { if(doc.exists) { currentBroker = {id: user.uid, ...doc.data()}; updateBrokerDashboard(); renderBrokerPortfolio(); } }));
-            unsubscribers.push(db.collection('settings').doc('dealAppetite').onSnapshot(doc => { if(doc.exists) document.getElementById('dealAppetiteContent').innerHTML = doc.data().content || 'Croft Finance is currently active across all sectors. Please contact Suzana to discuss specific mandates.'; }));
+            
+            // Broker's submissions
+            unsubscribers.push(db.collection('brokerSubmissions').where('brokerId','==',user.uid).onSnapshot(s => { 
+              brokerSubmissions = s.docs.map(d => ({id:d.id, ...d.data()})); 
+              updateBrokerDashboard(); 
+            }));
+            
+            // Broker's assigned projects
+            unsubscribers.push(db.collection('projects').where('brokerId','==',user.uid).onSnapshot(s => { 
+              projects = s.docs.map(d => ({id:d.id, ...d.data()})); 
+              renderBrokerPortfolio(); 
+              updateBrokerDashboard(); 
+            }));
+            
+            // Broker's messages
+            unsubscribers.push(db.collection('brokerMessages').where('brokerId','==',user.uid).onSnapshot(s => { 
+              brokerMessages = s.docs.map(d => ({id:d.id, ...d.data()})); 
+              loadBrokerMessages(); 
+            }));
+            
+            // Clients (for broker to see their clients)
+            unsubscribers.push(db.collection('clients').onSnapshot(s => { 
+              clients = s.docs.map(d => ({id:d.id, ...d.data()})); 
+              renderBrokerPortfolio(); 
+            }));
+            
+            // Broker's own data
+            unsubscribers.push(db.collection('brokers').doc(user.uid).onSnapshot(doc => { 
+              if(doc.exists) { 
+                currentBroker = {id: user.uid, ...doc.data()}; 
+                updateBrokerDashboard(); 
+                renderBrokerPortfolio(); 
+              } 
+            }));
+            
+            // Deal appetite (read-only)
+            unsubscribers.push(db.collection('settings').doc('dealAppetite').onSnapshot(doc => { 
+              if(doc.exists) document.getElementById('dealAppetiteContent').innerHTML = doc.data().content || 'Croft Finance is currently active across all sectors. Please contact Suzana to discuss specific mandates.'; 
+            }));
+            
             showView('broker');
             loadBrokerPortal();
             const savedTab = restoreActiveTab('broker', 'dashboard');
