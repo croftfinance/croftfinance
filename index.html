@@ -2300,9 +2300,6 @@ sessionResetInterval = setInterval(function() {
   updateAdvisorAvailability();
   setInterval(updateAdvisorAvailability, 60000);
   
-try { loadWebhooks(); } catch(e) { console.log('Webhooks not configured'); }
-try { loadCustomFields(); } catch(e) { console.log('Custom fields not configured'); }
-  
   const clientSearchEl = document.getElementById('clientSearch');
   if(clientSearchEl) {
     clientSearchEl.addEventListener('input', debounce(function() {
