@@ -2729,7 +2729,10 @@ function setupListeners() {
         unsubscribers.push(db.collection('settings').doc('announcement').onSnapshot(doc => { if(doc.exists) document.getElementById('announcementText') && (document.getElementById('announcementText').value = doc.data().content || ''); }));
         unsubscribers.push(db.collection('settings').doc('adminProfile').onSnapshot(doc => { if(doc.exists && doc.data()) { const p = doc.data(); document.getElementById('adminDisplayName') && (document.getElementById('adminDisplayName').value = p.displayName || 'Suzana Aleksić'); document.getElementById('adminTitle') && (document.getElementById('adminTitle').value = p.title || 'Principal'); document.getElementById('adminProfileEmail') && (document.getElementById('adminProfileEmail').value = p.email || 'suzana.aleksic@croftfinance.com'); document.getElementById('adminPhone') && (document.getElementById('adminPhone').value = p.phone || '+381 69 288 0 191'); document.getElementById('adminAvailability') && (document.getElementById('adminAvailability').value = p.availability || 'Mon–Fri, 9:00–18:00 CET'); } }));
         unsubscribers.push(db.collection('activityLog').orderBy('timestamp', 'desc').limit(200).onSnapshot(s => { activityLog = s.docs.map(d => ({ id: d.id, ...d.data() })); renderAuditLog(); }));
-        await loadSettings();
+
+         // Temporarily disabled - settings collection not configured
+         // await loadSettings();
+         
         showView('admin');
         updateAdminGreeting();
         const savedTab = restoreActiveTab('admin', 'overview');
@@ -3671,7 +3674,9 @@ async function loadSettings() {
       if(phoneEl) phoneEl.value = p.phone || '+381 69 288 0 191';
       if(availabilityEl) availabilityEl.value = p.availability || 'Mon–Fri, 9:00–18:00 CET';
     }
-  } catch(e) { showToast(e.message, true); }
+  } catch(e) { 
+    console.log('Settings collection not available - using defaults');
+  }
 }
 
 window.saveDealAppetite = async function() {
