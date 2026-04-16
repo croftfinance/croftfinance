@@ -3447,6 +3447,54 @@ function renderBrokerLeaderboard() {
   }
 }
 
+function renderBrokerPerformance() {
+  const brokerStats = brokers.map(b => {
+    const submissions = brokerSubmissions.filter(s => s.brokerId === b.id);
+    const brokerProjects = projects.filter(p => p.brokerId === b.id);
+    const accepted = brokerProjects.filter(p => p.status === 'active');
+    const funded = brokerProjects.filter(p => p.step >= 9);
+    const conversion = submissions.length ? Math.round((accepted.length / submissions.length) * 100) : 0;
+    const volume = brokerProjects.reduce((sum, p) => sum + (parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g,'')) || 0), 0);
+    const commission = funded.reduce((sum, p) => sum + ((parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g,'')) || 0) * (b.commissionRate || 0) / 100), 0);
+    return { id: b.id, name: b.name, firm: b.firm, country: b.country, submissions: submissions.length, accepted: accepted.length, funded: funded.length, conversion, volume, commission };
+  });
+  
+  brokerStats.sort((a,b) => brokerSortDesc ? b[brokerSortField] - a[brokerSortField] : a[brokerSortField] - b[brokerSortField]);
+  
+  const tbody = document.getElementById('brokerPerformanceBody');
+  if(tbody) {
+    const newRowsHtml = brokerStats.map(s => {
+      return `<tr>
+        <td><strong>${escapeHtml(s.name)}</strong><br><span class="data-label">${escapeHtml(s.firm)}</span></td>
+        <td>${escapeHtml(s.country || '—')}</div></td>
+        <td>${s.submissions}</div></td>
+        <td>${s.accepted}</div></td>
+        <td>${s.funded}</div></td>
+        <td>${s.conversion}%</div></td>
+        <td>${formatCurrency(s.volume)}</div></td>
+        <td>${formatCurrency(s.commission)}</div></td>
+      </tr>`;
+    }).join('');
+    patchTable('brokerPerformanceBody', newRowsHtml);
+  }
+  
+  const tbody2 = document.getElementById('brokerPerformanceTableBody');
+  if(tbody2) {
+    const newRowsHtml = brokerStats.map(s => {
+      return `<tr>
+        <td><strong>${escapeHtml(s.name)}</strong><br><span class="data-label">${escapeHtml(s.firm)}</span></td>
+        <td>${s.submissions}</div></td>
+        <td>${s.accepted}</div></td>
+        <td>${s.funded}</div></td>
+        <td>${s.conversion}%</div></td>
+        <td>${formatCurrency(s.volume)}</div></td>
+        <td>${formatCurrency(s.commission)}</div></td>
+      </tr>`;
+    }).join('');
+    patchTable('brokerPerformanceTableBody', newRowsHtml);
+  }
+}
+
 // ============================================================
 // CLIENT PORTAL FUNCTIONS
 // ============================================================
