@@ -1755,6 +1755,7 @@ body.dark-mode .badge-neutral { background: rgba(255,255,255,0.1); color: var(--
       <!-- BROKERS TAB -->
       <div id="admin-brokers" class="admin-tab">
         <div class="admin-page-title">Brokers</div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:16px;"><div></div><button class="btn btn-success btn-sm" onclick="showInviteBrokerModal()">✉ Invite Broker</button></div>
         <div class="table-wrap"><table class="admin-table"><thead><tr><th>Broker</th><th>Firm</th><th>Commission</th><th>Submitted</th><th>Funded</th><th>Est. Commission</th><th>Status</th><th>Engagement</th><th>Actions</th></tr></thead><tbody id="adminBrokersTable"></tbody></table></div>
         <div class="card" style="margin-top:20px;"><div class="card-header"><div class="card-title">Broker Performance</div></div><div class="card-body"><div class="table-wrap"><table class="admin-table" id="brokerPerformanceTableDetails"><thead><tr><th>Broker</th><th>Submissions</th><th>Accepted</th><th>Funded</th><th>Conversion %</th><th>Total Volume</th><th>Est. Commission</th></tr></thead><tbody id="brokerPerformanceTableBody"></tbody></table></div></div></div>
         <div class="card"><div class="card-header"><div class="card-title">Broker Update Requests</div></div><div class="card-body"><div id="brokerUpdateRequestsList"></div></div></div>
@@ -1947,6 +1948,15 @@ body.dark-mode .badge-neutral { background: rgba(255,255,255,0.1); color: var(--
 <!-- Document Expiry Warning Modal -->
 <div id="expiryWarningModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Document Expiry Warning</h3><button class="modal-close" onclick="closeModal('expiryWarningModal')">✕</button></div><div class="modal-body" id="expiryWarningContent"></div></div></div>
 
+<!-- Invite Client Modal -->
+<div id="inviteClientModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Invite Client</h3><button class="modal-close" onclick="closeModal('inviteClientModal')">✕</button></div><div class="modal-body"><div class="form-group"><label class="form-label">Client Name *</label><input type="text" id="inviteClientName" class="form-input" placeholder="Full name"></div><div class="form-group"><label class="form-label">Email Address *</label><input type="email" id="inviteClientEmail" class="form-input" placeholder="client@example.com"></div><div class="form-group"><label class="form-label">Project Name *</label><input type="text" id="inviteClientProject" class="form-input" placeholder="Project name"></div><div class="form-group"><label class="form-label">Personal Message (Optional)</label><textarea id="inviteClientMessage" rows="3" class="form-textarea" placeholder="Add a personal message to the invitation..."></textarea></div><button class="btn btn-primary btn-md" onclick="sendClientInvitation()" style="width:100%">Send Invitation</button></div></div></div>
+
+<!-- Invite Broker Modal -->
+<div id="inviteBrokerModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Invite Broker</h3><button class="modal-close" onclick="closeModal('inviteBrokerModal')">✕</button></div><div class="modal-body"><div class="form-group"><label class="form-label">Broker Name *</label><input type="text" id="inviteBrokerName" class="form-input" placeholder="Full name"></div><div class="form-group"><label class="form-label">Email Address *</label><input type="email" id="inviteBrokerEmail" class="form-input" placeholder="broker@example.com"></div><div class="form-group"><label class="form-label">Brokerage Firm</label><input type="text" id="inviteBrokerFirm" class="form-input" placeholder="Company name"></div><div class="form-group"><label class="form-label">Personal Message (Optional)</label><textarea id="inviteBrokerMessage" rows="3" class="form-textarea" placeholder="Add a personal message..."></textarea></div><button class="btn btn-primary btn-md" onclick="sendBrokerInvitation()" style="width:100%">Send Invitation</button></div></div></div>
+
+<!-- Add CRM Client Modal -->
+<div id="addCrmClientModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Add CRM Client (No Portal Access)</h3><button class="modal-close" onclick="closeModal('addCrmClientModal')">✕</button></div><div class="modal-body"><div class="form-grid-2"><div class="form-group"><label class="form-label">Full Name *</label><input type="text" id="crmName" class="form-input"></div><div class="form-group"><label class="form-label">Email</label><input type="email" id="crmEmail" class="form-input"></div><div class="form-group"><label class="form-label">Phone</label><input type="text" id="crmPhone" class="form-input"></div><div class="form-group"><label class="form-label">Company</label><input type="text" id="crmCompany" class="form-input"></div></div><div class="form-group"><label class="form-label">Notes</label><textarea id="crmNotes" rows="3" class="form-textarea"></textarea></div><div class="form-group"><label class="form-label">Project Name</label><input type="text" id="crmProject" class="form-input"></div><div class="form-grid-2"><div class="form-group"><label class="form-label">Industry</label><select id="crmIndustry" class="form-select"><option>Real Estate</option><option>Infrastructure</option><option>Energy & Renewables</option><option>Mining</option><option>Oil & Gas</option></select></div><div class="form-group"><label class="form-label">Project Status</label><select id="crmProjectStatus" class="form-select"><option>Lead</option><option>Proposal</option><option>Negotiation</option><option>Closed</option><option>Lost</option></select></div></div><div class="form-grid-2"><div class="form-group"><label class="form-label">Project Value (USD)</label><input type="text" id="crmProjectValue" class="form-input"></div><div class="form-group"><label class="form-label">Expected Close</label><input type="date" id="crmExpectedClose" class="form-input"></div></div><button class="btn btn-primary btn-md" onclick="createCrmClient()" style="width:100%">Save to CRM</button></div></div></div>
+  
 <!-- Tooltip -->
 <div id="tooltip" style="position:fixed; display:none; background:var(--navy); color:white; padding:4px 8px; border-radius:4px; font-size:11px; z-index:10000;"></div>
 <script>
@@ -2679,6 +2689,94 @@ window.showForgotPassword = function() {
   document.getElementById('forgotPasswordForm').style.display = 'block'; 
   document.getElementById('brokerRegisterForm').style.display = 'none'; 
 };
+
+// ===== INVITE & CRM FUNCTIONS =====
+window.showInviteClientModal = function() {
+  document.getElementById('inviteClientName').value = '';
+  document.getElementById('inviteClientEmail').value = '';
+  document.getElementById('inviteClientProject').value = '';
+  document.getElementById('inviteClientMessage').value = '';
+  openModal('inviteClientModal');
+}
+
+window.sendClientInvitation = async function() {
+  const name = document.getElementById('inviteClientName').value.trim();
+  const email = document.getElementById('inviteClientEmail').value.trim().toLowerCase();
+  const project = document.getElementById('inviteClientProject').value.trim();
+  const personalMessage = document.getElementById('inviteClientMessage').value.trim();
+  if (!name || !email || !project) return showToast('Please fill all required fields', true);
+  try {
+    const tempPassword = Math.random().toString(36).slice(-8) + '@' + Math.random().toString(36).slice(-4);
+    const cred = await auth.createUserWithEmailAndPassword(email, tempPassword);
+    await db.collection('clients').doc(cred.user.uid).set({ id: cred.user.uid, name: name, email: email, status: 'pending', invitedBy: 'admin', invitedAt: new Date().toISOString(), createdAt: new Date().toISOString() });
+    await db.collection('projects').add({ clientId: cred.user.uid, name: project, step: 1, status: 'pending', createdAt: new Date().toISOString() });
+    await sendEmailNotification({ to_name: name, to_email: email, from_name: 'Suzana Aleksić — Croft Finance', subject: 'Invitation to Croft Finance Client Portal', message: `Dear ${name},\n\nYou have been invited to access the Croft Finance client portal.\n\n${personalMessage ? '\nPersonal message from Suzana:\n' + personalMessage + '\n\n' : ''}\n\nTo access your portal:\n1. Go to: ${window.location.origin}\n2. Email: ${email}\n3. Temporary Password: ${tempPassword}\n\nPlease log in and change your password immediately.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`, project_name: project });
+    showToast(`Invitation sent to ${email}`);
+    closeModal('inviteClientModal');
+    renderAdminTables();
+  } catch(e) { showToast(e.message, true); }
+}
+
+window.showInviteBrokerModal = function() {
+  document.getElementById('inviteBrokerName').value = '';
+  document.getElementById('inviteBrokerEmail').value = '';
+  document.getElementById('inviteBrokerFirm').value = '';
+  document.getElementById('inviteBrokerMessage').value = '';
+  openModal('inviteBrokerModal');
+}
+
+window.sendBrokerInvitation = async function() {
+  const name = document.getElementById('inviteBrokerName').value.trim();
+  const email = document.getElementById('inviteBrokerEmail').value.trim().toLowerCase();
+  const firm = document.getElementById('inviteBrokerFirm').value.trim();
+  const personalMessage = document.getElementById('inviteBrokerMessage').value.trim();
+  if (!name || !email) return showToast('Please fill all required fields', true);
+  try {
+    const tempPassword = Math.random().toString(36).slice(-8) + '@' + Math.random().toString(36).slice(-4);
+    const cred = await auth.createUserWithEmailAndPassword(email, tempPassword);
+    await db.collection('brokers').doc(cred.user.uid).set({ id: cred.user.uid, name: name, email: email, firm: firm || '', commissionRate: 0, status: 'pending', engagementStatus: 'pending', invitedBy: 'admin', invitedAt: new Date().toISOString(), createdAt: new Date().toISOString() });
+    await sendEmailNotification({ to_name: name, to_email: email, from_name: 'Suzana Aleksić — Croft Finance', subject: 'Invitation to Croft Finance Broker Portal', message: `Dear ${name},\n\nYou have been invited to register as a broker partner with Croft Finance.\n\n${personalMessage ? '\nPersonal message from Suzana:\n' + personalMessage + '\n\n' : ''}\n\nTo access your broker portal:\n1. Go to: ${window.location.origin}\n2. Email: ${email}\n3. Temporary Password: ${tempPassword}\n\nPlease log in and change your password immediately.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`, project_name: 'Broker Registration' });
+    showToast(`Invitation sent to ${email}`);
+    closeModal('inviteBrokerModal');
+    renderBrokerAdminTable();
+  } catch(e) { showToast(e.message, true); }
+}
+
+window.showAddCrmClientModal = function() {
+  document.getElementById('crmName').value = '';
+  document.getElementById('crmEmail').value = '';
+  document.getElementById('crmPhone').value = '';
+  document.getElementById('crmCompany').value = '';
+  document.getElementById('crmNotes').value = '';
+  document.getElementById('crmProject').value = '';
+  document.getElementById('crmProjectValue').value = '';
+  document.getElementById('crmExpectedClose').value = '';
+  openModal('addCrmClientModal');
+}
+
+window.createCrmClient = async function() {
+  const name = document.getElementById('crmName').value.trim();
+  const email = document.getElementById('crmEmail').value.trim();
+  const phone = document.getElementById('crmPhone').value.trim();
+  const company = document.getElementById('crmCompany').value.trim();
+  const notes = document.getElementById('crmNotes').value.trim();
+  const projectName = document.getElementById('crmProject').value.trim();
+  const industry = document.getElementById('crmIndustry').value;
+  const projectStatus = document.getElementById('crmProjectStatus').value;
+  const projectValue = document.getElementById('crmProjectValue').value;
+  const expectedClose = document.getElementById('crmExpectedClose').value;
+  if (!name) return showToast('Name is required', true);
+  try {
+    const clientId = 'crm_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+    await db.collection('clients').doc(clientId).set({ id: clientId, name: name, email: email || '', phone: phone || '', company: company || '', notes: notes || '', status: 'crm_only', hasPortalAccess: false, createdAt: new Date().toISOString(), createdBy: 'admin' });
+    if (projectName) {
+      await db.collection('projects').add({ clientId: clientId, name: projectName, industry: industry, projectStatus: projectStatus, amount: projectValue || 'TBD', expectedClose: expectedClose || null, step: 1, status: 'crm_only', isActive: true, createdAt: new Date().toISOString() });
+    }
+    showToast(`CRM client "${name}" added successfully`);
+    closeModal('addCrmClientModal');
+    renderAdminTables();
+  } catch(e) { showToast(e.message, true); }
+}
 
 window.showBrokerRegisterForm = function() { 
   document.getElementById('loginForm').style.display = 'none'; 
@@ -4879,7 +4977,6 @@ if (commissionTableBody) {
     <td colspan="4"></td>
   `;
   commissionTableBody.appendChild(fundedRow);
-}
 }
   
 function exportBrokerPerformanceCSV() {
