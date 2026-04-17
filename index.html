@@ -2437,7 +2437,7 @@ async function initFirebase() {
     document.addEventListener(evt, resetInactivity);
   });
   
-sessionResetInterval = setInterval(function() {
+let sessionResetInterval = setInterval(function() {
     const idle = Date.now() - lastActivity;
     if (idle > 25 * 60 * 1000 && !sessionWarningShown) {
       sessionWarningShown = true;
@@ -5902,7 +5902,46 @@ if(localStorage.getItem('darkMode') === 'true') document.body.classList.add('dar
 updatePasswordStrengthMeter('regPassword', '#registerForm .strength-segment', '#registerForm .strength-hint');
 updatePasswordStrengthMeter('brokerRegPassword', '#brokerRegisterForm .strength-segment', '#brokerRegisterForm .strength-hint');
 
-document.addEventListener('DOMContentLoaded', () => { initFirebase(); });
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize any missing event listeners
+    const quickActionBtns = document.querySelectorAll('.quick-action-btn');
+    quickActionBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var tab = this.dataset.tab;
+            if (tab) switchPortalTab(tab);
+        });
+    });
+    
+    // Set up notification settings save
+    var saveNotifBtn = document.querySelector('#tab-notifications .btn-primary');
+    if (saveNotifBtn) {
+        saveNotifBtn.addEventListener('click', saveNotificationSettings);
+    }
+    
+    // Load saved notification settings
+    var savedSettings = localStorage.getItem('notificationSettings');
+    if (savedSettings) {
+        try {
+            var settings = JSON.parse(savedSettings);
+            var dealUpdates = document.getElementById('notifyDealUpdates');
+            var docApproval = document.getElementById('notifyDocumentApproval');
+            var meetingReminders = document.getElementById('notifyMeetingReminders');
+            var deadlines = document.getElementById('notifyDeadlines');
+            
+            if (dealUpdates) dealUpdates.checked = settings.dealUpdates !== false;
+            if (docApproval) docApproval.checked = settings.documentApproval !== false;
+            if (meetingReminders) meetingReminders.checked = settings.meetingReminders !== false;
+            if (deadlines) deadlines.checked = settings.deadlines !== false;
+        } catch(e) {}
+    }
+    
+    // Initialize Firebase (defined earlier)
+    initFirebase();
+});
+
+// End of all script content
+
 </script>
 </body>
 </html>
