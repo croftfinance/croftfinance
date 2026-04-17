@@ -1488,7 +1488,7 @@ body.dark-mode .badge-neutral { background: rgba(255,255,255,0.1); color: var(--
         <button class="nav-item active" data-tab="dashboard"><i class="fas fa-chart-line"></i> Dashboard</button>
         <button class="nav-item" data-tab="process"><i class="fas fa-tasks"></i> Closing Process</button>
         <button class="nav-item" data-tab="documents"><i class="fas fa-folder-open"></i> Documents</button>
-        <button class="nav-item" data-tab="messages"><i class="fas fa-comments"></i> Messages</button>
+        <button class="nav-item" data-tab="messages"><i class="fas fa-comments"></i> Messages<span class="nav-badge"></span></button>
         <button class="nav-item" data-tab="schedule"><i class="fas fa-calendar"></i> Schedule Meeting</button>
         <button class="nav-item" data-tab="projects"><i class="fas fa-briefcase"></i> Deal Sheet</button>
         <div class="sidebar-divider"></div>
@@ -3615,54 +3615,140 @@ function loadClientPortal() {
 }
 
 function loadCurrentProjectData() {
-  const p = projects.find(x => x.id === currentProjectId);
-  if (!p) return;
-  if(p.status === 'declined') {
-    document.getElementById('actionBannerDisplay').innerHTML = `<div class="action-banner" style="background:var(--error-light);border:0.5px solid var(--error);"><i class="fas fa-times-circle" style="color:var(--error);"></i><div><strong style="color:var(--error);">Mandate Not Approved</strong><br>Croft Finance has reviewed your project and is unable to proceed at this time. Please contact Suzana for feedback.</div></div>`;
-    return;
-  }
-  const step = p.step || 1;
-  document.getElementById('dashStage').innerHTML = STEP_NAMES[step];
-  document.getElementById('dashAmount').innerHTML = formatCurrency(p.amount);
-  document.getElementById('dashRate').innerHTML = p.interestRate ? p.interestRate + '%' : '—';
-  document.getElementById('dashCountdown').innerHTML = p.closeDate ? formatDate(p.closeDate) : '—';
-  document.getElementById('dashFundsNeeded').innerHTML = formatCurrency(p.fundsNeeded);
-  const percent = Math.round((step / 9) * 100);
-  document.getElementById('progressPercentage').innerHTML = percent + '%';
-  const circle = document.querySelector('.progress-circle-fill');
-  if(circle) circle.style.strokeDashoffset = (2 * Math.PI * 45) - (percent/100)*(2 * Math.PI * 45);
-  document.getElementById('stepNumber').innerHTML = `Step ${step} of 9`;
-  document.getElementById('stepName').innerHTML = STEP_NAMES[step];
-  document.getElementById('welcomeTitle').innerHTML = `Welcome back, ${currentClient.name.split(' ')[0]}.`;
-  const d = new Date(); document.getElementById('dashboardDate').innerHTML = d.toLocaleDateString('en-GB', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  if(p.closeDate) {
-    const days = Math.ceil((new Date(p.closeDate)-new Date())/(1000*60*60*24));
-    document.getElementById('daysRemainingDisplay').innerHTML = days;
-    document.getElementById('closingDateDisplay').innerHTML = formatDate(p.closeDate);
-    document.getElementById('nextActionText').innerHTML = STEP_CONFIG[step]?.clientAction || '—';
-  }
-  const bannerDiv = document.getElementById('actionBannerDisplay');
-  if(step === 1) {
-    document.getElementById('actionBannerDisplay').innerHTML = `<div class="action-banner" style="background:var(--navy);border:none;color:white;"><i class="fas fa-search" style="color:#c9a96e;"></i><div><strong style="color:#c9a96e;">Mandate Under Review</strong><br><span style="opacity:0.8;">Croft Finance is evaluating your project. You will be notified within 5 business days.</span></div></div>`;
-  } else if(step === 3 && p.commitmentFeeStatus !== 'paid') bannerDiv.innerHTML = `<div class="action-banner client-action"><i class="fas fa-exclamation-triangle"></i><div><strong>Action Required: Commitment Fee</strong><br>Please submit the commitment fee to advance to Step 4.</div><button class="btn btn-primary btn-sm" style="margin-top:8px;" onclick="showWiringInstructions()">Wiring Instructions</button></div>`;
-  else if(step === 7 && p.ecfStatus !== 'escrowed') bannerDiv.innerHTML = `<div class="action-banner client-action"><i class="fas fa-exclamation-triangle"></i><div><strong>Action Required: ECF Escrow</strong><br>Please fund the ECF escrow account to proceed to Step 8.</div></div>`;
-  else bannerDiv.innerHTML = '';
-  
-  const statCards = document.querySelectorAll('#tab-dashboard .stat-card');
-  statCards.forEach(card => {
-    card.style.borderLeft = step === 9 ? '3px solid var(--success)' : (step >= 5 ? '3px solid var(--blue)' : '3px solid var(--gray-200)');
-  });
-  const healthDot = document.getElementById('dealHealthDot');
-  if(healthDot) {
-    const daysLeft = p.closeDate ? Math.ceil((new Date(p.closeDate) - new Date()) / (1000*60*60*24)) : 999;
-    if(step === 9) healthDot.style.background = 'var(--success)';
-    else if(daysLeft < 14) healthDot.style.background = 'var(--error)';
-    else if(daysLeft < 30) healthDot.style.background = 'var(--warning)';
-    else healthDot.style.background = 'var(--success)';
-  }
+    const p = projects.find(x => x.id === currentProjectId);
+    if (!p) return;
+    
+    if (p.status === 'declined') {
+        document.getElementById('actionBannerDisplay').innerHTML = `
+            <div class="action-banner" style="background:var(--error-light);border:0.5px solid var(--error);">
+                <i class="fas fa-times-circle" style="color:var(--error);"></i>
+                <div>
+                    <strong style="color:var(--error);">Mandate Not Approved</strong><br>
+                    Croft Finance has reviewed your project and is unable to proceed at this time. 
+                    Please contact Suzana for feedback.
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    const step = p.step || 1;
+    const stageEl = document.getElementById('dashStage');
+    const amountEl = document.getElementById('dashAmount');
+    const rateEl = document.getElementById('dashRate');
+    const countdownEl = document.getElementById('dashCountdown');
+    const fundsNeededEl = document.getElementById('dashFundsNeeded');
+    
+    if (stageEl) stageEl.innerHTML = STEP_NAMES[step];
+    if (amountEl) amountEl.innerHTML = formatCurrency(p.amount);
+    if (rateEl) rateEl.innerHTML = p.interestRate ? p.interestRate + '%' : '—';
+    if (countdownEl) countdownEl.innerHTML = p.closeDate ? formatDate(p.closeDate) : '—';
+    if (fundsNeededEl) fundsNeededEl.innerHTML = formatCurrency(p.fundsNeeded);
+    
+    const percent = Math.round((step / 9) * 100);
+    const percentEl = document.getElementById('progressPercentage');
+    if (percentEl) percentEl.innerHTML = percent + '%';
+    
+    const circle = document.querySelector('.progress-circle-fill');
+    if (circle) {
+        const circumference = 2 * Math.PI * 45;
+        circle.style.strokeDashoffset = circumference - (percent / 100) * circumference;
+    }
+    
+    const stepNumberEl = document.getElementById('stepNumber');
+    const stepNameEl = document.getElementById('stepName');
+    if (stepNumberEl) stepNumberEl.innerHTML = `Step ${step} of 9`;
+    if (stepNameEl) stepNameEl.innerHTML = STEP_NAMES[step];
+    
+    const welcomeEl = document.getElementById('welcomeTitle');
+    if (welcomeEl && currentClient) {
+        const firstName = currentClient.name.split(' ')[0];
+        welcomeEl.innerHTML = `Welcome back, ${firstName}.`;
+    }
+    
+    const dateEl = document.getElementById('dashboardDate');
+    if (dateEl) {
+        const d = new Date();
+        dateEl.innerHTML = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    }
+    
+    if (p.closeDate) {
+        const days = Math.ceil((new Date(p.closeDate) - new Date()) / (1000 * 60 * 60 * 24));
+        const daysRemainingEl = document.getElementById('daysRemainingDisplay');
+        const closingDateEl = document.getElementById('closingDateDisplay');
+        const nextActionEl = document.getElementById('nextActionText');
+        
+        if (daysRemainingEl) daysRemainingEl.innerHTML = days;
+        if (closingDateEl) closingDateEl.innerHTML = formatDate(p.closeDate);
+        if (nextActionEl) nextActionEl.innerHTML = STEP_CONFIG[step]?.clientAction || '—';
+    }
+    
+    // Update action banners
+    const bannerDiv = document.getElementById('actionBannerDisplay');
+    if (bannerDiv) {
+        if (step === 1) {
+            bannerDiv.innerHTML = `
+                <div class="action-banner" style="background:var(--navy);border:none;color:white;">
+                    <i class="fas fa-search" style="color:#c9a96e;"></i>
+                    <div>
+                        <strong style="color:#c9a96e;">Mandate Under Review</strong><br>
+                        <span style="opacity:0.8;">Croft Finance is evaluating your project. You will be notified within 5 business days.</span>
+                    </div>
+                </div>
+            `;
+        } else if (step === 3 && p.commitmentFeeStatus !== 'paid') {
+            bannerDiv.innerHTML = `
+                <div class="action-banner client-action">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <strong>Action Required: Commitment Fee</strong><br>
+                        Please submit the commitment fee to advance to Step 4.
+                    </div>
+                    <button class="btn btn-primary btn-sm" style="margin-top:8px;" onclick="showWiringInstructions()">Wiring Instructions</button>
+                </div>
+            `;
+        } else if (step === 7 && p.ecfStatus !== 'escrowed') {
+            bannerDiv.innerHTML = `
+                <div class="action-banner client-action">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <strong>Action Required: ECF Escrow</strong><br>
+                        Please fund the ECF escrow account to proceed to Step 8.
+                    </div>
+                </div>
+            `;
+        } else {
+            bannerDiv.innerHTML = '';
+        }
+    }
+    
+    // Update stat card borders
+    const statCards = document.querySelectorAll('#tab-dashboard .stat-card');
+    statCards.forEach(card => {
+        card.style.borderLeft = step === 9 ? '3px solid var(--success)' : (step >= 5 ? '3px solid var(--blue)' : '3px solid var(--gray-200)');
+    });
+    
+    // Update deal health dot
+    const healthDot = document.getElementById('dealHealthDot');
+    if (healthDot) {
+        const daysLeft = p.closeDate ? Math.ceil((new Date(p.closeDate) - new Date()) / (1000 * 60 * 60 * 24)) : 999;
+        if (step === 9) {
+            healthDot.style.background = 'var(--success)';
+        } else if (daysLeft < 14 && daysLeft >= 0) {
+            healthDot.style.background = 'var(--error)';
+        } else if (daysLeft < 30 && daysLeft >= 0) {
+            healthDot.style.background = 'var(--warning)';
+        } else {
+            healthDot.style.background = 'var(--success)';
+        }
+    }
+    
+    // Update milestone progress
+    renderMilestoneProgress();
+    
+    // Check deadlines
+    checkDeadlines();
 }
-
-window.showWiringInstructions = function() { showToast('Wiring instructions will be sent to your email'); };
 
 function renderCapitalStack() {
   const p = projects.find(x => x.id === currentProjectId);
@@ -3775,104 +3861,501 @@ function renderProjectsList() {
   cont.innerHTML = projects.map(p => `<div class="card"><div class="card-body"><div style="display:flex;justify-content:space-between;margin-bottom:16px;"><h3 style="font-family:Cormorant Garamond;font-size:20px;">${escapeHtml(p.name)}</h3><span class="badge badge-info">Step ${p.step||1}</span></div><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;"><div><div class="data-label">Facility Amount</div><div class="data-value" style="font-size:18px;">${formatCurrency(p.amount)}</div></div><div><div class="data-label">Funds Needed</div><div class="data-value" style="font-size:18px;">${formatCurrency(p.fundsNeeded)}</div></div><div><div class="data-label">Interest Rate</div><div>${p.interestRate || '—'}%</div></div><div><div class="data-label">Term</div><div>${p.term || '—'} years</div></div><div><div class="data-label">Grace Period</div><div>${p.gracePeriod || '—'} months</div></div></div></div></div>`).join('');
 }
 
-function renderStepAccordion() {
-  const container = document.getElementById('stepAccordionContainer');
-  if(!container || !currentProjectId) return;
-  const p = projects.find(x => x.id === currentProjectId);
-  if(!p) return;
-  const currentStep = p.step || 1;
-  let html = '';
-  for(let i = 1; i <= 9; i++) {
-    const isCompleted = p[`step${i}Completed`];
-    const isCurrent = i === currentStep;
-    const stepData = STEP_CONFIG[i];
-    const deadlineField = ['', 'termSheetExpiry', 'commitmentFeeDeadline', 'deedExpiry', 'ecfPolicyExpiry', '', '', '', ''][i-1];
-    const deadline = p[deadlineField];
-    let deadlineHtml = '';
-    if(deadline) {
-      const daysLeft = Math.ceil((new Date(deadline) - new Date()) / (1000 * 60 * 60 * 24));
-      deadlineHtml = `<div class="data-label" style="margin-top:8px;">Deadline: ${formatDate(deadline)} (${daysLeft} days)</div>`;
+function showView(viewName) {
+    const validViews = ['home', 'portal', 'admin', 'broker'];
+    if (!validViews.includes(viewName)) {
+        console.error('Invalid view:', viewName);
+        return;
     }
-    const requiredDocs = getRequiredDocsForStep(i);
-    const docsStatus = requiredDocs.map(doc => {
-      const uploaded = documents.some(d => d.projectId === currentProjectId && d.name.includes(doc));
-      const approved = documents.some(d => d.projectId === currentProjectId && d.name.includes(doc) && d.approved);
-      return `<div><span class="badge ${approved ? 'badge-success' : (uploaded ? 'badge-warning' : 'badge-neutral')}">${doc}</span></div>`;
-    }).join('');
-    html += `<div class="card" style="margin-bottom:12px;border-left:3px solid ${isCompleted ? 'var(--success)' : (isCurrent ? 'var(--blue)' : 'var(--gray-200)')}"><div class="card-header" style="cursor:pointer;" onclick="toggleStepAccordion(${i})"><div style="display:flex;justify-content:space-between;width:100%;align-items:center;"><div><span class="data-label">STEP ${i}</span><h4 style="margin:0;font-size:16px;">${STEP_NAMES[i]}</h4></div><div>${isCompleted ? '<span class="badge badge-success">Completed</span>' : (isCurrent ? '<span class="badge badge-info">In Progress</span>' : '<span class="badge badge-neutral">Locked</span>')}<i class="fas fa-chevron-down" style="margin-left:12px;"></i></div></div></div><div class="card-body step-content-${i}" style="display:${isCurrent ? 'block' : 'none'};">${deadlineHtml}<div class="form-grid-2" style="margin-bottom:16px;"><div><div class="data-label">Client Action</div><div>${stepData.clientAction}</div></div><div><div class="data-label">Croft Action</div><div>${stepData.croftAction}</div></div></div><div><div class="data-label">Required Documents</div><div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">${docsStatus || '<span class="badge badge-neutral">No specific documents required</span>'}</div></div>${isCompleted ? `<div class="data-label" style="margin-top:12px;">Completed: ${formatDate(p[`step${i}CompletedAt`])}</div>` : ''}</div></div>`;
-  }
-  container.innerHTML = html;
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    const targetView = document.getElementById(`view-${viewName}`);
+    if (targetView) {
+        targetView.classList.add('active');
+    } else {
+        console.error('View element not found:', viewName);
+    }
 }
 
-window.toggleStepAccordion = function(stepNum) {
-  const content = document.querySelector(`.step-content-${stepNum}`);
-  if(content) content.style.display = content.style.display === 'none' ? 'block' : 'none';
-};
+function renderStepAccordion() {
+    const container = document.getElementById('stepAccordionContainer');
+    if (!container) {
+        console.warn('Step accordion container not found');
+        return;
+    }
+    
+    if (!currentProjectId) {
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-tasks"></i><p>No active project found.</p></div>';
+        return;
+    }
+    
+    const p = projects.find(x => x.id === currentProjectId);
+    if (!p) {
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-tasks"></i><p>Project data not available.</p></div>';
+        return;
+    }
+    
+    const currentStep = p.step || 1;
+    let html = '';
+    
+    for (let i = 1; i <= 9; i++) {
+        const isCompleted = p[`step${i}Completed`];
+        const isCurrent = i === currentStep;
+        const stepData = STEP_CONFIG[i];
+        
+        // Get deadline for this step if applicable
+        const deadlineField = ['', 'termSheetExpiry', 'commitmentFeeDeadline', 'deedExpiry', '', '', 'ecfPolicyExpiry', '', ''][i];
+        const deadline = p[deadlineField];
+        let deadlineHtml = '';
+        
+        if (deadline) {
+            const daysLeft = Math.ceil((new Date(deadline) - new Date()) / (1000 * 60 * 60 * 24));
+            const statusClass = daysLeft < 0 ? 'expiry-danger' : (daysLeft < 7 ? 'expiry-warn' : 'expiry-ok');
+            deadlineHtml = `<div class="data-label" style="margin-top:8px;">Deadline: ${formatDate(deadline)} <span class="${statusClass}">(${Math.abs(daysLeft)} days ${daysLeft < 0 ? 'overdue' : 'remaining'})</span></div>`;
+        }
+        
+        const requiredDocs = getRequiredDocsForStep(i);
+        const docsStatus = requiredDocs.map(doc => {
+            const uploaded = documents.some(d => d.projectId === currentProjectId && d.name && d.name.includes(doc));
+            const approved = documents.some(d => d.projectId === currentProjectId && d.name && d.name.includes(doc) && d.approved);
+            return `<span class="badge ${approved ? 'badge-success' : (uploaded ? 'badge-warning' : 'badge-neutral')}" style="margin-right:4px;">${doc}</span>`;
+        }).join('');
+        
+        const statusBadge = isCompleted ? 
+            '<span class="badge badge-success">Completed ✓</span>' : 
+            (isCurrent ? '<span class="badge badge-info">In Progress</span>' : '<span class="badge badge-neutral">Locked</span>');
+        
+        html += `
+            <div class="card" style="margin-bottom:12px;border-left:3px solid ${isCompleted ? 'var(--success)' : (isCurrent ? 'var(--blue)' : 'var(--gray-200)')}">
+                <div class="card-header" style="cursor:pointer;" onclick="toggleStepAccordion(${i})">
+                    <div style="display:flex;justify-content:space-between;width:100%;align-items:center;">
+                        <div>
+                            <span class="data-label">STEP ${i}</span>
+                            <h4 style="margin:0;font-size:16px;">${STEP_NAMES[i]}</h4>
+                        </div>
+                        <div>${statusBadge} <i class="fas fa-chevron-down" style="margin-left:12px;"></i></div>
+                    </div>
+                </div>
+                <div class="card-body step-content-${i}" style="display:${isCurrent ? 'block' : 'none'};">
+                    ${deadlineHtml}
+                    <div class="form-grid-2" style="margin-bottom:16px;">
+                        <div>
+                            <div class="data-label">Your Action Required</div>
+                            <div style="font-size:13px;">${stepData.clientAction}</div>
+                        </div>
+                        <div>
+                            <div class="data-label">Croft Finance Action</div>
+                            <div style="font-size:13px;">${stepData.croftAction}</div>
+                        </div>
+                    </div>
+                    ${requiredDocs.length > 0 ? `
+                        <div>
+                            <div class="data-label">Required Documents</div>
+                            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">${docsStatus || '<span class="badge badge-neutral">No specific documents required</span>'}</div>
+                        </div>
+                    ` : ''}
+                    ${isCompleted ? `<div class="data-label" style="margin-top:12px;">Completed: ${formatDate(p[`step${i}CompletedAt`])}</div>` : ''}
+                    ${i === 3 && !isCompleted && p.commitmentFeeStatus !== 'paid' ? 
+                        `<button class="btn btn-primary btn-sm" style="margin-top:12px;" onclick="showWiringInstructions()">View Wiring Instructions</button>` : ''}
+                    ${i === 7 && !isCompleted && p.ecfStatus !== 'escrowed' ? 
+                        `<button class="btn btn-primary btn-sm" style="margin-top:12px;" onclick="showECFInstructions()">View ECF Instructions</button>` : ''}
+                </div>
+            </div>
+        `;
+    }
+    
+    container.innerHTML = html;
+}
+
+function toggleStepAccordion(stepNum) {
+    const content = document.querySelector(`.step-content-${stepNum}`);
+    if (content) {
+        const isHidden = content.style.display === 'none';
+        content.style.display = isHidden ? 'block' : 'none';
+        
+        // Rotate chevron icon
+        const header = content.previousElementSibling;
+        const chevron = header?.querySelector('.fa-chevron-down');
+        if (chevron) {
+            chevron.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+            chevron.style.transition = 'transform 0.2s';
+        }
+    }
+}
+
+function renderMilestoneProgress() {
+    const container = document.getElementById('milestoneProgress');
+    if (!container || !currentProjectId) return;
+    
+    const p = projects.find(x => x.id === currentProjectId);
+    if (!p) return;
+    
+    const milestones = [
+        { step: 2, name: 'Term Sheet Issued', key: 'step2Completed' },
+        { step: 3, name: 'Commitment Fee Paid', key: 'step3Completed' },
+        { step: 4, name: 'Deed Signed', key: 'step4Completed' },
+        { step: 5, name: 'Credit Support Complete', key: 'step5Completed' },
+        { step: 6, name: 'Hard Copies Submitted', key: 'step6Completed' },
+        { step: 7, name: 'ECF Escrowed', key: 'step7Completed' },
+        { step: 8, name: 'Transfer to Agent', key: 'step8Completed' },
+        { step: 9, name: 'Funded', key: 'step9Completed' }
+    ];
+    
+    let html = '<div style="display:flex;flex-direction:column;gap:12px;">';
+    
+    milestones.forEach((milestone, index) => {
+        const isCompleted = p[milestone.key];
+        const date = p[`${milestone.key}At`];
+        const isUpcoming = !isCompleted && index === 0;
+        
+        html += `
+            <div style="display:flex;align-items:center;gap:12px;">
+                <div style="width:32px;height:32px;border-radius:50%;background:${isCompleted ? 'var(--success)' : 'var(--gray-200)'};display:flex;align-items:center;justify-content:center;color:${isCompleted ? 'white' : 'var(--gray-400)'};">
+                    <i class="fas ${isCompleted ? 'fa-check' : (isUpcoming ? 'fa-hourglass-half' : 'fa-clock')}"></i>
+                </div>
+                <div style="flex:1;">
+                    <div style="font-weight:500;color:var(--navy);">${milestone.name}</div>
+                    ${date ? `<div class="data-label">Completed ${formatDate(date)}</div>` : 
+                      (milestone.step <= (p.step || 1) ? '<div class="data-label">Pending</div>' : '<div class="data-label">Upcoming</div>')}
+                </div>
+                ${isCompleted ? '<i class="fas fa-check-circle" style="color:var(--success);"></i>' : ''}
+            </div>
+            ${index < milestones.length - 1 ? '<div style="width:2px;height:16px;background:var(--gray-200);margin-left:16px;"></div>' : ''}
+        `;
+    });
+    
+    html += '</div>';
+    container.innerHTML = html;
+    container.style.display = 'block';
+}
+
+function updateMilestoneProgress() {
+    renderMilestoneProgress();
+}
 
 function loadClientActivityLog() {
-  const container = document.getElementById('activityTimeline');
-  if(!container || !currentClient) return;
-  db.collection('activityLog').where('actorId', '==', currentClient.id).orderBy('timestamp', 'desc').limit(50).get().then(snapshot => {
-    const logs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-    if (logs.length === 0) {
-      container.innerHTML = '<div class="empty-state"><i class="fas fa-history"></i><p>No recent activity</p></div>';
-      return;
+    const container = document.getElementById('activityTimeline');
+    if (!container || !currentClient) return;
+    
+    container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div><p>Loading activity...</p></div>';
+    
+    db.collection('activityLog')
+        .where('actorId', '==', currentClient.id)
+        .orderBy('timestamp', 'desc')
+        .limit(50)
+        .get()
+        .then(snapshot => {
+            const logs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+            
+            if (logs.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-history"></i><p>No recent activity. Your actions will appear here as you use the portal.</p></div>';
+                return;
+            }
+            
+            container.innerHTML = logs.map(l => {
+                let actionText = ACTION_LABELS[l.action] || l.action;
+                if (typeof actionText === 'function') {
+                    actionText = actionText(l.details || '');
+                }
+                
+                let iconClass = 'fa-user';
+                let dotClass = 'client';
+                if (l.actorRole === 'croft') {
+                    iconClass = 'fa-building';
+                    dotClass = 'croft';
+                } else if (l.action === 'cf_confirmed' || l.action === 'ecf_confirmed' || l.action === 'step_completed') {
+                    iconClass = 'fa-check';
+                    dotClass = 'completion';
+                }
+                
+                return `
+                    <div class="activity-item">
+                        <div class="activity-dot ${dotClass}">
+                            <i class="fas ${iconClass}"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-description">${escapeHtml(actionText)}</div>
+                            <div class="activity-time">${formatDateTime(l.timestamp)}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        })
+        .catch(error => {
+            console.error('Error loading activity log:', error);
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Unable to load activity log. Please try again later.</p></div>';
+        });
+}
+
+function updateClientNotificationBadge() {
+    // Count unread messages
+    const unreadMessages = messages.filter(m => m.sender === 'admin' && !m.read);
+    const unreadCount = unreadMessages.length;
+    
+    const badge = document.querySelector('#view-portal .nav-item[data-tab="messages"] .nav-badge');
+    if (badge) {
+        if (unreadCount > 0) {
+            badge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+            badge.classList.add('show');
+        } else {
+            badge.classList.remove('show');
+        }
     }
-    container.innerHTML = logs.map(l => {
-      let actionText = ACTION_LABELS[l.action] || l.action;
-      if(typeof actionText === 'function') actionText = actionText(l.details || '');
-      return `<div class="activity-item"><div class="activity-dot ${l.actorRole === 'client' ? 'client' : (l.action.includes('confirm') ? 'completion' : 'croft')}"><i class="fas ${l.actorRole === 'client' ? 'fa-user' : (l.action.includes('confirm') ? 'fa-check' : 'fa-building')}"></i></div><div class="activity-content"><div class="activity-description">${escapeHtml(actionText)}</div><div class="activity-time">${formatDateTime(l.timestamp)}</div></div></div>`;
-    }).join('');
-  });
 }
 
 function checkDeadlines() {
-  const p = projects.find(x => x.id === currentProjectId);
-  if(!p) return;
-  const container = document.getElementById('expiryBannersContainer');
-  if(!container) return;
-  const dismissed = JSON.parse(sessionStorage.getItem('dismissedDeadlines') || '{}');
-  const deadlines = [
-    { field: 'termSheetExpiry', name: 'Term Sheet', date: p.termSheetExpiry },
-    { field: 'commitmentFeeDeadline', name: 'Commitment Fee', date: p.commitmentFeeDeadline },
-    { field: 'deedExpiry', name: 'Deed of Undertaking', date: p.deedExpiry },
-    { field: 'ecfPolicyExpiry', name: 'ECF Policy', date: p.ecfPolicyExpiry }
-  ];
-  let banners = '';
-  for(const dl of deadlines) {
-    if(!dl.date || dismissed[dl.field]) continue;
-    const daysLeft = Math.ceil((new Date(dl.date) - new Date()) / (1000 * 60 * 60 * 24));
-    let color = '', icon = '';
-    if(daysLeft <= 2 && daysLeft >= 0) { color = 'danger'; icon = 'fa-exclamation-triangle'; }
-    else if(daysLeft <= 7 && daysLeft >= 0) { color = 'warning'; icon = 'fa-clock'; }
-    else if(daysLeft <= 14 && daysLeft >= 0) { color = 'info'; icon = 'fa-info-circle'; }
-    else continue;
-    banners += `<div class="action-banner expiry-alert-${color === 'danger' ? 'critical' : (color === 'warning' ? 'warning' : 'notice')}" style="display:flex;justify-content:space-between;"><div><i class="fas ${icon}"></i> <strong>${dl.name} expires in ${daysLeft} days</strong><br><span style="font-size:12px;">Please contact Suzana immediately.</span></div><div><button class="btn btn-ghost btn-sm" onclick="dismissDeadline('${dl.field}')">Dismiss</button><button class="btn btn-primary btn-sm" onclick="switchPortalTab('messages')">Message Suzana</button></div></div>`;
-  }
-  if (banners === '') {
-    container.innerHTML = '';
-  } else {
-    container.innerHTML = banners;
-  }
+    const p = projects.find(x => x.id === currentProjectId);
+    if (!p) return;
+    
+    const container = document.getElementById('expiryBannersContainer');
+    if (!container) return;
+    
+    // Check session storage for dismissed deadlines
+    let dismissed = {};
+    try {
+        dismissed = JSON.parse(sessionStorage.getItem('dismissedDeadlines') || '{}');
+    } catch(e) {
+        dismissed = {};
+    }
+    
+    const deadlines = [
+        { field: 'termSheetExpiry', name: 'Term Sheet', date: p.termSheetExpiry, step: 2 },
+        { field: 'commitmentFeeDeadline', name: 'Commitment Fee', date: p.commitmentFeeDeadline, step: 3 },
+        { field: 'deedExpiry', name: 'Deed of Undertaking', date: p.deedExpiry, step: 4 },
+        { field: 'ecfPolicyExpiry', name: 'ECF Policy', date: p.ecfPolicyExpiry, step: 7 }
+    ];
+    
+    let banners = '';
+    let hasActiveBanners = false;
+    
+    for (const dl of deadlines) {
+        // Skip if no date, dismissed, or step already completed
+        if (!dl.date || dismissed[dl.field]) continue;
+        if (p[`step${dl.step}Completed`]) continue;
+        
+        const daysLeft = Math.ceil((new Date(dl.date) - new Date()) / (1000 * 60 * 60 * 24));
+        let alertClass = '', icon = '', urgency = '';
+        
+        if (daysLeft <= 0) {
+            alertClass = 'expiry-alert-critical';
+            icon = 'fa-exclamation-triangle';
+            urgency = 'CRITICAL: ';
+        } else if (daysLeft <= 3) {
+            alertClass = 'expiry-alert-critical';
+            icon = 'fa-exclamation-triangle';
+            urgency = 'URGENT: ';
+        } else if (daysLeft <= 7) {
+            alertClass = 'expiry-alert-warning';
+            icon = 'fa-clock';
+            urgency = 'Warning: ';
+        } else if (daysLeft <= 14) {
+            alertClass = 'expiry-alert-notice';
+            icon = 'fa-info-circle';
+            urgency = 'Notice: ';
+        } else {
+            continue; // Not urgent enough to show
+        }
+        
+        hasActiveBanners = true;
+        banners += `
+            <div class="${alertClass}" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <i class="fas ${icon}" style="font-size:18px;${alertClass === 'expiry-alert-critical' ? 'color:var(--error)' : (alertClass === 'expiry-alert-warning' ? 'color:var(--warning)' : 'color:var(--info)')}"></i>
+                    <div>
+                        <strong>${urgency}${dl.name} ${daysLeft <= 0 ? 'has expired' : `expires in ${daysLeft} days`}</strong>
+                        <div style="font-size:12px;margin-top:4px;">Please contact Suzana immediately to discuss next steps.</div>
+                    </div>
+                </div>
+                <div>
+                    <button class="btn btn-secondary btn-sm" onclick="dismissDeadline('${dl.field}')" style="margin-right:8px;">Dismiss</button>
+                    <button class="btn btn-primary btn-sm" onclick="switchPortalTab('messages')">Message Suzana</button>
+                </div>
+            </div>
+        `;
+    }
+    
+    container.innerHTML = hasActiveBanners ? banners : '';
 }
 
-window.dismissDeadline = function(field) {
-  const dismissed = JSON.parse(sessionStorage.getItem('dismissedDeadlines') || '{}');
-  dismissed[field] = true;
-  sessionStorage.setItem('dismissedDeadlines', JSON.stringify(dismissed));
-  checkDeadlines();
-};
+function dismissDeadline(field) {
+    const dismissed = JSON.parse(sessionStorage.getItem('dismissedDeadlines') || '{}');
+    dismissed[field] = true;
+    sessionStorage.setItem('dismissedDeadlines', JSON.stringify(dismissed));
+    checkDeadlines();
+}
 
-window.printDealSummary = function() {
-  const p = projects.find(x => x.id === currentProjectId);
-  if(!p) return;
-  const printHtml = `<div style="max-width:800px;margin:0 auto;padding:40px;font-family:'Jost',sans-serif;"><div style="text-align:center;margin-bottom:40px;"><h1 style="font-family:'Cormorant Garamond',serif;font-size:36px;">CROFT FINANCE</h1><p style="color:var(--gray-500);">Private Structured Finance</p></div><div style="margin-bottom:30px;"><h2 style="font-family:'Cormorant Garamond',serif;font-size:24px;">Deal Summary</h2><p>Date: ${formatDate(new Date().toISOString())}</p></div><div class="form-grid-2"><div><strong>Borrower:</strong><br>${escapeHtml(currentClient.name)}<br>${escapeHtml(currentClient.email)}</div><div><strong>Project:</strong><br>${escapeHtml(p.name)}<br>${escapeHtml(p.industry)} | ${escapeHtml(p.location)}</div></div><hr style="margin:20px 0;"><div class="form-grid-2"><div><strong>Facility Amount:</strong><br>${formatCurrency(p.amount)}</div><div><strong>Funds Needed:</strong><br>${formatCurrency(p.fundsNeeded)}</div><div><strong>Interest Rate:</strong><br>${p.interestRate || '—'}%</div><div><strong>Term:</strong><br>${p.term || '—'} years</div><div><strong>Grace Period:</strong><br>${p.gracePeriod || '—'} months</div><div><strong>Closing Timeline:</strong><br>14–21 business days</div><div><strong>Governing Law:</strong><br>${p.governingLaw || 'England and Wales'}</div></div><hr style="margin:20px 0;"><div><strong>Capital Stack:</strong><br>Sponsor Equity: ${formatCurrency(p.sponsorEquity)}<br>Croft Finance: ${formatCurrency(p.amount)}</div><hr style="margin:20px 0;"><div><strong>Key Milestones:</strong><br>Target Close: ${formatDate(p.closeDate)}<br>Current Step: ${STEP_NAMES[p.step || 1]}</div><hr style="margin:20px 0;"><div style="text-align:center;margin-top:40px;"><p>For any questions, contact:</p><p><strong>Suzana Aleksić</strong><br>suzana.aleksic@croftfinance.com<br>+381 69 288 0 191</p></div></div>`;
-  const printWindow = window.open('', '_blank');
-  printWindow.document.write(`<html><head><title>Deal Summary - ${escapeHtml(p.name)}</title><style>body{font-family:'Jost',sans-serif;padding:40px;}.form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}hr{border:none;border-top:0.5px solid #ccc;}</style></head><body>${printHtml}</body></html>`);
-  printWindow.document.close();
-  printWindow.print();
-};
+function updateComparisonSelects() {
+    const sel1 = document.getElementById('compareProject1');
+    const sel2 = document.getElementById('compareProject2');
+    
+    if (!sel1 || !sel2) return;
+    
+    const activeProjects = projects.filter(p => p.status === 'active' && p.step >= 2);
+    
+    if (activeProjects.length === 0) {
+        sel1.innerHTML = '<option value="">No projects available</option>';
+        sel2.innerHTML = '<option value="">No projects available</option>';
+        return;
+    }
+    
+    const options = activeProjects.map(p => `<option value="${p.id}">${escapeHtml(p.name)} - ${formatCurrency(p.amount)}</option>`).join('');
+    sel1.innerHTML = '<option value="">Select Project 1</option>' + options;
+    sel2.innerHTML = '<option value="">Select Project 2</option>' + options;
+}
 
+function showECFInstructions() {
+    showToast('ECF escrow instructions will be sent to your email address. Please contact Suzana for immediate assistance.');
+}
+
+function updateBrokerDashboard() {
+    if (!currentBroker) return;
+    
+    const rate = currentBroker.commissionRate || 0;
+    const commRateEl = document.getElementById('brokerCommRate');
+    if (commRateEl) commRateEl.innerText = rate + '%';
+    
+    const myProjects = projects.filter(p => p.brokerId === currentBroker.id && p.status === 'active');
+    const pipelineProjects = myProjects.filter(p => (p.step || 1) < 9);
+    const fundedProjects = myProjects.filter(p => (p.step || 1) === 9);
+    
+    let pipelineCommission = 0, earnedCommission = 0;
+    
+    pipelineProjects.forEach(p => {
+        let amt = parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g, "")) || 0;
+        pipelineCommission += amt * (rate / 100);
+    });
+    
+    fundedProjects.forEach(p => {
+        let amt = parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g, "")) || 0;
+        earnedCommission += amt * (rate / 100);
+    });
+    
+    const pipelineEl = document.getElementById('brokerPipelineCommission');
+    if (pipelineEl) pipelineEl.innerHTML = formatCurrency(pipelineCommission);
+    
+    const earnedEl = document.getElementById('brokerEarnedCommission');
+    if (earnedEl) earnedEl.innerHTML = formatCurrency(earnedCommission);
+    
+    const activeEl = document.getElementById('brokerActiveDeals');
+    if (activeEl) activeEl.innerHTML = myProjects.length;
+    
+    const historyEl = document.getElementById('brokerCommissionHistory');
+    if (historyEl) {
+        if (fundedProjects.length === 0) {
+            historyEl.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-chart-line"></i><p>No funded deals yet. Submit deals to start earning commission.</p></td></tr>';
+            return;
+        }
+        
+        const historyHtml = fundedProjects.map(p => {
+            const client = clients.find(c => c.id === p.clientId);
+            const amt = parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g, "")) || 0;
+            return `
+                <tr>
+                    <td><strong>${escapeHtml(p.name)}</strong></td>
+                    <td>${escapeHtml(client?.name || 'Unknown')}</td>
+                    <td>${p.fundedDate ? formatDate(p.fundedDate) : '—'}</td>
+                    <td><strong>${formatCurrency(amt)}</strong></td>
+                    <td><strong>${rate}%</strong></td>
+                    <td><strong>${formatCurrency(amt * rate / 100)}</strong></td>
+                </tr>
+            `;
+        }).join('');
+        
+        historyEl.innerHTML = historyHtml;
+    }
+}
+
+function loadBrokerMessages() {
+    const cont = document.getElementById('brokerMessagesList');
+    if (!cont || !currentBroker) return;
+    
+    const msgs = brokerMessages.filter(m => m.brokerId === currentBroker.id).sort((a, b) => (a.timestamp?.seconds || 0) - (b.timestamp?.seconds || 0));
+    
+    if (msgs.length === 0) {
+        cont.innerHTML = '<div class="empty-state"><i class="fas fa-comments"></i><p>No messages yet. Send a message to Suzana to start a conversation.</p></div>';
+        return;
+    }
+    
+    cont.innerHTML = msgs.map(m => `
+        <div class="message ${m.sender === 'broker' ? 'client' : 'admin'}">
+            <div class="message-sender">
+                <span class="avatar">${m.sender === 'broker' ? (currentBroker.name?.charAt(0) || 'B') : 'S'}</span>
+                ${m.sender === 'broker' ? 'You' : 'Suzana Aleksić'}
+            </div>
+            <div class="message-bubble">${escapeHtml(m.content)}</div>
+            <div class="message-meta">${formatDateTime(m.timestamp)}</div>
+        </div>
+    `).join('');
+    
+    cont.scrollTop = cont.scrollHeight;
+}
+
+function sendBrokerMessage() {
+    const input = document.getElementById('brokerMessageInput');
+    const val = input?.value.trim();
+    if (!val) return;
+    
+    withLoading(null, async () => {
+        try {
+            await db.collection('brokerMessages').add({
+                brokerId: currentBroker.id,
+                content: val,
+                sender: 'broker',
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            // Send email notification
+            await sendEmailNotification({
+                to_name: 'Croft Finance Team',
+                to_email: EMAILJS_CONFIG.adminEmail,
+                from_name: 'Croft Finance',
+                subject: `New Message from Broker ${currentBroker.name}`,
+                message: val,
+                project_name: 'Broker Communication'
+            });
+            
+            if (input) input.value = '';
+            loadBrokerMessages();
+        } catch (e) {
+            showToast(e.message, true);
+        }
+    })();
+}
+
+// Add this to ensure all event listeners are properly set up
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize any missing event listeners
+    const quickActionBtns = document.querySelectorAll('.quick-action-btn');
+    quickActionBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const tab = this.dataset.tab;
+            if (tab) switchPortalTab(tab);
+        });
+    });
+    
+    // Set up notification settings save
+    const saveNotifBtn = document.querySelector('#tab-notifications .btn-primary');
+    if (saveNotifBtn) {
+        saveNotifBtn.addEventListener('click', saveNotificationSettings);
+    }
+    
+    // Load saved notification settings
+    const savedSettings = localStorage.getItem('notificationSettings');
+    if (savedSettings) {
+        try {
+            const settings = JSON.parse(savedSettings);
+            const dealUpdates = document.getElementById('notifyDealUpdates');
+            const docApproval = document.getElementById('notifyDocumentApproval');
+            const meetingReminders = document.getElementById('notifyMeetingReminders');
+            const deadlines = document.getElementById('notifyDeadlines');
+            
+            if (dealUpdates) dealUpdates.checked = settings.dealUpdates !== false;
+            if (docApproval) docApproval.checked = settings.documentApproval !== false;
+            if (meetingReminders) meetingReminders.checked = settings.meetingReminders !== false;
+            if (deadlines) deadlines.checked = settings.deadlines !== false;
+        } catch(e) {}
+    }
+});
+  
 // ============================================================
 // CLIENT MEETINGS
 // ============================================================
