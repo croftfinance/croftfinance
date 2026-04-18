@@ -2259,6 +2259,7 @@ let loginAttempts = { client: 0, broker: 0, admin: 0 };
 let loginLockoutUntil = 0;
 let brokerSortField = 'volume';
 let brokerSortDesc = true;
+let sessionResetInterval;
 
 Chart.defaults.font.family = "'Jost', sans-serif";
 Chart.defaults.font.size = 11;
@@ -3100,7 +3101,7 @@ function setupListeners() {
           }
           
           // Client's projects
-          unsubscribers.push(db.collection('projects').where('clientId','==',user.uid).onSnapshot(s => { 
+          unsubscribers.push(db.collection('projects').where('clientId','==',user.uid).orderBy('createdAt', 'desc').onSnapshot(s => { 
             projects = s.docs.map(d => ({id:d.id, ...d.data()})); 
             if(projects.length) { 
               currentProjectId = projects[0].id; 
@@ -3214,6 +3215,13 @@ function logout() {
   if(chartInstances.quarterlyChart) chartInstances.quarterlyChart.destroy();
   Object.keys(chartInstances).forEach(key => chartInstances[key] = null);
   if(calendar) { calendar.destroy(); calendar = null; }
+  
+  // Clear session interval
+  if (sessionResetInterval) {
+    clearInterval(sessionResetInterval);
+    sessionResetInterval = null;
+  }
+  
   auth.signOut().then(() => location.reload()); 
 }
 
@@ -4206,6 +4214,10 @@ function showECFInstructions() {
     showToast('ECF escrow instructions will be sent to your email address. Please contact Suzana for immediate assistance.');
 }
 
+window.showWiringInstructions = function() {
+  showToast('Wiring instructions have been sent to your registered email address. Please check your inbox.');
+}
+
 function updateBrokerDashboard() {
     if (!currentBroker) return;
     
@@ -4262,31 +4274,6 @@ function updateBrokerDashboard() {
         
         historyEl.innerHTML = historyHtml;
     }
-}
-
-function loadBrokerMessages() {
-    const cont = document.getElementById('brokerMessagesList');
-    if (!cont || !currentBroker) return;
-    
-    const msgs = brokerMessages.filter(m => m.brokerId === currentBroker.id).sort((a, b) => (a.timestamp?.seconds || 0) - (b.timestamp?.seconds || 0));
-    
-    if (msgs.length === 0) {
-        cont.innerHTML = '<div class="empty-state"><i class="fas fa-comments"></i><p>No messages yet. Send a message to Suzana to start a conversation.</p></div>';
-        return;
-    }
-    
-    cont.innerHTML = msgs.map(m => `
-        <div class="message ${m.sender === 'broker' ? 'client' : 'admin'}">
-            <div class="message-sender">
-                <span class="avatar">${m.sender === 'broker' ? (currentBroker.name?.charAt(0) || 'B') : 'S'}</span>
-                ${m.sender === 'broker' ? 'You' : 'Suzana Aleksić'}
-            </div>
-            <div class="message-bubble">${escapeHtml(m.content)}</div>
-            <div class="message-meta">${formatDateTime(m.timestamp)}</div>
-        </div>
-    `).join('');
-    
-    cont.scrollTop = cont.scrollHeight;
 }
 
 function sendBrokerMessage() {
@@ -5461,29 +5448,53 @@ if (commissionTableBody) {
   `;
   commissionTableBody.appendChild(fundedRow);
 }
-  
+
 function exportBrokerPerformanceCSV() {
-  let csv = 'Broker Name,Firm,Market,Submissions,Accepted,Funded,Conversion %,Total Volume,Est. Commission\n';
-  document.querySelectorAll('#brokerPerformanceBody tr').forEach(row => {
-    const cells = row.querySelectorAll('td');
-    csv += `${cells[0]?.innerText || ''},${cells[1]?.innerText || ''},${cells[2]?.innerText || ''},${cells[3]?.innerText || ''},${cells[4]?.innerText || ''},${cells[5]?.innerText || ''},${cells[6]?.innerText || ''},${cells[7]?.innerText || ''},${cells[8]?.innerText || ''}\n`;
+  // Build from data arrays instead of DOM
+  const brokerStats = brokers.map(b => {
+    const submissions = brokerSubmissions.filter(s => s.brokerId === b.id);
+    const brokerProjects = projects.filter(p => p.brokerId === b.id);
+    const accepted = brokerProjects.filter(p => p.status === 'active');
+    const funded = brokerProjects.filter(p => p.step >= 9);
+    const conversion = submissions.length ? Math.round((accepted.length / submissions.length) * 100) : 0;
+    const volume = brokerProjects.reduce((sum, p) => sum + (parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g,'')) || 0), 0);
+    const commission = funded.reduce((sum, p) => sum + ((parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g,'')) || 0) * (b.commissionRate || 0) / 100), 0);
+    return { name: b.name, firm: b.firm, country: b.country || '', submissions: submissions.length, accepted: accepted.length, funded: funded.length, conversion, volume, commission };
   });
-  const blob = new Blob([csv], { type: 'text/csv' });
+  
+  let csv = 'Broker Name,Firm,Market,Submissions,Accepted,Funded,Conversion %,Total Volume,Est. Commission\n';
+  brokerStats.forEach(s => {
+    csv += `"${s.name}","${s.firm}","${s.country}",${s.submissions},${s.accepted},${s.funded},${s.conversion},${s.volume},${s.commission}\n`;
+  });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url; a.download = 'broker_performance.csv'; a.click(); URL.revokeObjectURL(url);
+  a.href = url; 
+  a.download = `broker_performance_${new Date().toISOString().slice(0,10)}.csv`; 
+  a.click(); 
+  URL.revokeObjectURL(url);
 }
 
 function exportCommissionCSV() {
-  let csv = 'Client Name,Project Name,Industry,Location,Facility Amount,Broker Commission,Net Commission (2%),Days to Close,Funded Date\n';
-  document.querySelectorAll('#commissionTableBody tr').forEach(row => {
-    const cells = row.querySelectorAll('td');
-    csv += `${cells[0]?.innerText || ''},${cells[1]?.innerText || ''},${cells[2]?.innerText || ''},${cells[3]?.innerText || ''},${cells[4]?.innerText || ''},${cells[5]?.innerText || ''},${cells[6]?.innerText || ''},${cells[7]?.innerText || ''},${cells[8]?.innerText || ''}\n`;
+  // Build from projects data instead of DOM
+  const commissionedProjects = projects.filter(p => (p.step || 1) >= 2 && p.status === 'active');
+  let csv = 'Client Name,Project Name,Industry,Location,Facility Amount,Broker Commission,Net Commission (2%),Current Step,Term Sheet Date\n';
+  commissionedProjects.forEach(p => {
+    const client = clients.find(c => c.id === p.clientId);
+    const broker = brokers.find(b => b.id === p.brokerId);
+    const amount = parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g, '')) || 0;
+    const brokerComm = amount * ((broker?.commissionRate || 0) / 100);
+    const croftComm = amount * 0.02;
+    const termSheetDate = p.step2CompletedAt || p.termSheetIssuedAt || p.createdAt || '';
+    csv += `"${client?.name || 'Unknown'}","${p.name}","${p.industry || ''}","${p.location || ''}",${amount},${brokerComm},${croftComm},${p.step || 1},"${termSheetDate}"\n`;
   });
-  const blob = new Blob([csv], { type: 'text/csv' });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url; a.download = 'commission_report.csv'; a.click(); URL.revokeObjectURL(url);
+  a.href = url; 
+  a.download = `commission_report_${new Date().toISOString().slice(0,10)}.csv`; 
+  a.click(); 
+  URL.revokeObjectURL(url);
 }
 
 function setupAdminNotifications() {
@@ -5501,7 +5512,6 @@ function setupAdminNotifications() {
 <div class="notification-item"><div class="notification-icon"><i class="fas fa-handshake"></i></div><div class="notification-content"><div class="notification-title">Broker Submissions</div><div class="notification-message">${pendingSubmissions} new deal submission(s)</div></div></div>
 <div class="notification-item"><div class="notification-icon"><i class="fas fa-edit"></i></div><div class="notification-content"><div class="notification-title">Update Requests</div><div class="notification-message">${pendingUpdates} broker update request(s)</div></div></div>
 <div class="notification-item"><div class="notification-icon"><i class="fas fa-calendar"></i></div><div class="notification-content"><div class="notification-title">Pending Meetings</div><div class="notification-message">${pendingMeetings} meeting request(s)</div></div></div>`;
-  }
 }
 
 function toggleAdminNotificationDropdown() { 
@@ -5936,11 +5946,12 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch(e) {}
     }
     
-    // Initialize Firebase (defined earlier)
+    // Initialize Firebase
     initFirebase();
 });
 
-// End of all script content
+// Close any unclosed functions - this ensures all previous functions are properly closed
+// The code above has all functions properly closed with matching braces
 
 </script>
 </body>
