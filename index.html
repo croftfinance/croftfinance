@@ -2087,7 +2087,11 @@ function markDirty() {
 }
 
 function renderAll() {
-  // Individual render functions called from snapshot handlers
+  if (typeof renderAdminTables === 'function') renderAdminTables();
+  if (typeof renderAnalytics === 'function') renderAnalytics();
+  if (typeof renderPipeline === 'function') renderPipeline();
+  if (typeof renderBrokerPerformance === 'function') renderBrokerPerformance();
+  if (typeof renderInbox === 'function') renderInbox();
 }
 
 // Format number with commas
@@ -2438,7 +2442,7 @@ async function initFirebase() {
     document.addEventListener(evt, resetInactivity);
   });
   
-let sessionResetInterval = setInterval(function() {
+sessionResetInterval = setInterval(function() {
     const idle = Date.now() - lastActivity;
     if (idle > 25 * 60 * 1000 && !sessionWarningShown) {
       sessionWarningShown = true;
@@ -2586,7 +2590,7 @@ function renderCustomFields() {
   container.innerHTML = customFields.map(f => `<div class="note-card"><div><strong>${escapeHtml(f.name)}</strong> (${f.type})</div><button class="btn btn-danger btn-sm" onclick="deleteCustomField('${f.id}')">Delete</button></div>`).join('');
 }
 
-async function addWebhook() {
+window.addWebhook = async function() {
   const url = prompt('Webhook URL:');
   if(url) {
     try {
@@ -2597,7 +2601,7 @@ async function addWebhook() {
   }
 }
 
-async function deleteWebhook(id) {
+window.deleteWebhook = async function(id) {
   if (!confirmDelete('webhook')) return;
   try {
     await db.collection('webhooks').doc(id).delete();
@@ -2606,7 +2610,7 @@ async function deleteWebhook(id) {
   } catch(e) { showToast(e.message, true); }
 }
 
-async function addCustomField() {
+window.addCustomField = async function() {
   const name = prompt('Field name:');
   const type = prompt('Type (text/date/number):');
   if(name && type) {
@@ -2618,7 +2622,7 @@ async function addCustomField() {
   }
 }
 
-async function deleteCustomField(id) {
+window.deleteCustomField = async function(id) {
   if (!confirmDelete('custom field')) return;
   try {
     await db.collection('customFields').doc(id).delete();
@@ -2627,12 +2631,12 @@ async function deleteCustomField(id) {
   } catch(e) { showToast(e.message, true); }
 }
 
-function enable2FA() {
+window.enable2FA = function() {
   showToast('2FA would be enabled via authenticator app in production');
   document.getElementById('2faStatus').innerHTML = '2FA Enabled (Demo)';
 }
 
-function saveNotificationSettings() {
+window.saveNotificationSettings = function() {
   const settings = {
     dealUpdates: document.getElementById('notifyDealUpdates')?.checked,
     documentApproval: document.getElementById('notifyDocumentApproval')?.checked,
@@ -3083,6 +3087,7 @@ function setupListeners() {
         }));
         
         showView('admin');
+        loadSettings();
         updateAdminGreeting();
         const savedTab = restoreActiveTab('admin', 'overview');
         switchAdminTab(savedTab);
@@ -3363,7 +3368,7 @@ function updateComparisonSelects() {
   sel2.innerHTML = options;
 }
 
-function showComparisonModal() {
+window.showComparisonModal = function() {
   const id1 = document.getElementById('compareProject1').value;
   const id2 = document.getElementById('compareProject2').value;
   const p1 = projects.find(p => p.id === id1);
@@ -3381,8 +3386,8 @@ function showComparisonModal() {
       <tr><td>Step</td><td>${STEP_NAMES[p1.step]}</td><td>${STEP_NAMES[p2.step]}</td></tr>
       <tr><td>Industry</td><td>${escapeHtml(p1.industry)}</td><td>${escapeHtml(p2.industry)}</td></tr>
       <tr><td>Target Close</td><td>${formatDate(p1.closeDate)}</td><td>${formatDate(p2.closeDate)}</td></tr>
-      <tr><td>Broker</td><td>${escapeHtml(b1?.name)}</td><td>${escapeHtml(b2?.name)}</td></tr>
-     habil
+        <tr><td>Broker</td><td>${escapeHtml(b1?.name)}</td><td>${escapeHtml(b2?.name)}</td></tr>
+    </table>
   `;
   openModal('comparisonModal');
 }
@@ -3428,7 +3433,7 @@ function updateUpcomingDeadlines() {
 // ============================================================
 // EXPORT FUNCTIONS
 // ============================================================
-function exportPipelineToExcel() {
+window.exportPipelineToExcel = function() {
   try {
     const data = projects.map(p => ({
       Name: p.name,
@@ -3445,7 +3450,7 @@ function exportPipelineToExcel() {
   } catch(e) { showToast(e.message, true); }
 }
 
-function exportCommissionStatement() {
+window.exportCommissionStatement = function() {
   try {
     const funded = projects.filter(p => p.step === 9);
     const data = funded.map(p => ({
@@ -3463,7 +3468,7 @@ function exportCommissionStatement() {
   } catch(e) { showToast(e.message, true); }
 }
 
-function exportClientPortfolios() {
+window.exportClientPortfolios = function() {
   try {
     const data = clients.map(c => ({
       Name: c.name,
@@ -3479,7 +3484,7 @@ function exportClientPortfolios() {
   } catch(e) { showToast(e.message, true); }
 }
 
-function exportAuditLog() {
+window.exportAuditLog = function() {
   try {
     const data = activityLog.map(l => ({
       Time: formatDateTime(l.timestamp),
@@ -3508,7 +3513,7 @@ function renderAuditLog() {
   }).join('');
 }
 
-function generateBrokerStatement() {
+window.generateBrokerStatement = function() {
   const brokerId = document.getElementById('brokerStatementSelect').value;
   const broker = brokers.find(b => b.id === brokerId);
   if(!broker) return;
@@ -3525,11 +3530,16 @@ function generateBrokerStatement() {
     html += `<tr><td colspan="3" class="empty-state">No funded projects yet</td></tr>`;
   }
   html += `<tr><td><strong>Total</strong></td><td></td><td><strong>${formatCurrency(total)}</strong></td></tr></tbody></table>`;
-  document.getElementById('statementContent').innerHTML = html;
-  openModal('statementModal');
+  const previewDiv = document.getElementById('brokerStatementPreview');
+  if (previewDiv) {
+    previewDiv.innerHTML = html;
+  } else {
+    document.getElementById('statementContent').innerHTML = html;
+    openModal('statementModal');
+  }
 }
 
-function renderBrokerLeaderboard() {
+window.renderBrokerLeaderboard = function() {
   const stats = brokers.map(b => ({
     name: b.name,
     funded: projects.filter(p => p.brokerId === b.id && p.step === 9).length,
@@ -3974,7 +3984,7 @@ function renderStepAccordion() {
     container.innerHTML = html;
 }
 
-function toggleStepAccordion(stepNum) {
+window.toggleStepAccordion = function(stepNum) {
     const content = document.querySelector(`.step-content-${stepNum}`);
     if (content) {
         const isHidden = content.style.display === 'none';
@@ -4184,7 +4194,7 @@ function checkDeadlines() {
     container.innerHTML = hasActiveBanners ? banners : '';
 }
 
-function dismissDeadline(field) {
+window.dismissDeadline = function(field) {
     const dismissed = JSON.parse(sessionStorage.getItem('dismissedDeadlines') || '{}');
     dismissed[field] = true;
     sessionStorage.setItem('dismissedDeadlines', JSON.stringify(dismissed));
@@ -4218,94 +4228,8 @@ window.showWiringInstructions = function() {
   showToast('Wiring instructions have been sent to your registered email address. Please check your inbox.');
 }
 
-function updateBrokerDashboard() {
-    if (!currentBroker) return;
-    
-    const rate = currentBroker.commissionRate || 0;
-    const commRateEl = document.getElementById('brokerCommRate');
-    if (commRateEl) commRateEl.innerText = rate + '%';
-    
-    const myProjects = projects.filter(p => p.brokerId === currentBroker.id && p.status === 'active');
-    const pipelineProjects = myProjects.filter(p => (p.step || 1) < 9);
-    const fundedProjects = myProjects.filter(p => (p.step || 1) === 9);
-    
-    let pipelineCommission = 0, earnedCommission = 0;
-    
-    pipelineProjects.forEach(p => {
-        let amt = parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g, "")) || 0;
-        pipelineCommission += amt * (rate / 100);
-    });
-    
-    fundedProjects.forEach(p => {
-        let amt = parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g, "")) || 0;
-        earnedCommission += amt * (rate / 100);
-    });
-    
-    const pipelineEl = document.getElementById('brokerPipelineCommission');
-    if (pipelineEl) pipelineEl.innerHTML = formatCurrency(pipelineCommission);
-    
-    const earnedEl = document.getElementById('brokerEarnedCommission');
-    if (earnedEl) earnedEl.innerHTML = formatCurrency(earnedCommission);
-    
-    const activeEl = document.getElementById('brokerActiveDeals');
-    if (activeEl) activeEl.innerHTML = myProjects.length;
-    
-    const historyEl = document.getElementById('brokerCommissionHistory');
-    if (historyEl) {
-        if (fundedProjects.length === 0) {
-            historyEl.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-chart-line"></i><p>No funded deals yet. Submit deals to start earning commission.</p></td></tr>';
-            return;
-        }
-        
-        const historyHtml = fundedProjects.map(p => {
-            const client = clients.find(c => c.id === p.clientId);
-            const amt = parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g, "")) || 0;
-            return `
-                <tr>
-                    <td><strong>${escapeHtml(p.name)}</strong></td>
-                    <td>${escapeHtml(client?.name || 'Unknown')}</td>
-                    <td>${p.fundedDate ? formatDate(p.fundedDate) : '—'}</td>
-                    <td><strong>${formatCurrency(amt)}</strong></td>
-                    <td><strong>${rate}%</strong></td>
-                    <td><strong>${formatCurrency(amt * rate / 100)}</strong></td>
-                </tr>
-            `;
-        }).join('');
-        
-        historyEl.innerHTML = historyHtml;
-    }
-}
-
-function sendBrokerMessage() {
-    const input = document.getElementById('brokerMessageInput');
-    const val = input?.value.trim();
-    if (!val) return;
-    
-    withLoading(null, async () => {
-        try {
-            await db.collection('brokerMessages').add({
-                brokerId: currentBroker.id,
-                content: val,
-                sender: 'broker',
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            
-            // Send email notification
-            await sendEmailNotification({
-                to_name: 'Croft Finance Team',
-                to_email: EMAILJS_CONFIG.adminEmail,
-                from_name: 'Croft Finance',
-                subject: `New Message from Broker ${currentBroker.name}`,
-                message: val,
-                project_name: 'Broker Communication'
-            });
-            
-            if (input) input.value = '';
-            loadBrokerMessages();
-        } catch (e) {
-            showToast(e.message, true);
-        }
-    })();
+window.printDealSummary = function() {
+  window.print();
 }
 
 // Add this to ensure all event listeners are properly set up
@@ -4341,6 +4265,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (deadlines) deadlines.checked = settings.deadlines !== false;
         } catch(e) {}
     }
+    
+    initFirebase();
 });
   
 // ============================================================
@@ -4567,10 +4493,16 @@ function loadBrokerMessages() {
 
 window.sendBrokerMessage = async function() {
   const input = document.getElementById('brokerMessageInput');
-  const val = input.value.trim();
+  const val = input?.value.trim();
   if(!val) return;
+  
   try {
-    await db.collection('brokerMessages').add({ brokerId: currentBroker.id, content: val, sender: 'broker', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+    await db.collection('brokerMessages').add({
+      brokerId: currentBroker.id,
+      content: val,
+      sender: 'broker',
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
     
     await sendEmailNotification({
       to_name: 'Croft Finance Team',
@@ -4582,8 +4514,11 @@ window.sendBrokerMessage = async function() {
     });
     
     input.value = '';
-  } catch(e) { showToast(e.message, true); }
-};
+    loadBrokerMessages();
+  } catch(e) { 
+    showToast(e.message, true); 
+  }
+}
 
 // ============================================================
 // ADMIN PORTAL FUNCTIONS
@@ -4851,7 +4786,7 @@ function renderAdminTables() {
   if(el3) el3.innerHTML = projects.filter(p => (p.step||1) === 1 && p.status === 'active').length;
 }
 
-function editClientProject(clientId) { const p = projects.find(x => x.clientId === clientId); if(p) editProject(p.id); else showToast('No project found', true); }
+window.editClientProject = function(clientId) { const p = projects.find(x => x.clientId === clientId); if(p) editProject(p.id); else showToast('No project found', true); }
 
 function renderPipeline() {
   const boardDiv = document.getElementById('pipelineBoard');
@@ -4999,23 +4934,31 @@ function renderBrokerAdminTable() {
       </tr>`;
   }).join('');
   patchTable('adminBrokersTable', newRowsHtml);
+  // Populate broker statement select dropdown
+const brokerSelect = document.getElementById('brokerStatementSelect');
+if (brokerSelect) {
+  brokerSelect.innerHTML = '<option value="">Select Broker</option>' + 
+    brokers.filter(b => b.status === 'active').map(b => 
+      `<option value="${b.id}">${escapeHtml(b.name)} (${b.commissionRate || 0}%)</option>`
+    ).join('');
+}
   const requestsDiv = document.getElementById('brokerUpdateRequestsList');
   if(requestsDiv) {
     const pending = brokerUpdateRequests.filter(r => r.status === 'pending');
     if (pending.length === 0) {
       requestsDiv.innerHTML = '<div class="empty-state"><i class="fas fa-check-circle"></i><p>No pending update requests</p></div>';
-      return;
-    }
+    } else {
     requestsDiv.innerHTML = pending.map(r => {
       const broker = brokers.find(b => b.id === r.brokerId);
       const project = projects.find(p => p.id === r.projectId);
       return `<div class="card" style="margin-bottom:12px;"><div class="card-body"><div><strong>${escapeHtml(broker?.name || 'Unknown')}</strong> requested update for <strong>${escapeHtml(project?.name || 'Unknown')}</strong></div><div class="note-card" style="margin:12px 0;"><div class="note-card-label">Requested Changes</div><div class="note-card-text">${escapeHtml(r.requestedChanges)}</div></div><div><button class="btn btn-success btn-sm" onclick="approveBrokerUpdate('${r.id}')">Approve & Apply</button><button class="btn btn-danger btn-sm" onclick="rejectBrokerUpdate('${r.id}')">Reject</button></div></div></div>`;
     }).join('');
+    }
   }
 }
 
 // MISSING FUNCTIONS: Broker update handling
-async function approveBrokerUpdate(requestId) {
+window.approveBrokerUpdate = async function(requestId) {
   const request = brokerUpdateRequests.find(r => r.id === requestId);
   if (!request) return;
   if (!confirmDelete('approve this broker update')) return;
@@ -5035,7 +4978,7 @@ async function approveBrokerUpdate(requestId) {
   } catch(e) { showToast(e.message, true); }
 }
 
-async function rejectBrokerUpdate(requestId) {
+window.rejectBrokerUpdate = async function(requestId) {
   if (!confirmDelete('reject this broker update')) return;
   try {
     await db.collection('brokerUpdateRequests').doc(requestId).update({
@@ -5049,7 +4992,7 @@ async function rejectBrokerUpdate(requestId) {
 }
 
 // MISSING FUNCTION: Update broker engagement
-async function updateBrokerEngagement(brokerId, status) {
+window.updateBrokerEngagement = async function(brokerId, status) {
   try {
     await db.collection('brokers').doc(brokerId).update({ engagementStatus: status });
     showToast(`Engagement status updated to ${status}`);
@@ -5058,7 +5001,7 @@ async function updateBrokerEngagement(brokerId, status) {
 }
 
 // MISSING FUNCTION: Set broker commission
-async function setBrokerCommission(brokerId) {
+window.setBrokerCommission = async function(brokerId) {
   const rate = prompt('Enter commission percentage (e.g., 1.5 for 1.5%):');
   if (rate && !isNaN(parseFloat(rate))) {
     try {
@@ -5097,7 +5040,7 @@ function renderSubmissionsTable() {
 }
 
 // MISSING FUNCTION: View submission detail
-function viewSubmissionDetail(submissionId) {
+window.viewSubmissionDetail = function(submissionId) {
   const s = brokerSubmissions.find(x => x.id === submissionId);
   if (!s) return;
   const panel = document.getElementById('submissionDetailPanel');
@@ -5106,7 +5049,7 @@ function viewSubmissionDetail(submissionId) {
   panel.scrollIntoView({ behavior: 'smooth' });
 }
 
-async function acceptSubmission(submissionId) {
+window.acceptSubmission = async function(submissionId) {
   try {
     await db.collection('brokerSubmissions').doc(submissionId).update({ status: 'accepted' });
     showToast('Submission accepted');
@@ -5115,7 +5058,7 @@ async function acceptSubmission(submissionId) {
   } catch(e) { showToast(e.message, true); }
 }
 
-async function rejectSubmission(submissionId) {
+window.rejectSubmission = async function(submissionId) {
   try {
     await db.collection('brokerSubmissions').doc(submissionId).update({ status: 'rejected' });
     showToast('Submission rejected');
@@ -5151,7 +5094,7 @@ function renderAdminDocumentsTable() {
 }
 
 // MISSING FUNCTION: Toggle document approval
-async function toggleDocumentApproval(docId, currentStatus) {
+window.toggleDocumentApproval = async function(docId, currentStatus) {
   try {
     await db.collection('documents').doc(docId).update({ approved: !currentStatus });
     showToast(currentStatus ? 'Document approval revoked' : 'Document approved');
@@ -5159,7 +5102,7 @@ async function toggleDocumentApproval(docId, currentStatus) {
   } catch(e) { showToast(e.message, true); }
 }
 
-async function deleteDoc(id) { 
+window.deleteDoc = async function(id) {
   if (!confirmDelete('document')) return;
   try {
     await db.collection('documents').doc(id).delete(); 
@@ -5167,7 +5110,7 @@ async function deleteDoc(id) {
   } catch(e) { showToast(e.message, true); }
 }
 
-async function deleteBroker(id) { 
+window.deleteBroker = async function(id) {
   if (!confirmDelete('broker')) return;
   try {
     await db.collection('brokers').doc(id).delete(); 
@@ -5193,7 +5136,7 @@ function renderMeetings() {
   patchTable('meetingsTableBody', newRowsHtml);
 }
 
-async function updateMeetingStatus(id, status) { 
+window.updateMeetingStatus = async function(id, status) {
   try {
     await db.collection('meetings').doc(id).update({ status }); 
     showToast(`Meeting ${status}`);
@@ -5202,7 +5145,7 @@ async function updateMeetingStatus(id, status) {
 }
 
 // MISSING FUNCTION: Delete meeting
-async function deleteMeeting(id) { 
+window.deleteMeeting = async function(id) {
   if (!confirmDelete('meeting')) return;
   try {
     await db.collection('meetings').doc(id).delete(); 
@@ -5211,7 +5154,7 @@ async function deleteMeeting(id) {
   } catch(e) { showToast(e.message, true); }
 }
 
-function showScheduleMeetingModal() {
+window.showScheduleMeetingModal = function() {
   const clientSelect = document.getElementById('meetingClientId');
   if(clientSelect) clientSelect.innerHTML = '<option value="">Select Client</option>' + clients.filter(c => c.status === 'active').map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
   document.getElementById('meetingDate').value = new Date().toISOString().split('T')[0];
@@ -5219,7 +5162,7 @@ function showScheduleMeetingModal() {
   openModal('scheduleMeetingModal');
 }
 
-async function createMeeting() {
+window.createMeeting = async function() {
   const clientId = document.getElementById('meetingClientId').value;
   const date = document.getElementById('meetingDate').value;
   const time = document.getElementById('meetingTime').value;
@@ -5278,13 +5221,13 @@ function renderInbox() {
 }
 
 // MISSING FUNCTION: Toggle inbox thread
-function toggleInboxThread(element) {
+window.toggleInboxThread = function(element) {
   const body = element.nextElementSibling;
   if (body) body.style.display = body.style.display === 'none' ? 'block' : 'none';
 }
 
 // MISSING FUNCTION: Send inbox reply
-async function sendInboxReply(recipientId, type) {
+window.sendInboxReply = async function(recipientId, type) {
   const input = document.getElementById(`reply_${recipientId}_${type}`);
   const message = input?.value.trim();
   if (!message) return;
@@ -5494,10 +5437,11 @@ if (commissionTableBody) {
     <td colspan="4"></td>
   `;
   commissionTableBody.appendChild(fundedRow);
+  }
 }
 }
-  
-function exportBrokerPerformanceCSV() {
+
+window.exportBrokerPerformanceCSV = function exportBrokerPerformanceCSV() {
   // Build from data arrays instead of DOM
   const brokerStats = brokers.map(b => {
     const submissions = brokerSubmissions.filter(s => s.brokerId === b.id);
@@ -5523,7 +5467,7 @@ function exportBrokerPerformanceCSV() {
   URL.revokeObjectURL(url);
 }
 
-function exportCommissionCSV() {
+window.exportCommissionCSV = function exportCommissionCSV() {
   // Build from projects data instead of DOM
   const commissionedProjects = projects.filter(p => (p.step || 1) >= 2 && p.status === 'active');
   let csv = 'Client Name,Project Name,Industry,Location,Facility Amount,Broker Commission,Net Commission (2%),Current Step,Term Sheet Date\n';
@@ -5545,7 +5489,7 @@ function exportCommissionCSV() {
   URL.revokeObjectURL(url);
 }
 
-function setupAdminNotifications() {
+window.setupAdminNotifications = function setupAdminNotifications() {
   let unreadCount = 0;
   const pendingClients = clients.filter(c => c.status === 'pending').length;
   const pendingUpdates = brokerUpdateRequests.filter(r => r.status === 'pending').length;
@@ -5563,12 +5507,12 @@ function setupAdminNotifications() {
   }
 }
 
-function toggleAdminNotificationDropdown() { 
+window.toggleAdminNotificationDropdown = function() { 
   const d = document.getElementById('adminNotificationDropdown'); 
   if(d) d.classList.toggle('open'); 
 }
 
-function closeAdminNotificationDropdown() { 
+window.closeAdminNotificationDropdown = function() { 
   const d = document.getElementById('adminNotificationDropdown'); 
   if(d) d.classList.remove('open'); 
 }
@@ -5595,7 +5539,7 @@ function renderStepDashboard(project) {
 }
 
 // MISSING FUNCTIONS: Step management
-async function approveMandateReview(projectId) {
+window.approveMandateReview = async function(projectId) {
   if (!confirm('Are you sure you want to approve this mandate? This will advance the deal to Step 2.')) return;
   try {
     await db.collection('projects').doc(projectId).update({
@@ -5621,7 +5565,7 @@ async function approveMandateReview(projectId) {
   } catch(e) { showToast(e.message, true); }
 }
 
-async function rejectMandateReview(projectId) {
+window.rejectMandateReview = async function(projectId) {
   if (!confirm('Are you sure you want to decline this mandate? This will mark the project as declined.')) return;
   try {
     await db.collection('projects').doc(projectId).update({ status: 'declined', declinedAt: new Date().toISOString() });
@@ -5643,7 +5587,7 @@ async function rejectMandateReview(projectId) {
   } catch(e) { showToast(e.message, true); }
 }
 
-async function revertStepStatus(projectId, stepNumber) {
+window.revertStepStatus = async function(projectId, stepNumber) {
   const project = projects.find(p => p.id === projectId);
   if(!project) return;
   if (!confirm(`Are you sure you want to revert Step ${stepNumber}?`)) return;
@@ -5662,7 +5606,7 @@ async function revertStepStatus(projectId, stepNumber) {
   } catch(e) { showToast(e.message, true); }
 }
 
-async function markStepCompleted(projectId, stepNumber) {
+window.markStepCompleted = async function(projectId, stepNumber) {
   const project = projects.find(p => p.id === projectId);
   if(!project) return;
   if(stepNumber===3) { showCommitmentFeeModal(projectId); return; }
@@ -5682,7 +5626,7 @@ async function markStepCompleted(projectId, stepNumber) {
   } catch(e) { showToast(e.message, true); }
 }
 
-function showCommitmentFeeModal(projectId) {
+window.showCommitmentFeeModal = function(projectId) {
   document.getElementById('feeDate').value = new Date().toISOString().split('T')[0];
   document.getElementById('feeAmount').value = '';
   document.getElementById('feeReference').value = '';
@@ -5690,7 +5634,7 @@ function showCommitmentFeeModal(projectId) {
   openModal('commitmentFeeModal');
 }
 
-function showECFEscrowModal(projectId) {
+window.showECFEscrowModal = function(projectId) {
   document.getElementById('ecfDate').value = new Date().toISOString().split('T')[0];
   document.getElementById('ecfAmount').value = '';
   document.getElementById('ecfInstitution').value = '';
@@ -5699,7 +5643,7 @@ function showECFEscrowModal(projectId) {
   openModal('ecfEscrowModal');
 }
 
-async function confirmCommitmentFee(projectId) {
+window.confirmCommitmentFee = async function(projectId) {
   const amount = document.getElementById('feeAmount')?.value;
   const reference = document.getElementById('feeReference')?.value;
   if(!amount || !reference) return showToast('Enter amount and reference', true);
@@ -5730,7 +5674,7 @@ async function confirmCommitmentFee(projectId) {
   } catch(e) { showToast(e.message, true); }
 }
 
-async function confirmECFEscrow(projectId) {
+window.confirmECFEscrow = async function(projectId) {
   const amount = document.getElementById('ecfAmount')?.value;
   const institution = document.getElementById('ecfInstitution')?.value;
   if(!amount || !institution) return showToast('Enter amount and institution', true);
@@ -5761,7 +5705,7 @@ async function confirmECFEscrow(projectId) {
   } catch(e) { showToast(e.message, true); }
 }
 
-function editProject(pid) {
+window.editProject = function(pid) {
   if(!pid) return showToast('No project attached', true);
   const p = projects.find(x => x.id === pid);
   if(!p) return;
@@ -5825,7 +5769,7 @@ function editProject(pid) {
   openModal('editProjectModal');
 }
 
-async function saveProjectInfo() {
+window.saveProjectInfo = async function() {
   const pid = editProjectId;
   const p = projects.find(x => x.id === pid);
   if(!p) return;
@@ -5859,8 +5803,8 @@ async function saveProjectInfo() {
   } catch(e) { showToast(e.message, true); }
 }
 
-function showAddClientModal() { openModal('addClientModal'); }
-async function createClient() {
+window.showAddClientModal = function() { openModal('addClientModal'); }
+window.createClient = async function() {
   const name = document.getElementById('ncName').value.trim();
   const email = document.getElementById('ncEmail').value.trim().toLowerCase();
   const password = document.getElementById('ncPassword').value;
@@ -5877,7 +5821,7 @@ async function createClient() {
   } catch(e) { showToast(e.message, true); }
 }
 
-async function deleteProject(id) {
+window.deleteProject = async function(id) {
   if (!confirmDelete('project')) return;
   try {
     const projectDocs = documents.filter(d => d.projectId === id);
@@ -5887,7 +5831,7 @@ async function deleteProject(id) {
   } catch(e) { showToast(e.message, true); }
 }
 
-async function deleteClient(id) {
+window.deleteClient = async function(id) {
   if (!confirmDelete('client')) return;
   try {
     const clientProjects = projects.filter(p => p.clientId === id);
@@ -5903,7 +5847,7 @@ async function deleteClient(id) {
   } catch(e) { showToast(e.message, true); }
 }
 
-async function adminUploadDocument() {
+window.adminUploadDocument = async function() {
   const clientId = document.getElementById('uploadClientId').value;
   const projectId = document.getElementById('uploadProjectId').value;
   const docType = document.getElementById('documentType').value;
@@ -5922,7 +5866,7 @@ async function adminUploadDocument() {
   } catch(e) { showToast(e.message, true); }
 }
 
-async function submitContactForm(e) {
+window.submitContactForm = async function(e) {
   e.preventDefault();
   try {
     await db.collection('contactRequests').add({
@@ -5961,46 +5905,6 @@ if(localStorage.getItem('darkMode') === 'true') document.body.classList.add('dar
 updatePasswordStrengthMeter('regPassword', '#registerForm .strength-segment', '#registerForm .strength-hint');
 updatePasswordStrengthMeter('brokerRegPassword', '#brokerRegisterForm .strength-segment', '#brokerRegisterForm .strength-hint');
 
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize any missing event listeners
-    const quickActionBtns = document.querySelectorAll('.quick-action-btn');
-    quickActionBtns.forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            var tab = this.dataset.tab;
-            if (tab) switchPortalTab(tab);
-        });
-    });
-    
-    // Set up notification settings save
-    var saveNotifBtn = document.querySelector('#tab-notifications .btn-primary');
-    if (saveNotifBtn) {
-        saveNotifBtn.addEventListener('click', saveNotificationSettings);
-    }
-    
-    // Load saved notification settings
-    var savedSettings = localStorage.getItem('notificationSettings');
-    if (savedSettings) {
-        try {
-            var settings = JSON.parse(savedSettings);
-            var dealUpdates = document.getElementById('notifyDealUpdates');
-            var docApproval = document.getElementById('notifyDocumentApproval');
-            var meetingReminders = document.getElementById('notifyMeetingReminders');
-            var deadlines = document.getElementById('notifyDeadlines');
-            
-            if (dealUpdates) dealUpdates.checked = settings.dealUpdates !== false;
-            if (docApproval) docApproval.checked = settings.documentApproval !== false;
-            if (meetingReminders) meetingReminders.checked = settings.meetingReminders !== false;
-            if (deadlines) deadlines.checked = settings.deadlines !== false;
-        } catch(e) {}
-    }
-    
-    // Initialize Firebase
-    initFirebase();
-});
-
-// Close any unclosed functions - this ensures all previous functions are properly closed
-// The code above has all functions properly closed with matching braces
-
+</script>
 </body>
 </html>
