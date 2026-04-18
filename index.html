@@ -2636,7 +2636,7 @@ window.enable2FA = function() {
   document.getElementById('2faStatus').innerHTML = '2FA Enabled (Demo)';
 }
 
-window.saveNotificationSettings = function() {
+function saveNotificationSettings() {
   const settings = {
     dealUpdates: document.getElementById('notifyDealUpdates')?.checked,
     documentApproval: document.getElementById('notifyDocumentApproval')?.checked,
