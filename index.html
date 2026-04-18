@@ -4907,7 +4907,7 @@ function renderPipeline() {
     listDiv.innerHTML = `<div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Project</th><th>Stage</th><th>Step</th><th>Amount</th><th>Days in Step</th><th>Target Close</th><th>Days to Close</th><th>Broker</th><th>CF</th><th>ECF</th></thead><tbody>${projects.filter(p => p.status === 'active' || p.status === 'crm_only').map(p => {`
       const c = clients.find(cl => cl.id === p.clientId);
       const broker = brokers.find(b => b.id === p.brokerId);
-      const daysInStep = p[`step${p.step||1}At`] ? Math.floor((new Date() - new Date(p[`step${p.step||1}At`])) / (1000*60*60*24)) : '—';
+      const daysInStep = p[`step${p.step||1}CompletedAt`] ? Math.floor((new Date() - new Date(p[`step${p.step||1}CompletedAt`])) / (1000*60*60*24)) : '—';
       let daysToClose = '—', daysClass = '';
       if(p.closeDate) {
         const diff = Math.ceil((new Date(p.closeDate) - new Date()) / (1000*60*60*24));
