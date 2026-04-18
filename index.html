@@ -4770,7 +4770,7 @@ function updateProjectSelectForUpload(clientId) {
 function renderDealHealthSummary() {
   const el = document.getElementById('dealHealthSummary');
   if(!el) return;
-  const active = projects.filter(p => p.status === 'active');
+  const active = projects.filter(p => p.status === 'active' || p.status === 'crm_only');
   const overdue = active.filter(p => p.closeDate && Math.ceil((new Date(p.closeDate) - new Date()) / (1000*60*60*24)) < 0);
   const urgent = active.filter(p => p.closeDate && Math.ceil((new Date(p.closeDate) - new Date()) / (1000*60*60*24)) >= 0 && Math.ceil((new Date(p.closeDate) - new Date()) / (1000*60*60*24)) < 14);
   const onTrack = active.filter(p => !p.closeDate || Math.ceil((new Date(p.closeDate) - new Date()) / (1000*60*60*24)) >= 14);
@@ -4804,7 +4804,7 @@ function renderAdminTables() {
         <td><strong>${escapeHtml(c.name)}</strong></td>
         <td>${escapeHtml(c.email)}</div></td>
         <td>${projectCount}</div></td>
-        <td><span class="badge ${c.status === 'active' ? 'badge-success' : (c.status === 'pending' ? 'badge-warning' : 'badge-danger')}">${c.status}</span></td>
+        <td><span class="badge ${c.status === 'active' ? 'badge-success' : (c.status === 'pending' ? 'badge-warning' : (c.status === 'crm_only' ? 'badge-info' : 'badge-danger'))}">${c.status === 'crm_only' ? 'CRM' : c.status}</span></td>
         <td><input type="text" class="form-input" style="font-size:11px;padding:4px 8px;" placeholder="Add note..." value="${escapeHtml(c.adminNote || '')}" onblur="saveClientNote('${c.id}', this.value)"></td>
         <td>${c.createdAt ? c.createdAt.split('T')[0] : '—'}</div></td>
         <td>
@@ -4866,7 +4866,7 @@ function renderPipeline() {
       { name: 'Funded', steps: [9] }
     ];
     boardDiv.innerHTML = stages.map(stage => {
-      const stageProjects = projects.filter(p => stage.steps.includes(p.step || 1) && p.status === 'active');
+      const stageProjects = projects.filter(p => stage.steps.includes(p.step || 1) && (p.status === 'active' || p.status === 'crm_only'));
       return `<div class="pipeline-col">
         <div class="pipeline-col-header">
           <div class="pipeline-col-title">${stage.name}</div>
@@ -4904,7 +4904,7 @@ function renderPipeline() {
   } else {
     boardDiv.style.display = 'none';
     listDiv.style.display = 'block';
-    listDiv.innerHTML = `<div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Project</th><th>Stage</th><th>Step</th><th>Amount</th><th>Days in Step</th><th>Target Close</th><th>Days to Close</th><th>Broker</th><th>CF</th><th>ECF</th></thead><tbody>${projects.filter(p => p.status === 'active').map(p => {
+    listDiv.innerHTML = `<div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Project</th><th>Stage</th><th>Step</th><th>Amount</th><th>Days in Step</th><th>Target Close</th><th>Days to Close</th><th>Broker</th><th>CF</th><th>ECF</th></thead><tbody>${projects.filter(p => p.status === 'active' || p.status === 'crm_only').map(p => {`
       const c = clients.find(cl => cl.id === p.clientId);
       const broker = brokers.find(b => b.id === p.brokerId);
       const daysInStep = p[`step${p.step||1}At`] ? Math.floor((new Date() - new Date(p[`step${p.step||1}At`])) / (1000*60*60*24)) : '—';
@@ -5285,7 +5285,7 @@ async function sendInboxReply(recipientId, type) {
 }
 
 function renderAnalytics() {
-  const activeProjects = projects.filter(p => p.status === 'active');
+  const activeProjects = projects.filter(p => p.status === 'active' || p.status === 'crm_only');
   const pipelineCount = activeProjects.filter(p => (p.step || 1) < 9).length;
   const fundedCount = activeProjects.filter(p => (p.step || 1) === 9).length;
 
