@@ -1916,7 +1916,7 @@ body.dark-mode .badge-neutral { background: rgba(255,255,255,0.1); color: var(--
 <!-- ============================================================ -->
 
 <!-- Upload Document Modal -->
-<div id="uploadDocumentModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Upload Document</h3><button class="modal-close" onclick="closeModal('uploadDocumentModal')">✕</button></div><div class="modal-body"><div class="form-group"><label class="form-label">Client</label><select id="uploadClientId" class="form-select"></select></div><div class="form-group"><label class="form-label">Project</label><select id="uploadProjectId" class="form-select"></select></div><div class="form-group"><label class="form-label">Document Type</label><select id="documentType" class="form-select"><option>Term Sheet</option><option>Commitment Fee</option><option>Deed of Undertaking</option><option>ECF Confirmation</option><option>Other</option></select></div><div class="form-group"><label class="form-label">Expiry Date (Optional)</label><input type="date" id="documentExpiryDate" class="form-input"></div><div class="form-group"><label class="form-label">PDF File</label><input type="file" id="pdfFile" class="form-input" accept=".pdf"></div><button class="btn btn-primary btn-md" onclick="adminUploadDocument()" style="width:100%">Upload</button></div></div></div>
+<div id="uploadDocumentModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Upload Document</h3><button class="modal-close" onclick="closeModal('uploadDocumentModal')">✕</button></div><div class="modal-body"><div class="form-group"><label class="form-label">Client</label><select id="uploadClientId" class="form-select"></select></div><div class="form-group"><label class="form-label">Project</label><select id="uploadProjectId" class="form-select"></select></div><div class="form-group"><label class="form-label">Document Type</label><select id="documentType" class="form-select"><option>Funding Proposal</option><option>Term Sheet</option><option>Commitment Fee</option><option>Deed of Undertaking</option><option>ECF Confirmation</option><option>Other</option></select></div><div class="form-group"><label class="form-label">Expiry Date (Optional)</label><input type="date" id="documentExpiryDate" class="form-input"></div><div class="form-group"><label class="form-label">PDF File</label><input type="file" id="pdfFile" class="form-input" accept=".pdf"></div><button class="btn btn-primary btn-md" onclick="adminUploadDocument()" style="width:100%">Upload</button></div></div></div>
 
 <!-- Schedule Meeting Modal -->
 <div id="scheduleMeetingModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Schedule Meeting</h3><button class="modal-close" onclick="closeModal('scheduleMeetingModal')">✕</button></div><div class="modal-body"><div class="form-group"><label class="form-label">Client</label><select id="meetingClientId" class="form-select"></select></div><div class="form-group"><label class="form-label">Date</label><input type="date" id="meetingDate" class="form-input"></div><div class="form-group"><label class="form-label">Time</label><input type="time" id="meetingTime" class="form-input"></div><div class="form-group"><label class="form-label">Type</label><select id="meetingType" class="form-select"><option>Video Call</option><option>Phone Call</option></select></div><div class="form-group"><label class="form-label">Notes</label><textarea id="meetingNotes" rows="3" class="form-textarea"></textarea></div><button class="btn btn-primary btn-md" onclick="createMeeting()" style="width:100%">Schedule</button></div></div></div>
@@ -4698,14 +4698,53 @@ window.saveClientNote = async function(clientId, note) {
 let uploadClientChangeHandler = null;
 
 window.showUploadDocumentModal = function() {
+  // First, make sure clients array has data
+  if (!clients || clients.length === 0) {
+    showToast('Loading clients... Please wait', true);
+    // Try again after a short delay
+    setTimeout(function() {
+      window.showUploadDocumentModal();
+    }, 1000);
+    return;
+  }
+  
   const sel = document.getElementById('uploadClientId');
-  sel.innerHTML = '<option value="">Select Client</option>' + clients.filter(c=>c.status==='active').map(c=>`<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+  if (!sel) return;
+  
+  // Clear existing options and add default
+  sel.innerHTML = '<option value="">-- Select Client --</option>';
+  
+  // Add all active clients to dropdown
+  const activeClients = clients.filter(c => c.status === 'active');
+  if (activeClients.length === 0) {
+    sel.innerHTML = '<option value="">No active clients found</option>';
+  } else {
+    activeClients.forEach(function(c) {
+      const option = document.createElement('option');
+      option.value = c.id;
+      option.textContent = c.name + ' (' + c.email + ')';
+      sel.appendChild(option);
+    });
+  }
+  
+  // Clear project dropdown
+  const projectSelect = document.getElementById('uploadProjectId');
+  if (projectSelect) {
+    projectSelect.innerHTML = '<option value="">-- Select Project --</option>';
+  }
+  
+  // Remove existing event listener if any
   if (uploadClientChangeHandler) {
     sel.removeEventListener('change', uploadClientChangeHandler);
   }
-  uploadClientChangeHandler = function() { updateProjectSelectForUpload(sel.value); };
+  
+  // Add new event listener
+  uploadClientChangeHandler = function() {
+    updateProjectSelectForUpload(sel.value);
+  };
   sel.addEventListener('change', uploadClientChangeHandler);
-  document.getElementById('uploadProjectId').innerHTML = '<option value="">Select Project</option>';
+  
+  // Open the modal
   openModal('uploadDocumentModal');
 };
 
@@ -4713,13 +4752,29 @@ window.showUploadDocumentModal = function() {
 function updateProjectSelectForUpload(clientId) {
   const projectSelect = document.getElementById('uploadProjectId');
   if (!projectSelect) return;
+  
   if (!clientId) {
-    projectSelect.innerHTML = '<option value="">Select Project</option>';
+    projectSelect.innerHTML = '<option value="">-- Select Project --</option>';
     return;
   }
-  const clientProjects = projects.filter(p => p.clientId === clientId && p.status === 'active');
-  projectSelect.innerHTML = '<option value="">Select Project</option>' + 
-    clientProjects.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
+  
+  // Find projects for this client
+  const clientProjects = projects.filter(function(p) {
+    return p.clientId === clientId && (p.status === 'active' || p.status === 'crm_only');
+  });
+  
+  projectSelect.innerHTML = '<option value="">-- Select Project --</option>';
+  
+  if (clientProjects.length === 0) {
+    projectSelect.innerHTML = '<option value="">No projects found for this client</option>';
+  } else {
+    clientProjects.forEach(function(p) {
+      const option = document.createElement('option');
+      option.value = p.id;
+      option.textContent = p.name + ' (Step ' + (p.step || 1) + ')';
+      projectSelect.appendChild(option);
+    });
+  }
 }
 
 function renderDealHealthSummary() {
