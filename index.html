@@ -4904,34 +4904,71 @@ function renderPipeline() {
   } else {
     boardDiv.style.display = 'none';
     listDiv.style.display = 'block';
-    listDiv.innerHTML = `<div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Project</th><th>Stage</th><th>Step</th><th>Amount</th><th>Days in Step</th><th>Target Close</th><th>Days to Close</th><th>Broker</th><th>CF</th><th>ECF</th></thead><tbody>${projects.filter(p => p.status === 'active' || p.status === 'crm_only').map(p => {`
+     // Build the table rows separately to avoid template literal issues
+    let tableRows = '';
+    const activeProjects = projects.filter(p => p.status === 'active' || p.status === 'crm_only');
+    
+    for (const p of activeProjects) {
       const c = clients.find(cl => cl.id === p.clientId);
       const broker = brokers.find(b => b.id === p.brokerId);
-      const daysInStep = p[`step${p.step||1}CompletedAt`] ? Math.floor((new Date() - new Date(p[`step${p.step||1}CompletedAt`])) / (1000*60*60*24)) : '—';
-      let daysToClose = '—', daysClass = '';
-      if(p.closeDate) {
-        const diff = Math.ceil((new Date(p.closeDate) - new Date()) / (1000*60*60*24));
-        if(diff < 14 && diff >= 0) { daysToClose = `${diff} days`; daysClass = 'expiry-danger'; }
-        else if(diff < 30 && diff >= 0) { daysToClose = `${diff} days`; daysClass = 'expiry-warn'; }
-        else if(diff >= 0) { daysToClose = `${diff} days`; daysClass = 'expiry-ok'; }
-        else daysToClose = 'Past due';
+      
+      // Calculate days in step safely
+      let daysInStep = '—';
+      const stepCompletedField = 'step' + (p.step || 1) + 'CompletedAt';
+      if (p[stepCompletedField]) {
+        const stepDate = new Date(p[stepCompletedField]);
+        const now = new Date();
+        const diffDays = Math.floor((now - stepDate) / (1000 * 60 * 60 * 24));
+        daysInStep = diffDays;
       }
-      return `<tr>
-        <td>${escapeHtml(c?.name || 'Unknown')}</td>
-        <td>${escapeHtml(p.name)}</strong></td>
-        <td>${p.step <= 1 ? 'Origination' : (p.step <= 3 ? 'Structuring' : (p.step <= 8 ? 'Execution' : 'Funded'))}</td>
-        <td>${STEP_NAMES[p.step||1]}</div></td>
-        <td>${formatCurrency(p.amount)}</div></td>
-        <td>${daysInStep}</div></td>
-        <td>${p.closeDate || '—'}</div></td>
-        <td><span class="${daysClass}">${daysToClose}</span></div></td>
-        <td>${broker ? escapeHtml(broker.name) : 'Direct'}</div></td>
-        <td><span class="badge ${p.commitmentFeeStatus === 'paid' ? 'badge-success' : 'badge-warning'}">${p.commitmentFeeStatus === 'paid' ? 'Paid' : 'Pending'}</span></div></td>
-        <td><span class="badge ${p.ecfStatus === 'escrowed' ? 'badge-success' : 'badge-warning'}">${p.ecfStatus === 'escrowed' ? 'Escrowed' : 'Pending'}</span></div></td>
-      </tr>`;
-    }).join('')}</tbody></table></div>`;
+      
+      let daysToClose = '—';
+      let daysClass = '';
+      if (p.closeDate) {
+        const diff = Math.ceil((new Date(p.closeDate) - new Date()) / (1000 * 60 * 60 * 24));
+        if (diff < 14 && diff >= 0) { 
+          daysToClose = diff + ' days'; 
+          daysClass = 'expiry-danger'; 
+        } else if (diff < 30 && diff >= 0) { 
+          daysToClose = diff + ' days'; 
+          daysClass = 'expiry-warn'; 
+        } else if (diff >= 0) { 
+          daysToClose = diff + ' days'; 
+          daysClass = 'expiry-ok'; 
+        } else { 
+          daysToClose = 'Past due'; 
+        }
+      }
+      
+      const stepNum = p.step || 1;
+      let stage = 'Origination';
+      if (stepNum <= 1) stage = 'Origination';
+      else if (stepNum <= 3) stage = 'Structuring';
+      else if (stepNum <= 8) stage = 'Execution';
+      else stage = 'Funded';
+      
+      tableRows += `
+        <tr>
+          <td>${escapeHtml(c?.name || 'Unknown')}</td>
+          <td><strong>${escapeHtml(p.name)}</strong></div></td>
+          <td>${stage}</div></td>
+          <td>${STEP_NAMES[stepNum]}</div></td>
+          <td>${formatCurrency(p.amount)}</div></td>
+          <td>${daysInStep}</div></td>
+          <td>${p.closeDate || '—'}</div></td>
+          <td><span class="${daysClass}">${daysToClose}</span></div></td>
+          <td>${broker ? escapeHtml(broker.name) : 'Direct'}</div></td>
+          <td><span class="badge ${p.commitmentFeeStatus === 'paid' ? 'badge-success' : 'badge-warning'}">${p.commitmentFeeStatus === 'paid' ? 'Paid' : 'Pending'}</span></div></td>
+          <td><span class="badge ${p.ecfStatus === 'escrowed' ? 'badge-success' : 'badge-warning'}">${p.ecfStatus === 'escrowed' ? 'Escrowed' : 'Pending'}</span></div></td>
+        </tr>
+      `;
+    }
+    
+    listDiv.innerHTML = `<div class="table-wrap"><table class="admin-table"><thead>
+      <tr><th>Client</th><th>Project</th><th>Stage</th><th>Step</th><th>Amount</th><th>Days in Step</th><th>Target Close</th><th>Days to Close</th><th>Broker</th><th>CF</th><th>ECF</th></thead>
+      <tbody>${tableRows}</tbody>
+    </table></div>`;
   }
-}
 
 function renderBrokerAdminTable() {
   const tbody = document.getElementById('adminBrokersTable');
