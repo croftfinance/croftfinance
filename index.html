@@ -4840,7 +4840,7 @@ function renderAdminTables() {
     patchTable('adminProjectsTable', newRowsHtml);
   }
   document.getElementById('totalClients').innerHTML = clients.filter(c=>c.status==='active').length;
-  document.getElementById('totalProjects').innerHTML = projects.filter(p=>p.status==='active').length;
+  document.getElementById('totalProjects').innerHTML = projects.filter(p=>p.status==='active' || p.status==='crm_only').length;
   document.getElementById('totalDocuments').innerHTML = documents.length;
   document.getElementById('pendingClientsCount').innerHTML = clients.filter(c=>c.status==='pending').length;
   const el1 = document.getElementById('pendingMessages');
@@ -5466,7 +5466,10 @@ const commissionHtml = commissionedProjects.map(p => {
 
 const commissionTableBody = document.getElementById('commissionTableBody');
 if (commissionTableBody) {
-  commissionTableBody.innerHTML = commissionHtml;
+  if (commissionedProjects.length === 0) {
+    commissionTableBody.innerHTML = '<tr><td colspan="9" class="empty-state"><i class="fas fa-chart-line"></i><p>No active projects with amounts entered. Add facility amounts to projects to see commission breakdown.</p></td></tr>';
+  } else {
+    commissionTableBody.innerHTML = commissionHtml;
   
   // Add totals row
   const totalsRow = document.createElement('tr');
