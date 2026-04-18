@@ -5327,15 +5327,21 @@ function renderAnalytics() {
   const pipelineCount = activeProjects.filter(p => (p.step || 1) < 9).length;
   const fundedCount = activeProjects.filter(p => (p.step || 1) === 9).length;
 
-  const step2PlusProjects = activeProjects.filter(p => (p.step || 1) >= 2);
+  // Count ALL active projects for Total Capital Committed (from Step 1)
   let totalCapitalCommitted = 0;
-  step2PlusProjects.forEach(p => { totalCapitalCommitted += parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g, '')) || 0; });
+  activeProjects.forEach(p => { 
+    totalCapitalCommitted += parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g, '')) || 0; 
+  });
 
   const commission2pc = totalCapitalCommitted * ADMIN_ONLY_COMMISSION_RATE;
-  const avgFacility = step2PlusProjects.length ? totalCapitalCommitted / step2PlusProjects.length : 0;
+  
+  // Average Facility Size - now using ALL active projects
+  const avgFacility = activeProjects.length ? totalCapitalCommitted / activeProjects.length : 0;
 
   let totalCapitalFunded = 0;
-  activeProjects.filter(p => (p.step || 1) === 9).forEach(p => { totalCapitalFunded += parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g, '')) || 0; });
+  activeProjects.filter(p => (p.step || 1) === 9).forEach(p => { 
+    totalCapitalFunded += parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g, '')) || 0; 
+  });
 
   const brokerProjects = projects.filter(p => p.brokerId && p.brokerId !== '');
   const brokerVolume = brokerProjects.reduce((sum, p) => sum + (parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g, '')) || 0), 0);
@@ -5349,10 +5355,10 @@ function renderAnalytics() {
     kpiContainer.innerHTML = `
       <div class="kpi-card navy"><span class="kpi-label">Pipeline Projects</span><div class="kpi-value" id="kpiPipeline">${formatNumber(pipelineCount)}</div><div class="kpi-sub">Active deals in progress</div></div>
       <div class="kpi-card success"><span class="kpi-label">Funded Projects</span><div class="kpi-value" id="kpiFunded">${formatNumber(fundedCount)}</div><div class="kpi-sub">Successfully closed</div></div>
-      <div class="kpi-card blue"><span class="kpi-label">Total Capital Committed</span><div class="kpi-value" id="kpiCapital">${formatCurrency(totalCapitalCommitted)}</div><div class="kpi-sub">Across all active deals (Step 2+)</div></div>
+      <div class="kpi-card blue"><span class="kpi-label">Total Capital Committed</span><div class="kpi-value" id="kpiCapital">${formatCurrency(totalCapitalCommitted)}</div><div class="kpi-sub">Across all active deals</div></div>
       <div class="kpi-card success"><span class="kpi-label">Total Capital Funded</span><div class="kpi-value" id="kpiCapitalFunded">${formatCurrency(totalCapitalFunded)}</div><div class="kpi-sub">Actual deployed capital (Step 9)</div></div>
-      <div class="kpi-card warning"><span class="kpi-label">Suzana's Commission (2%)</span><div class="kpi-value" id="kpiCommission">${formatCurrency(commission2pc)}</div><div class="kpi-sub">On active deals from Term Sheet</div></div>
-      <div class="kpi-card navy"><span class="kpi-label">Average Facility Size</span><div class="kpi-value" id="kpiAvgFacility">${formatCurrency(avgFacility)}</div><div class="kpi-sub">Per active project (Step 2+)</div></div>
+      <div class="kpi-card warning"><span class="kpi-label">Suzana's Commission (2%)</span><div class="kpi-value" id="kpiCommission">${formatCurrency(commission2pc)}</div><div class="kpi-sub">On all active deals</div></div>
+      <div class="kpi-card navy"><span class="kpi-label">Average Facility Size</span><div class="kpi-value" id="kpiAvgFacility">${formatCurrency(avgFacility)}</div><div class="kpi-sub">Per active project</div></div>
       <div class="kpi-card blue"><span class="kpi-label">Broker vs Direct</span><div class="kpi-value" id="kpiBrokerSplit">${formatNumber(brokerPercent)}%</div><div class="kpi-sub">Broker-originated volume</div></div>
       <div class="kpi-card success"><span class="kpi-label">Active Brokers</span><div class="kpi-value" id="kpiActiveBrokers">${formatNumber(activeBrokers)}</div><div class="kpi-sub">With signed engagement</div></div>
       <div class="kpi-card warning"><span class="kpi-label">Pending Actions</span><div class="kpi-value" id="kpiPending">${formatNumber(pendingActions)}</div><div class="kpi-sub">Require your attention</div></div>
