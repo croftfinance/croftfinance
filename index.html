@@ -4225,8 +4225,28 @@ function showECFInstructions() {
 }
 
 window.showWiringInstructions = function() {
-  showToast('Wiring instructions have been sent to your registered email address. Please check your inbox.');
-}
+  const project = projects.find(p => p.id === currentProjectId);
+  const client = currentClient;
+  
+  if(!client || !project) {
+    showToast('Unable to send instructions. Please contact Croft Finance directly.', true);
+    return;
+  }
+  
+  emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
+    to_name: client.name,
+    to_email: client.email,
+    from_name: 'Suzana Aleksić - Croft Finance',
+    subject: `Wiring Instructions for ${project.name}`,
+    message: `Dear ${client.name},\n\nHere are your wiring instructions:\n\nRecipient: Zane Richardson\nCompany: Black Harbour Joint Ventures LLC\nAddress: 11 School St, North Chelmsford, MA 01863\nBank: Bank of America\nAccount: 394010746714\nRouting: 011500010\nWire: 026009593\nReference: ${project.name}\n\nBest regards,\nSuzana Aleksić`,
+    project_name: project.name
+  }).then(function() {
+    showToast('Wiring instructions sent to your email');
+  }).catch(function(error) {
+    console.error('Email error:', error);
+    showToast('Failed to send email. Please contact Croft Finance directly.', true);
+  });
+};
 
 window.printDealSummary = function() {
   window.print();
@@ -5609,55 +5629,166 @@ window.revertStepStatus = async function(projectId, stepNumber) {
 window.markStepCompleted = async function(projectId, stepNumber) {
   const project = projects.find(p => p.id === projectId);
   if(!project) return;
-  if(stepNumber===3) { showCommitmentFeeModal(projectId); return; }
-  if(stepNumber===7) { showECFEscrowModal(projectId); return; }
-  if (!confirm(`Are you sure you want to mark Step ${stepNumber} (${STEP_NAMES[stepNumber]}) as complete?`)) return;
+  
+  // Step 2: Term Sheet - Special handling
+  if(stepNumber === 2) {
+    if (!confirm('Are you sure you want to mark Step 2 (Term Sheet) as complete? This will advance the deal to Step 3.')) return;
+    
+    try {
+      await db.collection('projects').doc(projectId).update({
+        step2Completed: true,
+        step2CompletedAt: new Date().toISOString(),
+        step: 3,
+        termSheetIssuedAt: new Date().toISOString(),
+        overallProgress: Math.round((2/9)*100)
+      });
+      await logActivity('admin', 'Suzana Aleksić', 'croft', 'step_completed', projectId, 'Step 2: Term Sheet completed');
+      showToast('Term Sheet completed — advancing to Step 3');
+      
+      const client = clients.find(c => c.id === project.clientId);
+      if(client) {
+        await sendEmailNotification({
+          to_name: client.name,
+          to_email: client.email,
+          from_name: 'Croft Finance',
+          subject: `Term Sheet Signed for ${project.name}`,
+          message: `Dear ${client.name},\n\nThe Term Sheet for ${project.name} has been signed. Your deal is now advancing to Step 3: Commitment Fee.\n\nBest regards,\nSuzana Aleksić`,
+          project_name: project.name
+        });
+      }
+      renderAdminTables();
+      if(editProjectId === projectId) {
+        document.getElementById('stepStatusContainer').innerHTML = renderStepDashboard(projects.find(p=>p.id===projectId));
+      }
+      return;
+    } catch(e) {
+      showToast(e.message, true);
+      return;
+    }
+  }
+  
+  // Step 3: Commitment Fee - Open modal
+  if(stepNumber === 3) {
+    showCommitmentFeeModal(projectId);
+    return;
+  }
+  
+  // Step 7: ECF Escrow - Open modal
+  if(stepNumber === 7) {
+    showECFEscrowModal(projectId);
+    return;
+  }
+  
+  // All other steps
+  if (!confirm(`Mark Step ${stepNumber} (${STEP_NAMES[stepNumber]}) as complete?`)) return;
+  
   try {
-    const updateData = { [`step${stepNumber}Completed`]: true, [`step${stepNumber}CompletedAt`]: new Date().toISOString() };
-    if(project.step === stepNumber) updateData.step = stepNumber + 1;
+    const updateData = {};
+    updateData[`step${stepNumber}Completed`] = true;
+    updateData[`step${stepNumber}CompletedAt`] = new Date().toISOString();
+    if(project.step === stepNumber) {
+      updateData.step = stepNumber + 1;
+    }
     let completedCount = 0;
-    for(let i=1;i<=stepNumber;i++) if(i===stepNumber || project[`step${i}Completed`]) completedCount++;
+    for(let i = 1; i <= stepNumber; i++) {
+      if(i === stepNumber || project[`step${i}Completed`]) completedCount++;
+    }
     updateData.overallProgress = Math.round((completedCount/9)*100);
     await db.collection('projects').doc(projectId).update(updateData);
     await logActivity('admin', 'Suzana Aleksić', 'croft', 'step_completed', projectId, `Step ${stepNumber}: ${STEP_NAMES[stepNumber]}`);
     showToast(`Step ${stepNumber} completed`);
     renderAdminTables();
-    if(editProjectId === projectId) document.getElementById('stepStatusContainer').innerHTML = renderStepDashboard(projects.find(p=>p.id===projectId));
-  } catch(e) { showToast(e.message, true); }
-}
+    if(editProjectId === projectId) {
+      document.getElementById('stepStatusContainer').innerHTML = renderStepDashboard(projects.find(p=>p.id===projectId));
+    }
+  } catch(e) {
+    showToast(e.message, true);
+  }
+};
 
 window.showCommitmentFeeModal = function(projectId) {
   document.getElementById('feeDate').value = new Date().toISOString().split('T')[0];
   document.getElementById('feeAmount').value = '';
   document.getElementById('feeReference').value = '';
-  document.getElementById('feeConfirmBtn').onclick = () => confirmCommitmentFee(projectId);
+  document.getElementById('feeConfirmBtn').onclick = function() { confirmCommitmentFee(projectId); };
   openModal('commitmentFeeModal');
-}
+};
 
 window.showECFEscrowModal = function(projectId) {
   document.getElementById('ecfDate').value = new Date().toISOString().split('T')[0];
   document.getElementById('ecfAmount').value = '';
   document.getElementById('ecfInstitution').value = '';
   document.getElementById('ecfReference').value = '';
-  document.getElementById('ecfConfirmBtn').onclick = () => confirmECFEscrow(projectId);
+  document.getElementById('ecfConfirmBtn').onclick = function() { confirmECFEscrow(projectId); };
   openModal('ecfEscrowModal');
-}
+};
 
 window.confirmCommitmentFee = async function(projectId) {
   const amount = document.getElementById('feeAmount')?.value;
   const reference = document.getElementById('feeReference')?.value;
-  if(!amount || !reference) return showToast('Enter amount and reference', true);
+  if(!amount || !reference) {
+    showToast('Enter amount and reference', true);
+    return;
+  }
   try {
     await db.collection('projects').doc(projectId).update({
-      commitmentFeeStatus:'paid', commitmentFeeAmount:amount, commitmentFeeReference:reference,
-      commitmentFeeDate:document.getElementById('feeDate')?.value, commitmentFeeMethod:document.getElementById('feeMethod')?.value,
-      step3Completed:true, step3CompletedAt:new Date().toISOString(), step:4
+      commitmentFeeStatus: 'paid',
+      commitmentFeeAmount: amount,
+      commitmentFeeReference: reference,
+      commitmentFeeDate: document.getElementById('feeDate')?.value,
+      commitmentFeeMethod: document.getElementById('feeMethod')?.value,
+      step3Completed: true,
+      step3CompletedAt: new Date().toISOString(),
+      step: 4
     });
-    await logActivity('admin', 'Suzana Aleksić', 'croft', 'cf_confirmed', projectId, `Amount: $${amount}`);
-    showToast(`Fee confirmed: $${amount}`);
+    await logActivity('admin', 'Suzana Aleksić', 'croft', 'cf_confirmed', projectId, 'Commitment fee confirmed');
+    showToast('Commitment fee confirmed');
     closeModal('commitmentFeeModal');
     renderAdminTables();
-    if(editProjectId === projectId) document.getElementById('stepStatusContainer').innerHTML = renderStepDashboard(projects.find(p=>p.id===projectId));
+    
+    const project = projects.find(p => p.id === projectId);
+    const client = clients.find(c => c.id === project?.clientId);
+    if(client) {
+      await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
+        to_name: client.name,
+        to_email: client.email,
+        from_name: 'Suzana Aleksić',
+        subject: `Wiring Instructions for ${project?.name}`,
+        message: `Dear ${client.name},\n\nWIRING INSTRUCTIONS:\nRecipient: Zane Richardson\nCompany: Black Harbour Joint Ventures LLC\nAddress: 11 School St, North Chelmsford, MA 01863\nBank: Bank of America\nAccount: 394010746714\nRouting: 011500010\nWire: 026009593\nReference: ${reference}\n\nBest regards,\nSuzana Aleksić`,
+        project_name: project?.name || 'N/A'
+      });
+    }
+    
+    if(editProjectId === projectId) {
+      document.getElementById('stepStatusContainer').innerHTML = renderStepDashboard(projects.find(p=>p.id===projectId));
+    }
+  } catch(e) {
+    showToast(e.message, true);
+  }
+};
+
+window.confirmECFEscrow = async function(projectId) {
+  const amount = document.getElementById('ecfAmount')?.value;
+  const institution = document.getElementById('ecfInstitution')?.value;
+  if(!amount || !institution) {
+    showToast('Enter amount and institution', true);
+    return;
+  }
+  try {
+    await db.collection('projects').doc(projectId).update({
+      ecfStatus: 'escrowed',
+      ecfAmount: amount,
+      ecfInstitution: institution,
+      ecfReference: document.getElementById('ecfReference')?.value,
+      ecfEscrowDate: document.getElementById('ecfDate')?.value,
+      step7Completed: true,
+      step7CompletedAt: new Date().toISOString(),
+      step: 8
+    });
+    await logActivity('admin', 'Suzana Aleksić', 'croft', 'ecf_confirmed', projectId, 'ECF escrow confirmed');
+    showToast('ECF escrow confirmed');
+    closeModal('ecfEscrowModal');
+    renderAdminTables();
     
     const project = projects.find(p => p.id === projectId);
     const client = clients.find(c => c.id === project?.clientId);
@@ -5666,13 +5797,19 @@ window.confirmCommitmentFee = async function(projectId) {
         to_name: client.name,
         to_email: client.email,
         from_name: 'Croft Finance',
-        subject: `Commitment Fee Confirmed for ${project?.name}`,
-        message: `Dear ${client.name},\n\nThe commitment fee for your project (${project?.name}) has been confirmed. Your deal is now advancing to Step 4: Deed of Undertaking.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
+        subject: `ECF Escrow Confirmed for ${project?.name}`,
+        message: `Dear ${client.name},\n\nThe ECF escrow for ${project?.name} has been confirmed. Your deal is advancing to Step 8.\n\nBest regards,\nSuzana Aleksić`,
         project_name: project?.name || 'N/A'
       });
     }
-  } catch(e) { showToast(e.message, true); }
-}
+    
+    if(editProjectId === projectId) {
+      document.getElementById('stepStatusContainer').innerHTML = renderStepDashboard(projects.find(p=>p.id===projectId));
+    }
+  } catch(e) {
+    showToast(e.message, true);
+  }
+};
 
 window.confirmECFEscrow = async function(projectId) {
   const amount = document.getElementById('ecfAmount')?.value;
