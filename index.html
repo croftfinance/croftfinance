@@ -1735,7 +1735,7 @@ body.dark-mode .badge-neutral { background: rgba(255,255,255,0.1); color: var(--
       <!-- CLIENTS TAB -->
       <div id="admin-clients" class="admin-tab">
         <div class="admin-page-title">Clients</div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:16px;"><input type="text" id="clientSearch" class="form-input" placeholder="Search clients..." style="max-width:300px;"><button class="btn btn-primary btn-sm" onclick="showAddClientModal()">+ Add Client</button></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:16px; gap: 12px; flex-wrap: wrap;"><input type="text" id="clientSearch" class="form-input" placeholder="Search clients..." style="max-width:300px;"><div style="display:flex; gap: 8px;"><button class="btn btn-primary btn-sm" onclick="showAddClientModal()">+ Add Client (Portal Access)</button><button class="btn btn-secondary btn-sm" onclick="showAddCrmClientModal()">+ Add CRM Client (No Portal)</button></div></div>
         <div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Email</th><th>Projects</th><th>Status</th><th>Notes</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="adminClientsTable"></tbody></table></div>
       </div>
       
