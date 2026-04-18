@@ -5549,7 +5549,7 @@ function renderStepDashboard(project) {
 
 // MISSING FUNCTIONS: Step management
 async function approveMandateReview(projectId) {
-  if (!confirmDelete('mandate approval')) return;
+  if (!confirm('Are you sure you want to approve this mandate? This will advance the deal to Step 2.')) return;
   try {
     await db.collection('projects').doc(projectId).update({
       step1Completed: true, step1CompletedAt: new Date().toISOString(), step: 2,
@@ -5575,7 +5575,7 @@ async function approveMandateReview(projectId) {
 }
 
 async function rejectMandateReview(projectId) {
-  if (!confirmDelete('mandate decline')) return;
+  if (!confirm('Are you sure you want to decline this mandate? This will mark the project as declined.')) return;
   try {
     await db.collection('projects').doc(projectId).update({ status: 'declined', declinedAt: new Date().toISOString() });
     await logActivity('admin', 'Suzana Aleksić', 'croft', 'step_completed', projectId, 'Step 1: Mandate Review — Declined');
@@ -5599,7 +5599,7 @@ async function rejectMandateReview(projectId) {
 async function revertStepStatus(projectId, stepNumber) {
   const project = projects.find(p => p.id === projectId);
   if(!project) return;
-  if (!confirmDelete(`Step ${stepNumber} revert`)) return;
+  if (!confirm(`Are you sure you want to revert Step ${stepNumber}?`)) return;
   try {
     const isCompleted = project[`step${stepNumber}Completed`];
     const updateData = {};
@@ -5620,7 +5620,7 @@ async function markStepCompleted(projectId, stepNumber) {
   if(!project) return;
   if(stepNumber===3) { showCommitmentFeeModal(projectId); return; }
   if(stepNumber===7) { showECFEscrowModal(projectId); return; }
-  if (!confirmDelete(`Step ${stepNumber} completion`)) return;
+  if (!confirm(`Are you sure you want to mark Step ${stepNumber} (${STEP_NAMES[stepNumber]}) as complete?`)) return;
   try {
     const updateData = { [`step${stepNumber}Completed`]: true, [`step${stepNumber}CompletedAt`]: new Date().toISOString() };
     if(project.step === stepNumber) updateData.step = stepNumber + 1;
