@@ -1758,7 +1758,7 @@ body.dark-mode .badge-neutral { background: rgba(255,255,255,0.1); color: var(--
         <div class="admin-page-title">Brokers</div>
         <div style="display:flex;justify-content:space-between;margin-bottom:16px;"><div></div><button class="btn btn-success btn-sm" onclick="showInviteBrokerModal()">✉ Invite Broker</button></div>
         <div class="table-wrap"><table class="admin-table"><thead><tr><th>Broker</th><th>Firm</th><th>Commission</th><th>Submitted</th><th>Funded</th><th>Est. Commission</th><th>Status</th><th>Engagement</th><th>Actions</th></tr></thead><tbody id="adminBrokersTable"></tbody></table></div>
-        <div class="card" style="margin-top:20px;"><div class="card-header"><div class="card-title">Broker Performance</div></div><div class="card-body"><div class="table-wrap"><table class="admin-table" id="brokerPerformanceTableDetails"><thead><tr><th>Broker</th><th>Submissions</th><th>Accepted</th><th>Funded</th><th>Conversion %</th><th>Total Volume</th><th>Est. Commission</th></tr></thead><tbody id="brokerPerformanceTableBody"></tbody></tr></div></div></div>
+        <div class="card" style="margin-top:20px;"><div class="card-header"><div class="card-title">Broker Performance</div></div><div class="card-body"><div class="table-wrap"><table class="admin-table" id="brokerPerformanceTableDetails"><thead><tr><th>Broker</th><th>Submissions</th><th>Accepted</th><th>Funded</th><th>Conversion %</th><th>Total Volume</th><th>Est. Commission</th></tr></thead><tbody id="brokerPerformanceTableBody"></tbody></table></div></div></div>
         <div class="card"><div class="card-header"><div class="card-title">Broker Update Requests</div></div><div class="card-body"><div id="brokerUpdateRequestsList"></div></div></div>
         
         <!-- Broker Commission Statements -->
@@ -1900,7 +1900,7 @@ body.dark-mode .badge-neutral { background: rgba(255,255,255,0.1); color: var(--
       <!-- MESSAGES TAB -->
       <div id="broker-tab-messages" class="portal-tab">
         <div class="admin-page-title">Messages</div>
-        <div class="card"><div class="card-body"><div class="messages-container"><div class="messages-list" id="brokerMessagesList"></div><div class="message-input"><input type="text" id="brokerMessageInput" placeholder="Write a message..." onkeypress="if(event.key==='Enter')withLoading(null, sendBrokerMessage)()"><button class="btn btn-primary btn-sm" onclick="sendBrokerMessage()">Send</button></div></div></div></div></div>
+        <div class="card"><div class="card-body"><div class="messages-container"><div class="messages-list" id="brokerMessagesList"></div><div class="message-input"><input type="text" id="brokerMessageInput" placeholder="Write a message..." onkeypress="if(event.key==='Enter')withLoading(null, sendBrokerMessage)"><button class="btn btn-primary btn-sm" onclick="sendBrokerMessage()">Send</button></div></div></div></div></div>
       </div>
       
       <!-- STATEMENTS TAB -->
@@ -1923,7 +1923,7 @@ body.dark-mode .badge-neutral { background: rgba(255,255,255,0.1); color: var(--
 <div id="scheduleMeetingModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Schedule Meeting</h3><button class="modal-close" onclick="closeModal('scheduleMeetingModal')">✕</button></div><div class="modal-body"><div class="form-group"><label class="form-label">Client</label><select id="meetingClientId" class="form-select"></select></div><div class="form-group"><label class="form-label">Date</label><input type="date" id="meetingDate" class="form-input"></div><div class="form-group"><label class="form-label">Time</label><input type="time" id="meetingTime" class="form-input"></div><div class="form-group"><label class="form-label">Type</label><select id="meetingType" class="form-select"><option>Video Call</option><option>Phone Call</option></select></div><div class="form-group"><label class="form-label">Notes</label><textarea id="meetingNotes" rows="3" class="form-textarea"></textarea></div><button class="btn btn-primary btn-md" onclick="createMeeting()" style="width:100%">Schedule</button></div></div></div>
 
 <!-- Edit Project Modal -->
-<div id="editProjectModal" class="modal-overlay"><div class="modal modal-lg"><div class="modal-header"><h3>Edit Project</h3><button class="modal-close" onclick="closeModal('editProjectModal')">✕</button></div><div class="modal-tabs"><button id="tabBtn-project" class="modal-tab-btn active" onclick="switchEditTab('project')">Details</button><button id="tabBtn-process" class="modal-tab-btn" onclick="switchEditTab('process')">Process</button></div><div class="modal-body"><div id="edit-tab-project" class="modal-tab-pane active"><div class="form-section-header">Client Information</div><div class="form-grid-2"><div class="form-group"><label class="form-label">Client Name</label><input type="text" id="editClientName" class="form-input"></div><div class="form-group"><label class="form-label">Client Email</label><input type="email" id="editClientEmail" class="form-input"></div></div><div class="form-section-header">Project Details</div><div class="form-grid-2"><div class="form-group"><label class="form-label">Project Name</label><input type="text" id="editProjectName" class="form-input"></div><div class="form-group"><label class="form-label">Industry</label><select id="editIndustry" class="form-select"><option>Real Estate</option><option>Infrastructure</option><option>Energy</option><option>Mining</option><option>Oil & Gas</option></select></div><div class="form-group"><label class="form-label">Location</label><input type="text" id="editLocation" class="form-input"></div><div class="form-group"><label class="form-label">Data Room Link</label><input type="url" id="editDataRoomLink" class="form-input" placeholder="https://..."></div></div><div class="form-section-header">Facility Terms</div><div class="form-grid-2"><div class="form-group"><label class="form-label">Facility Amount</label><input type="text" id="editAmount" class="form-input"></div><div class="form-group"><label class="form-label">Interest Rate</label><input type="text" id="editRate" class="form-input"></div><div class="form-group"><label class="form-label">Funds Needed</label><input type="text" id="editFundsNeeded" class="form-input"></div><div class="form-group"><label class="form-label">Sponsor Equity</label><input type="text" id="editSponsorEquity" class="form-input"></div><div class="form-group"><label class="form-label">Term (years)</label><input type="text" id="editTerm" class="form-input"></div><div class="form-group"><label class="form-label">Grace Period (months)</label><input type="text" id="editGracePeriod" class="form-input"></div><div class="form-group"><label class="form-label">Governing Law</label><input type="text" id="editGoverningLaw" class="form-input" placeholder="England and Wales"></div></div><div class="form-section-header">Key Dates</div><div class="form-grid-2"><div class="form-group"><label class="form-label">Target Close Date</label><input type="date" id="editCloseDate" class="form-input"></div><div class="form-group"><label class="form-label">Term Sheet Expiry</label><input type="date" id="editTermSheetExpiry" class="form-input"></div><div class="form-group"><label class="form-label">Commitment Fee Deadline</label><input type="date" id="editCommitFeeDeadline" class="form-input"></div><div class="form-group"><label class="form-label">Deed Expiry</label><input type="date" id="editDeedExpiry" class="form-input"></div><div class="form-group"><label class="form-label">ECF Policy Expiry</label><input type="date" id="editECFPolicyExpiry" class="form-input"></div><div class="form-group"><label class="form-label">Funded Date</label><input type="date" id="editFundedDate" class="form-input"></div></div><div class="form-section-header">Broker Assignment</div><div class="form-grid-2"><div class="form-group"><label class="form-label">Assign Broker</label><select id="editBrokerAssign" class="form-select"></select></div><div class="form-group"><label class="form-label">Broker Engagement Status</label><select id="editBrokerEngagement" class="form-select"><option value="none">None</option><option value="pending">Pending</option><option value="active">Active</option></select></div></div></div><div id="edit-tab-process" class="modal-tab-pane"><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;"><div id="cfStatusDisplay" style="padding:16px;border-radius:8px;border:0.5px solid var(--gray-200);"></div><div id="ecfStatusDisplay" style="padding:16px;border-radius:8px;border:0.5px solid var(--gray-200);"></div></div><div class="form-grid-2"><div class="form-group"><label class="form-label">Current Step</label><select id="editStep" class="form-select"><option value="1">Step 1: Mandate Review</option><option value="2">Step 2: Term Sheet</option><option value="3">Step 3: Commitment Fee</option><option value="4">Step 4: Deed of Undertaking</option><option value="5">Step 5: Credit Support</option><option value="6">Step 6: Hard-Copy Submission</option><option value="7">Step 7: ECF Escrow</option><option value="8">Step 8: Transfer to Agent</option><option value="9">Step 9: Funded</option></select></div><div class="form-group"><label class="form-label">CF Status</label><select id="editCommitFee" class="form-select"><option value="pending">Pending</option><option value="paid">Paid</option></select></div><div class="form-group"><label class="form-label">ECF Status</label><select id="editECFStatus" class="form-select"><option value="pending">Pending</option><option value="escrowed">Escrowed</option></select></div><div class="form-group"><label class="form-label">Advisor Note</label><textarea id="editAdvisorNote" rows="2" class="form-textarea"></textarea></div></div><div id="stepStatusContainer"></div></div></div><div class="modal-footer"><button class="btn btn-secondary btn-md" onclick="closeModal('editProjectModal')" style="flex:1">Cancel</button><button class="btn btn-primary btn-md" onclick="saveProjectInfo()" style="flex:2">Save Changes</button></div></div></div>
+<div id="editProjectModal" class="modal-overlay"><div class="modal modal-lg"><div class="modal-header"><h3>Edit Project</h3><button class="modal-close" onclick="closeModal('editProjectModal')">✕</button></div><div class="modal-tabs"><button id="tabBtn-project" class="modal-tab-btn active" onclick="switchEditTab('project')">Details</button><button id="tabBtn-process" class="modal-tab-btn" onclick="switchEditTab('process')">Process</button></div><div class="modal-body"><div id="edit-tab-project" class="modal-tab-pane active"><div class="form-section-header">Client Information</div><div class="form-grid-2"><div class="form-group"><label class="form-label">Client Name</label><input type="text" id="editClientName" class="form-input"></div><div class="form-group"><label class="form-label">Client Email</label><input type="email" id="editClientEmail" class="form-input"></div></div><div class="form-section-header">Project Details</div><div class="form-grid-2"><div class="form-group"><label class="form-label">Project Name</label><input type="text" id="editProjectName" class="form-input"></div><div class="form-group"><label class="form-label">Industry</label><select id="editIndustry" class="form-select"><option>Real Estate</option><option>Infrastructure</option><option>Energy</option><option>Mining</option><option>Oil & Gas</option></select></div><div class="form-group"><label class="form-label">Location</label><input type="text" id="editLocation" class="form-input"></div><div class="form-group"><label class="form-label">Data Room Link</label><input type="url" id="editDataRoomLink" class="form-input" placeholder="https://..."></div></div><div class="form-section-header">Facility Terms</div><div class="form-grid-2"><div class="form-group"><label class="form-label">Facility Amount</label><input type="text" id="editAmount" class="form-input"></div><div class="form-group"><label class="form-label">Interest Rate</label><input type="text" id="editRate" class="form-input"></div><div class="form-group"><label class="form-label">Funds Needed</label><input type="text" id="editFundsNeeded" class="form-input"></div><div class="form-group"><label class="form-label">Sponsor Equity</label><input type="text" id="editSponsorEquity" class="form-input"></div><div class="form-group"><label class="form-label">Term (years)</label><input type="text" id="editTerm" class="form-input"></div><div class="form-group"><label class="form-label">Grace Period (months)</label><input type="text" id="editGracePeriod" class="form-input"></div><div class="form-group"><label class="form-label">Governing Law</label><input type="text" id="editGoverningLaw" class="form-input" placeholder="England and Wales"></div></div><div class="form-section-header">Key Dates</div><div class="form-grid-2"><div class="form-group"><label class="form-label">Target Close Date</label><input type="date" id="editCloseDate" class="form-input"></div><div class="form-group"><label class="form-label">Term Sheet Expiry</label><input type="date" id="editTermSheetExpiry" class="form-input"></div><div class="form-group"><label class="form-label">Commitment Fee Deadline</label><input type="date" id="editCommitFeeDeadline" class="form-input"></div><div class="form-group"><label class="form-label">Deed Expiry</label><input type="date" id="editDeedExpiry" class="form-input"></div><div class="form-group"><label class="form-label">ECF Policy Expiry</label><input type="date" id="editECFPolicyExpiry" class="form-input"></div><div class="form-group"><label class="form-label">Funded Date</label><input type="date" id="editFundedDate" class="form-input"></div></div><div class="form-section-header">Broker Assignment</div><div class="form-grid-2"><div class="form-group"><label class="form-label">Assign Broker</label><select id="editBrokerAssign" class="form-select"></select></div><div class="form-group"><label class="form-label">Broker Engagement Status</label><select id="editBrokerEngagement" class="form-select"><option value="none">None</option><option value="pending">Pending</option><option value="active">Active</option></select></div></div></div><div id="edit-tab-process" class="modal-tab-pane"><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;"><div id="cfStatusDisplay" style="padding:16px;border-radius:8px;border:0.5px solid var(--gray-200);"></div><div id="ecfStatusDisplay" style="padding:16px;border-radius:8px;border:0.5px solid var(--gray-200);"></div></div><div class="form-grid-2"><div id="stepStatusContainer" style="margin-top: 20px;"></div><div class="form-group"><label class="form-label">Current Step</label><select id="editStep" class="form-select"><option value="1">Step 1: Mandate Review</option><option value="2">Step 2: Term Sheet</option><option value="3">Step 3: Commitment Fee</option><option value="4">Step 4: Deed of Undertaking</option><option value="5">Step 5: Credit Support</option><option value="6">Step 6: Hard-Copy Submission</option><option value="7">Step 7: ECF Escrow</option><option value="8">Step 8: Transfer to Agent</option><option value="9">Step 9: Funded</option></select></div><div class="form-group"><label class="form-label">CF Status</label><select id="editCommitFee" class="form-select"><option value="pending">Pending</option><option value="paid">Paid</option></select></div><div class="form-group"><label class="form-label">ECF Status</label><select id="editECFStatus" class="form-select"><option value="pending">Pending</option><option value="escrowed">Escrowed</option></select></div><div class="form-group"><label class="form-label">Advisor Note</label><textarea id="editAdvisorNote" rows="2" class="form-textarea"></textarea></div></div><div id="stepStatusContainer"></div></div></div><div class="modal-footer"><button class="btn btn-secondary btn-md" onclick="closeModal('editProjectModal')" style="flex:1">Cancel</button><button class="btn btn-primary btn-md" onclick="saveProjectInfo()" style="flex:2">Save Changes</button></div></div></div>
 
 <!-- Add Client Modal -->
 <div id="addClientModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Add Client</h3><button class="modal-close" onclick="closeModal('addClientModal')">✕</button></div><div class="modal-body"><div class="form-grid-2"><div class="form-group"><label class="form-label">Full Name</label><input type="text" id="ncName" class="form-input"></div><div class="form-group"><label class="form-label">Email</label><input type="email" id="ncEmail" class="form-input"></div><div class="form-group"><label class="form-label">Password</label><input type="password" id="ncPassword" class="form-input"></div><div class="form-group"><label class="form-label">Project Name</label><input type="text" id="ncProject" class="form-input"></div></div><button class="btn btn-primary btn-md" onclick="createClient()" style="width:100%">Create Client</button></div></div></div>
@@ -2028,11 +2028,11 @@ function patchTable(tbodyId, newRowsHtml) {
   const tbody = document.getElementById(tbodyId);
   if (!tbody) return;
   const existingRows = tbody.querySelectorAll('tr');
-  if (existingRows.length === 0) { tbody.innerHTML = newRows; return; }
+  if (existingRows.length === 0) { tbody.innerHTML = newRowsHtml; return; }
   const parser = new DOMParser();
-  const newDoc = parser.parseFromString(`<table><tbody>${newRows}</tbody></table>`, 'text/html');
+  const newDoc = parser.parseFromString(`<td><tbody>${newRowsHtml}</tbody>舀`, 'text/html');
   const newRowElements = Array.from(newDoc.querySelectorAll('tbody tr'));
-  if (newRowElements.length !== existingRows.length) { tbody.innerHTML = newRows; return; }
+  if (newRowElements.length !== existingRows.length) { tbody.innerHTML = newRowsHtml; return; }
   for (let i = 0; i < newRowElements.length; i++) {
     const newRowHtml = newRowElements[i].outerHTML;
     const newHash = computeRowHash(newRowHtml);
@@ -2040,7 +2040,7 @@ function patchTable(tbodyId, newRowsHtml) {
     if (newHash !== oldHash) {
       const oldRow = existingRows[i];
       if (oldRow) { oldRow.outerHTML = newRowHtml; }
-      else { tbody.innerHTML = newRows; return; }
+      else { tbody.innerHTML = newRowsHtml; return; }
       tableRowHashes.set(`${tbodyId}_${i}`, newHash);
     }
   }
@@ -2114,8 +2114,7 @@ function updateOrCreateChart(chartId, chartType, data, options) {
   else if (chartId === 'quarterlyTrendChart') chartKey = 'quarterlyChart';
   else return null;
   if (chartInstances[chartKey]) {
-    chartInstances[chartKey].data.labels = data.labels;
-    chartInstances[chartKey].data.datasets = data.datasets;
+    chartInstances[chartKey].data = data;
     chartInstances[chartKey].update();
     return chartInstances[chartKey];
   } else {
@@ -2181,7 +2180,7 @@ const ACTION_LABELS = {
   'logout': 'Logged out'
 };
 
-let db, auth, storage, currentClient, editProjectId = null, currentBroker, currentProjectId = null;
+let db, auth, storage, currentClient, editProjectId = null, currentBroker = null, currentProjectId = null;
 let clients = [], projects = [], documents = [], messages = [], brokers = [], brokerSubmissions = [], brokerMessages = [], meetings = [], brokerUpdateRequests = [], activityLog = [], webhooks = [], customFields = [];
 let capitalChart = null, industryChart = null, pipelineStageChart = null, quarterlyChart = null, calendar = null;
 let unsubscribers = [];
@@ -2219,19 +2218,26 @@ const EMAILJS_CONFIG = {
 };
 
 async function initEmailJS() {
-  for (let attempt = 0; attempt < 3; attempt++) {
+  let lastError = null;
+  
+  for (let attempt = 1; attempt <= 3; attempt++) {
     try {
       if (typeof emailjs !== 'undefined' && emailjs.init) {
         emailjs.init(EMAILJS_CONFIG.publicKey);
-        console.log('EmailJS initialized successfully');
-        return;
+        console.log(`✅ EmailJS initialized (attempt ${attempt})`);
+        return true;
       }
     } catch (e) {
-      console.warn(`EmailJS init attempt ${attempt + 1} failed:`, e);
-      await new Promise(r => setTimeout(r, 1000));
+      lastError = e;
+      console.warn(`EmailJS init attempt ${attempt} failed:`, e);
+      await new Promise(r => setTimeout(r, 1000 * attempt));
     }
   }
-  showToast('Email service unavailable. Please contact support.', true);
+  
+  const errorMsg = 'Email service unavailable. Please contact Croft Finance directly for time-sensitive communications.';
+  showToast(errorMsg, true);
+  console.error('EmailJS initialization failed after 3 attempts:', lastError);
+  return false;
 }
 
 async function sendEmailNotification(params) {
@@ -2251,14 +2257,19 @@ function formatCurrency(value) {
   return isNaN(num) ? '—' : '$' + num.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 }
 
-// FIXED: Timezone-safe date formatting
 function formatDate(isoString) {
   if (!isoString) return '—';
-  const d = new Date(isoString);
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+  try {
+    const date = new Date(isoString);
+    if (isNaN(date.getTime())) return isoString.split('T')[0] || '—';
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  } catch(e) {
+    console.warn('Date parsing error:', e);
+    return isoString?.split('T')[0] || '—';
+  }
 }
 
 function formatDateTime(timestamp) {
@@ -2343,6 +2354,13 @@ async function initFirebase() {
   }
   
   await initEmailJS();
+  
+  if (typeof pdfjsLib !== 'undefined') {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    console.log('PDF.js worker initialized');
+  }
+  
+  await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
   
   if (!sessionStorage.getItem('croftSessionId')) {
     sessionStorage.setItem('croftSessionId', crypto.randomUUID ? crypto.randomUUID() : Date.now().toString());
@@ -2774,17 +2792,23 @@ async function loginWithLoading(loginFn, btnId) {
 }
 
 window.login = async function() {
-  if (checkLoginLockout('client')) return;
-  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-  const pass = document.getElementById('loginPassword').value;
-  const errEl = document.getElementById('loginError');
-  errEl.style.display = 'none';
-  if (!email || !pass) {
-    errEl.innerText = 'Please enter email and password.';
-    errEl.style.display = 'block';
-    return;
+  const btn = document.querySelector('#loginForm .btn-primary');
+  const originalText = btn?.innerHTML;
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="btn-spinner"></span> Signing in...';
   }
   try {
+    if (checkLoginLockout('client')) return;
+    const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+    const pass = document.getElementById('loginPassword').value;
+    const errEl = document.getElementById('loginError');
+    errEl.style.display = 'none';
+    if (!email || !pass) {
+      errEl.innerText = 'Please enter email and password.';
+      errEl.style.display = 'block';
+      return;
+    }
     await auth.signInWithEmailAndPassword(email, pass);
     resetLoginAttempts('client');
     closeModal('loginModal');
@@ -2794,37 +2818,59 @@ window.login = async function() {
     if (e.code === 'auth/user-not-found') errorMsg = 'No account found with this email.';
     if (e.code === 'auth/wrong-password') errorMsg = 'Incorrect password.';
     if (e.code === 'auth/too-many-requests') errorMsg = 'Too many failed attempts. Try again later.';
-    errEl.innerText = errorMsg;
-    errEl.style.display = 'block';
+    document.getElementById('loginError').innerText = errorMsg;
+    document.getElementById('loginError').style.display = 'block';
     showToast(errorMsg, true);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+    }
   }
 };
 
 window.brokerLogin = async function() {
-  if (checkLoginLockout('broker')) return;
-  const email = document.getElementById('brokerLoginEmail').value.trim().toLowerCase();
-  const pass = document.getElementById('brokerLoginPassword').value;
-  const errEl = document.getElementById('brokerLoginError');
-  errEl.style.display = 'none';
+  const btn = document.querySelector('#brokerLoginForm .btn-primary');
+  const originalText = btn?.innerHTML;
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="btn-spinner"></span> Signing in...';
+  }
   try {
+    if (checkLoginLockout('broker')) return;
+    const email = document.getElementById('brokerLoginEmail').value.trim().toLowerCase();
+    const pass = document.getElementById('brokerLoginPassword').value;
+    const errEl = document.getElementById('brokerLoginError');
+    errEl.style.display = 'none';
     await auth.signInWithEmailAndPassword(email, pass);
     resetLoginAttempts('broker');
     closeModal('loginModal');
   } catch(e) {
     recordFailedLogin('broker');
-    errEl.innerText = 'Invalid credentials.';
-    errEl.style.display = 'block';
+    document.getElementById('brokerLoginError').innerText = 'Invalid credentials.';
+    document.getElementById('brokerLoginError').style.display = 'block';
     showToast(e.message, true);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+    }
   }
 };
 
 window.doAdminLogin = async function() {
-  if (checkLoginLockout('admin')) return;
-  const email = document.getElementById('adminUsername').value.trim();
-  const pass = document.getElementById('adminPassword').value;
-  const errEl = document.getElementById('adminLoginError');
-  errEl.style.display = 'none';
+  const btn = document.querySelector('#adminLoginForm .btn-primary');
+  const originalText = btn?.innerHTML;
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="btn-spinner"></span> Signing in...';
+  }
   try {
+    if (checkLoginLockout('admin')) return;
+    const email = document.getElementById('adminUsername').value.trim();
+    const pass = document.getElementById('adminPassword').value;
+    const errEl = document.getElementById('adminLoginError');
+    errEl.style.display = 'none';
     const cred = await auth.signInWithEmailAndPassword(email, pass);
     const adminCheck = await db.collection('admins').doc(cred.user.uid).get();
     if (!adminCheck.exists) {
@@ -2838,9 +2884,14 @@ window.doAdminLogin = async function() {
     closeModal('loginModal');
   } catch(e) {
     recordFailedLogin('admin');
-    errEl.textContent = 'Incorrect credentials.';
-    errEl.style.display = 'block';
+    document.getElementById('adminLoginError').textContent = 'Incorrect credentials.';
+    document.getElementById('adminLoginError').style.display = 'block';
     showToast(e.message, true);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+    }
   }
 };
 
@@ -2869,7 +2920,6 @@ window.register = async function() {
     await secondaryAuth.signOut();
     await logActivity(cred.user.uid, name, 'client', 'register', null, `Registered new account`);
     
-    // Send confirmation email to client
     await sendEmailNotification({
       to_name: name,
       to_email: email,
@@ -2879,7 +2929,6 @@ window.register = async function() {
       project_name: project
     });
     
-    // Send notification to admin
     await sendEmailNotification({
       to_name: 'Croft Finance Team',
       to_email: EMAILJS_CONFIG.adminEmail,
@@ -2912,7 +2961,6 @@ window.brokerRegister = async function() {
     });
     await secondaryAuth.signOut();
     
-    // Send confirmation email to broker
     await sendEmailNotification({
       to_name: name,
       to_email: email,
@@ -2922,7 +2970,6 @@ window.brokerRegister = async function() {
       project_name: 'Broker Registration'
     });
     
-    // Send notification to admin
     await sendEmailNotification({
       to_name: 'Croft Finance Team',
       to_email: EMAILJS_CONFIG.adminEmail,
@@ -2950,7 +2997,6 @@ function setupListeners() {
       const isAdminUser = adminDoc.exists;
       
       if (isAdminUser) {
-        // Admin listeners
         unsubscribers.push(db.collection('clients').onSnapshot(s => {
           clients = s.docs.map(d => ({ id: d.id, ...d.data() }));
           markDirty();
@@ -3096,9 +3142,8 @@ function setupListeners() {
             loadMessages();
           }));
           
-          // Client's meetings - direct query only
-          unsubscribers.push(db.collection('meetings').where('clientId','==',user.uid).onSnapshot(s => { 
-          loadClientMeetings();  // This already queries directly
+          unsubscribers.push(db.collection('meetings').where('clientId', '==', user.uid).onSnapshot(s => {
+            loadClientMeetings();
           }));
           
           showView('portal');
@@ -3180,7 +3225,6 @@ function logout() {
     sessionResetInterval = null;
   }
   
-  // Clear all global state
   clients = [];
   projects = [];
   documents = [];
@@ -3190,7 +3234,6 @@ function logout() {
   meetings = [];
   activityLog = [];
   
-  // Unsubscribe all Firestore listeners
   if (unsubscribers.length) {
     unsubscribers.forEach(fn => fn());
     unsubscribers = [];
@@ -3358,7 +3401,7 @@ window.showComparisonModal = function() {
   document.getElementById('comparisonContent').innerHTML = `
     <table class="compare-table">
       <tr><th>Field</th><th>${escapeHtml(p1.name)}</th><th>${escapeHtml(p2.name)}</th></tr>
-      <tr><td>Client</div><td>${escapeHtml(c1?.name)}</div><td>${escapeHtml(c2?.name)}</div></td>
+      <tr><td>Client</div><td>${escapeHtml(c1?.name)}</div><td>${escapeHtml(c2?.name)}</div></tr>
       <tr><td>Amount</div><td>${formatCurrency(p1.amount)}</div><td>${formatCurrency(p2.amount)}</div></tr>
       <tr><td>Step</div><td>${STEP_NAMES[p1.step]}</div><td>${STEP_NAMES[p2.step]}</div></tr>
       <tr><td>Industry</div><td>${escapeHtml(p1.industry)}</div><td>${escapeHtml(p2.industry)}</div></tr>
@@ -3501,12 +3544,12 @@ window.generateBrokerStatement = function() {
     const amt = parseFloat(p.amount) || 0;
     const comm = amt * ((broker.commissionRate || 0) / 100);
     total += comm;
-    html += `<tr><td>${escapeHtml(p.name)}</td><td>${formatCurrency(amt)}</td><td>${formatCurrency(comm)}</td></tr>`;
+    html += `<tr><td>${escapeHtml(p.name)}</div><td style="text-align:right;">${formatCurrency(amt)}</div><td style="text-align:right;">${formatCurrency(comm)}</div></tr>`;
   });
   if (brokerProjects.length === 0) {
     html += `<tr><td colspan="3" class="empty-state">No funded projects yet</td></tr>`;
   }
-  html += `<tr><td><strong>Total</strong></td><td></td><td><strong>${formatCurrency(total)}</strong></td></tr></tbody></table>`;
+  html += `<tr style="border-top:2px solid var(--gray-200);"><td><strong>Total</strong></td><td style="text-align:right;"></td><td style="text-align:right;"><strong>${formatCurrency(total)}</strong></td></tr></tbody></table>`;
   const previewDiv = document.getElementById('brokerStatementPreview');
   if (previewDiv) {
     previewDiv.innerHTML = html;
@@ -3610,8 +3653,23 @@ function loadClientPortal() {
 }
 
 function loadCurrentProjectData() {
-  const p = projects.find(x => x.id === currentProjectId);
-  if (!p) return;
+  if (!currentProjectId && projects.length === 0) {
+    console.warn('No project available yet');
+    return;
+  }
+  
+  let projectId = currentProjectId;
+  if (!projectId && projects.length > 0) {
+    projectId = projects[0].id;
+    currentProjectId = projectId;
+    console.log('Auto-selected project:', projectId);
+  }
+  
+  const p = projects.find(x => x.id === projectId);
+  if (!p) {
+    console.warn('Project not found:', projectId);
+    return;
+  }
   
   if (p.status === 'declined') {
     document.getElementById('actionBannerDisplay').innerHTML = `
@@ -3787,7 +3845,6 @@ function loadMessages() {
   cont.scrollTop = cont.scrollHeight;
 }
 
-// FIXED: Optimistic UI for client messages
 window.sendMessage = async function() {
   const input = document.getElementById('messageInput');
   const val = input.value.trim();
@@ -3970,22 +4027,24 @@ function renderMilestoneProgress() {
 
 function updateMilestoneProgress() { renderMilestoneProgress(); }
 
-// FIXED: Activity log with fallback for missing index
 async function loadClientActivityLog() {
   const container = document.getElementById('activityTimeline');
   if (!container || !currentClient) return;
   container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div><p>Loading activity...</p></div>';
   try {
-    // Try ordered query first, fallback to unordered if index missing
     let snapshot;
     try {
       snapshot = await db.collection('activityLog').where('actorId', '==', currentClient.id).orderBy('timestamp', 'desc').limit(50).get();
     } catch (indexError) {
-      console.warn('Index missing, using unordered query');
-      snapshot = await db.collection('activityLog').where('actorId', '==', currentClient.id).limit(50).get();
-      const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-      docs.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
-      snapshot = { docs: docs.map(d => ({ data: () => d })) };
+      console.warn('Index missing, using unordered query with client-side sort');
+      const snapshotUnordered = await db.collection('activityLog').where('actorId', '==', currentClient.id).limit(100).get();
+      const docs = snapshotUnordered.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      docs.sort((a, b) => {
+        const timeA = a.timestamp?.seconds || 0;
+        const timeB = b.timestamp?.seconds || 0;
+        return timeB - timeA;
+      });
+      snapshot = { docs: docs.map(doc => ({ data: () => doc, id: doc.id })) };
     }
     const logs = snapshot.docs.map(d => d.data());
     if (logs.length === 0) {
@@ -4061,9 +4120,7 @@ function showECFInstructions() {
   showToast('ECF escrow instructions will be sent to your email address. Please contact Suzana for immediate assistance.');
 }
 
-// FIXED: showWiringInstructions sends email with Zane's banking details
 window.showWiringInstructions = function() {
-  // Add this check at the very beginning
   if (typeof emailjs === 'undefined' || !emailjs.send) {
     showToast('Email service unavailable. Please contact Croft Finance directly for wiring instructions.', true);
     return;
@@ -4093,14 +4150,12 @@ window.showWiringInstructions = function() {
 };
 
 window.printDealSummary = function() {
-  // Get the deal sheet content
   const dealSheet = document.getElementById('projectsList');
   if (!dealSheet) {
     window.print();
     return;
   }
   
-  // Create a print-friendly clone
   const printContent = dealSheet.cloneNode(true);
   const printWindow = window.open('', '_blank');
   printWindow.document.write(`
@@ -4164,20 +4219,33 @@ function updateBrokerDashboard() {
   }
 }
 
-// FIXED: Broker portfolio checks status, not engagement
 function renderBrokerPortfolio() {
-  const cont = document.getElementById('brokerPortfolioContainer');
-  if (!cont) return;
+  const container = document.getElementById('brokerPortfolioContainer');
+  if (!container) return;
+  
   if (currentBroker.status !== 'active') {
-    cont.innerHTML = '<div class="card"><div class="card-body"><div class="action-banner warning"><i class="fas fa-file-contract"></i><div><strong>Account pending approval</strong><br>You will be able to see client progress once your account is approved.</div></div></div></div>';
+    container.innerHTML = `
+      <div class="card">
+        <div class="card-body">
+          <div class="action-banner warning">
+            <i class="fas fa-clock"></i>
+            <div>
+              <strong>Account Pending Approval</strong><br>
+              Your broker account is awaiting admin approval. You will receive an email once approved.
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
     return;
   }
+  
   const myProjects = projects.filter(p => p.brokerId === currentBroker.id && p.status === 'active');
   if (!myProjects.length) {
-    cont.innerHTML = '<div class="empty-state"><i class="fas fa-briefcase"></i><p>No active clients yet. Submit a deal to get started.</p><button class="btn btn-primary btn-sm" onclick="switchBrokerTab(\'submit-deal\')">Submit a Deal</button></div>';
+    container.innerHTML = '<div class="empty-state"><i class="fas fa-briefcase"></i><p>No active clients yet. Submit a deal to get started.</p><button class="btn btn-primary btn-sm" onclick="switchBrokerTab(\'submit-deal\')">Submit a Deal</button></div>';
     return;
   }
-  cont.innerHTML = myProjects.map(p => {
+  container.innerHTML = myProjects.map(p => {
     const client = clients.find(c => c.id === p.clientId);
     const percent = Math.round(((p.step || 1) / 9) * 100);
     const amt = parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g, "")) || 0;
@@ -4238,7 +4306,6 @@ function loadBrokerMessages() {
   cont.scrollTop = cont.scrollHeight;
 }
 
-// FIXED: Optimistic UI for broker messages
 window.sendBrokerMessage = async function() {
   const input = document.getElementById('brokerMessageInput');
   const val = input?.value.trim();
@@ -4339,7 +4406,6 @@ window.saveAdminProfile = async function() {
   } catch(e) { showToast(e.message, true); }
 };
 
-// FIXED: Approve client with email validation
 window.approveClient = async function(id) {
   const client = clients.find(c => c.id === id);
   if (!client?.email?.includes('@')) {
@@ -4680,10 +4746,11 @@ function renderBrokerAdminTable() {
           <button class="btn btn-ghost btn-sm" onclick="setBrokerCommission('${b.id}')">Set Rate</button>
           <button class="btn btn-danger btn-sm" onclick="deleteBroker('${b.id}')">Delete</button>
           ${pendingRequests ? `<span class="badge badge-warning" style="margin-left:8px;">${pendingRequests} updates</span>` : ''}
-        </div></td>
-      </tr>`;
-  }).join('');
-  patchTable('adminBrokersTable', newRowsHtml);
+        </div>
+      </table>`;
+    }).join('');
+    patchTable('adminBrokersTable', newRowsHtml);
+  }
   const brokerSelect = document.getElementById('brokerStatementSelect');
   if (brokerSelect) {
     brokerSelect.innerHTML = '<option value="">Select Broker</option>' + brokers.filter(b => b.status === 'active').map(b => `<option value="${b.id}">${escapeHtml(b.name)} (${b.commissionRate || 0}%)</option>`).join('');
@@ -4701,7 +4768,6 @@ function renderBrokerAdminTable() {
       }).join('');
     }
   }
-}
 
 window.approveBrokerUpdate = async function(requestId) {
   const request = brokerUpdateRequests.find(r => r.id === requestId);
@@ -4816,7 +4882,7 @@ function renderAdminDocumentsTable() {
       <td>${escapeHtml(project?.name || '—')}</td>
       <td>${escapeHtml(d.name)}</strong></td>
       <td><span class="badge ${d.approved ? 'badge-success' : 'badge-warning'}">${d.approved ? 'Approved' : 'Pending Review'}</span></td>
-      <td>${d.expiryDate ? formatDate(d.expiryDate) : '—'}</td>
+      <td>${d.expiryDate ? formatDate(d.expiryDate) : '—'}</div></td>
       <td><a href="${d.url}" target="_blank" class="btn btn-ghost btn-sm"><i class="fas fa-eye"></i> View</a><button class="btn btn-${d.approved ? 'warning' : 'success'} btn-sm" onclick="toggleDocumentApproval('${d.id}', ${d.approved})">${d.approved ? 'Revoke' : 'Approve'}</button><button class="btn btn-danger btn-sm" onclick="deleteDoc('${d.id}')">Delete</button></div></td>
     </tr>`;
   }).join('');
@@ -4948,11 +5014,15 @@ function renderInbox() {
   }
 }
 
-// FIXED: Toggle inbox thread - proper display toggle
 window.toggleInboxThread = function(element) {
   const body = element.nextElementSibling;
   if (body) {
-    body.style.display = body.style.display === 'none' ? 'block' : 'none';
+    const isHidden = body.style.display === 'none' || !body.style.display;
+    body.style.display = isHidden ? 'block' : 'none';
+    const chevron = element.querySelector('.fa-chevron-down, .fa-chevron-up');
+    if (chevron) {
+      chevron.className = isHidden ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
+    }
   }
 };
 
@@ -4994,7 +5064,6 @@ window.sendInboxReply = async function(recipientId, type) {
   } catch(e) { showToast(e.message, true); }
 };
 
-// FIXED: renderAnalytics with proper closing
 function renderAnalytics() {
   const activeProjects = projects.filter(p => p.status === 'active' || p.status === 'crm_only');
   const pipelineCount = activeProjects.filter(p => (p.step || 1) < 9).length;
@@ -5104,18 +5173,18 @@ function renderAnalytics() {
   const commissionTableBody = document.getElementById('commissionTableBody');
   if (commissionTableBody) {
     if (commissionedProjects.length === 0) {
-      commissionTableBody.innerHTML = '<tr><td colspan="9" class="empty-state"><i class="fas fa-chart-line"></i><p>No active projects with amounts entered. Add facility amounts to projects to see commission breakdown.</p></td></tr>';
+      commissionTableBody.innerHTML = '<tr><td colspan="9" class="empty-state"><i class="fas fa-chart-line"></i><p>No active projects with amounts entered. Add facility amounts to projects to see commission breakdown.</p><tr></tr>';
     } else {
       commissionTableBody.innerHTML = commissionHtml;
       const totalsRow = document.createElement('tr');
       totalsRow.style.background = 'var(--gray-100)';
       totalsRow.style.borderTop = '1px solid var(--gray-200)';
-      totalsRow.innerHTML = `<td colspan="4"><strong>TOTAL</strong></td><td style="text-align: right; font-weight: 700; color: var(--navy);">${formatCurrency(totalFacilityAmount)}</div></td><td style="text-align: right; font-weight: 600; color: var(--blue);">${formatCurrency(totalBrokerCommission)}</div></td><td style="text-align: right; font-weight: 600; color: var(--navy);">${formatCurrency(totalCroftCommission)}</div></td><td colspan="2"></td>`;
+      totalsRow.innerHTML = `<td colspan="3"><strong>TOTAL</strong></td><td style="text-align: right; font-weight: 700; color: var(--navy);">${formatCurrency(totalFacilityAmount)}</div></td><td style="text-align: right; font-weight: 600; color: var(--blue);">${formatCurrency(totalBrokerCommission)}</div></td><td style="text-align: right; font-weight: 600; color: var(--navy);">${formatCurrency(totalCroftCommission)}</div></td><td colspan="3"></td>`;
       commissionTableBody.appendChild(totalsRow);
       const fundedAmount = projects.filter(p => (p.step || 1) === 9).reduce((s, p) => s + (parseFloat(String(p.amount || '0').replace(/[^0-9.-]/g, '')) || 0), 0);
       const fundedRow = document.createElement('tr');
       fundedRow.style.background = 'var(--success-light)';
-      fundedRow.innerHTML = `<td colspan="4"><strong>FUNDED ONLY</strong></td><td style="text-align: right; font-weight: 700; color: var(--success);">${formatCurrency(fundedAmount)}</div></td><td colspan="4"></td>`;
+      fundedRow.innerHTML = `<td colspan="3"><strong>FUNDED ONLY</strong></td><td style="text-align: right; font-weight: 700; color: var(--success);">${formatCurrency(fundedAmount)}</div></td><td colspan="5"></td>`;
       commissionTableBody.appendChild(fundedRow);
     }
   }
@@ -5296,7 +5365,6 @@ window.revertStepStatus = async function(projectId, stepNumber) {
   } catch(e) { showToast(e.message, true); }
 };
 
-// FIXED: markStepCompleted with proper Step 2 handling
 window.markStepCompleted = async function(projectId, stepNumber) {
   const project = projects.find(p => p.id === projectId);
   if (!project) return;
@@ -5485,7 +5553,6 @@ window.editProject = function(pid) {
   openModal('editProjectModal');
 };
 
-// FIXED: saveProjectInfo doesn't overwrite blank email
 window.saveProjectInfo = async function() {
   const pid = editProjectId;
   const p = projects.find(x => x.id === pid);
@@ -5496,7 +5563,9 @@ window.saveProjectInfo = async function() {
   try {
     if (p.clientId && clientName) {
       const updateData = { name: clientName };
-      if (clientEmail && clientEmail.includes('@')) updateData.email = clientEmail;
+      if (clientEmail && clientEmail.includes('@') && clientEmail !== p.clientEmail) {
+        updateData.email = clientEmail;
+      }
       await db.collection('clients').doc(p.clientId).update(updateData);
     }
     const updates = {
@@ -5525,7 +5594,6 @@ window.saveProjectInfo = async function() {
 
 window.showAddClientModal = function() { openModal('addClientModal'); };
 
-// FIXED: createClient with email notification and no admin logout
 window.createClient = async function() {
   const name = document.getElementById('ncName').value.trim();
   const email = document.getElementById('ncEmail').value.trim().toLowerCase();
@@ -5533,6 +5601,12 @@ window.createClient = async function() {
   const projectName = document.getElementById('ncProject').value.trim();
   if (!name || !email || !password || !projectName) return showToast('Fill all fields', true);
   if (password.length < 6) return showToast('Password must be 6+ chars', true);
+  const btn = document.querySelector('#addClientModal .btn-primary');
+  const originalText = btn?.innerHTML;
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="btn-spinner"></span> Creating...';
+  }
   try {
     const secondaryAuth = getSecondaryAuth();
     const cred = await secondaryAuth.createUserWithEmailAndPassword(email, password);
@@ -5554,7 +5628,14 @@ window.createClient = async function() {
     });
     showToast(`Client ${name} created and email sent`);
     closeModal('addClientModal');
+    renderAdminTables();
   } catch(e) { showToast(e.message, true); }
+  finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+    }
+  }
 };
 
 window.deleteProject = async function(id) {
@@ -5605,7 +5686,6 @@ window.adminUploadDocument = async function() {
   } catch(e) { showToast(e.message, true); }
 };
 
-// FIXED: submitContactForm validates NDA checkbox
 window.submitContactForm = async function(e) {
   e.preventDefault();
   const ndaCheckbox = document.getElementById('contactNda');
@@ -5638,30 +5718,32 @@ function acceptCookies() {
 }
 if (localStorage.getItem('cookiesAccepted') === 'true') document.getElementById('cookieBanner').style.display = 'none';
 
-// FIXED: toggleDarkMode with null-safe chart updates
 function toggleDarkMode() {
   document.body.classList.toggle('dark-mode');
   localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
-  if (chartInstances.capitalChart) chartInstances.capitalChart.update();
-  if (chartInstances.industryChart) chartInstances.industryChart.update();
-  if (chartInstances.pipelineStageChart) chartInstances.pipelineStageChart.update();
-  if (chartInstances.quarterlyChart) chartInstances.quarterlyChart.update();
+  const chartKeys = ['capitalChart', 'industryChart', 'pipelineStageChart', 'quarterlyChart'];
+  chartKeys.forEach(key => {
+    if (chartInstances[key] && typeof chartInstances[key].update === 'function') {
+      chartInstances[key].update();
+    }
+  });
 }
 if (localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark-mode');
 
 updatePasswordStrengthMeter('regPassword', '#registerForm .strength-segment', '#registerForm .strength-hint');
 updatePasswordStrengthMeter('brokerRegPassword', '#brokerRegisterForm .strength-segment', '#brokerRegisterForm .strength-hint');
 
-// FIXED: Remove duplicate DOMContentLoaded binding - only one initialization
 document.addEventListener('DOMContentLoaded', function() {
   initFirebase();
   
   const quickActionBtns = document.querySelectorAll('.quick-action-btn');
   quickActionBtns.forEach(btn => {
-    btn.addEventListener('click', function() {
+    btn.removeEventListener('click', btn._listener);
+    btn._listener = function() {
       const tab = this.dataset.tab;
       if (tab) switchPortalTab(tab);
-    });
+    };
+    btn.addEventListener('click', btn._listener);
   });
   
   const saveNotifBtn = document.querySelector('#tab-notifications .btn-primary');
@@ -5679,9 +5761,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// ============================================================
-// CLIENT MEETINGS - FIXED with direct query
-// ============================================================
 window.requestClientMeeting = async function() {
   const date = document.getElementById('clientMeetingDate').value;
   const time = document.getElementById('clientMeetingTime').value;
@@ -5715,23 +5794,54 @@ window.resetMeetingForm = function() {
   document.getElementById('clientMeetingNotes').value = '';
 };
 
-// FIXED: loadClientMeetings uses direct Firestore query
 async function loadClientMeetings() {
-  const cont = document.getElementById('clientMeetingsList');
-  if (!cont || !currentClient) return;
+  const container = document.getElementById('clientMeetingsList');
+  if (!container || !currentClient) return;
+  container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div><p>Loading meetings...</p></div>';
   try {
-    const snap = await db.collection('meetings').where('clientId', '==', currentClient.id).get();
-    const clientMeetings = snap.docs.map(d => d.data());
+    const snapshot = await db.collection('meetings').where('clientId', '==', currentClient.id).orderBy('date', 'desc').get();
+    const clientMeetings = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     if (clientMeetings.length === 0) {
-      cont.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-alt"></i><p>No meetings scheduled. Request a meeting above.</p></div>';
+      container.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-alt"></i><p>No meetings scheduled. Request a meeting above.</p></div>';
       return;
     }
-    cont.innerHTML = clientMeetings.map(m => `<div class="note-card"><div class="note-card-label">${formatDate(m.date)} at ${m.time} · ${escapeHtml(m.type)}</div><div class="note-card-text">${escapeHtml(m.notes || 'No notes')}</div><div class="note-card-date">Status: <span class="badge ${m.status === 'confirmed' ? 'badge-success' : (m.status === 'cancelled' ? 'badge-danger' : 'badge-warning')}">${m.status}</span></div></div>`).join('');
-  } catch(e) {
-    console.error('Error loading meetings:', e);
-    cont.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-alt"></i><p>Unable to load meetings. Please try again later.</p></div>';
+    container.innerHTML = clientMeetings.map(meeting => `
+      <div class="note-card" data-meeting-id="${meeting.id}">
+        <div class="note-card-label">
+          ${formatDate(meeting.date)} at ${meeting.time} · ${escapeHtml(meeting.type || 'Meeting')}
+        </div>
+        <div class="note-card-text">${escapeHtml(meeting.notes || 'No notes provided')}</div>
+        <div class="note-card-date">
+          Status: 
+          <span class="badge ${meeting.status === 'confirmed' ? 'badge-success' : (meeting.status === 'cancelled' ? 'badge-danger' : 'badge-warning')}">
+            ${meeting.status || 'pending'}
+          </span>
+          ${meeting.status === 'pending' ? `
+            <button class="btn btn-ghost btn-sm" onclick="cancelMeetingRequest('${meeting.id}')" style="margin-left: 8px;">
+              Cancel Request
+            </button>
+          ` : ''}
+        </div>
+      </div>
+    `).join('');
+  } catch(error) {
+    console.error('Error loading meetings:', error);
+    container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Unable to load meetings. Please refresh the page.</p></div>';
   }
 }
+
+window.cancelMeetingRequest = async function(meetingId) {
+  if (!confirm('Are you sure you want to cancel this meeting request?')) return;
+  try {
+    await db.collection('meetings').doc(meetingId).update({ 
+      status: 'cancelled',
+      cancelledBy: 'client',
+      cancelledAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showToast('Meeting request cancelled');
+    loadClientMeetings();
+  } catch(e) { showToast(e.message, true); }
+};
 
 window.openPDFWithWatermark = async function(url, docName) {
   if (!url) { showToast('Document not available', true); return; }
@@ -5761,6 +5871,12 @@ window.submitDeal = async function() {
   const pName = document.getElementById('dealProjectName').value.trim();
   const fNeeded = document.getElementById('dealFundsNeeded').value.trim();
   if (!cName || !cEmail || !pName || !fNeeded) return showToast('Fill all required fields', true);
+  const btn = document.querySelector('#broker-tab-submit-deal .btn-primary');
+  const originalText = btn?.innerHTML;
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="btn-spinner"></span> Submitting...';
+  }
   try {
     await db.collection('brokerSubmissions').add({
       brokerId: currentBroker.id, brokerName: currentBroker.name,
@@ -5792,28 +5908,34 @@ window.submitDeal = async function() {
       message: `Broker: ${currentBroker.name}\nClient: ${cName}\nProject: ${pName}\nAmount: ${fNeeded}\n\nPlease review in the admin portal.`,
       project_name: pName
     });
-    showToast('Deal submitted');
-    // Clear form
-    document.getElementById('dealClientName').value = '';
-    document.getElementById('dealClientEmail').value = '';
-    document.getElementById('dealProjectName').value = '';
-    document.getElementById('dealFundsNeeded').value = '';
-    document.getElementById('dealSponsorEquity').value = '';
-    document.getElementById('dealBackground').value = '';
-    document.getElementById('dealJurisdiction').value = '';
-    document.getElementById('dealTargetDate').value = '';
-    document.getElementById('dealDescription').value = '';
-    document.getElementById('dealDataRoomLink').value = '';
-    document.getElementById('dealTotalCost').value = '';
-    document.getElementById('dealDebtEquity').value = '';
-    document.getElementById('dealProjectedIRR').value = '';
-    document.getElementById('dealRisks').value = '';
-    document.getElementById('dealBrokerCommExpectation').value = '';
+    showToast('Deal submitted successfully!');
+    const formFields = [
+      'dealClientName', 'dealClientEmail', 'dealProjectName', 'dealFundsNeeded',
+      'dealSponsorEquity', 'dealBackground', 'dealJurisdiction', 'dealTargetDate',
+      'dealDescription', 'dealDataRoomLink', 'dealTotalCost', 'dealDebtEquity',
+      'dealProjectedIRR', 'dealRisks', 'dealBrokerCommExpectation'
+    ];
+    formFields.forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (field) field.value = '';
+    });
+    document.getElementById('dealIndustry').value = 'Real Estate';
+    document.getElementById('dealRelationship').value = 'Owner';
+    document.getElementById('dealOtherLenders').value = 'No';
+    document.getElementById('dealExitStrategy').value = 'Sale of Asset';
+    document.getElementById('dealProjectStatus').value = 'Pre-Development';
+    document.getElementById('dealOtherLendersNotes').style.display = 'none';
+    document.getElementById('dealOtherLendersNotes').value = '';
     switchBrokerTab('dashboard');
   } catch(e) { showToast(e.message, true); }
+  finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+    }
+  }
 };
 
-// Final initialization
 initFirebase();
 </script>
 </body>
