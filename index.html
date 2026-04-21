@@ -5511,6 +5511,276 @@ window.confirmECFEscrow = async function (projectId) {
     }
   } catch (e) { showToast(e.message, true); }
 };
+<script>
+// ============================================================
+// EDIT BUTTON PATCH — complete, self-contained, no dependencies
+// ============================================================
+
+function _esc(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function _fmt(isoString) {
+  if (!isoString) return '—';
+  const parts = String(isoString).split('T')[0].split('-');
+  if (parts.length < 3) return '—';
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${parseInt(parts[2], 10)} ${months[parseInt(parts[1], 10) - 1]} ${parts[0]}`;
+}
+
+const _STEP_NAMES = [
+  '', 'Mandate Review', 'Term Sheet', 'Commitment Fee',
+  'Deed of Undertaking', 'Credit Support', 'Hard-Copy Submission',
+  'ECF Escrow', 'Transfer to Agent', 'Funded'
+];
+
+function _renderStepDash(project) {
+  const pct = Math.round(((project.step || 1) / 9) * 100);
+  let html = `
+    <div style="margin-bottom:20px;">
+      <div class="data-label" style="margin-bottom:6px;">Overall Progress — ${pct}%</div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" style="width:${pct}%;height:8px;"></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;">`;
+
+  for (let i = 1; i <= 9; i++) {
+    const isDone    = !!project[`step${i}Completed`];
+    const isCurrent = (project.step || 1) === i;
+    const border    = isDone ? 'var(--success)' : isCurrent ? 'var(--blue)' : 'var(--gray-200)';
+    const hdrBg     = isDone ? 'var(--success)' : isCurrent ? 'var(--navy)' : 'var(--gray-100)';
+    const hdrClr    = (isDone || isCurrent) ? 'white' : 'var(--gray-600)';
+
+    let buttons = '';
+    if (i === 1 && !isDone) {
+      buttons = `
+        <button class="btn btn-success btn-sm"
+          onclick="approveMandateReview('${project.id}')">Approve Mandate</button>
+        <button class="btn btn-danger btn-sm"
+          onclick="rejectMandateReview('${project.id}')">Decline Mandate</button>`;
+    } else if (!isDone) {
+      buttons = `
+        <button class="btn btn-success btn-sm"
+          onclick="markStepCompleted('${project.id}',${i})">Mark Complete</button>`;
+    }
+    buttons += `
+      <button class="btn btn-ghost btn-sm"
+        onclick="revertStepStatus('${project.id}',${i})">${isDone ? 'Revert' : 'Skip'}</button>`;
+
+    html += `
+      <div style="border:1.5px solid ${border};border-radius:8px;overflow:hidden;">
+        <div style="padding:10px 14px;background:${hdrBg};color:${hdrClr};
+                    font-size:11px;font-weight:600;letter-spacing:1px;">
+          STEP ${i}: ${_STEP_NAMES[i]}
+        </div>
+        <div style="padding:12px;">
+          ${isDone
+            ? `<div class="data-label" style="color:var(--success);margin-bottom:8px;">
+                 ✓ Completed ${_fmt(project[`step${i}CompletedAt`])}
+               </div>`
+            : ''}
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">${buttons}</div>
+        </div>
+      </div>`;
+  }
+
+  html += '</div>';
+  return html;
+}
+
+// ── editProject ───────────────────────────────────────────────
+window.editProject = function (pid) {
+  if (!pid) { showToast('No project ID provided', true); return; }
+  const p = (typeof projects !== 'undefined') ? projects.find(x => x.id === pid) : null;
+  if (!p) { showToast('Project not found — try refreshing', true); return; }
+
+  editProjectId = pid;
+  const c = (typeof clients !== 'undefined') ? clients.find(cl => cl.id === p.clientId) : null;
+
+  const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+
+  setVal('editClientName',       c?.name || '');
+  setVal('editClientEmail',      c?.email || '');
+  setVal('editProjectName',      p.name || '');
+  setVal('editIndustry',         p.industry || 'Real Estate');
+  setVal('editLocation',         p.location || '');
+  setVal('editDataRoomLink',     p.dataRoomLink || '');
+  setVal('editAmount',           p.amount || '');
+  setVal('editRate',             p.interestRate || '');
+  setVal('editFundsNeeded',      p.fundsNeeded || '');
+  setVal('editSponsorEquity',    p.sponsorEquity || '');
+  setVal('editTerm',             p.term || '');
+  setVal('editGracePeriod',      p.gracePeriod || '');
+  setVal('editGoverningLaw',     p.governingLaw || 'England and Wales');
+  setVal('editCloseDate',        p.closeDate || '');
+  setVal('editTermSheetExpiry',  p.termSheetExpiry || '');
+  setVal('editCommitFeeDeadline',p.commitmentFeeDeadline || '');
+  setVal('editDeedExpiry',       p.deedExpiry || '');
+  setVal('editECFPolicyExpiry',  p.ecfPolicyExpiry || '');
+  setVal('editFundedDate',       p.fundedDate || '');
+  setVal('editCommitFee',        p.commitmentFeeStatus || 'pending');
+  setVal('editECFStatus',        p.ecfStatus || 'pending');
+  setVal('editAdvisorNote',      p.advisorNote || '');
+  setVal('editBrokerEngagement', p.brokerEngagement || 'none');
+
+  const stepSel = document.getElementById('editStep');
+  if (stepSel) stepSel.value = String(p.step || 1);
+
+  // Broker dropdown
+  const brokerSelect = document.getElementById('editBrokerAssign');
+  if (brokerSelect) {
+    brokerSelect.innerHTML = '<option value="">Direct Client</option>' +
+      (typeof brokers !== 'undefined' ? brokers : []).map(b =>
+        `<option value="${b.id}" ${p.brokerId === b.id ? 'selected' : ''}>${_esc(b.name)} (${b.commissionRate || 0}%)</option>`
+      ).join('');
+  }
+
+  // CF status panel
+  const cfDiv = document.getElementById('cfStatusDisplay');
+  if (cfDiv) {
+    if (p.commitmentFeeStatus === 'paid') {
+      cfDiv.style.cssText = 'padding:16px;border-radius:8px;background:var(--success-light);border:0.5px solid var(--success);';
+      cfDiv.innerHTML = `
+        <div class="data-label" style="color:var(--success);">Commitment Fee</div>
+        <div style="font-size:16px;font-weight:600;color:var(--success);">✓ Paid</div>
+        <div style="font-size:11px;color:var(--gray-500);margin-top:4px;">
+          Amount: ${_esc(p.commitmentFeeAmount || '—')} &nbsp;·&nbsp;
+          Ref: ${_esc(p.commitmentFeeReference || '—')} &nbsp;·&nbsp;
+          Date: ${_esc(p.commitmentFeeDate || '—')}
+        </div>`;
+    } else {
+      cfDiv.style.cssText = 'padding:16px;border-radius:8px;background:var(--warning-light);border:0.5px solid var(--warning);';
+      cfDiv.innerHTML = `
+        <div class="data-label" style="color:var(--warning);">Commitment Fee</div>
+        <div style="font-size:16px;font-weight:600;color:var(--warning);">⏳ Pending</div>
+        <button class="btn btn-primary btn-sm" style="margin-top:8px;"
+          onclick="showCommitmentFeeModal('${pid}')">Confirm Fee Receipt</button>`;
+    }
+  }
+
+  // ECF status panel
+  const ecfDiv = document.getElementById('ecfStatusDisplay');
+  if (ecfDiv) {
+    if (p.ecfStatus === 'escrowed') {
+      ecfDiv.style.cssText = 'padding:16px;border-radius:8px;background:var(--success-light);border:0.5px solid var(--success);';
+      ecfDiv.innerHTML = `
+        <div class="data-label" style="color:var(--success);">ECF Escrow</div>
+        <div style="font-size:16px;font-weight:600;color:var(--success);">✓ Escrowed</div>
+        <div style="font-size:11px;color:var(--gray-500);margin-top:4px;">
+          Amount: ${_esc(p.ecfAmount || '—')} &nbsp;·&nbsp;
+          Institution: ${_esc(p.ecfInstitution || '—')}
+        </div>`;
+    } else {
+      ecfDiv.style.cssText = 'padding:16px;border-radius:8px;background:var(--warning-light);border:0.5px solid var(--warning);';
+      ecfDiv.innerHTML = `
+        <div class="data-label" style="color:var(--warning);">ECF Escrow</div>
+        <div style="font-size:16px;font-weight:600;color:var(--warning);">⏳ Pending</div>
+        <button class="btn btn-primary btn-sm" style="margin-top:8px;"
+          onclick="showECFEscrowModal('${pid}')">Confirm ECF Escrow</button>`;
+    }
+  }
+
+  // Step dashboard
+  const sc = document.getElementById('stepStatusContainer');
+  if (sc) {
+    try { sc.innerHTML = _renderStepDash(p); }
+    catch (e) { sc.innerHTML = '<p style="color:var(--gray-400);font-size:12px;">Step dashboard unavailable.</p>'; }
+  }
+
+  // Open modal on Details tab
+  window.switchEditTab('project');
+  const modal = document.getElementById('editProjectModal');
+  if (modal) modal.classList.add('active');
+};
+
+// ── editClientProject ─────────────────────────────────────────
+window.editClientProject = function (clientId) {
+  if (!clientId) return;
+  const p = (typeof projects !== 'undefined') ? projects.find(x => x.clientId === clientId) : null;
+  if (p) {
+    window.editProject(p.id);
+  } else {
+    showToast('No project found for this client', true);
+  }
+};
+
+// ── saveProjectInfo ───────────────────────────────────────────
+window.saveProjectInfo = async function () {
+  const pid = (typeof editProjectId !== 'undefined') ? editProjectId : null;
+  if (!pid) { showToast('No project selected', true); return; }
+  const p = (typeof projects !== 'undefined') ? projects.find(x => x.id === pid) : null;
+  if (!p) { showToast('Project not found', true); return; }
+
+  const get = id => document.getElementById(id)?.value || '';
+  const clientName  = get('editClientName').trim();
+  const clientEmail = get('editClientEmail').trim();
+
+  const btn = document.querySelector('#editProjectModal .modal-footer .btn-primary');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="btn-spinner"></span> Saving...'; }
+
+  try {
+    // BugFix#8 — only update email if it contains '@'
+    if (p.clientId && clientName) {
+      const clientUpdate = { name: clientName };
+      if (clientEmail && clientEmail.includes('@')) clientUpdate.email = clientEmail;
+      await db.collection('clients').doc(p.clientId).update(clientUpdate);
+    }
+
+    await db.collection('projects').doc(pid).update({
+      name:                  get('editProjectName')      || p.name,
+      industry:              get('editIndustry'),
+      location:              get('editLocation'),
+      dataRoomLink:          get('editDataRoomLink'),
+      amount:                get('editAmount'),
+      interestRate:          get('editRate'),
+      fundsNeeded:           get('editFundsNeeded'),
+      sponsorEquity:         get('editSponsorEquity'),
+      step:                  parseInt(get('editStep'))   || p.step || 1,
+      closeDate:             get('editCloseDate'),
+      termSheetExpiry:       get('editTermSheetExpiry'),
+      commitmentFeeDeadline: get('editCommitFeeDeadline'),
+      deedExpiry:            get('editDeedExpiry'),
+      ecfPolicyExpiry:       get('editECFPolicyExpiry'),
+      term:                  get('editTerm'),
+      gracePeriod:           get('editGracePeriod'),
+      governingLaw:          get('editGoverningLaw'),
+      fundedDate:            get('editFundedDate'),
+      brokerId:              get('editBrokerAssign')     || null,
+      commitmentFeeStatus:   get('editCommitFee')        || 'pending',
+      ecfStatus:             get('editECFStatus')        || 'pending',
+      advisorNote:           get('editAdvisorNote'),
+      brokerEngagement:      get('editBrokerEngagement') || 'none'
+    });
+
+    const modal = document.getElementById('editProjectModal');
+    if (modal) modal.classList.remove('active');
+    showToast('Project saved successfully');
+
+  } catch (e) {
+    showToast(e.message, true);
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = 'Save Changes'; }
+  }
+};
+
+// ── switchEditTab ─────────────────────────────────────────────
+window.switchEditTab = function (tabName) {
+  document.querySelectorAll('.modal-tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.modal-tab-pane').forEach(p => p.classList.remove('active'));
+  const tabBtn  = document.getElementById('tabBtn-' + tabName);
+  const tabPane = document.getElementById('edit-tab-' + tabName);
+  if (tabBtn)  tabBtn.classList.add('active');
+  if (tabPane) tabPane.classList.add('active');
+};
+
+// ── Self-test ─────────────────────────────────────────────────
+console.log('[Croft] Edit patch loaded — editProject:', typeof window.editProject);
 </script>
 </body>
 </html>
