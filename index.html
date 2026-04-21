@@ -886,6 +886,20 @@ body.dark-mode .badge-neutral { background:rgba(255,255,255,0.1); color:var(--gr
 <div id="termsModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Confidentiality & Portal Access Terms</h3><button class="modal-close" onclick="closeModal('termsModal')">✕</button></div><div class="modal-body" style="font-size:13px;line-height:1.8;color:var(--gray-700);"><p><strong>1. Confidentiality.</strong> All information shared through this portal is strictly confidential.</p><p style="margin-top:12px;"><strong>2. Permitted Use.</strong> Access is granted solely for the purpose of managing your financing mandate with Croft Finance.</p><p style="margin-top:12px;"><strong>3. Investor Confidentiality.</strong> The identity of Croft Finance's capital partners is not disclosed as a condition of their participation.</p><p style="margin-top:12px;"><strong>4. Governing Law.</strong> These terms are governed by the laws of the Republic of Serbia.</p><p style="margin-top:12px;"><strong>5. Acceptance.</strong> By registering for portal access, you confirm that you have read, understood, and agree to be bound by these terms.</p></div></div></div>
 
 <!-- ============================================================ -->
+<!-- IMPERSONATION BANNER -->
+<!-- ============================================================ -->
+<div id="impersonationBanner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#c97b2a;color:white;padding:10px 24px;display:none;align-items:center;justify-content:space-between;">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <i class="fas fa-eye"></i>
+    <span style="font-size:13px;font-weight:500;">You are viewing the portal as <strong id="impersonationClientName"></strong></span>
+    <span style="font-size:11px;opacity:0.8;">— This is a read-only preview</span>
+  </div>
+  <button onclick="exitImpersonation()" style="background:white;color:#c97b2a;border:none;padding:6px 16px;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;">
+    ← Exit Preview &amp; Return to Admin
+  </button>
+</div>
+  
+<!-- ============================================================ -->
 <!-- CLIENT PORTAL VIEW -->
 <!-- ============================================================ -->
 <div id="view-portal" class="view">
@@ -2939,6 +2953,7 @@ function renderClientsTable(filteredClients) {
              <button class="btn btn-danger btn-sm" onclick="declineClient('${c.id}')">Decline</button>`
           : ''}
         <button class="btn btn-ghost btn-sm" onclick="editClientProject('${c.id}')">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteClient('${c.id}')">Delete</button>
         <button class="btn btn-danger btn-sm" onclick="deleteClient('${c.id}')">Delete</button>
       </td>
     </tr>`;
@@ -5767,6 +5782,109 @@ window.switchEditTab = function (tabName) {
   const tabPane = document.getElementById('edit-tab-' + tabName);
   if (tabBtn)  tabBtn.classList.add('active');
   if (tabPane) tabPane.classList.add('active');
+};
+
+// ============================================================
+// ADMIN IMPERSONATION — VIEW AS CLIENT
+// ============================================================
+
+let _impersonationPreviousState = null;
+
+window.impersonateClient = async function (clientId) {
+  const client = clients.find(c => c.id === clientId);
+  if (!client) { showToast('Client not found', true); return; }
+  if (client.status === 'crm_only') {
+    showToast('CRM-only clients have no portal — nothing to preview', true);
+    return;
+  }
+
+  // Save current admin state so we can restore it
+  _impersonationPreviousState = {
+    currentClient:    currentClient,
+    currentProjectId: currentProjectId,
+    currentBroker:    currentBroker,
+    projects:         [...projects],
+    documents:        [...documents],
+    messages:         [...messages],
+    meetings:         [...meetings]
+  };
+
+  // Set up client context
+  currentClient    = client;
+  currentProjectId = null;
+
+  // Fetch this client's data directly
+  try {
+    const [projSnap, docSnap, msgSnap, meetSnap] = await Promise.all([
+      db.collection('projects').where('clientId','==', clientId).get(),
+      db.collection('documents').where('clientId','==', clientId).get(),
+      db.collection('messages').where('clientId','==', clientId).get(),
+      db.collection('meetings').where('clientId','==', clientId).get()
+    ]);
+
+    projects  = projSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    documents = docSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    messages  = msgSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    meetings  = meetSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    if (projects.length) currentProjectId = projects[0].id;
+
+  } catch (e) {
+    showToast('Failed to load client data: ' + e.message, true);
+    return;
+  }
+
+  // Show impersonation banner
+  const banner = document.getElementById('impersonationBanner');
+  const nameEl = document.getElementById('impersonationClientName');
+  if (banner) { banner.style.display = 'flex'; }
+  if (nameEl) nameEl.innerText = client.name;
+
+  // Switch to client portal view and push portal nav down
+  showView('portal');
+  document.querySelector('.portal-nav').style.top = '40px';
+  document.querySelector('.sidebar').style.top    = '104px';
+
+  // Load client portal with impersonated data
+  loadClientPortal();
+  loadCurrentProjectData();
+  renderCapitalStack();
+  renderProjectsList();
+  renderStepAccordion();
+  renderDocuments();
+  loadMessages();
+  updateUpcomingDeadlines();
+  checkDeadlines();
+  switchPortalTab('dashboard');
+
+  showToast(`Previewing portal as ${client.name}`);
+};
+
+window.exitImpersonation = function () {
+  if (!_impersonationPreviousState) { location.reload(); return; }
+
+  // Restore admin state
+  currentClient    = _impersonationPreviousState.currentClient;
+  currentProjectId = _impersonationPreviousState.currentProjectId;
+  currentBroker    = _impersonationPreviousState.currentBroker;
+  projects         = _impersonationPreviousState.projects;
+  documents        = _impersonationPreviousState.documents;
+  messages         = _impersonationPreviousState.messages;
+  meetings         = _impersonationPreviousState.meetings;
+  _impersonationPreviousState = null;
+
+  // Hide banner and restore nav positions
+  const banner = document.getElementById('impersonationBanner');
+  if (banner) banner.style.display = 'none';
+  const nav     = document.querySelector('.portal-nav');
+  const sidebar = document.querySelector('.sidebar');
+  if (nav)     nav.style.top     = '0';
+  if (sidebar) sidebar.style.top = '64px';
+
+  // Return to admin panel
+  showView('admin');
+  switchAdminTab('clients');
+  showToast('Returned to admin panel');
 };
 
 // ── Self-test ─────────────────────────────────────────────────
