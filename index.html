@@ -4902,13 +4902,6 @@ function loadClientActivityLog() {
     });
 }
 
-  query.orderBy('timestamp','desc').limit(50).get()
-    .then(fetchAndRender)
-    .catch(() => query.limit(50).get().then(fetchAndRender).catch(e => {
-      container.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Unable to load activity log.</p></div>`;
-    }));
-}
-
 // ============================================================
 // WIRING INSTRUCTIONS
 // ============================================================
@@ -5511,6 +5504,7 @@ window.confirmECFEscrow = async function (projectId) {
     }
   } catch (e) { showToast(e.message, true); }
 };
+</script>
 <script>
 // ============================================================
 // EDIT BUTTON PATCH — complete, self-contained, no dependencies
@@ -5701,13 +5695,9 @@ window.editProject = function (pid) {
 
 // ── editClientProject ─────────────────────────────────────────
 window.editClientProject = function (clientId) {
-  if (!clientId) return;
-  const p = (typeof projects !== 'undefined') ? projects.find(x => x.clientId === clientId) : null;
-  if (p) {
-    window.editProject(p.id);
-  } else {
-    showToast('No project found for this client', true);
-  }
+  const p = projects.find(x => x.clientId === clientId);
+  if (p) window.editProject(p.id);
+  else showToast('No project found for this client', true);
 };
 
 // ── saveProjectInfo ───────────────────────────────────────────
