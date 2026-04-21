@@ -1317,7 +1317,7 @@ body.dark-mode .badge-neutral { background:rgba(255,255,255,0.1); color:var(--gr
 </div><div class="modal-footer"><button class="btn btn-secondary btn-md" onclick="closeModal('editProjectModal')">Cancel</button><button class="btn btn-primary btn-md" onclick="saveProjectInfo()">Save Changes</button></div></div></div>
 
 <!-- Add Client Modal -->
-<div id="addClientModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Add Client (Portal Access)</h3><button class="modal-close" onclick="closeModal('addClientModal')">✕</button></div><div class="modal-body"><div class="form-grid-2"><div class="form-group"><label class="form-label">Full Name *</label><input type="text" id="ncName" class="form-input"></div><div class="form-group"><label class="form-label">Email *</label><input type="email" id="ncEmail" class="form-input"></div><div class="form-group"><label class="form-label">Password *</label><input type="password" id="ncPassword" class="form-input"></div><div class="form-group"><label class="form-label">Project Name *</label><input type="text" id="ncProject" class="form-input"></div></div><button class="btn btn-primary btn-md" id="createClientBtn" onclick="createClient()" style="width:100%;margin-top:8px;">Create Client</button></div></div></div>
+<div id="addClientModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Add Client (Portal Access)</h3><button class="modal-close" onclick="closeModal('addClientModal')">✕</button></div><div class="modal-body"><div class="form-grid-2"><div class="form-group"><label class="form-label">Full Name *</label><input type="text" id="ncName" class="form-input"></div><div class="form-group"><label class="form-label">Email *</label><input type="email" id="ncEmail" class="form-input"></div><div class="form-group"><label class="form-label">Project Name *</label><input type="text" id="ncProject" class="form-input"></div></div><button class="btn btn-primary btn-md" id="createClientBtn" onclick="createClient()" style="width:100%;margin-top:8px;">Create Client</button></div></div></div>
 
 <!-- Add CRM Client Modal -->
 <div id="addCrmClientModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Add CRM Client (No Portal Access)</h3><button class="modal-close" onclick="closeModal('addCrmClientModal')">✕</button></div><div class="modal-body"><div class="form-grid-2"><div class="form-group"><label class="form-label">Full Name *</label><input type="text" id="crmName" class="form-input"></div><div class="form-group"><label class="form-label">Email</label><input type="email" id="crmEmail" class="form-input"></div><div class="form-group"><label class="form-label">Phone</label><input type="text" id="crmPhone" class="form-input"></div><div class="form-group"><label class="form-label">Company</label><input type="text" id="crmCompany" class="form-input"></div></div><div class="form-group"><label class="form-label">Notes</label><textarea id="crmNotes" rows="3" class="form-textarea"></textarea></div><div class="form-group"><label class="form-label">Project Name</label><input type="text" id="crmProject" class="form-input"></div><div class="form-grid-2"><div class="form-group"><label class="form-label">Industry</label><select id="crmIndustry" class="form-select"><option>Real Estate</option><option>Infrastructure</option><option>Energy & Renewables</option><option>Mining</option><option>Oil & Gas</option></select></div><div class="form-group"><label class="form-label">Project Status</label><select id="crmProjectStatus" class="form-select"><option>Lead</option><option>Proposal</option><option>Negotiation</option><option>Closed</option><option>Lost</option></select></div><div class="form-group"><label class="form-label">Project Value (USD)</label><input type="text" id="crmProjectValue" class="form-input"></div><div class="form-group"><label class="form-label">Expected Close</label><input type="date" id="crmExpectedClose" class="form-input"></div></div><button class="btn btn-primary btn-md" onclick="createCrmClient()" style="width:100%">Save to CRM</button></div></div></div>
@@ -2467,23 +2467,24 @@ function _getSecondaryAuth() {
 window.showAddClientModal = function () { openModal('addClientModal'); };
 
 window.createClient = async function () {
-  const name     = document.getElementById('ncName').value.trim();
-  const email    = document.getElementById('ncEmail').value.trim().toLowerCase();
-  const password = document.getElementById('ncPassword').value;
-  const project  = document.getElementById('ncProject').value.trim();
-  if (!name || !email || !password || !project) return showToast('Fill all fields', true);
-  if (password.length < 6) return showToast('Password must be 6+ characters', true);
+  const name    = document.getElementById('ncName').value.trim();
+  const email   = document.getElementById('ncEmail').value.trim().toLowerCase();
+  const project = document.getElementById('ncProject').value.trim();
+  if (!name || !email || !project) return showToast('Fill all fields', true);
 
   const adminUser = auth.currentUser;
   if (!adminUser) return showToast('Admin session expired — please refresh', true);
+
+  // Auto-generate a secure temporary password
+  const tempPassword = 'Croft' + Math.random().toString(36).slice(-4).toUpperCase() + 
+                       Math.random().toString(36).slice(-4) + '!7';
 
   const btn = document.getElementById('createClientBtn');
   if (btn) { btn.disabled = true; btn.innerHTML = '<span class="btn-spinner"></span> Creating...'; }
 
   try {
-    // BugFix#3 — use secondary app so admin stays logged in
     const secondaryAuth = _getSecondaryAuth();
-    const cred = await secondaryAuth.createUserWithEmailAndPassword(email, password);
+    const cred = await secondaryAuth.createUserWithEmailAndPassword(email, tempPassword);
     const newUid = cred.user.uid;
     await secondaryAuth.signOut();
 
@@ -2495,11 +2496,35 @@ window.createClient = async function () {
       clientId: newUid, name: project, step: 1,
       status: 'active', createdAt: new Date().toISOString()
     });
-    await logActivity(adminUser.uid, 'Suzana Aleksić', 'croft', 'client_created', null, `Created client: ${name}`);
+    await logActivity(adminUser.uid, 'Suzana Aleksić', 'croft',
+      'client_created', null, `Created client: ${name}`);
 
-    showToast(`Client ${name} created`);
+    // Send welcome email with login details
+    await sendEmailNotification({
+      to_name:      name,
+      to_email:     email,
+      from_name:    'Suzana Aleksić — Croft Finance',
+      subject:      `Welcome to the Croft Finance Client Portal — ${project}`,
+      message:      `Dear ${name},\n\nI am pleased to confirm that your secure client portal has been set up for your project "${project}".\n\nYour login details are below:\n\nPortal: ${window.location.origin}\nEmail: ${email}\nTemporary Password: ${tempPassword}\n\nPlease log in at your earliest convenience and change your password immediately after signing in for the first time.\n\nThrough your portal you will be able to:\n— Track your deal progress in real time\n— Access and upload documents\n— Send me messages directly\n— Schedule calls\n— View your full deal sheet\n\nIf you have any difficulty logging in, please do not hesitate to contact me directly.\n\nBest regards,\nSuzana Aleksić\nPrincipal, Croft Finance\n\nsuzana.aleksic@croftfinance.com\n+381 69 288 0 191`,
+      project_name: project
+    });
+
+    // Also notify yourself so you have a record
+    await sendEmailNotification({
+      to_name:      'Croft Finance',
+      to_email:     EMAILJS_CONFIG.adminEmail,
+      from_name:    'Croft Finance Portal',
+      subject:      `New Client Portal Created — ${name}`,
+      message:      `A new client portal has been created:\n\nName: ${name}\nEmail: ${email}\nProject: ${project}\nTemporary Password: ${tempPassword}\n\nThe client has been sent their login details automatically.`,
+      project_name: project
+    });
+
+    showToast(`Portal created and invitation sent to ${email}`);
     closeModal('addClientModal');
-    ['ncName','ncEmail','ncPassword','ncProject'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+    ['ncName','ncEmail','ncProject'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = '';
+    });
+
   } catch (e) {
     showToast(e.message, true);
   } finally {
@@ -3090,19 +3115,75 @@ function updateDashboardWidgets() {
 function checkDocumentExpiry() {
   const today = new Date(); today.setHours(0,0,0,0);
   const week  = new Date(today.getTime() + 7*24*60*60*1000);
+
   const expiring = documents.filter(d => {
     if (!d.expiryDate) return false;
     const exp = new Date(d.expiryDate); exp.setHours(0,0,0,0);
     return exp > today && exp <= week;
   });
+
+  // Update the counter widget
   const el = document.getElementById('expiringDocs');
   if (el) el.innerText = expiring.length;
-  if (expiring.length && !sessionStorage.getItem('expiryShown')) {
-    sessionStorage.setItem('expiryShown','true');
-    const content = document.getElementById('expiryWarningContent');
-    if (content) content.innerHTML = `<p>${expiring.length} document(s) will expire within 7 days:</p><ul style="margin-top:12px;">${expiring.map(d=>`<li style="margin-bottom:6px;">${escapeHtml(d.name)} — ${formatDate(d.expiryDate)}</li>`).join('')}</ul>`;
-    openModal('expiryWarningModal');
+
+  if (!expiring.length) return;
+
+  // Build a unique key based on which documents are expiring
+  // This means the warning shows again whenever a NEW document enters the expiry window
+  const expiryKey = expiring.map(d => d.id + '_' + d.expiryDate).sort().join('|');
+  const lastShown = sessionStorage.getItem('expiryShownKey');
+
+  if (lastShown === expiryKey) return; // Same set of documents already warned about
+
+  // New documents in expiry window — show the warning
+  sessionStorage.setItem('expiryShownKey', expiryKey);
+
+  const content = document.getElementById('expiryWarningContent');
+  if (content) {
+    // Group by urgency
+    const critical = expiring.filter(d => daysUntil(d.expiryDate) <= 3);
+    const warning  = expiring.filter(d => daysUntil(d.expiryDate) > 3);
+
+    let html = `<p style="margin-bottom:16px;">${expiring.length} document(s) will expire within 7 days:</p>`;
+
+    if (critical.length) {
+      html += `<div style="margin-bottom:12px;">
+        <div class="data-label" style="color:var(--error);margin-bottom:8px;">⚠ Expiring within 3 days</div>
+        ${critical.map(d => {
+          const days = daysUntil(d.expiryDate);
+          const client = clients.find(c => c.id === d.clientId);
+          return `<div style="padding:10px;background:var(--error-light);border-radius:6px;margin-bottom:6px;">
+            <strong>${escapeHtml(d.name)}</strong>
+            ${client ? `<span class="data-label" style="margin-left:8px;">${escapeHtml(client.name)}</span>` : ''}
+            <br><span class="expiry-danger">${formatDate(d.expiryDate)} — ${days === 0 ? 'expires today' : days + ' day' + (days !== 1 ? 's' : '') + ' remaining'}</span>
+          </div>`;
+        }).join('')}
+      </div>`;
+    }
+
+    if (warning.length) {
+      html += `<div>
+        <div class="data-label" style="color:var(--warning);margin-bottom:8px;">Expiring within 7 days</div>
+        ${warning.map(d => {
+          const days = daysUntil(d.expiryDate);
+          const client = clients.find(c => c.id === d.clientId);
+          return `<div style="padding:10px;background:var(--warning-light);border-radius:6px;margin-bottom:6px;">
+            <strong>${escapeHtml(d.name)}</strong>
+            ${client ? `<span class="data-label" style="margin-left:8px;">${escapeHtml(client.name)}</span>` : ''}
+            <br><span class="expiry-warn">${formatDate(d.expiryDate)} — ${days} day${days !== 1 ? 's' : ''} remaining</span>
+          </div>`;
+        }).join('')}
+      </div>`;
+    }
+
+    html += `<div style="margin-top:20px;font-size:12px;color:var(--gray-500);">
+      You will be reminded again if new documents enter the expiry window.
+    </div>`;
+
+    content.innerHTML = html;
   }
+
+  openModal('expiryWarningModal');
 }
 
 function renderDealHealthSummary() {
@@ -3256,8 +3337,41 @@ function renderMeetings() {
 }
 
 window.updateMeetingStatus = async function (id, status) {
-  try { await db.collection('meetings').doc(id).update({ status }); showToast(`Meeting ${status}`); }
-  catch (e) { showToast(e.message, true); }
+  try {
+    await db.collection('meetings').doc(id).update({ status });
+    showToast(`Meeting ${status}`);
+
+    // Send email to client when meeting is confirmed or cancelled
+    const meeting = meetings.find(m => m.id === id);
+    if (!meeting) return;
+    const client = clients.find(c => c.id === meeting.clientId);
+    if (!client?.email?.includes('@')) return;
+
+    if (status === 'confirmed') {
+      await sendEmailNotification({
+        to_name:      client.name,
+        to_email:     client.email,
+        from_name:    'Suzana Aleksić — Croft Finance',
+        subject:      `Meeting Confirmed — ${meeting.date} at ${meeting.time}`,
+        message:      `Dear ${client.name},\n\nYour ${meeting.type} has been confirmed for ${meeting.date} at ${meeting.time}.\n\n${meeting.notes ? 'Notes: ' + meeting.notes + '\n\n' : ''}Please log in to your portal if you need to make any changes.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
+        project_name: meetings.find(m => m.id === id)?.projectName || 'N/A'
+      });
+      await logActivity('admin', 'Suzana Aleksić', 'croft', 'meeting_confirmed',
+        null, `Meeting confirmed for ${client.name} on ${meeting.date} at ${meeting.time}`);
+    }
+
+    if (status === 'cancelled') {
+      await sendEmailNotification({
+        to_name:      client.name,
+        to_email:     client.email,
+        from_name:    'Suzana Aleksić — Croft Finance',
+        subject:      `Meeting Cancelled — ${meeting.date} at ${meeting.time}`,
+        message:      `Dear ${client.name},\n\nUnfortunately your ${meeting.type} scheduled for ${meeting.date} at ${meeting.time} has been cancelled.\n\nPlease log in to your portal to request a new time.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
+        project_name: 'N/A'
+      });
+    }
+
+  } catch (e) { showToast(e.message, true); }
 };
 window.deleteMeeting = async function (id) {
   if (!confirmDelete('meeting')) return;
@@ -3691,12 +3805,67 @@ window.viewSubmissionDetail = function (id) {
 };
 
 window.acceptSubmission = async function (id) {
-  try { await db.collection('brokerSubmissions').doc(id).update({ status:'accepted' }); showToast('Submission accepted'); renderSubmissionsTable(); const p=document.getElementById('submissionDetailPanel'); if(p) p.style.display='none'; }
-  catch (e) { showToast(e.message, true); }
+  try {
+    await db.collection('brokerSubmissions').doc(id).update({
+      status: 'accepted',
+      resolvedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showToast('Submission accepted');
+
+    // Notify the broker
+    const submission = brokerSubmissions.find(s => s.id === id);
+    if (submission) {
+      const broker = brokers.find(b => b.id === submission.brokerId);
+      if (broker?.email?.includes('@')) {
+        await sendEmailNotification({
+          to_name:      broker.name,
+          to_email:     broker.email,
+          from_name:    'Suzana Aleksić — Croft Finance',
+          subject:      `Deal Submission Accepted — ${submission.projectName}`,
+          message:      `Dear ${broker.name},\n\nGreat news — your deal submission for "${submission.projectName}" (Client: ${submission.clientName}) has been accepted by Croft Finance.\n\nSuzana will be in touch shortly to discuss next steps and arrange introductions.\n\nPlease log in to your broker portal to track progress.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
+          project_name: submission.projectName
+        });
+      }
+      await logActivity('admin', 'Suzana Aleksić', 'croft', 'submission_accepted',
+        null, `Accepted submission: ${submission.projectName} from ${submission.brokerName}`);
+    }
+
+    renderSubmissionsTable();
+    const p = document.getElementById('submissionDetailPanel');
+    if (p) p.style.display = 'none';
+  } catch (e) { showToast(e.message, true); }
 };
+
 window.rejectSubmission = async function (id) {
-  try { await db.collection('brokerSubmissions').doc(id).update({ status:'rejected' }); showToast('Submission rejected'); renderSubmissionsTable(); const p=document.getElementById('submissionDetailPanel'); if(p) p.style.display='none'; }
-  catch (e) { showToast(e.message, true); }
+  try {
+    await db.collection('brokerSubmissions').doc(id).update({
+      status: 'rejected',
+      resolvedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showToast('Submission rejected');
+
+    // Notify the broker
+    const submission = brokerSubmissions.find(s => s.id === id);
+    if (submission) {
+      const broker = brokers.find(b => b.id === submission.brokerId);
+      if (broker?.email?.includes('@')) {
+        await sendEmailNotification({
+          to_name:      broker.name,
+          to_email:     broker.email,
+          from_name:    'Suzana Aleksić — Croft Finance',
+          subject:      `Deal Submission Update — ${submission.projectName}`,
+          message:      `Dear ${broker.name},\n\nThank you for submitting "${submission.projectName}" to Croft Finance.\n\nAfter careful review, we are unable to proceed with this particular mandate at this time. This may be due to deal size, sector focus, or current pipeline capacity.\n\nWe value your relationship and encourage you to continue submitting deals that match our current focus. Please log in to your broker portal to view our current deal appetite.\n\nIf you would like to discuss this decision, please reply to this email.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
+          project_name: submission.projectName
+        });
+      }
+      await logActivity('admin', 'Suzana Aleksić', 'croft', 'submission_rejected',
+        null, `Rejected submission: ${submission.projectName} from ${submission.brokerName}`);
+    }
+
+    renderSubmissionsTable();
+    const p = document.getElementById('submissionDetailPanel');
+    if (p) p.style.display = 'none';
+  } catch (e) { showToast(e.message, true); }
 };
 
 // ============================================================
@@ -4644,37 +4813,94 @@ function loadClientActivityLog() {
   if (!container || !currentClient) return;
   container.innerHTML = `<div style="text-align:center;padding:20px;"><div class="spinner"></div></div>`;
 
-  // Try with orderBy first, fall back without if index missing
-  const query = db.collection('activityLog').where('actorId','==',currentClient.id);
-  const fetchAndRender = (snap) => {
-    const logs = snap.docs.map(d=>({id:d.id,...d.data()}))
+  // Fetch both client's own actions AND admin actions on their project
+  const clientQuery = db.collection('activityLog').where('actorId','==',currentClient.id);
+  const projectQuery = currentProjectId
+    ? db.collection('activityLog').where('projectId','==',currentProjectId)
+    : null;
+
+  const fetchAndRender = (snaps) => {
+    // Merge both result sets and remove duplicates by id
+    const allDocs = {};
+    snaps.forEach(snap => {
+      snap.docs.forEach(d => { allDocs[d.id] = { id: d.id, ...d.data() }; });
+    });
+
+    const logs = Object.values(allDocs)
       .sort((a,b) => (b.timestamp?.seconds||0) - (a.timestamp?.seconds||0))
-      .slice(0, 50);
+      .slice(0, 80);
+
     if (!logs.length) {
       container.innerHTML = `<div class="empty-state"><i class="fas fa-history"></i><p>No activity yet. Your actions will appear here.</p></div>`;
       return;
     }
+
     container.innerHTML = logs.map(l => {
+      const isCroft  = l.actorRole === 'croft' || l.actorId !== currentClient.id;
+      const actorName = isCroft ? 'Suzana Aleksić' : 'You';
+
+      // Human-readable labels for every action type
       const actionLabels = {
-        'register':        'Account registered',
-        'upload_document': `Document uploaded${l.details?' — '+l.details:''}`,
-        'send_message':    'Message sent to Croft Finance',
-        'login':           'Logged in',
-        'step_completed':  `Step completed${l.details?' — '+l.details:''}`
+        'register':           'Account registered',
+        'upload_document':    `Document uploaded${l.details ? ' — ' + l.details : ''}`,
+        'send_message':       'Message sent to Croft Finance',
+        'login':              'Logged in to portal',
+        'step_completed':     `${l.details || 'Deal step completed'}`,
+        'client_created':     'Portal access granted',
+        'mandate_approved':   'Mandate approved — deal advancing to Term Sheet',
+        'mandate_declined':   'Mandate reviewed — unable to proceed at this time',
+        'document_approved':  `Document approved${l.details ? ' — ' + l.details : ''}`,
+        'deal_update':        `Deal updated${l.details ? ' — ' + l.details : ''}`,
+        'meeting_confirmed':  'Meeting confirmed by Croft Finance',
+        'meeting_scheduled':  'Meeting scheduled',
+        'note_added':         'Note added by Croft Finance'
       };
-      const text     = actionLabels[l.action] || l.action || 'Action recorded';
-      const dotClass = l.actorRole === 'croft' ? 'croft' : l.action?.includes('complete') ? 'completion' : 'client';
-      const iconCls  = l.actorRole === 'croft' ? 'fa-building' : l.action?.includes('complete') ? 'fa-check' : 'fa-user';
+
+      const text     = actionLabels[l.action] || l.details || l.action || 'Activity recorded';
+      const dotClass = isCroft ? 'croft' : l.action?.includes('complete') ? 'completion' : 'client';
+      const iconCls  = isCroft
+        ? 'fa-building'
+        : l.action === 'upload_document'
+          ? 'fa-upload'
+          : l.action === 'send_message'
+            ? 'fa-comment'
+            : l.action?.includes('complete')
+              ? 'fa-check'
+              : 'fa-user';
+
+      // Color coding
+      const dotColor = isCroft
+        ? 'var(--blue)'
+        : l.action?.includes('complete')
+          ? 'var(--success)'
+          : 'var(--navy)';
+
       return `
         <div class="activity-item">
-          <div class="activity-dot ${dotClass}"><i class="fas ${iconCls}"></i></div>
+          <div class="activity-dot ${dotClass}" style="border-color:${dotColor};">
+            <i class="fas ${iconCls}" style="color:${dotColor};"></i>
+          </div>
           <div class="activity-content">
-            <div class="activity-description">${escapeHtml(text)}</div>
+            <div class="activity-description">
+              <span style="font-weight:600;color:${isCroft?'var(--blue)':'var(--navy)'};">${actorName}</span>
+              — ${escapeHtml(text)}
+            </div>
             <div class="activity-time">${formatDateTime(l.timestamp)}</div>
           </div>
         </div>`;
     }).join('');
   };
+
+  // Run both queries and combine results
+  const promises = [clientQuery.limit(50).get()];
+  if (projectQuery) promises.push(projectQuery.limit(50).get());
+
+  Promise.all(promises)
+    .then(fetchAndRender)
+    .catch(() => {
+      container.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Unable to load activity log.</p></div>`;
+    });
+}
 
   query.orderBy('timestamp','desc').limit(50).get()
     .then(fetchAndRender)
