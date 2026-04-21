@@ -2994,7 +2994,7 @@ function renderAdminTables() {
 
 window.editClientProject = function (clientId) {
   const p = projects.find(x => x.clientId === clientId);
-  if (p) editProject(p.id);
+  if (p) window.editProject(p.id);
   else showToast('No project found for this client', true);
 };
 
