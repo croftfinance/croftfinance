@@ -2378,8 +2378,8 @@ function _bindClientListeners(uid) {
   sub(db.collection('projects').where('clientId', '==', uid).orderBy('createdAt', 'desc'), s => {
     projects = s.docs.map(d => ({ id: d.id, ...d.data() }));
     if (projects.length) {
-      // BugFix#5 — only update currentProjectId if not yet set (avoids race)
-      if (!currentProjectId) currentProjectId = projects[0].id;
+      const stillExists = projects.find(p => p.id === currentProjectId);
+      currentProjectId = stillExists ? stillExists.id : projects[0].id;
       loadCurrentProjectData();
       renderCapitalStack();
       renderProjectsList();
@@ -4256,7 +4256,7 @@ function loadCurrentProjectData() {
   const p = projects.find(x => x.id === currentProjectId);
   if (!p) return;
 
-  const step    = p.step || 1;
+  const step    = parseInt(p.step) || 1;
   const percent = Math.round((step / 9) * 100);
 
   // Hero stats
@@ -4637,7 +4637,7 @@ function renderStepAccordion() {
   }
   const p = projects.find(x => x.id === currentProjectId);
   if (!p) return;
-  const currentStep = p.step || 1;
+  const currentStep = parseInt(p.step) || 1;
 
   container.innerHTML = Array.from({length:9},(_,i)=>i+1).map(i => {
     const isCompleted = p[`step${i}Completed`];
