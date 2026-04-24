@@ -1048,7 +1048,7 @@ body.dark-mode .badge-neutral { background:rgba(255,255,255,0.10);color:var(--gr
           </div>
           <div style="background:white;border:0.5px solid var(--gray-200);border-radius:8px;padding:20px;">
             <div class="data-label">Approach</div>
-            <div style="font-size:13px;color:var(--navy);margin-top:8px;line-height:1.8;">Single point of contact<br>No credit committees<br>Direct decisions<br>14–21 day funding<br>Full confidentiality</div>
+            <div style="font-size:13px;color:var(--navy);margin-top:8px;line-height:1.8;">Single point of contact<br>Direct decisions<br>14–21 day funding</div>
           </div>
         </div>
       </div>
@@ -3619,8 +3619,11 @@ function renderPipeline() {
             if (!newStep) return;
             try {
               await db.collection('projects').doc(pid).update({ step: newStep });
+              // Update local array immediately so UI refreshes before Firestore listener fires
+              const localProj = projects.find(x=>x.id===pid);
+              if (localProj) localProj.step = newStep;
               showToast(`Deal moved to ${toStage}`);
-            } catch(e) { showToastError(e.message); }
+            } catch(e) { showToastError(e.message); renderPipeline(); }
           }
         });
       });
@@ -4479,7 +4482,7 @@ window.saveProjectInfo = async function() {
       interestRate:          parseFloat(get('editRate'))||0,
       fundsNeeded:           parseFloat(get('editFundsNeeded'))||0,
       sponsorEquity:         parseFloat(get('editSponsorEquity'))||0,
-      step:                  parseInt(get('editStep'))||1,
+      step:                  Math.max(parseInt(get('editStep'))||1, parseInt(p.step)||1),
       closeDate:             get('editCloseDate'),
       termSheetExpiry:       get('editTermSheetExpiry'),
       commitmentFeeDeadline: get('editCommitFeeDeadline'),
@@ -4558,6 +4561,9 @@ async function _advanceStep(projectId, stepNum, extraData = {}) {
     const sc=document.getElementById('stepStatusContainer');
     const updated = {...project,...updates};
     if (sc) { try{sc.innerHTML=renderStepDashboard(updated);}catch(_){} }
+    // Sync dropdown so Save button always writes the correct (advanced) step
+    const stepDrop=document.getElementById('editStep');
+    if (stepDrop) stepDrop.value=String(updates.step||parseInt(project.step)||1);
   }
 }
 
@@ -4599,6 +4605,10 @@ window.markStepCompleted = async function(projectId, stepNum) {
   if (!confirmAction(`Mark Step ${stepNum} (${STEP_NAMES[stepNum]}) as complete?`)) return;
   try {
     await _advanceStep(projectId, stepNum);
+    // Update local projects array immediately so admin pipeline refreshes now
+    const lp = projects.find(x=>x.id===projectId);
+    if (lp) { lp.step = Math.max(parseInt(lp.step)||1, stepNum+1<=9?stepNum+1:9); lp[`step${stepNum}Completed`]=true; }
+    renderPipeline(); renderDealHealthSummary();
     showToastSuccess(`Step ${stepNum} completed`);
     const project=projects.find(p=>p.id===projectId);
     const client =clients.find(c=>c.id===project?.clientId);
@@ -4618,8 +4628,14 @@ window.revertStepStatus = async function(projectId, stepNum) {
   if (!confirmAction(`${isDone?'Revert':'Skip to'} Step ${stepNum}?`)) return;
   try {
     const updates={[`step${stepNum}Completed`]:!isDone,[`step${stepNum}CompletedAt`]:isDone?null:new Date().toISOString()};
-    if (isDone && (parseInt(project.step)||1)>stepNum) updates.step=stepNum;
-    if (!isDone && (parseInt(project.step)||1)===stepNum) updates.step=stepNum+1;
+    const currStep = parseInt(project.step)||1;
+    if (isDone) {
+      // Reverting: go back to this step
+      if (currStep > stepNum) updates.step = stepNum;
+    } else {
+      // Skipping forward: advance past this step
+      if (currStep <= stepNum) updates.step = stepNum + 1;
+    }
     await db.collection('projects').doc(projectId).update(updates);
     showToastSuccess(`Step ${stepNum} ${isDone?'reverted':'skipped'}`);
     if (editProjectId===projectId) {
@@ -4651,6 +4667,7 @@ window.confirmCommitmentFee = async function(projectId) {
       commitmentFeeMethod:document.getElementById('feeMethod')?.value
     });
     closeModal('commitmentFeeModal'); showToastSuccess('Commitment fee confirmed — advancing to Step 4');
+    const lp2=projects.find(x=>x.id===projectId); if(lp2){lp2.step=Math.max(parseInt(lp2.step)||1,4);lp2.commitmentFeeStatus='paid';lp2.step3Completed=true;} renderPipeline();
     const project=projects.find(p=>p.id===projectId);
     const client =clients.find(c=>c.id===project?.clientId);
     if (client?.email?.includes('@')) {
@@ -4682,6 +4699,7 @@ window.confirmECFEscrow = async function(projectId) {
       ecfEscrowDate:document.getElementById('ecfDate')?.value
     });
     closeModal('ecfEscrowModal'); showToastSuccess('ECF escrow confirmed — advancing to Step 8');
+    const lp3=projects.find(x=>x.id===projectId); if(lp3){lp3.step=Math.max(parseInt(lp3.step)||1,8);lp3.ecfStatus='escrowed';lp3.step7Completed=true;} renderPipeline();
     const project=projects.find(p=>p.id===projectId);
     const client =clients.find(c=>c.id===project?.clientId);
     if (client?.email?.includes('@')) {
