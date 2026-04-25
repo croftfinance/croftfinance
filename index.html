@@ -6823,42 +6823,42 @@ window.initGroup1Features = async function() {
 
 <script>
 window.renderHealthScoreTable = function() {
-  const el = document.getElementById('healthScoreTableContainer');
+  var el = document.getElementById('healthScoreTableContainer');
   if (!el) return;
-  const scored = projects.filter(p => p.status === 'active').map(p => ({
-    project: p,
-    client:  clients.find(c => c.id === p.clientId),
-    score:   calculateDealHealthScore(p)
-  })).sort((a, b) => (a.score || 0) - (b.score || 0));
+  var scored = projects.filter(function(p) { return p.status === 'active'; }).map(function(p) {
+    return { project: p, client: clients.find(function(c) { return c.id === p.clientId; }), score: calculateDealHealthScore(p) };
+  }).sort(function(a, b) { return (a.score || 0) - (b.score || 0); });
 
   if (!scored.length) {
     el.innerHTML = '<div class="empty-state"><i class="fas fa-heartbeat"></i><p>No active projects.</p></div>';
     return;
   }
 
-  let rows = '';
-  scored.forEach(function(item) {
-    const p     = item.project;
-    const c     = item.client;
-    const score = item.score;
-    const days  = daysUntil(p.closeDate);
-    const daysDisplay = days === null ? '—'
+  var rows = '';
+  for (var i = 0; i < scored.length; i++) {
+    var p     = scored[i].project;
+    var c     = scored[i].client;
+    var score = scored[i].score;
+    var days  = daysUntil(p.closeDate);
+    var daysDisplay = days === null ? '&mdash;'
       : days < 0 ? '<span class="expiry-danger">' + Math.abs(days) + 'd overdue</span>'
       : days + 'd';
-    rows += '<tr>' +
-      '<td>' + escapeHtml(c ? c.name : 'Unknown') + '</td>' +
-      '<td>' + escapeHtml(p.name) + '</td>' +
-      '<td>' + STEP_NAMES[parseInt(p.step) || 1] + '</td>' +
-      '<td>' + getHealthScoreBadge(score) + '</td>' +
-      '<td>' + daysDisplay + '</td>' +
-      '<td><button class="btn btn-ghost btn-xs" onclick="editProject(\'' + p.id + '\')"><i class="fas fa-edit"></i> Edit</button></td>' +
-      '</tr>';
-  });
+    var cName = c ? escapeHtml(c.name) : 'Unknown';
+    var step  = parseInt(p.step) || 1;
+    rows += '<tr>';
+    rows += '<td>' + cName + '</td>';
+    rows += '<td>' + escapeHtml(p.name) + '</td>';
+    rows += '<td>' + STEP_NAMES[step] + '</td>';
+    rows += '<td>' + getHealthScoreBadge(score) + '</td>';
+    rows += '<td>' + daysDisplay + '</td>';
+    rows += '<td><button class="btn btn-ghost btn-xs" onclick="editProject(\'' + p.id + '\')"><i class="fas fa-edit"></i> Edit</button></td>';
+    rows += '</tr>';
+  }
 
-  el.innerHTML = '<div class="table-wrap"><table class="admin-table">' +
-    '<thead><tr><th>Client</th><th>Project</th><th>Step</th><th>Score</th><th>Days to Close</th><th>Actions</th></tr></thead>' +
-    '<tbody>' + rows + '</tbody>' +
-    '</table></div>';
+  el.innerHTML = '<div class="table-wrap"><table class="admin-table">'
+    + '<thead><tr><th>Client</th><th>Project</th><th>Step</th><th>Score</th><th>Days to Close</th><th>Actions</th></tr></thead>'
+    + '<tbody>' + rows + '</tbody>'
+    + '</table></div>';
 };
 
 window.updateReferralStats = function() {
