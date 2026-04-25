@@ -36,6 +36,8 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
 <style>
 /* ============================================================
@@ -916,6 +918,53 @@ body.dark-mode .badge-neutral { background:rgba(255,255,255,0.10);color:var(--gr
 #tab-dashboard .stats-grid { grid-template-columns:repeat(3,1fr); }
 .page-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px; }
 
+
+/* ============================================================
+   GROUP 1 FEATURES — ADDITIONAL CSS
+   ============================================================ */
+
+/* Pagination */
+.pagination-btn { padding:4px 10px; font-size:11px; border-radius:4px; cursor:pointer; font-family:'Jost',sans-serif; border:0.5px solid var(--gray-200); background:var(--white); color:var(--gray-600); transition:var(--transition); }
+.pagination-btn:hover { border-color:var(--navy); color:var(--navy); }
+.pagination-btn.active { background:var(--navy); color:white; border-color:var(--navy); }
+.pagination-btn:disabled { opacity:0.4; cursor:not-allowed; }
+
+/* Health score */
+.health-score-bar { display:flex; gap:2px; margin-top:4px; }
+.health-score-seg { flex:1; height:4px; border-radius:2px; background:var(--gray-100); }
+
+/* Gantt */
+.gantt-container { overflow-x:auto; padding-bottom:8px; }
+.gantt-bar { transition:opacity 0.15s, transform 0.15s; }
+.gantt-bar:hover { opacity:1 !important; transform:scaleY(1.1); }
+
+/* Bulk action bar */
+.bulk-checkbox { width:16px; height:16px; cursor:pointer; accent-color:var(--navy); }
+
+/* Survey stars */
+.survey-star:hover { background:var(--gold) !important; border-color:var(--gold) !important; transform:scale(1.15) !important; }
+
+/* Broker tier badges */
+.tier-platinum { background:rgba(44,95,138,0.15);  color:#2c5f8a; }
+.tier-gold     { background:rgba(201,169,110,0.15); color:#8a6a2e; }
+.tier-silver   { background:rgba(156,163,175,0.15); color:#4b5563; }
+.tier-bronze   { background:rgba(201,123,42,0.15);  color:#92560f; }
+
+/* Archive tab */
+.archived-badge { background:rgba(107,114,128,0.12); color:var(--gray-500); padding:2px 8px; border-radius:3px; font-size:10px; font-weight:500; letter-spacing:0.5px; text-transform:uppercase; }
+
+/* Template dropdown */
+.template-dropdown { width:100%; padding:6px 10px; border:0.5px solid var(--gray-200); border-radius:6px; font-family:'Jost',sans-serif; font-size:12px; outline:none; background:var(--white); color:var(--gray-600); margin-bottom:8px; }
+
+/* Timeline */
+.gantt-row:hover .gantt-bar { opacity:1 !important; }
+
+/* Referral badge */
+.referral-tag { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; background:rgba(201,169,110,0.12); color:#8a6a2e; border-radius:10px; font-size:10px; font-weight:500; }
+
+body.dark-mode .pagination-btn { background:var(--gray-200); border-color:var(--gray-300); color:var(--gray-600); }
+body.dark-mode .template-dropdown { background:var(--gray-200); border-color:var(--gray-300); color:var(--gray-600); }
+
 /* ===== PRINT ===== */
 @media print {
   .sidebar, .portal-nav, .dark-mode-toggle, .btn, .quick-actions-bar,
@@ -1586,6 +1635,10 @@ body.dark-mode .badge-neutral { background:rgba(255,255,255,0.10);color:var(--gr
         <div class="sidebar-divider"></div>
         <button class="nav-item" data-admin-tab="settings"><i class="fas fa-cog"></i> Settings</button>
         <button class="nav-item" data-admin-tab="audit"><i class="fas fa-history"></i> Audit Log</button>
+        <button class="nav-item" data-admin-tab="timeline"><i class="fas fa-stream"></i> Timeline</button>
+        <button class="nav-item" data-admin-tab="archive"><i class="fas fa-archive"></i> Archive</button>
+        <button class="nav-item" data-admin-tab="feedback"><i class="fas fa-star"></i> Feedback</button>
+        <button class="nav-item" data-admin-tab="referrals"><i class="fas fa-users"></i> Referrals</button>
       </div>
     </aside>
     <main class="main-content" id="adminMainContent">
@@ -1652,6 +1705,7 @@ body.dark-mode .badge-neutral { background:rgba(255,255,255,0.10);color:var(--gr
         <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-handshake"></i> Broker Performance</div><button class="btn btn-ghost btn-sm" onclick="exportBrokerPerformanceCSV()"><i class="fas fa-download"></i> CSV</button></div><div class="card-body"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Broker</th><th>Firm</th><th>Submissions</th><th>Accepted</th><th>Funded</th><th>Conv%</th><th>Volume</th><th>Commission</th></tr></thead><tbody id="brokerPerformanceBody"></tbody></table></div></div></div>
         <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-dollar-sign"></i> Commission Breakdown</div><div style="display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="exportCommissionCSV()"><i class="fas fa-download"></i> CSV</button></div></div><div class="card-body"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Project</th><th>Industry</th><th>Location</th><th>Facility</th><th>Broker Comm</th><th>Net Comm (2%)</th><th>Step</th><th>Term Sheet</th></tr></thead><tbody id="commissionTableBody"></tbody></table></div></div></div>
         <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-trophy"></i> Broker Leaderboard</div></div><div class="card-body"><div id="brokerLeaderboard"></div></div></div>
+        <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-medal"></i> Broker Tiers</div></div><div class="card-body"><div id="brokerTierSummary" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;"></div></div></div>
       </div>
 
       <!-- CLIENTS TAB -->
@@ -1665,7 +1719,7 @@ body.dark-mode .badge-neutral { background:rgba(255,255,255,0.10);color:var(--gr
             <button class="btn btn-secondary btn-sm" onclick="showAddCrmClientModal()"><i class="fas fa-plus"></i> Add CRM</button>
           </div>
         </div>
-        <div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Email</th><th>Projects</th><th>Status</th><th>Last Seen</th><th>Terms Ver.</th><th>Notes</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="adminClientsTable"></tbody></table></div>
+        <div class="table-wrap"><table class="admin-table"><thead><tr><th><input type="checkbox" class="bulk-checkbox" id="bulk-select-all-clients" onclick="toggleSelectAll('clients',this.checked)"></th><th>Client</th><th>Email</th><th>Projects</th><th>Status</th><th>Last Seen</th><th>Terms Ver.</th><th>Notes</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="adminClientsTable"></tbody></table></div>
       </div>
 
       <!-- PROJECTS TAB -->
@@ -1731,6 +1785,7 @@ body.dark-mode .badge-neutral { background:rgba(255,255,255,0.10);color:var(--gr
         <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-user-circle"></i> Admin Profile</div></div><div class="card-body"><div class="form-grid-2"><div class="form-group"><label class="form-label">Display Name</label><input type="text" id="adminDisplayName" class="form-input"></div><div class="form-group"><label class="form-label">Title</label><input type="text" id="adminTitle" class="form-input"></div><div class="form-group"><label class="form-label">Email</label><input type="email" id="adminProfileEmail" class="form-input"></div><div class="form-group"><label class="form-label">Phone</label><input type="text" id="adminPhone" class="form-input"></div><div class="form-group"><label class="form-label">Availability Hours</label><input type="text" id="adminAvailability" class="form-input" placeholder="Mon–Fri, 9:00–18:00 CET"></div></div><button class="btn btn-primary btn-sm" onclick="saveAdminProfile()" style="margin-top:4px;">Save Profile</button></div></div>
         <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-shield-alt"></i> Security</div></div><div class="card-body"><button class="btn btn-secondary btn-sm" onclick="enable2FA()">Enable 2FA (Demo)</button><p id="2faStatus" style="margin-top:8px;font-size:12px;color:var(--gray-500);">2FA Disabled</p></div></div>
         <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-puzzle-piece"></i> Custom Fields</div></div><div class="card-body"><div id="customFieldsList"></div><button class="btn btn-primary btn-sm" onclick="addCustomField()" style="margin-top:8px;"><i class="fas fa-plus"></i> Add Field</button></div></div>
+        <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-comment-dots"></i> Message Templates</div><button class="btn btn-primary btn-sm" onclick="saveNewTemplate()"><i class="fas fa-plus"></i> Add Template</button></div><div class="card-body"><div id="templateManagerList"></div></div></div>
         <div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-code"></i> API Webhooks</div></div><div class="card-body"><div id="webhooksList"></div><button class="btn btn-primary btn-sm" onclick="addWebhook()" style="margin-top:8px;"><i class="fas fa-plus"></i> Add Webhook</button></div></div>
       </div>
 
@@ -1745,6 +1800,78 @@ body.dark-mode .badge-neutral { background:rgba(255,255,255,0.10);color:var(--gr
         </div>
         <div id="auditLogList"></div>
         <button class="btn btn-secondary btn-sm" onclick="exportAuditLog()" style="margin-top:16px;"><i class="fas fa-download"></i> Export CSV</button>
+      </div>
+
+
+      <!-- TIMELINE TAB -->
+      <div id="admin-timeline" class="admin-tab">
+        <div class="admin-page-title">Deal Timeline</div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fas fa-stream"></i> Gantt View — All Active Deals</div>
+            <button class="btn btn-secondary btn-sm" onclick="renderDealTimeline()"><i class="fas fa-sync"></i> Refresh</button>
+          </div>
+          <div class="card-body"><div id="dealTimelineContainer"><div class="empty-state"><i class="fas fa-stream"></i><p>Click Refresh to load timeline.</p></div></div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fas fa-heartbeat"></i> Deal Health Scores</div></div>
+          <div class="card-body">
+            <p style="font-size:13px;color:var(--gray-500);margin-bottom:16px;">Scores are calculated from: days to close (40%), step velocity (30%), document completeness (20%), client activity (10%).</p>
+            <div id="healthScoreTableContainer"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ARCHIVE TAB -->
+      <div id="admin-archive" class="admin-tab">
+        <div class="admin-page-title">Archive</div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fas fa-archive"></i> Archived Deals</div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-secondary btn-sm" onclick="viewArchivedDeals()"><i class="fas fa-sync"></i> Refresh</button>
+              <button class="btn btn-ghost btn-sm" onclick="runAutoArchive();viewArchivedDeals();" title="Run archiving rules now"><i class="fas fa-robot"></i> Run Auto-Archive</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <p style="font-size:13px;color:var(--gray-500);margin-bottom:16px;">Deals declined for 30+ days or funded for 180+ days are automatically archived. Archived deals are removed from the pipeline but can be restored at any time.</p>
+            <div id="archivedDealsContainer"><div class="empty-state"><i class="fas fa-archive"></i><p>Click Refresh to load archived deals.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FEEDBACK TAB -->
+      <div id="admin-feedback" class="admin-tab">
+        <div class="admin-page-title">Client Feedback</div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fas fa-star"></i> Satisfaction Survey Results</div>
+            <button class="btn btn-secondary btn-sm" onclick="renderSurveyResults()"><i class="fas fa-sync"></i> Refresh</button>
+          </div>
+          <div class="card-body"><div id="surveyResultsContainer"><div class="empty-state"><i class="fas fa-star"></i><p>Click Refresh to load survey results.</p></div></div></div>
+        </div>
+      </div>
+
+      <!-- REFERRALS TAB -->
+      <div id="admin-referrals" class="admin-tab">
+        <div class="admin-page-title">Referral Tracking</div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fas fa-users"></i> Referral Report</div>
+            <button class="btn btn-secondary btn-sm" onclick="renderReferralReport()"><i class="fas fa-sync"></i> Refresh</button>
+          </div>
+          <div class="card-body"><div id="referralReportContainer"><div class="empty-state"><i class="fas fa-users"></i><p>Click Refresh to load referral data.</p></div></div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fas fa-chart-bar"></i> Referral Stats</div></div>
+          <div class="card-body">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
+              <div class="stat-card"><div class="data-label">Total Referred Clients</div><div class="stat-value" id="totalReferredClients">0</div></div>
+              <div class="stat-card"><div class="data-label">Unique Referrers</div><div class="stat-value" id="uniqueReferrers">0</div></div>
+              <div class="stat-card"><div class="data-label">Referral Conversion</div><div class="stat-value" id="referralConversion">0%</div></div>
+            </div>
+          </div>
+        </div>
       </div>
 
     </main>
@@ -2643,6 +2770,10 @@ window.switchAdminTab = function(tabName) {
   if (tabName==='audit')       renderAuditLog();
   if (tabName==='inbox')       renderInbox();
   if (tabName==='submissions') renderSubmissionsTable();
+  if (tabName==='timeline')    { renderDealTimeline(); renderHealthScoreTable(); }
+  if (tabName==='archive')     viewArchivedDeals();
+  if (tabName==='feedback')    renderSurveyResults();
+  if (tabName==='referrals')   { renderReferralReport(); updateReferralStats(); }
   saveActiveTab('admin', tabName);
   if (window.innerWidth<=768) toggleAdminSidebar();
 };
@@ -3216,7 +3347,8 @@ window.requestDataDeletion = async function() {
 // ============================================================
 // BOOT
 // ============================================================
-document.addEventListener('DOMContentLoaded', initFirebase);
+document.addEventListener('DOMContentLoaded', function() { initFirebase().then ? initFirebase() : initFirebase(); });
+document.addEventListener('DOMContentLoaded', function() { setTimeout(initGroup1Features, 3000); });
 
 </script>
 <script>
@@ -3251,13 +3383,17 @@ function renderClientsTable(filteredClients) {
 
   const newRowsHtml = list.map(c => {
     const projectCount = projects.filter(p => p.clientId === c.id).length;
-    const statusBadge  = { active:'badge-success', pending:'badge-warning', crm_only:'badge-info', declined:'badge-danger' }[c.status] || 'badge-neutral';
-    const statusLabel  = c.status === 'crm_only' ? 'CRM' : (c.status || '—');
+    const statusBadge  = { active:'badge-success', pending:'badge-warning', crm_only:'badge-info', declined:'badge-danger', archived:'badge-neutral' }[c.status] || 'badge-neutral';
+    const statusLabel  = c.status === 'crm_only' ? 'CRM' : c.status === 'archived' ? 'Archived' : (c.status || '—');
+    const cProject     = projects.find(p => p.clientId === c.id);
+    const healthScore  = cProject ? calculateDealHealthScore(cProject) : null;
+    const referralTag  = c.referredBy ? `<span class="referral-tag"><i class="fas fa-user-plus" style="font-size:9px;"></i> ${escapeHtml(c.referredBy)}</span>` : '';
     const lastSeen     = c.lastSeenAt
       ? formatDateTime(c.lastSeenAt)
       : (c.createdAt ? 'Never' : '—');
     return `<tr>
-      <td><strong>${escapeHtml(c.name)}</strong>${c.hasPortalAccess === false ? '<br><span class="data-label">No portal</span>' : ''}</td>
+      <td style="width:32px;"><input type="checkbox" class="bulk-checkbox bulk-cb-clients" onclick="toggleBulkSelect('clients','${c.id}',this.checked)"></td>
+      <td><strong>${escapeHtml(c.name)}</strong>${c.hasPortalAccess === false ? '<br><span class="data-label">No portal</span>' : ''}${referralTag?'<br>'+referralTag:''}</td>
       <td style="font-size:12px;">${escapeHtml(c.email||'—')}</td>
       <td style="text-align:center;">${projectCount}</td>
       <td><span class="badge ${statusBadge}">${statusLabel}</span></td>
@@ -3274,11 +3410,13 @@ function renderClientsTable(filteredClients) {
           : ''}
         <button class="btn btn-ghost btn-xs" onclick="editClientProject('${c.id}')"><i class="fas fa-edit"></i></button>
         <button class="btn btn-secondary btn-xs" onclick="impersonateClient('${c.id}')"><i class="fas fa-eye"></i> View</button>
+        <button class="btn btn-ghost btn-xs" onclick="showReferralModal('${c.id}')" title="Record referral"><i class="fas fa-user-plus"></i></button>
         <button class="btn btn-danger btn-xs" onclick="deleteClient('${c.id}')"><i class="fas fa-trash"></i></button>
       </td>
     </tr>`;
   }).join('');
   patchTable('adminClientsTable', newRowsHtml);
+  renderPaginationControls('adminClientsTable','clients',list.length, renderClientsTable);
 }
 
 function renderAdminTables() {
@@ -3587,7 +3725,7 @@ function renderPipeline() {
           </div>
           <div class="pipeline-card-footer">
             <span class="pipeline-card-days ${urgClass}">${daysLabel}</span>
-            <span style="font-size:10px;color:var(--gray-400);">${percent}%</span>
+            <span style="font-size:9px;color:${getHealthScoreColor(calculateDealHealthScore(p))};font-weight:600;">${(score=>score?score+'/10':'')(calculateDealHealthScore(p))}</span>
           </div>
         </div>`;
       }).join('') || `<div style="text-align:center;padding:24px;font-size:12px;color:var(--gray-400);">No deals</div>`;
@@ -3839,6 +3977,7 @@ function renderInbox() {
       ? messages.filter(m => m.clientId===t.id).sort((a,b) => (a.timestamp?.seconds||0)-(b.timestamp?.seconds||0))
       : brokerMessages.filter(m => m.brokerId===t.id).sort((a,b) => (a.timestamp?.seconds||0)-(b.timestamp?.seconds||0));
     body.innerHTML = `
+      <div style="margin-bottom:8px;display:flex;gap:8px;align-items:center;"><select class="template-dropdown" onchange="insertTemplate(this,'reply-${t.id}-${t.type}')"></select><button class="btn btn-ghost btn-xs" onclick="saveNewTemplate()" title="Save new template"><i class="fas fa-plus"></i></button></div>
       <div style="margin-bottom:12px;max-height:300px;overflow-y:auto;padding:4px 0;">
         ${threadMsgs.map(m => `
           <div class="inbox-message" style="margin-bottom:10px;">
@@ -4090,6 +4229,7 @@ function renderSubmissionsTable() {
     </td>
   </tr>`).join('');
   patchTable('submissionsTableBody', rows);
+  renderPaginationControls('submissionsTableBody','submissions',sorted.length, renderSubmissionsTable);
 }
 
 window.viewSubmissionDetail = function(id) {
@@ -4954,11 +5094,15 @@ function loadCurrentProjectData() {
         <span style="font-size:13px;">Please fund the ECF escrow account to proceed to Step 8. Contact Suzana for instructions.</span></div>
       </div>`;
     } else if (step===9) {
+      const surveyDone = p.surveyCompleted;
       bannerDiv.innerHTML = `<div class="action-banner funded">
         <i class="fas fa-check-circle" style="color:var(--success);font-size:22px;flex-shrink:0;"></i>
-        <div><strong style="color:var(--success);font-size:15px;">Congratulations — Deal Funded!</strong><br>
-        <span style="font-size:13px;color:var(--gray-600);">Your facility has been successfully disbursed. Please refer to your closing statement.</span></div>
+        <div style="flex:1;"><strong style="color:var(--success);font-size:15px;">Congratulations — Deal Funded!</strong><br>
+        <span style="font-size:13px;color:var(--gray-600);">Your facility has been successfully disbursed. Please refer to your closing statement.</span>
+        ${surveyDone?'':'<div style="margin-top:10px;"><button class="btn btn-gold btn-sm" onclick="showSatisfactionSurvey(''+currentProjectId+'')"><i class="fas fa-star"></i> Share Your Experience</button></div>'}
+        </div>
       </div>`;
+      if (!surveyDone) checkAndSendSatisfactionSurvey(currentProjectId);
     } else {
       bannerDiv.innerHTML = '';
     }
@@ -5788,6 +5932,854 @@ window.submitBrokerUpdateRequest = async function() {
 };
 
 </script>
+
+
+<script>
+// ============================================================
+// GROUP 1 FEATURES — ALL PURE FRONTEND
+// 1. Pagination on all tables
+// 2. Deal health scoring
+// 3. Deal timeline / Gantt view
+// 4. Bulk actions in admin
+// 5. Saved message templates
+// 6. Client satisfaction survey
+// 7. Broker tiering system
+// 8. Client referral tracking
+// 9. Automatic archiving
+// ============================================================
+
+// ============================================================
+// 1. PAGINATION SYSTEM
+// ============================================================
+const PAGINATION = {
+  clients:     { page: 1, perPage: 20 },
+  projects:    { page: 1, perPage: 20 },
+  documents:   { page: 1, perPage: 20 },
+  audit:       { page: 1, perPage: 50 },
+  submissions: { page: 1, perPage: 20 },
+  brokers:     { page: 1, perPage: 20 }
+};
+
+function paginate(arr, key) {
+  const p   = PAGINATION[key];
+  const start = (p.page - 1) * p.perPage;
+  return arr.slice(start, start + p.perPage);
+}
+
+function renderPaginationControls(containerId, key, total, onChangeFn) {
+  const existing = document.getElementById('pagination-' + key);
+  if (existing) existing.remove();
+
+  const p        = PAGINATION[key];
+  const totalPages = Math.ceil(total / p.perPage);
+  if (totalPages <= 1) return;
+
+  const div = document.createElement('div');
+  div.id = 'pagination-' + key;
+  div.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:0.5px solid var(--gray-200);background:var(--gray-50);font-size:12px;';
+
+  const start = (p.page - 1) * p.perPage + 1;
+  const end   = Math.min(p.page * p.perPage, total);
+
+  div.innerHTML = `
+    <span style="color:var(--gray-500);">Showing ${start}–${end} of ${total}</span>
+    <div style="display:flex;gap:6px;align-items:center;">
+      <button class="btn btn-secondary btn-xs" ${p.page<=1?'disabled':''} onclick="changePage('${key}',${p.page-1})">← Prev</button>
+      ${Array.from({length:Math.min(totalPages,7)},(_,i)=>{
+        const pg = totalPages<=7 ? i+1 : (p.page<=4 ? i+1 : p.page-3+i);
+        if (pg<1||pg>totalPages) return '';
+        return `<button class="btn btn-xs ${pg===p.page?'btn-primary':'btn-secondary'}" onclick="changePage('${key}',${pg})">${pg}</button>`;
+      }).join('')}
+      <button class="btn btn-secondary btn-xs" ${p.page>=totalPages?'disabled':''} onclick="changePage('${key}',${p.page+1})">Next →</button>
+    </div>`;
+
+  const container = document.getElementById(containerId);
+  if (container) {
+    const wrap = container.closest('.table-wrap') || container.parentElement;
+    if (wrap) wrap.appendChild(div);
+  }
+}
+
+window.changePage = function(key, page) {
+  PAGINATION[key].page = page;
+  const refreshMap = {
+    clients:     () => renderClientsTable(),
+    projects:    () => renderAdminTables(),
+    documents:   () => renderAdminDocumentsTable(),
+    audit:       () => renderAuditLog(),
+    submissions: () => renderSubmissionsTable(),
+    brokers:     () => renderBrokerAdminTable()
+  };
+  if (refreshMap[key]) refreshMap[key]();
+};
+
+// Reset to page 1 when data changes
+function resetPagination(key) { if (PAGINATION[key]) PAGINATION[key].page = 1; }
+
+// ============================================================
+// 2. DEAL HEALTH SCORING
+// ============================================================
+function calculateDealHealthScore(project) {
+  if (!project || project.status === 'crm_only') return null;
+  const step = parseInt(project.step) || 1;
+  if (step === 9) return 10; // Funded = perfect score
+
+  let score = 0;
+
+  // Component 1: Days to close (40% weight — max 4 points)
+  const days = daysUntil(project.closeDate);
+  if (days === null) {
+    score += 1; // No close date set — low score
+  } else if (days > 60)  score += 4;
+  else if (days > 30)    score += 3;
+  else if (days > 14)    score += 2;
+  else if (days > 0)     score += 1;
+  else                   score += 0; // Overdue
+
+  // Component 2: Step velocity (30% weight — max 3 points)
+  // How many steps completed relative to how long the deal has been active
+  const createdAt  = project.createdAt ? new Date(project.createdAt) : new Date();
+  const ageInDays  = Math.max(1, Math.ceil((Date.now() - createdAt) / 86400000));
+  const stepsPerDay = (step - 1) / ageInDays;
+  if (stepsPerDay >= 0.15)     score += 3; // Moving fast
+  else if (stepsPerDay >= 0.07) score += 2;
+  else if (stepsPerDay >= 0.03) score += 1;
+  else                          score += 0; // Stalled
+
+  // Component 3: Document completeness (20% weight — max 2 points)
+  const projDocs       = documents.filter(d => d.projectId === project.id);
+  const approvedDocs   = projDocs.filter(d => d.approved).length;
+  const requiredForStep = getRequiredDocsForStep(step);
+  const hasRequired    = requiredForStep.every(req =>
+    projDocs.some(d => (d.name||'').toLowerCase().includes(req.toLowerCase()))
+  );
+  if (hasRequired && approvedDocs > 0) score += 2;
+  else if (approvedDocs > 0)           score += 1;
+
+  // Component 4: Client last activity (10% weight — max 1 point)
+  const client = clients.find(c => c.id === project.clientId);
+  if (client && client.lastSeenAt) {
+    const lastSeen = client.lastSeenAt.seconds
+      ? new Date(client.lastSeenAt.seconds * 1000)
+      : new Date(client.lastSeenAt);
+    const daysSince = Math.ceil((Date.now() - lastSeen) / 86400000);
+    if (daysSince <= 7) score += 1;
+  }
+
+  return Math.min(10, Math.max(1, score));
+}
+
+function getHealthScoreBadge(score) {
+  if (score === null) return '<span class="badge badge-neutral">N/A</span>';
+  if (score >= 9)  return `<span class="badge" style="background:rgba(43,140,78,0.15);color:#1a5c36;">⬤ ${score}/10 Excellent</span>`;
+  if (score >= 7)  return `<span class="badge badge-success">⬤ ${score}/10 Good</span>`;
+  if (score >= 5)  return `<span class="badge badge-warning">⬤ ${score}/10 Fair</span>`;
+  if (score >= 3)  return `<span class="badge badge-danger">⬤ ${score}/10 At Risk</span>`;
+  return `<span class="badge" style="background:rgba(185,28,28,0.2);color:#991b1b;">⬤ ${score}/10 Critical</span>`;
+}
+
+function getHealthScoreColor(score) {
+  if (score === null) return 'var(--gray-300)';
+  if (score >= 9)  return '#1a6b38';
+  if (score >= 7)  return 'var(--success)';
+  if (score >= 5)  return 'var(--warning)';
+  if (score >= 3)  return 'var(--error)';
+  return '#991b1b';
+}
+
+// ============================================================
+// 3. DEAL TIMELINE / GANTT VIEW
+// ============================================================
+window.renderDealTimeline = function() {
+  const container = document.getElementById('dealTimelineContainer');
+  if (!container) return;
+
+  const active = projects.filter(p => p.status === 'active' && p.closeDate)
+    .sort((a, b) => new Date(a.closeDate) - new Date(b.closeDate));
+
+  if (!active.length) {
+    container.innerHTML = `<div class="empty-state"><i class="fas fa-stream"></i><p>No active deals with close dates set.</p></div>`;
+    return;
+  }
+
+  const today    = new Date(); today.setHours(0,0,0,0);
+  const allDates = active.map(p => [new Date(p.createdAt||today), new Date(p.closeDate)]).flat();
+  const minDate  = new Date(Math.min(...allDates.map(d => d.getTime())));
+  const maxDate  = new Date(Math.max(...allDates.map(d => d.getTime())));
+  minDate.setDate(minDate.getDate() - 7);
+  maxDate.setDate(maxDate.getDate() + 14);
+  const totalDays = Math.ceil((maxDate - minDate) / 86400000) || 1;
+
+  // Month headers
+  const months = [];
+  let cur = new Date(minDate);
+  while (cur <= maxDate) {
+    months.push({ label: cur.toLocaleDateString('en-GB',{month:'short',year:'2-digit'}), date: new Date(cur) });
+    cur.setMonth(cur.getMonth() + 1);
+  }
+
+  const monthHeaders = months.map(m => {
+    const left = Math.max(0, Math.min(100, ((m.date - minDate) / 86400000 / totalDays) * 100));
+    return `<div style="position:absolute;left:${left}%;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--gray-400);white-space:nowrap;">${m.label}</div>`;
+  }).join('');
+
+  // Today marker position
+  const todayPct = Math.max(0, Math.min(100, ((today - minDate) / 86400000 / totalDays) * 100));
+
+  // Deal bars
+  const bars = active.map(p => {
+    const client    = clients.find(c => c.id === p.clientId);
+    const start     = new Date(p.createdAt || today);
+    const end       = new Date(p.closeDate);
+    const step      = parseInt(p.step) || 1;
+    const score     = calculateDealHealthScore(p);
+    const color     = getHealthScoreColor(score);
+    const leftPct   = Math.max(0, ((start - minDate) / 86400000 / totalDays) * 100);
+    const widthPct  = Math.max(2, ((end - start) / 86400000 / totalDays) * 100);
+    const isOverdue = end < today;
+    const days      = daysUntil(p.closeDate);
+    const daysLabel = days === null ? '' : days < 0 ? `${Math.abs(days)}d overdue` : `${days}d`;
+
+    return `
+      <div style="display:flex;align-items:center;margin-bottom:8px;gap:12px;" title="${escapeHtml(client?.name||'')}: ${escapeHtml(p.name)} — ${STEP_NAMES[step]}">
+        <div style="width:160px;flex-shrink:0;font-size:12px;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+          <strong style="color:var(--navy);">${escapeHtml(client?.name||'Unknown')}</strong><br>
+          <span class="data-label">${escapeHtml(p.name.substring(0,20))}</span>
+        </div>
+        <div style="flex:1;position:relative;height:28px;">
+          <div style="position:absolute;left:${leftPct}%;width:${widthPct}%;min-width:2%;height:100%;
+            background:${color};opacity:${isOverdue?0.5:0.85};border-radius:4px;
+            border:${isOverdue?'2px dashed var(--error)':'none'};
+            display:flex;align-items:center;padding:0 8px;overflow:hidden;cursor:pointer;"
+            onclick="editProject('${p.id}')">
+            <span style="font-size:10px;color:white;font-weight:600;white-space:nowrap;overflow:hidden;">${STEP_NAMES[step]}</span>
+          </div>
+        </div>
+        <div style="width:80px;flex-shrink:0;font-size:10px;text-align:right;color:${isOverdue?'var(--error)':'var(--gray-400)'};">${daysLabel}</div>
+        <div style="width:70px;flex-shrink:0;">${getHealthScoreBadge(score)}</div>
+      </div>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div style="overflow-x:auto;">
+      <div style="min-width:700px;">
+        <div style="display:flex;align-items:center;margin-bottom:4px;gap:12px;">
+          <div style="width:160px;flex-shrink:0;"></div>
+          <div style="flex:1;position:relative;height:20px;">${monthHeaders}</div>
+          <div style="width:80px;"></div><div style="width:70px;"></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:8px;">
+          <div style="width:160px;flex-shrink:0;"></div>
+          <div style="flex:1;position:relative;height:2px;background:var(--gray-100);">
+            <div style="position:absolute;left:${todayPct}%;width:2px;top:-4px;bottom:-600px;background:var(--error);opacity:0.5;z-index:1;"></div>
+            <div style="position:absolute;left:${todayPct}%;transform:translateX(-50%);top:-16px;font-size:9px;color:var(--error);white-space:nowrap;font-weight:600;">TODAY</div>
+          </div>
+          <div style="width:80px;"></div><div style="width:70px;"></div>
+        </div>
+        ${bars}
+      </div>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:16px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:6px;font-size:11px;"><div style="width:12px;height:12px;border-radius:2px;background:#1a6b38;"></div>Excellent (9–10)</div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:11px;"><div style="width:12px;height:12px;border-radius:2px;background:var(--success);"></div>Good (7–8)</div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:11px;"><div style="width:12px;height:12px;border-radius:2px;background:var(--warning);"></div>Fair (5–6)</div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:11px;"><div style="width:12px;height:12px;border-radius:2px;background:var(--error);"></div>At Risk / Critical (1–4)</div>
+    </div>`;
+};
+
+// ============================================================
+// 4. BULK ACTIONS
+// ============================================================
+let bulkSelected = { clients: new Set(), documents: new Set() };
+
+function renderBulkActionBar(key, total) {
+  const existing = document.getElementById('bulk-bar-' + key);
+  if (existing) existing.remove();
+  const count = bulkSelected[key]?.size || 0;
+  if (count === 0) return;
+
+  const bar = document.createElement('div');
+  bar.id = 'bulk-bar-' + key;
+  bar.style.cssText = 'position:sticky;top:64px;z-index:200;background:var(--navy);color:white;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-radius:8px;margin-bottom:12px;animation:slideInRight 0.2s ease;';
+
+  const actions = key === 'clients'
+    ? `<button class="btn btn-gold btn-sm" onclick="bulkApprove()"><i class="fas fa-check"></i> Approve All</button>
+       <button class="btn btn-secondary btn-sm" style="border-color:rgba(255,255,255,0.3);color:white;" onclick="bulkExportSelected('${key}')"><i class="fas fa-download"></i> Export</button>
+       <button class="btn btn-secondary btn-sm" style="border-color:rgba(255,255,255,0.3);color:white;" onclick="bulkArchive()"><i class="fas fa-archive"></i> Archive</button>`
+    : `<button class="btn btn-gold btn-sm" onclick="bulkApproveDocuments()"><i class="fas fa-check"></i> Approve All</button>
+       <button class="btn btn-danger btn-sm" onclick="bulkDeleteDocuments()"><i class="fas fa-trash"></i> Delete</button>`;
+
+  bar.innerHTML = `
+    <span style="font-size:13px;font-weight:500;">${count} item${count!==1?'s':''} selected</span>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">${actions}
+      <button class="btn btn-ghost btn-sm" style="color:rgba(255,255,255,0.6);" onclick="clearBulkSelection('${key}')">✕ Clear</button>
+    </div>`;
+
+  const container = document.getElementById(key==='clients' ? 'admin-clients' : 'admin-documents-admin');
+  if (container) container.insertBefore(bar, container.firstChild.nextSibling);
+}
+
+window.toggleBulkSelect = function(key, id, checked) {
+  if (checked) bulkSelected[key].add(id);
+  else         bulkSelected[key].delete(id);
+  renderBulkActionBar(key, bulkSelected[key].size);
+  // Update select-all checkbox
+  const allCb = document.getElementById('bulk-select-all-' + key);
+  if (allCb) allCb.indeterminate = bulkSelected[key].size > 0;
+};
+
+window.toggleSelectAll = function(key, checked) {
+  const list = key === 'clients' ? clients : documents;
+  bulkSelected[key] = checked ? new Set(list.map(x=>x.id)) : new Set();
+  renderBulkActionBar(key, bulkSelected[key].size);
+  document.querySelectorAll(`.bulk-cb-${key}`).forEach(cb => cb.checked = checked);
+};
+
+window.clearBulkSelection = function(key) {
+  bulkSelected[key] = new Set();
+  document.querySelectorAll(`.bulk-cb-${key}`).forEach(cb => cb.checked = false);
+  const allCb = document.getElementById('bulk-select-all-' + key);
+  if (allCb) { allCb.checked = false; allCb.indeterminate = false; }
+  renderBulkActionBar(key, 0);
+};
+
+window.bulkApprove = async function() {
+  const ids = [...bulkSelected.clients].filter(id => clients.find(c=>c.id===id)?.status==='pending');
+  if (!ids.length) return showToast('No pending clients selected', 'error');
+  if (!confirmAction(`Approve ${ids.length} client(s)?`)) return;
+  for (const id of ids) await approveClient(id);
+  clearBulkSelection('clients');
+  showToastSuccess(`${ids.length} client(s) approved`);
+};
+
+window.bulkArchive = async function() {
+  const ids = [...bulkSelected.clients];
+  if (!ids.length) return;
+  if (!confirmAction(`Archive ${ids.length} record(s)?`)) return;
+  for (const id of ids) {
+    await db.collection('clients').doc(id).update({ status:'archived', archivedAt: new Date().toISOString() }).catch(()=>{});
+  }
+  clearBulkSelection('clients');
+  showToastSuccess(`${ids.length} record(s) archived`);
+};
+
+window.bulkApproveDocuments = async function() {
+  const ids = [...bulkSelected.documents];
+  if (!ids.length) return;
+  if (!confirmAction(`Approve ${ids.length} document(s)?`)) return;
+  for (const id of ids) {
+    await db.collection('documents').doc(id).update({ approved: true }).catch(()=>{});
+  }
+  clearBulkSelection('documents');
+  showToastSuccess(`${ids.length} document(s) approved`);
+};
+
+window.bulkDeleteDocuments = async function() {
+  const ids = [...bulkSelected.documents];
+  if (!ids.length) return;
+  if (!confirmDelete(`${ids.length} documents`)) return;
+  for (const id of ids) {
+    await db.collection('documents').doc(id).delete().catch(()=>{});
+  }
+  clearBulkSelection('documents');
+  showToastSuccess(`${ids.length} document(s) deleted`);
+};
+
+window.bulkExportSelected = function(key) {
+  const ids  = [...bulkSelected[key]];
+  const list = key === 'clients' ? clients.filter(c=>ids.includes(c.id)) : documents.filter(d=>ids.includes(d.id));
+  let csv = key === 'clients'
+    ? 'Name,Email,Status,Projects,Joined\n' + list.map(c=>`"${c.name}","${c.email||''}","${c.status}",${projects.filter(p=>p.clientId===c.id).length},"${c.createdAt?c.createdAt.split('T')[0]:''}"`).join('\n')
+    : 'Name,Project,Status,Date\n' + list.map(d=>`"${d.name}","${projects.find(p=>p.id===d.projectId)?.name||''}","${d.approved?'Approved':'Pending'}","${d.date||''}"`).join('\n');
+  const a = Object.assign(document.createElement('a'), { href:URL.createObjectURL(new Blob([csv],{type:'text/csv'})), download:`selected_${key}_${new Date().toISOString().slice(0,10)}.csv` });
+  a.click(); URL.revokeObjectURL(a.href);
+};
+
+// ============================================================
+// 5. SAVED MESSAGE TEMPLATES
+// ============================================================
+let messageTemplates = [];
+
+async function loadMessageTemplates() {
+  try {
+    const snap = await db.collection('messageTemplates').orderBy('name').get();
+    messageTemplates = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderTemplateDropdown();
+  } catch(e) {
+    // Fallback defaults if collection doesn't exist yet
+    messageTemplates = [
+      { id:'t1', name:'Term Sheet Ready',        content:'Dear Client,\n\nYour term sheet is now ready for review. Please log in to your portal to access and sign it.\n\nBest regards,\nSuzana Aleksić\nCroft Finance' },
+      { id:'t2', name:'Commitment Fee Request',  content:'Dear Client,\n\nPlease submit the commitment fee at your earliest convenience to advance your deal to Step 4. Log in to your portal for wiring instructions.\n\nBest regards,\nSuzana Aleksić\nCroft Finance' },
+      { id:'t3', name:'Documents Required',      content:'Dear Client,\n\nWe are still awaiting some outstanding documents. Please upload these to your portal as soon as possible.\n\nBest regards,\nSuzana Aleksić\nCroft Finance' },
+      { id:'t4', name:'Deal Update',             content:'Dear Client,\n\nI wanted to provide you with an update on your deal progress. Please log in to your portal to view the latest status.\n\nBest regards,\nSuzana Aleksić\nCroft Finance' },
+      { id:'t5', name:'Meeting Follow-up',       content:'Dear Client,\n\nThank you for our conversation today. I will follow up with the next steps shortly.\n\nBest regards,\nSuzana Aleksić\nCroft Finance' }
+    ];
+    renderTemplateDropdown();
+  }
+}
+
+function renderTemplateDropdown() {
+  document.querySelectorAll('.template-dropdown').forEach(el => {
+    el.innerHTML = '<option value="">Insert template...</option>' +
+      messageTemplates.map(t => `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
+  });
+}
+
+window.insertTemplate = function(selectEl, targetTextareaId) {
+  const id       = selectEl.value;
+  const template = messageTemplates.find(t => t.id === id);
+  if (!template) return;
+  const ta = document.getElementById(targetTextareaId);
+  if (ta) {
+    ta.value = template.content;
+    ta.focus();
+    ta.style.height = 'auto';
+    ta.style.height = ta.scrollHeight + 'px';
+  }
+  selectEl.value = '';
+};
+
+window.saveNewTemplate = async function() {
+  const name    = prompt('Template name:');
+  const content = prompt('Template content:');
+  if (!name || !content) return;
+  try {
+    await db.collection('messageTemplates').add({ name, content, createdAt: new Date().toISOString() });
+    await loadMessageTemplates();
+    showToastSuccess('Template saved');
+  } catch(e) {
+    // Save locally if Firestore fails
+    messageTemplates.push({ id: 'local_' + Date.now(), name, content });
+    renderTemplateDropdown();
+    showToastSuccess('Template saved locally');
+  }
+};
+
+window.deleteTemplate = async function(id) {
+  if (!confirmAction('Delete this template?')) return;
+  try {
+    if (!id.startsWith('local_')) await db.collection('messageTemplates').doc(id).delete();
+    messageTemplates = messageTemplates.filter(t => t.id !== id);
+    renderTemplateDropdown();
+    showToastSuccess('Template deleted');
+  } catch(e) { showToastError(e.message); }
+};
+
+function renderTemplateManager() {
+  const el = document.getElementById('templateManagerList');
+  if (!el) return;
+  if (!messageTemplates.length) { el.innerHTML = '<p class="data-label">No templates saved yet.</p>'; return; }
+  el.innerHTML = messageTemplates.map(t => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:0.5px solid var(--gray-100);">
+      <div>
+        <div style="font-size:13px;font-weight:500;">${escapeHtml(t.name)}</div>
+        <div style="font-size:11px;color:var(--gray-400);">${escapeHtml((t.content||'').substring(0,60))}…</div>
+      </div>
+      <button class="btn btn-danger btn-xs" onclick="deleteTemplate('${t.id}')"><i class="fas fa-trash"></i></button>
+    </div>`).join('');
+}
+
+// ============================================================
+// 6. CLIENT SATISFACTION SURVEY
+// ============================================================
+async function checkAndSendSatisfactionSurvey(projectId) {
+  const project = projects.find(p => p.id === projectId);
+  if (!project || parseInt(project.step) !== 9) return;
+  const surveyKey = `survey_sent_${projectId}`;
+  if (localStorage.getItem(surveyKey)) return;
+  localStorage.setItem(surveyKey, 'sent');
+  const client = clients.find(c => c.id === project.clientId);
+  if (!client?.email?.includes('@')) return;
+  await sendEmailNotification({
+    to_name:  client.name,
+    to_email: client.email,
+    from_name:'Suzana Aleksić — Croft Finance',
+    subject:  `Congratulations on your funded deal — a quick note from Suzana`,
+    message:  `Dear ${client.name},\n\nCongratulations on the successful closing of "${project.name}"!\n\nI would be very grateful if you could take 2 minutes to share your experience of working with Croft Finance. Your feedback helps me deliver an even better service to future clients.\n\nPlease log in to your portal to complete a short 5-question survey.\n\nWith warm regards,\nSuzana Aleksić\nPrincipal, Croft Finance`,
+    project_name: project.name
+  });
+  // Mark survey as pending for client
+  await db.collection('projects').doc(projectId).update({ surveyPending: true }).catch(() => {});
+}
+
+window.showSatisfactionSurvey = function(projectId) {
+  const project = projects.find(p => p.id === projectId);
+  if (!project) return;
+  const existing = document.getElementById('satisfactionSurveyModal');
+  if (existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'satisfactionSurveyModal';
+  modal.className = 'modal-overlay active';
+  modal.innerHTML = `
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Share Your Experience</h3>
+        <button class="modal-close" onclick="document.getElementById('satisfactionSurveyModal').remove()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:13px;color:var(--gray-500);margin-bottom:20px;">
+          Congratulations on your funded deal! Please take 2 minutes to share your experience. Your feedback is read personally by Suzana.
+        </p>
+        ${[
+          { id:'q1', label:'How would you rate the overall deal experience?' },
+          { id:'q2', label:'How satisfied were you with communication from Suzana?' },
+          { id:'q3', label:'How was the speed of the process?' },
+          { id:'q4', label:'How transparent was the process?' },
+          { id:'q5', label:'How likely are you to recommend Croft Finance?' }
+        ].map(q => `
+          <div class="form-group">
+            <label class="form-label">${q.label}</label>
+            <div style="display:flex;gap:8px;margin-top:6px;">
+              ${[1,2,3,4,5].map(n => `
+                <label style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;">
+                  <input type="radio" name="${q.id}" value="${n}" style="display:none;">
+                  <div class="survey-star" data-q="${q.id}" data-val="${n}" onclick="selectSurveyStar('${q.id}',${n})"
+                    style="width:40px;height:40px;border-radius:50%;border:2px solid var(--gray-200);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:all 0.15s;">⭐</div>
+                  <span style="font-size:10px;color:var(--gray-400);">${n}</span>
+                </label>`).join('')}
+            </div>
+          </div>`).join('')}
+        <div class="form-group">
+          <label class="form-label">Any additional comments? (Optional)</label>
+          <textarea id="surveyComments" rows="3" class="form-textarea" placeholder="What worked well? What could be improved?"></textarea>
+        </div>
+        <button class="btn btn-primary btn-md" onclick="submitSatisfactionSurvey('${projectId}')" style="width:100%;justify-content:center;">
+          Submit Feedback
+        </button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+};
+
+window.selectSurveyStar = function(questionId, value) {
+  document.querySelectorAll(`.survey-star[data-q="${questionId}"]`).forEach(el => {
+    const v = parseInt(el.dataset.val);
+    el.style.background     = v <= value ? 'var(--gold)' : '';
+    el.style.borderColor    = v <= value ? 'var(--gold)' : 'var(--gray-200)';
+    el.style.transform      = v <= value ? 'scale(1.1)' : 'scale(1)';
+  });
+  document.querySelector(`input[name="${questionId}"][value="${value}"]`).checked = true;
+};
+
+window.submitSatisfactionSurvey = async function(projectId) {
+  const answers = {};
+  ['q1','q2','q3','q4','q5'].forEach(q => {
+    const checked = document.querySelector(`input[name="${q}"]:checked`);
+    answers[q] = checked ? parseInt(checked.value) : null;
+  });
+  const unanswered = Object.values(answers).filter(v => v === null).length;
+  if (unanswered > 0) return showToastError('Please answer all 5 questions');
+  const avg = Object.values(answers).reduce((s,v)=>s+v,0) / 5;
+  try {
+    await db.collection('satisfactionSurveys').add({
+      projectId, clientId: currentClient?.id,
+      clientName: currentClient?.name,
+      answers, averageScore: avg,
+      comments: document.getElementById('surveyComments')?.value || '',
+      submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    await db.collection('projects').doc(projectId).update({ surveyCompleted: true, surveyScore: avg });
+    document.getElementById('satisfactionSurveyModal')?.remove();
+    showToastSuccess('Thank you for your feedback!');
+    await sendEmailNotification({
+      to_name:'Croft Finance', to_email:EMAILJS_CONFIG.adminEmail,
+      from_name:'Croft Finance Portal',
+      subject:`Client Survey Received — ${currentClient?.name} (${avg.toFixed(1)}/5)`,
+      message:`Client: ${currentClient?.name}\nProject: ${projects.find(p=>p.id===projectId)?.name}\nAverage Score: ${avg.toFixed(1)}/5\n\nAnswers:\nOverall experience: ${answers.q1}/5\nCommunication: ${answers.q2}/5\nSpeed: ${answers.q3}/5\nTransparency: ${answers.q4}/5\nLikelihood to recommend: ${answers.q5}/5\n\nComments: ${document.getElementById('surveyComments')?.value||'None'}`,
+      project_name: projects.find(p=>p.id===projectId)?.name||'N/A'
+    });
+  } catch(e) { showToastError(e.message); }
+};
+
+function renderSurveyResults() {
+  const container = document.getElementById('surveyResultsContainer');
+  if (!container) return;
+  db.collection('satisfactionSurveys').orderBy('submittedAt','desc').limit(50).get()
+    .then(snap => {
+      const surveys = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      if (!surveys.length) { container.innerHTML = '<div class="empty-state"><i class="fas fa-star"></i><p>No survey responses yet.</p></div>'; return; }
+      const avg = surveys.reduce((s,r)=>s+r.averageScore,0)/surveys.length;
+      container.innerHTML = `
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px;">
+          <div class="kpi-card gold"><span class="kpi-label">Average Score</span><div class="kpi-value">${avg.toFixed(1)}/5</div><div class="kpi-sub">${surveys.length} response${surveys.length!==1?'s':''}</div></div>
+          <div class="kpi-card success"><span class="kpi-label">Would Recommend</span><div class="kpi-value">${Math.round(surveys.filter(s=>s.answers?.q5>=4).length/surveys.length*100)}%</div><div class="kpi-sub">Scored 4 or 5 on Q5</div></div>
+        </div>
+        <div class="table-wrap"><table class="admin-table"><thead><tr><th>Client</th><th>Project</th><th>Score</th><th>Communication</th><th>Speed</th><th>Recommend</th><th>Comments</th><th>Date</th></tr></thead>
+        <tbody>${surveys.map(s=>`<tr>
+          <td>${escapeHtml(s.clientName||'—')}</td>
+          <td>${escapeHtml(projects.find(p=>p.id===s.projectId)?.name||'—')}</td>
+          <td><strong>${s.averageScore?.toFixed(1)||'—'}/5</strong></td>
+          <td>${s.answers?.q2||'—'}/5</td>
+          <td>${s.answers?.q3||'—'}/5</td>
+          <td>${s.answers?.q5||'—'}/5</td>
+          <td style="font-size:11px;color:var(--gray-500);">${escapeHtml((s.comments||'').substring(0,60))}</td>
+          <td>${s.submittedAt?formatDateTime(s.submittedAt):'—'}</td>
+        </tr>`).join('')}</tbody></table></div>`;
+    }).catch(() => { container.innerHTML = '<div class="empty-state"><i class="fas fa-star"></i><p>Unable to load survey results.</p></div>'; });
+}
+
+// ============================================================
+// 7. BROKER TIERING SYSTEM
+// ============================================================
+const BROKER_TIERS = [
+  { name:'Platinum', minDeals:10, minVolume:200_000_000, color:'#6b96b5', bg:'rgba(44,95,138,0.15)',   commBonus:0.5 },
+  { name:'Gold',     minDeals:5,  minVolume:50_000_000,  color:'#c9a96e', bg:'rgba(201,169,110,0.15)', commBonus:0.25 },
+  { name:'Silver',   minDeals:2,  minVolume:10_000_000,  color:'#9ca3af', bg:'rgba(156,163,175,0.15)', commBonus:0.1 },
+  { name:'Bronze',   minDeals:0,  minVolume:0,           color:'#c97b2a', bg:'rgba(201,123,42,0.15)',  commBonus:0 }
+];
+
+function getBrokerTier(brokerId) {
+  const bProjects = projects.filter(p => p.brokerId === brokerId && (parseInt(p.step)||1) === 9);
+  const volume    = bProjects.reduce((s,p) => s + parseAmount(p.amount), 0);
+  const deals     = bProjects.length;
+  for (const tier of BROKER_TIERS) {
+    if (deals >= tier.minDeals && volume >= tier.minVolume) return tier;
+  }
+  return BROKER_TIERS[BROKER_TIERS.length - 1]; // Bronze
+}
+
+function getBrokerTierBadge(brokerId) {
+  const tier = getBrokerTier(brokerId);
+  return `<span class="badge" style="background:${tier.bg};color:${tier.color};font-weight:600;">
+    ${tier.name === 'Platinum' ? '💎' : tier.name === 'Gold' ? '🥇' : tier.name === 'Silver' ? '🥈' : '🥉'} ${tier.name}
+  </span>`;
+}
+
+async function checkBrokerTierUpgrades() {
+  for (const broker of brokers) {
+    if (!broker.id || broker.status !== 'active') continue;
+    const currentTier = getBrokerTier(broker.id);
+    const savedTier   = broker.tier || 'Bronze';
+    if (currentTier.name !== savedTier) {
+      await db.collection('brokers').doc(broker.id).update({ tier: currentTier.name }).catch(() => {});
+      // Only notify on upgrade (not downgrade)
+      const tierRank = t => ['Bronze','Silver','Gold','Platinum'].indexOf(t);
+      if (tierRank(currentTier.name) > tierRank(savedTier) && broker.email?.includes('@')) {
+        await sendEmailNotification({
+          to_name:  broker.name,
+          to_email: broker.email,
+          from_name:'Suzana Aleksić — Croft Finance',
+          subject:  `Congratulations — You've reached ${currentTier.name} tier!`,
+          message:  `Dear ${broker.name},\n\nCongratulations! Based on your deal performance, you have been upgraded to ${currentTier.name} tier in the Croft Finance broker network.\n\nYour commission rate bonus: +${currentTier.commBonus}%\n\nThank you for your continued partnership.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
+          project_name:'Broker Tier Upgrade'
+        });
+      }
+    }
+  }
+}
+
+function renderBrokerTierSummary() {
+  const el = document.getElementById('brokerTierSummary');
+  if (!el) return;
+  const tierCounts = { Platinum:0, Gold:0, Silver:0, Bronze:0 };
+  brokers.filter(b=>b.status==='active').forEach(b => {
+    const tier = getBrokerTier(b.id);
+    tierCounts[tier.name]++;
+  });
+  el.innerHTML = BROKER_TIERS.map(t => `
+    <div style="text-align:center;padding:12px;background:${t.bg};border-radius:8px;border:0.5px solid ${t.color};">
+      <div style="font-size:20px;">${t.name==='Platinum'?'💎':t.name==='Gold'?'🥇':t.name==='Silver'?'🥈':'🥉'}</div>
+      <div style="font-size:16px;font-weight:600;color:${t.color};">${tierCounts[t.name]}</div>
+      <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:${t.color};">${t.name}</div>
+    </div>`).join('');
+}
+
+// ============================================================
+// 8. CLIENT REFERRAL TRACKING
+// ============================================================
+async function saveReferral(referredClientId, referrerName) {
+  if (!referrerName?.trim()) return;
+  try {
+    await db.collection('clients').doc(referredClientId).update({
+      referredBy: referrerName.trim(),
+      referredAt: new Date().toISOString()
+    });
+    showToastSuccess('Referral recorded');
+  } catch(e) { showToastError(e.message); }
+}
+
+window.showReferralModal = function(clientId) {
+  const existing = document.getElementById('referralModal');
+  if (existing) existing.remove();
+  const client = clients.find(c=>c.id===clientId);
+  if (!client) return;
+  const modal = document.createElement('div');
+  modal.id = 'referralModal';
+  modal.className = 'modal-overlay active';
+  modal.innerHTML = `
+    <div class="modal">
+      <div class="modal-header"><h3>Record Referral — ${escapeHtml(client.name)}</h3><button class="modal-close" onclick="document.getElementById('referralModal').remove()">✕</button></div>
+      <div class="modal-body">
+        <p style="font-size:13px;color:var(--gray-500);margin-bottom:16px;">Who referred ${escapeHtml(client.name)} to Croft Finance?</p>
+        <div class="form-group"><label class="form-label">Referred By</label>
+          <input type="text" id="referralInput" class="form-input" value="${escapeHtml(client.referredBy||'')}" placeholder="Name or company...">
+        </div>
+        <div class="form-group"><label class="form-label">Referral Type</label>
+          <select id="referralType" class="form-select">
+            <option value="client">Existing Client</option>
+            <option value="broker">Broker</option>
+            <option value="partner">Business Partner</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-md" onclick="saveReferral('${clientId}',document.getElementById('referralInput').value);document.getElementById('referralModal').remove();" style="width:100%;justify-content:center;">Save Referral</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+};
+
+function renderReferralReport() {
+  const el = document.getElementById('referralReportContainer');
+  if (!el) return;
+  const referred = clients.filter(c => c.referredBy);
+  if (!referred.length) { el.innerHTML='<div class="empty-state"><i class="fas fa-users"></i><p>No referrals recorded yet.</p></div>'; return; }
+
+  // Group by referrer
+  const byReferrer = {};
+  referred.forEach(c => {
+    const key = c.referredBy;
+    if (!byReferrer[key]) byReferrer[key] = [];
+    byReferrer[key].push(c);
+  });
+
+  el.innerHTML = `
+    <div class="table-wrap"><table class="admin-table">
+      <thead><tr><th>Referred By</th><th>Clients Referred</th><th>Active Deals</th><th>Total Volume</th></tr></thead>
+      <tbody>${Object.entries(byReferrer).sort((a,b)=>b[1].length-a[1].length).map(([referrer, cls]) => {
+        const activeDeals = cls.reduce((s,c)=>s+projects.filter(p=>p.clientId===c.id&&p.status==='active').length,0);
+        const volume = cls.reduce((s,c)=>s+projects.filter(p=>p.clientId===c.id).reduce((sv,p)=>sv+parseAmount(p.amount),0),0);
+        return `<tr>
+          <td><strong>${escapeHtml(referrer)}</strong></td>
+          <td>${cls.map(c=>`<span class="badge badge-info">${escapeHtml(c.name)}</span>`).join(' ')}</td>
+          <td style="text-align:center;">${activeDeals}</td>
+          <td><strong>${formatCurrency(volume)}</strong></td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table></div>`;
+}
+
+// ============================================================
+// 9. AUTOMATIC ARCHIVING
+// ============================================================
+async function runAutoArchive() {
+  const archiveKey = 'lastAutoArchive';
+  const lastRun    = localStorage.getItem(archiveKey);
+  const now        = Date.now();
+  // Only run once per day
+  if (lastRun && (now - parseInt(lastRun)) < 24*60*60*1000) return;
+  localStorage.setItem(archiveKey, String(now));
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  let archived = 0;
+
+  for (const p of projects) {
+    // Archive declined deals older than 30 days
+    if (p.status === 'declined' && p.declinedAt) {
+      const declinedDate = new Date(p.declinedAt);
+      const daysSince    = Math.ceil((today - declinedDate) / 86400000);
+      if (daysSince >= 30) {
+        await db.collection('projects').doc(p.id).update({ status:'archived', archivedAt: new Date().toISOString(), archivedReason:'auto_declined_30d' }).catch(()=>{});
+        archived++;
+      }
+    }
+    // Archive funded deals older than 180 days
+    if ((parseInt(p.step)||1) === 9 && p.fundedDate) {
+      const fundedDate = new Date(p.fundedDate);
+      const daysSince  = Math.ceil((today - fundedDate) / 86400000);
+      if (daysSince >= 180) {
+        await db.collection('projects').doc(p.id).update({ status:'archived', archivedAt: new Date().toISOString(), archivedReason:'auto_funded_180d' }).catch(()=>{});
+        archived++;
+      }
+    }
+  }
+  if (archived > 0) {
+    showToast(`Auto-archived ${archived} deal${archived!==1?'s':''} (declined 30d+ / funded 180d+)`, 'default', 6000);
+    await logActivity('system','Auto Archive','system','auto_archive',null,`Archived ${archived} deals`);
+  }
+}
+
+window.viewArchivedDeals = function() {
+  const archived = projects.filter(p => p.status === 'archived')
+    .sort((a,b) => new Date(b.archivedAt||0) - new Date(a.archivedAt||0));
+  const container = document.getElementById('archivedDealsContainer');
+  if (!container) return;
+  if (!archived.length) { container.innerHTML='<div class="empty-state"><i class="fas fa-archive"></i><p>No archived deals.</p></div>'; return; }
+  container.innerHTML = `<div class="table-wrap"><table class="admin-table">
+    <thead><tr><th>Client</th><th>Project</th><th>Reason</th><th>Archived</th><th>Actions</th></tr></thead>
+    <tbody>${archived.map(p => {
+      const c = clients.find(cl=>cl.id===p.clientId);
+      const reasonLabel = { auto_declined_30d:'Declined 30+ days', auto_funded_180d:'Funded 180+ days', manual:'Manually archived' }[p.archivedReason]||p.archivedReason||'—';
+      return `<tr>
+        <td>${escapeHtml(c?.name||'Unknown')}</td>
+        <td><strong>${escapeHtml(p.name)}</strong></td>
+        <td>${reasonLabel}</td>
+        <td>${p.archivedAt?formatDate(p.archivedAt):'—'}</td>
+        <td><button class="btn btn-secondary btn-xs" onclick="restoreArchivedDeal('${p.id}')"><i class="fas fa-undo"></i> Restore</button></td>
+      </tr>`;
+    }).join('')}</tbody></table></div>`;
+};
+
+window.restoreArchivedDeal = async function(projectId) {
+  if (!confirmAction('Restore this deal to the active pipeline?')) return;
+  try {
+    await db.collection('projects').doc(projectId).update({ status:'active', archivedAt:null, archivedReason:null });
+    showToastSuccess('Deal restored to pipeline');
+    viewArchivedDeals();
+  } catch(e) { showToastError(e.message); }
+};
+
+// ============================================================
+// INIT — called after Firebase is ready
+// ============================================================
+window.initGroup1Features = async function() {
+  await loadMessageTemplates();
+  // Run auto-archive check on admin login
+  const user = firebase.auth().currentUser;
+  if (user) {
+    const adminDoc = await db.collection('admins').doc(user.uid).get().catch(()=>({exists:false}));
+    if (adminDoc.exists) {
+      runAutoArchive();
+      checkBrokerTierUpgrades();
+    }
+  }
+};
+
+</script>
+
+window.renderHealthScoreTable = function() {
+  const el = document.getElementById('healthScoreTableContainer');
+  if (!el) return;
+  const scored = projects.filter(p=>p.status==='active').map(p=>({
+    project:p, client:clients.find(c=>c.id===p.clientId), score:calculateDealHealthScore(p)
+  })).sort((a,b)=>(a.score||0)-(b.score||0));
+  if (!scored.length){el.innerHTML='<div class="empty-state"><i class="fas fa-heartbeat"></i><p>No active projects.</p></div>';return;}
+  el.innerHTML=`<div class="table-wrap"><table class="admin-table">
+    <thead><tr><th>Client</th><th>Project</th><th>Step</th><th>Score</th><th>Days to Close</th><th>Actions</th></tr></thead>
+    <tbody>${scored.map(({project:p,client:c,score})=>{
+      const days=daysUntil(p.closeDate);
+      return `<tr>
+        <td>${escapeHtml(c?.name||'Unknown')}</td>
+        <td>${escapeHtml(p.name)}</td>
+        <td>${STEP_NAMES[parseInt(p.step)||1]}</td>
+        <td>${getHealthScoreBadge(score)}</td>
+        <td>${days===null?'—':days<0?'<span class="expiry-danger">'+Math.abs(days)+'d overdue</span>':days+'d'}</td>
+        <td><button class="btn btn-ghost btn-xs" onclick="editProject('${p.id}')"><i class="fas fa-edit"></i> Edit</button></td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table></div>`;
+};
+
+window.updateReferralStats = function() {
+  const referred = clients.filter(c=>c.referredBy);
+  const unique   = new Set(referred.map(c=>c.referredBy)).size;
+  const active   = referred.filter(c=>c.status==='active').length;
+  const conv     = referred.length>0?Math.round((active/referred.length)*100):0;
+  const setEl=(id,v)=>{const el=document.getElementById(id);if(el)el.innerHTML=v;};
+  setEl('totalReferredClients',referred.length);
+  setEl('uniqueReferrers',unique);
+  setEl('referralConversion',conv+'%');
+};
 
 </body>
 </html>
