@@ -3293,22 +3293,97 @@ window.closeAdminNotificationDropdown  = () => document.getElementById('adminNot
 // IMPERSONATION
 // ============================================================
 window.impersonateClient = async function(clientId) {
-  const client=clients.find(c=>c.id===clientId);
+  const client = clients.find(c => c.id === clientId);
   if (!client) return showToastError('Client not found');
-  if (client.status==='crm_only') return showToastError('CRM-only clients have no portal to preview');
-  _impersonationPreviousState={currentClient,currentProjectId,currentBroker,projects:[...projects],documents:[...documents],messages:[...messages],meetings:[...meetings]};
-  currentClient=client; currentProjectId=null;
+  if (client.status === 'crm_only') return showToastError('CRM-only clients have no portal to preview');
+
+  _impersonationPreviousState = {
+    currentClient, currentProjectId, currentBroker,
+    projects: [...projects], documents: [...documents],
+    messages: [...messages], meetings: [...meetings]
+  };
+
+  currentClient = client;
+  currentProjectId = null;
+
   try {
-    const [pS,dS,mS,meS]=await Promise.all([db.collection('projects').where('clientId','==',clientId).get(),db.collection('documents').where('clientId','==',clientId).get(),db.collection('messages').where('clientId','==',clientId).get(),db.collection('meetings').where('clientId','==',clientId).get()]);
-    projects=pS.docs.map(d=>({id:d.id,...d.data()})); documents=dS.docs.map(d=>({id:d.id,...d.data()})); messages=mS.docs.map(d=>({id:d.id,...d.data()})); meetings=meS.docs.map(d=>({id:d.id,...d.data()}));
-    if (projects.length) currentProjectId=projects[0].id;
-  } catch(e) { showToastError('Failed to load client data'); return; }
-  await logActivity(auth.currentUser?.uid,'Suzana Aleksić','croft','impersonation_start',null,`Viewing as: ${client.name}`);
-  const banner=document.getElementById('impersonationBanner'),nameEl=document.getElementById('impersonationClientName');
-  if (banner) banner.style.display='flex'; if (nameEl) nameEl.textContent=client.name;
-  const pNav=document.querySelector('#view-portal .portal-nav'),sidebar=document.querySelector('#view-portal .sidebar');
-  if (pNav) pNav.style.top='40px'; if (sidebar) sidebar.style.top='104px';
-  showView('portal'); loadClientPortal(); loadCurrentProjectData(); renderCapitalStack(); renderProjectsList(); renderStepAccordion(); renderDocuments(); loadMessages(); updateUpcomingDeadlines(); checkDeadlines(); switchPortalTab('dashboard');
+    const [pS, dS, mS, meS] = await Promise.all([
+      db.collection('projects').where('clientId','==',clientId).get(),
+      db.collection('documents').where('clientId','==',clientId).get(),
+      db.collection('messages').where('clientId','==',clientId).get(),
+      db.collection('meetings').where('clientId','==',clientId).get()
+    ]);
+
+    projects  = pS.docs.map(d => ({ id: d.id, ...d.data() }));
+    documents = dS.docs.map(d => ({ id: d.id, ...d.data() }));
+    messages  = mS.docs.map(d => ({ id: d.id, ...d.data() }));
+    meetings  = meS.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    // KEY FIX: set currentProjectId before rendering
+    if (projects.length) {
+      currentProjectId = projects[0].id;
+    }
+
+  } catch(e) {
+    showToastError('Failed to load client data: ' + e.message);
+    return;
+  }
+
+  await logActivity(
+    auth.currentUser?.uid, 'Suzana Aleksić', 'croft',
+    'impersonation_start', null, `Viewing as: ${client.name}`
+  );
+
+  const banner  = document.getElementById('impersonationBanner');
+  const nameEl  = document.getElementById('impersonationClientName');
+  if (banner) banner.style.display = 'flex';
+  if (nameEl) nameEl.textContent   = client.name;
+
+  // Push nav and sidebar down to make room for banner
+  const pNav    = document.querySelector('#view-portal .portal-nav');
+  const sidebar = document.querySelector('#view-portal .sidebar');
+  if (pNav)    pNav.style.top    = '40px';
+  if (sidebar) sidebar.style.top = '104px';
+
+  // Switch view first
+  showView('portal');
+
+  // Load portal UI elements in correct order
+  loadClientPortal();
+
+  // Only render if we have a project
+  if (currentProjectId) {
+    loadCurrentProjectData();
+    renderCapitalStack();
+    renderProjectsList();
+    renderStepAccordion();
+    renderDocuments();
+    updateUpcomingDeadlines();
+    checkDeadlines();
+    renderOnboardingChecklist();
+  } else {
+    // Show empty state if client has no projects
+    const hero = document.getElementById('dashboardHero');
+    if (hero) {
+      hero.innerHTML = `
+        <div style="grid-column:1/-1;text-align:center;padding:20px;">
+          <i class="fas fa-briefcase" style="font-size:40px;color:rgba(255,255,255,0.3);display:block;margin-bottom:12px;"></i>
+          <div style="color:rgba(255,255,255,0.6);font-size:14px;">No projects found for this client.</div>
+          <button class="btn btn-gold btn-sm" style="margin-top:16px;" 
+            onclick="exitImpersonation();showAddClientModal();">
+            Add Project
+          </button>
+        </div>`;
+    }
+  }
+
+  // Load messages separately (async is fine)
+  loadMessages();
+  loadClientMeetings();
+  loadClientActivityLog();
+  updateClientNotificationBadge();
+
+  switchPortalTab('dashboard');
   showToast(`Previewing portal as ${client.name}`);
 };
 
