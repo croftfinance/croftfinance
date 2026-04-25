@@ -3345,46 +3345,45 @@ window.impersonateClient = async function(clientId) {
   if (pNav)    pNav.style.top    = '40px';
   if (sidebar) sidebar.style.top = '104px';
 
-  // Switch view first
-  showView('portal');
+ // Switch view first
+showView('portal');
 
-  // Load portal UI elements in correct order
-  loadClientPortal();
+// Safe calls — check functions exist before calling
+if (typeof loadClientPortal === 'function') loadClientPortal();
 
-  // Only render if we have a project
-  if (currentProjectId) {
-    loadCurrentProjectData();
-    renderCapitalStack();
-    renderProjectsList();
-    renderStepAccordion();
-    renderDocuments();
-    updateUpcomingDeadlines();
-    checkDeadlines();
-    renderOnboardingChecklist();
-  } else {
-    // Show empty state if client has no projects
-    const hero = document.getElementById('dashboardHero');
-    if (hero) {
-      hero.innerHTML = `
-        <div style="grid-column:1/-1;text-align:center;padding:20px;">
-          <i class="fas fa-briefcase" style="font-size:40px;color:rgba(255,255,255,0.3);display:block;margin-bottom:12px;"></i>
-          <div style="color:rgba(255,255,255,0.6);font-size:14px;">No projects found for this client.</div>
-          <button class="btn btn-gold btn-sm" style="margin-top:16px;" 
-            onclick="exitImpersonation();showAddClientModal();">
-            Add Project
-          </button>
-        </div>`;
-    }
+// Only render if we have a project
+if (currentProjectId) {
+  if (typeof loadCurrentProjectData === 'function')    loadCurrentProjectData();
+  if (typeof renderCapitalStack === 'function')        renderCapitalStack();
+  if (typeof renderProjectsList === 'function')        renderProjectsList();
+  if (typeof renderStepAccordion === 'function')       renderStepAccordion();
+  if (typeof renderDocuments === 'function')           renderDocuments();
+  if (typeof updateUpcomingDeadlines === 'function')   updateUpcomingDeadlines();
+  if (typeof checkDeadlines === 'function')            checkDeadlines();
+  if (typeof renderOnboardingChecklist === 'function') renderOnboardingChecklist();
+} else {
+  const hero = document.getElementById('dashboardHero');
+  if (hero) {
+    hero.innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:20px;">
+        <i class="fas fa-briefcase" style="font-size:40px;color:rgba(255,255,255,0.3);display:block;margin-bottom:12px;"></i>
+        <div style="color:rgba(255,255,255,0.6);font-size:14px;">No projects found for this client.</div>
+        <button class="btn btn-gold btn-sm" style="margin-top:16px;"
+          onclick="exitImpersonation();showAddClientModal();">
+          Add Project
+        </button>
+      </div>`;
   }
+}
 
-  // Load messages separately (async is fine)
-  loadMessages();
-  loadClientMeetings();
-  loadClientActivityLog();
-  updateClientNotificationBadge();
+// Load messages separately (async is fine)
+if (typeof loadMessages === 'function')                  loadMessages();
+if (typeof loadClientMeetings === 'function')            loadClientMeetings();
+if (typeof loadClientActivityLog === 'function')         loadClientActivityLog();
+if (typeof updateClientNotificationBadge === 'function') updateClientNotificationBadge();
 
-  switchPortalTab('dashboard');
-  showToast(`Previewing portal as ${client.name}`);
+switchPortalTab('dashboard');
+showToast(`Previewing portal as ${client.name}`);
 };
 
 window.exitImpersonation = async function() {
@@ -6826,24 +6825,40 @@ window.initGroup1Features = async function() {
 window.renderHealthScoreTable = function() {
   const el = document.getElementById('healthScoreTableContainer');
   if (!el) return;
-  const scored = projects.filter(p=>p.status==='active').map(p=>({
-    project:p, client:clients.find(c=>c.id===p.clientId), score:calculateDealHealthScore(p)
-  })).sort((a,b)=>(a.score||0)-(b.score||0));
-  if (!scored.length){el.innerHTML='<div class="empty-state"><i class="fas fa-heartbeat"></i><p>No active projects.</p></div>';return;}
-  el.innerHTML=`<div class="table-wrap"><table class="admin-table">
-    <thead><tr><th>Client</th><th>Project</th><th>Step</th><th>Score</th><th>Days to Close</th><th>Actions</th></tr></thead>
-    <tbody>${scored.map(({project:p,client:c,score})=>{
-      const days=daysUntil(p.closeDate);
-      return `<tr>
-        <td>${escapeHtml(c?.name||'Unknown')}</td>
-        <td>${escapeHtml(p.name)}</td>
-        <td>${STEP_NAMES[parseInt(p.step)||1]}</td>
-        <td>${getHealthScoreBadge(score)}</td>
-        <td>${days===null?'—':days<0?'<span class="expiry-danger">'+Math.abs(days)+'d overdue</span>':days+'d'}</td>
-        <td><button class="btn btn-ghost btn-xs" onclick="editProject('${p.id}')"><i class="fas fa-edit"></i> Edit</button></td>
-      </tr>`;
-    }).join('')}</tbody>
-  </table></div>`;
+  const scored = projects.filter(p => p.status === 'active').map(p => ({
+    project: p,
+    client:  clients.find(c => c.id === p.clientId),
+    score:   calculateDealHealthScore(p)
+  })).sort((a, b) => (a.score || 0) - (b.score || 0));
+
+  if (!scored.length) {
+    el.innerHTML = '<div class="empty-state"><i class="fas fa-heartbeat"></i><p>No active projects.</p></div>';
+    return;
+  }
+
+  let rows = '';
+  scored.forEach(function(item) {
+    const p     = item.project;
+    const c     = item.client;
+    const score = item.score;
+    const days  = daysUntil(p.closeDate);
+    const daysDisplay = days === null ? '—'
+      : days < 0 ? '<span class="expiry-danger">' + Math.abs(days) + 'd overdue</span>'
+      : days + 'd';
+    rows += '<tr>' +
+      '<td>' + escapeHtml(c ? c.name : 'Unknown') + '</td>' +
+      '<td>' + escapeHtml(p.name) + '</td>' +
+      '<td>' + STEP_NAMES[parseInt(p.step) || 1] + '</td>' +
+      '<td>' + getHealthScoreBadge(score) + '</td>' +
+      '<td>' + daysDisplay + '</td>' +
+      '<td><button class="btn btn-ghost btn-xs" onclick="editProject(\'' + p.id + '\')"><i class="fas fa-edit"></i> Edit</button></td>' +
+      '</tr>';
+  });
+
+  el.innerHTML = '<div class="table-wrap"><table class="admin-table">' +
+    '<thead><tr><th>Client</th><th>Project</th><th>Step</th><th>Score</th><th>Days to Close</th><th>Actions</th></tr></thead>' +
+    '<tbody>' + rows + '</tbody>' +
+    '</table></div>';
 };
 
 window.updateReferralStats = function() {
