@@ -6745,28 +6745,45 @@ window.initGroup1Features = async function() {
   }
 };
 
-</script>
-
 window.renderHealthScoreTable = function() {
   const el = document.getElementById('healthScoreTableContainer');
   if (!el) return;
-  const scored = projects.filter(p=>p.status==='active').map(p=>({
-    project:p, client:clients.find(c=>c.id===p.clientId), score:calculateDealHealthScore(p)
-  })).sort((a,b)=>(a.score||0)-(b.score||0));
-  if (!scored.length){el.innerHTML='<div class="empty-state"><i class="fas fa-heartbeat"></i><p>No active projects.</p></div>';return;}
-  el.innerHTML=`<div class="table-wrap"><table class="admin-table">
-    <thead><tr><th>Client</th><th>Project</th><th>Step</th><th>Score</th><th>Days to Close</th><th>Actions</th></tr></thead>
-    <tbody>${scored.map(({project:p,client:c,score})=>{
-      const days=daysUntil(p.closeDate);
-      return `<tr>
-        <td>${escapeHtml(c?.name||'Unknown')}</td>
-        <td>${escapeHtml(p.name)}</td>
-        <td>${STEP_NAMES[parseInt(p.step)||1]}</td>
-        <td>${getHealthScoreBadge(score)}</td>
-        <td>${days===null?'—':days<0?'<span class="expiry-danger">'+Math.abs(days)+'d overdue</span>':days+'d'}</td>
-        <td><button class="btn btn-ghost btn-xs" onclick="editProject('${p.id}')"><i class="fas fa-edit"></i> Edit</button></td>
-      </tr>`;
-    }).join('')}</tbody>
+  
+  const scored = projects.filter(p => p.status === 'active').map(p => ({
+    project: p,
+    client: clients.find(c => c.id === p.clientId),
+    score: calculateDealHealthScore(p)
+  })).sort((a, b) => (a.score || 0) - (b.score || 0));
+  
+  if (!scored.length) {
+    el.innerHTML = '<div class="empty-state"><i class="fas fa-heartbeat"></i><p>No active projects.</p></div>';
+    return;
+  }
+  
+  el.innerHTML = `<div class="table-wrap"><table class="admin-table">
+    <thead>
+      <tr>
+        <th>Client</th>
+        <th>Project</th>
+        <th>Step</th>
+        <th>Score</th>
+        <th>Days to Close</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${scored.map(({ project: p, client: c, score }) => {
+        const days = daysUntil(p.closeDate);
+        return `<tr>
+          <td>${escapeHtml(c?.name || 'Unknown')}</td>
+          <td>${escapeHtml(p.name)}</td>
+          <td>${STEP_NAMES[parseInt(p.step) || 1]}</td>
+          <td>${getHealthScoreBadge(score)}</td>
+          <td>${days === null ? '—' : days < 0 ? '<span class="expiry-danger">' + Math.abs(days) + 'd overdue</span>' : days + 'd'}</td>
+          <td><button class="btn btn-ghost btn-xs" onclick="editProject('${p.id}')"><i class="fas fa-edit"></i> Edit</button></td>
+        </tr>`;
+      }).join('')}
+    </tbody>
   </table></div>`;
 };
 
@@ -6781,5 +6798,6 @@ window.updateReferralStats = function() {
   setEl('referralConversion',conv+'%');
 };
 
+</script>
 </body>
 </html>
