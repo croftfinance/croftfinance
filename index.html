@@ -1097,7 +1097,7 @@ body.dark-mode .template-dropdown { background:var(--gray-200); border-color:var
           </div>
           <div style="background:white;border:0.5px solid var(--gray-200);border-radius:8px;padding:20px;">
             <div class="data-label">Approach</div>
-            <div style="font-size:13px;color:var(--navy);margin-top:8px;line-height:1.8;">Single point of contact<br>Direct decisions<br>14–21 day funding</div>
+            <div style="font-size:13px;color:var(--navy);margin-top:8px;line-height:1.8;">Single point of contact<br>No credit committees<br>Direct decisions<br>14–21 day funding<br>Full confidentiality</div>
           </div>
         </div>
       </div>
@@ -3293,97 +3293,23 @@ window.closeAdminNotificationDropdown  = () => document.getElementById('adminNot
 // IMPERSONATION
 // ============================================================
 window.impersonateClient = async function(clientId) {
-  const client = clients.find(c => c.id === clientId);
+  const client=clients.find(c=>c.id===clientId);
   if (!client) return showToastError('Client not found');
-  if (client.status === 'crm_only') return showToastError('CRM-only clients have no portal to preview');
-
-  _impersonationPreviousState = {
-    currentClient, currentProjectId, currentBroker,
-    projects: [...projects], documents: [...documents],
-    messages: [...messages], meetings: [...meetings]
-  };
-
-  currentClient = client;
-  currentProjectId = null;
-
+  if (client.status==='crm_only') return showToastError('CRM-only clients have no portal to preview');
+  _impersonationPreviousState={currentClient,currentProjectId,currentBroker,projects:[...projects],documents:[...documents],messages:[...messages],meetings:[...meetings]};
+  currentClient=client; currentProjectId=null;
   try {
-    const [pS, dS, mS, meS] = await Promise.all([
-      db.collection('projects').where('clientId','==',clientId).get(),
-      db.collection('documents').where('clientId','==',clientId).get(),
-      db.collection('messages').where('clientId','==',clientId).get(),
-      db.collection('meetings').where('clientId','==',clientId).get()
-    ]);
-
-    projects  = pS.docs.map(d => ({ id: d.id, ...d.data() }));
-    documents = dS.docs.map(d => ({ id: d.id, ...d.data() }));
-    messages  = mS.docs.map(d => ({ id: d.id, ...d.data() }));
-    meetings  = meS.docs.map(d => ({ id: d.id, ...d.data() }));
-
-    // KEY FIX: set currentProjectId before rendering
-    if (projects.length) {
-      currentProjectId = projects[0].id;
-    }
-
-  } catch(e) {
-    showToastError('Failed to load client data: ' + e.message);
-    return;
-  }
-
-  await logActivity(
-    auth.currentUser?.uid, 'Suzana Aleksić', 'croft',
-    'impersonation_start', null, `Viewing as: ${client.name}`
-  );
-
-  const banner  = document.getElementById('impersonationBanner');
-  const nameEl  = document.getElementById('impersonationClientName');
-  if (banner) banner.style.display = 'flex';
-  if (nameEl) nameEl.textContent   = client.name;
-
-  // Push nav and sidebar down to make room for banner
-  const pNav    = document.querySelector('#view-portal .portal-nav');
-  const sidebar = document.querySelector('#view-portal .sidebar');
-  if (pNav)    pNav.style.top    = '40px';
-  if (sidebar) sidebar.style.top = '104px';
-
- // Switch view first
-showView('portal');
-
-// Safe calls — check functions exist before calling
-if (typeof loadClientPortal === 'function') loadClientPortal();
-
-// Only render if we have a project
-if (currentProjectId) {
-  if (typeof loadCurrentProjectData === 'function')    loadCurrentProjectData();
-  if (typeof renderCapitalStack === 'function')        renderCapitalStack();
-  if (typeof renderProjectsList === 'function')        renderProjectsList();
-  if (typeof renderStepAccordion === 'function')       renderStepAccordion();
-  if (typeof renderDocuments === 'function')           renderDocuments();
-  if (typeof updateUpcomingDeadlines === 'function')   updateUpcomingDeadlines();
-  if (typeof checkDeadlines === 'function')            checkDeadlines();
-  if (typeof renderOnboardingChecklist === 'function') renderOnboardingChecklist();
-} else {
-  const hero = document.getElementById('dashboardHero');
-  if (hero) {
-    hero.innerHTML = `
-      <div style="grid-column:1/-1;text-align:center;padding:20px;">
-        <i class="fas fa-briefcase" style="font-size:40px;color:rgba(255,255,255,0.3);display:block;margin-bottom:12px;"></i>
-        <div style="color:rgba(255,255,255,0.6);font-size:14px;">No projects found for this client.</div>
-        <button class="btn btn-gold btn-sm" style="margin-top:16px;"
-          onclick="exitImpersonation();showAddClientModal();">
-          Add Project
-        </button>
-      </div>`;
-  }
-}
-
-// Load messages separately (async is fine)
-if (typeof loadMessages === 'function')                  loadMessages();
-if (typeof loadClientMeetings === 'function')            loadClientMeetings();
-if (typeof loadClientActivityLog === 'function')         loadClientActivityLog();
-if (typeof updateClientNotificationBadge === 'function') updateClientNotificationBadge();
-
-switchPortalTab('dashboard');
-showToast(`Previewing portal as ${client.name}`);
+    const [pS,dS,mS,meS]=await Promise.all([db.collection('projects').where('clientId','==',clientId).get(),db.collection('documents').where('clientId','==',clientId).get(),db.collection('messages').where('clientId','==',clientId).get(),db.collection('meetings').where('clientId','==',clientId).get()]);
+    projects=pS.docs.map(d=>({id:d.id,...d.data()})); documents=dS.docs.map(d=>({id:d.id,...d.data()})); messages=mS.docs.map(d=>({id:d.id,...d.data()})); meetings=meS.docs.map(d=>({id:d.id,...d.data()}));
+    if (projects.length) currentProjectId=projects[0].id;
+  } catch(e) { showToastError('Failed to load client data'); return; }
+  await logActivity(auth.currentUser?.uid,'Suzana Aleksić','croft','impersonation_start',null,`Viewing as: ${client.name}`);
+  const banner=document.getElementById('impersonationBanner'),nameEl=document.getElementById('impersonationClientName');
+  if (banner) banner.style.display='flex'; if (nameEl) nameEl.textContent=client.name;
+  const pNav=document.querySelector('#view-portal .portal-nav'),sidebar=document.querySelector('#view-portal .sidebar');
+  if (pNav) pNav.style.top='40px'; if (sidebar) sidebar.style.top='104px';
+  showView('portal'); loadClientPortal(); loadCurrentProjectData(); renderCapitalStack(); renderProjectsList(); renderStepAccordion(); renderDocuments(); loadMessages(); updateUpcomingDeadlines(); checkDeadlines(); switchPortalTab('dashboard');
+  showToast(`Previewing portal as ${client.name}`);
 };
 
 window.exitImpersonation = async function() {
@@ -5169,13 +5095,13 @@ function loadCurrentProjectData() {
       </div>`;
     } else if (step===9) {
       const surveyDone = p.surveyCompleted;
-      bannerDiv.innerHTML = `<div class="action-banner funded">
-        <i class="fas fa-check-circle" style="color:var(--success);font-size:22px;flex-shrink:0;"></i>
-        <div style="flex:1;"><strong style="color:var(--success);font-size:15px;">Congratulations — Deal Funded!</strong><br>
-        <span style="font-size:13px;color:var(--gray-600);">Your facility has been successfully disbursed. Please refer to your closing statement.</span>
-        ${surveyDone?'':'<div style="margin-top:10px;"><button class="btn btn-gold btn-sm" onclick="showSatisfactionSurvey(''+currentProjectId+'')"><i class="fas fa-star"></i> Share Your Experience</button></div>'}
-        </div>
-      </div>`;
+      let _fb = '<div class="action-banner funded">';
+      _fb += '<i class="fas fa-check-circle" style="color:var(--success);font-size:22px;flex-shrink:0;"></i>';
+      _fb += '<div style="flex:1;"><strong style="color:var(--success);font-size:15px;">Congratulations — Deal Funded!</strong><br>';
+      _fb += '<span style="font-size:13px;color:var(--gray-600);">Your facility has been successfully disbursed. Please refer to your closing statement.</span>';
+      if (!surveyDone) _fb += '<div style="margin-top:10px;"><button class="btn btn-gold btn-sm" onclick="showSatisfactionSurvey(this.dataset.pid)" data-pid="' + currentProjectId + '"><i class="fas fa-star"></i> Share Your Experience</button></div>';
+      _fb += '</div></div>';
+      bannerDiv.innerHTML = _fb;
       if (!surveyDone) checkAndSendSatisfactionSurvey(currentProjectId);
     } else {
       bannerDiv.innerHTML = '';
@@ -6821,44 +6747,27 @@ window.initGroup1Features = async function() {
 
 </script>
 
-<script>
 window.renderHealthScoreTable = function() {
-  var el = document.getElementById('healthScoreTableContainer');
+  const el = document.getElementById('healthScoreTableContainer');
   if (!el) return;
-  var scored = projects.filter(function(p) { return p.status === 'active'; }).map(function(p) {
-    return { project: p, client: clients.find(function(c) { return c.id === p.clientId; }), score: calculateDealHealthScore(p) };
-  }).sort(function(a, b) { return (a.score || 0) - (b.score || 0); });
-
-  if (!scored.length) {
-    el.innerHTML = '<div class="empty-state"><i class="fas fa-heartbeat"></i><p>No active projects.</p></div>';
-    return;
-  }
-
-  var rows = '';
-  for (var i = 0; i < scored.length; i++) {
-    var p     = scored[i].project;
-    var c     = scored[i].client;
-    var score = scored[i].score;
-    var days  = daysUntil(p.closeDate);
-    var daysDisplay = days === null ? '&mdash;'
-      : days < 0 ? '<span class="expiry-danger">' + Math.abs(days) + 'd overdue</span>'
-      : days + 'd';
-    var cName = c ? escapeHtml(c.name) : 'Unknown';
-    var step  = parseInt(p.step) || 1;
-    rows += '<tr>';
-    rows += '<td>' + cName + '</td>';
-    rows += '<td>' + escapeHtml(p.name) + '</td>';
-    rows += '<td>' + STEP_NAMES[step] + '</td>';
-    rows += '<td>' + getHealthScoreBadge(score) + '</td>';
-    rows += '<td>' + daysDisplay + '</td>';
-    rows += '<td><button class="btn btn-ghost btn-xs" onclick="editProject(\'' + p.id + '\')"><i class="fas fa-edit"></i> Edit</button></td>';
-    rows += '</tr>';
-  }
-
-  el.innerHTML = '<div class="table-wrap"><table class="admin-table">'
-    + '<thead><tr><th>Client</th><th>Project</th><th>Step</th><th>Score</th><th>Days to Close</th><th>Actions</th></tr></thead>'
-    + '<tbody>' + rows + '</tbody>'
-    + '</table></div>';
+  const scored = projects.filter(p=>p.status==='active').map(p=>({
+    project:p, client:clients.find(c=>c.id===p.clientId), score:calculateDealHealthScore(p)
+  })).sort((a,b)=>(a.score||0)-(b.score||0));
+  if (!scored.length){el.innerHTML='<div class="empty-state"><i class="fas fa-heartbeat"></i><p>No active projects.</p></div>';return;}
+  el.innerHTML=`<div class="table-wrap"><table class="admin-table">
+    <thead><tr><th>Client</th><th>Project</th><th>Step</th><th>Score</th><th>Days to Close</th><th>Actions</th></tr></thead>
+    <tbody>${scored.map(({project:p,client:c,score})=>{
+      const days=daysUntil(p.closeDate);
+      return `<tr>
+        <td>${escapeHtml(c?.name||'Unknown')}</td>
+        <td>${escapeHtml(p.name)}</td>
+        <td>${STEP_NAMES[parseInt(p.step)||1]}</td>
+        <td>${getHealthScoreBadge(score)}</td>
+        <td>${days===null?'—':days<0?'<span class="expiry-danger">'+Math.abs(days)+'d overdue</span>':days+'d'}</td>
+        <td><button class="btn btn-ghost btn-xs" onclick="editProject('${p.id}')"><i class="fas fa-edit"></i> Edit</button></td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table></div>`;
 };
 
 window.updateReferralStats = function() {
@@ -6871,8 +6780,6 @@ window.updateReferralStats = function() {
   setEl('uniqueReferrers',unique);
   setEl('referralConversion',conv+'%');
 };
-
-</script>
 
 </body>
 </html>
