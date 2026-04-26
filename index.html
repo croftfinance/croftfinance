@@ -1979,6 +1979,7 @@ body.dark-mode .template-dropdown { background:var(--gray-200); border-color:var
       <div class="form-group"><label class="form-label">Project Name</label><input type="text" id="editProjectName" class="form-input"></div>
       <div class="form-group"><label class="form-label">Industry</label><select id="editIndustry" class="form-select"><option>Real Estate</option><option>Infrastructure</option><option>Energy &amp; Renewables</option><option>Mining</option><option>Oil &amp; Gas</option></select></div>
       <div class="form-group"><label class="form-label">Location</label><input type="text" id="editLocation" class="form-input"></div>
+      <div class="form-group"><label class="form-label">Status</label><select id="editStatus" class="form-select"><option value="active">Active</option><option value="crm_only">CRM Only</option><option value="pending">Pending</option><option value="declined">Declined</option></select></div>
       <div class="form-group"><label class="form-label">Data Room Link</label><input type="url" id="editDataRoomLink" class="form-input"></div>
       <div class="form-group"><label class="form-label">Priority</label><select id="editPriority" class="form-select"><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></div>
       <div class="form-section-header">Facility Terms</div>
@@ -4559,6 +4560,7 @@ window.editProject = function(pid) {
   setVal('editECFStatus',        p.ecfStatus||'pending');
   setVal('editAdvisorNote',      p.advisorNote||'');
   setVal('editBrokerEngagement', p.brokerEngagement||'none');
+  setVal('editStatus',           p.status || 'crm_only');
   setVal('editStep',             String(parseInt(p.step)||1));
 
   const bs = document.getElementById('editBrokerAssign');
@@ -4618,6 +4620,7 @@ window.saveProjectInfo = async function() {
       location:              get('editLocation'),
       dataRoomLink:          get('editDataRoomLink'),
       priority:              get('editPriority')||'low',
+      status:                get('editStatus') || 'crm_only',
       amount:                parseFloat(get('editAmount'))||0,
       interestRate:          parseFloat(get('editRate'))||0,
       fundsNeeded:           parseFloat(get('editFundsNeeded'))||0,
