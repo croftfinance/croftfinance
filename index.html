@@ -965,6 +965,34 @@ body.dark-mode .badge-neutral { background:rgba(255,255,255,0.10);color:var(--gr
 body.dark-mode .pagination-btn { background:var(--gray-200); border-color:var(--gray-300); color:var(--gray-600); }
 body.dark-mode .template-dropdown { background:var(--gray-200); border-color:var(--gray-300); color:var(--gray-600); }
 
+/* Applications Table Styles */
+.app-risk-flag {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+.app-risk-flag.high { background: var(--error); }
+.app-risk-flag.medium { background: var(--warning); }
+.app-risk-flags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.application-detail-section {
+  margin-bottom: 20px;
+}
+.application-detail-section h4 {
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 12px;
+  border-bottom: 0.5px solid var(--gray-200);
+  padding-bottom: 6px;
+}
+
 /* ===== PRINT ===== */
 @media print {
   .sidebar, .portal-nav, .dark-mode-toggle, .btn, .quick-actions-bar,
@@ -1060,9 +1088,9 @@ body.dark-mode .template-dropdown { background:var(--gray-200); border-color:var
       <h1 class="hero-h1">Capital that moves<br><em>with</em> your vision.</h1>
       <p class="hero-p">Croft Finance deploys private capital into exceptional projects — real estate, infrastructure, energy and renewables, mining, and oil &amp; gas — with institutional discipline and the execution speed that conventional lenders cannot match. <strong>All client communications are encrypted and handled under strict confidentiality as standard practice in private capital markets.</strong></p>
       <div class="hero-actions">
-        <button class="btn-hero" onclick="openLoginModal()">Access Client Portal</button>
-        <button class="btn-hero-outline" onclick="scrollToSection('contact-form')">Request a Conversation</button>
-      </div>
+      <button class="btn-hero" onclick="openLoginModal()">Access Client Portal</button>
+      <button class="btn-hero-outline" onclick="openApplicationForm()"><i class="fas fa-file-alt"></i> Apply for Financing</button>
+      <button class="btn-hero-outline" onclick="scrollToSection('contact-form')">Request a Conversation</button>
     </div>
     <div class="hero-stats">
       <div class="hero-stat"><div class="hero-stat-num">$500M</div><div class="hero-stat-label">Maximum Facility</div><div class="hero-stat-div"></div></div>
@@ -1638,6 +1666,7 @@ body.dark-mode .template-dropdown { background:var(--gray-200); border-color:var
         <button class="nav-item" data-admin-tab="timeline"><i class="fas fa-stream"></i> Timeline</button>
         <button class="nav-item" data-admin-tab="archive"><i class="fas fa-archive"></i> Archive</button>
         <button class="nav-item" data-admin-tab="feedback"><i class="fas fa-star"></i> Feedback</button>
+        <button class="nav-item" data-admin-tab="applications"><i class="fas fa-file-alt"></i> Applications</button>
         <button class="nav-item" data-admin-tab="referrals"><i class="fas fa-users"></i> Referrals</button>
       </div>
     </aside>
@@ -1873,6 +1902,42 @@ body.dark-mode .template-dropdown { background:var(--gray-200); border-color:var
           </div>
         </div>
       </div>
+      
+      <!-- APPLICATIONS TAB -->
+<div id="admin-applications" class="admin-tab">
+  <div class="page-header">
+    <div class="admin-page-title" style="margin-bottom:0;">Applications Received</div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-secondary btn-sm" onclick="loadApplications()"><i class="fas fa-sync"></i> Refresh</button>
+      <select id="applicationStatusFilter" class="form-select" style="max-width:160px;" onchange="filterApplications()">
+        <option value="all">All Applications</option>
+        <option value="pending">Pending Review</option>
+        <option value="accepted">Accepted</option>
+        <option value="invited">Client Invited</option>
+        <option value="rejected">Rejected</option>
+      </select>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Date Received</th>
+          <th>Applicant / Company</th>
+          <th>Project Name</th>
+          <th>Industry</th>
+          <th>Funds Needed</th>
+          <th>Risk Flags</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="applicationsTableBody">
+        <tr><td colspan="8"><div class="skeleton skeleton-text" style="width:100%;"></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
 
     </main>
   </div>
@@ -1959,6 +2024,100 @@ body.dark-mode .template-dropdown { background:var(--gray-200); border-color:var
 <!-- ============================================================
      ALL MODALS
      ============================================================ -->
+
+/* ===== APPLICATION FORM CSS ===== */
+.app-step, .onb-step { display: none; }
+.app-step.active, .onb-step.active { display: block; }
+.app-step-tab, .onb-step-tab {
+  flex: 1;
+  text-align: center;
+  padding: 12px 8px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gray-400);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.app-step-tab.active, .onb-step-tab.active {
+  color: var(--navy);
+  border-bottom-color: var(--blue);
+}
+.app-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--blue);
+  padding: 20px 0 12px 0;
+  border-bottom: 0.5px solid var(--gray-200);
+  margin-bottom: 16px;
+}
+.app-risk-section {
+  background: var(--white);
+  border: 0.5px solid var(--gray-200);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.app-risk-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.app-yn-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.app-yn-label input {
+  margin: 0;
+}
+.app-upload-box {
+  border: 2px dashed var(--gray-300);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  background: var(--gray-50);
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.app-upload-box:hover {
+  border-color: var(--blue);
+  background: rgba(44,95,138,0.05);
+}
+.app-upload-icon {
+  font-size: 32px;
+  color: var(--blue);
+  margin-bottom: 12px;
+}
+.app-upload-label {
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--navy);
+}
+.app-upload-sub {
+  font-size: 11px;
+  color: var(--gray-400);
+  margin-top: 4px;
+}
+.app-file-input {
+  display: none;
+}
+.app-file-label {
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--success);
+}
+.onb-director-entry {
+  transition: all 0.2s;
+}
 
 <!-- Upload Document -->
 <div id="uploadDocumentModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Upload Document</h3><button class="modal-close" onclick="closeModal('uploadDocumentModal')">✕</button></div><div class="modal-body"><div class="form-group"><label class="form-label">Client</label><select id="uploadClientId" class="form-select" onchange="updateProjectSelectForUpload(this.value)"></select></div><div class="form-group"><label class="form-label">Project</label><select id="uploadProjectId" class="form-select"></select></div><div class="form-group"><label class="form-label">Document Type</label><select id="documentType" class="form-select"><option>Funding Proposal</option><option>Term Sheet</option><option>Commitment Fee</option><option>Deed of Undertaking</option><option>ECF Confirmation</option><option>Credit Support Package</option><option>Other</option></select></div><div class="form-group"><label class="form-label">Expiry Date (Optional)</label><input type="date" id="documentExpiryDate" class="form-input"></div><div class="form-group"><label class="form-label">PDF File</label><input type="file" id="pdfFile" class="form-input" accept=".pdf,.doc,.docx"></div><button class="btn btn-primary btn-md" onclick="adminUploadDocument()" style="width:100%;justify-content:center;">Upload</button></div></div></div>
@@ -2129,6 +2288,7 @@ let activityLog       = [];
 let webhooks          = [];
 let customFields      = [];
 let unsubscribers     = [];
+let applicationsList  = [];
 
 let currentPipelineView = 'board';
 let calendar            = null;
@@ -2278,6 +2438,467 @@ const showToastSuccess = msg => showToast(msg, 'success');
 
 function openModal(id)  { const el = document.getElementById(id); if (el) el.classList.add('active'); }
 function closeModal(id) { const el = document.getElementById(id); if (el) el.classList.remove('active'); }
+function filterApplications() {
+    const filterSelect = document.getElementById('applicationStatusFilter');
+    if (filterSelect) {
+        // Re-render the table with the new filter
+        renderApplicationsTable();
+    }
+}
+
+function renderApplicationsTable() {
+    const container = document.getElementById('applicationsTableBody');
+    if (!container) return;
+    
+    const filterSelect = document.getElementById('applicationStatusFilter');
+    const statusFilter = filterSelect ? filterSelect.value : 'all';
+    
+    let filteredApps = [...applicationsList];
+    if (statusFilter !== 'all') {
+        filteredApps = filteredApps.filter(a => a.status === statusFilter);
+    }
+    
+    filteredApps.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+    
+    if (!filteredApps.length) {
+        container.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fas fa-file-alt"></i><p>No applications found.</p></div></td></tr>`;
+        return;
+    }
+    
+    const rows = filteredApps.map(app => {
+        const statusBadge = {
+            pending: 'badge-warning',
+            accepted: 'badge-success',
+            rejected: 'badge-danger',
+            invited: 'badge-info'
+        }[app.status] || 'badge-neutral';
+        
+        const statusText = {
+            pending: 'Pending Review',
+            accepted: 'Accepted',
+            rejected: 'Declined',
+            invited: '✓ Client Invited'
+        }[app.status] || app.status;
+        
+        let riskFlags = [];
+        if (app.disclosures?.hasBankruptcy) riskFlags.push('⚠');
+        if (app.disclosures?.hasLitigation) riskFlags.push('⚖');
+        if (app.disclosures?.hasRegulatory) riskFlags.push('🏛');
+        if (app.disclosures?.hasPEP) riskFlags.push('👤');
+        
+        const riskHtml = riskFlags.length ? riskFlags.join(' ') : '—';
+        const submittedDate = app.submittedAt ? new Date(app.submittedAt).toLocaleDateString('en-GB') : '—';
+        
+        return `<tr>
+            <td style="white-space:nowrap;font-size:11px;">${submittedDate}</td>
+            <td><strong>${escapeHtml(app.client?.name || '—')}</strong><br><span class="data-label">${escapeHtml(app.client?.company || '—')}</span></td>
+            <td><strong>${escapeHtml(app.project?.name || '—')}</strong></td>
+            <td><span class="badge badge-neutral">${escapeHtml(app.project?.industry || '—')}</span></td>
+            <td style="font-weight:600;">${formatCurrency(app.project?.fundsNeeded)}</td>
+            <td>${riskHtml}</td>
+            <td><span class="badge ${statusBadge}">${statusText}</span></td>
+            <td style="white-space:nowrap;">
+                <button class="btn btn-ghost btn-xs" onclick="viewApplication('${app.id}')"><i class="fas fa-eye"></i> View</button>
+                ${app.status === 'pending' ? `
+                    <button class="btn btn-success btn-xs" onclick="acceptApplication('${app.id}')"><i class="fas fa-check"></i> Accept</button>
+                    <button class="btn btn-danger btn-xs" onclick="rejectApplication('${app.id}')"><i class="fas fa-times"></i> Reject</button>
+                ` : ''}
+                ${app.status === 'invited' ? '<span class="badge badge-success" style="margin-left:4px;"><i class="fas fa-envelope"></i> Invited</span>' : ''}
+            </td>
+        </tr>`;
+    }).join('');
+    
+    patchTable('applicationsTableBody', rows);
+}
+
+async function loadApplications() {
+    if (!db) return;
+    try {
+        const snap = await db.collection('applications').orderBy('submittedAt', 'desc').get();
+        applicationsList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderApplicationsTable();
+    } catch(e) {
+        console.warn('[Applications]', e.message);
+        const container = document.getElementById('applicationsTableBody');
+        if (container) {
+            container.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Unable to load applications. Please refresh.</p></div></td></tr>`;
+        }
+    }
+}
+
+function viewApplication(appId) {
+    const app = applicationsList.find(a => a.id === appId);
+    if (!app) {
+        showToastError('Application not found');
+        return;
+    }
+    
+    // Create modal if it doesn't exist
+    let modal = document.getElementById('applicationDetailModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'applicationDetailModal';
+        modal.className = 'modal-overlay';
+        document.body.appendChild(modal);
+    }
+    
+    const riskFlags = [];
+    if (app.disclosures?.hasBankruptcy) riskFlags.push('<span class="badge badge-danger">⚠ Bankruptcy/Insolvency Disclosed</span>');
+    if (app.disclosures?.hasLitigation) riskFlags.push('<span class="badge badge-warning">⚖ Litigation Disclosed</span>');
+    if (app.disclosures?.hasRegulatory) riskFlags.push('<span class="badge badge-danger">🏛 Regulatory Disclosed</span>');
+    if (app.disclosures?.hasPEP) riskFlags.push('<span class="badge badge-warning">👤 PEP Disclosed</span>');
+    
+    const statusText = {
+        pending: 'Pending Review',
+        accepted: 'Accepted',
+        rejected: 'Declined',
+        invited: '✓ Client Invited'
+    }[app.status] || app.status;
+    
+    modal.innerHTML = `
+        <div class="modal modal-lg" style="max-width: 900px; width: 95%;">
+            <div class="modal-header">
+                <div>
+                    <h3>Application Details</h3>
+                    <div class="data-label" style="margin-top: 4px;">Submitted: ${app.submittedAt ? new Date(app.submittedAt).toLocaleString() : '—'}</div>
+                </div>
+                <button class="modal-close" onclick="closeModal('applicationDetailModal')">✕</button>
+            </div>
+            <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                <!-- Status Banner -->
+                <div style="margin-bottom: 20px; padding: 12px; background: ${app.status === 'pending' ? 'var(--warning-light)' : app.status === 'accepted' ? 'var(--success-light)' : app.status === 'rejected' ? 'var(--error-light)' : 'var(--info-light)'}; border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <span class="data-label">Current Status</span>
+                            <div style="font-size: 18px; font-weight: 600; margin-top: 4px;">${statusText}</div>
+                        </div>
+                        ${app.status === 'pending' ? `
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn btn-success btn-sm" onclick="acceptApplication('${app.id}'); closeModal('applicationDetailModal');"><i class="fas fa-check"></i> Accept</button>
+                                <button class="btn btn-danger btn-sm" onclick="rejectApplication('${app.id}'); closeModal('applicationDetailModal');"><i class="fas fa-times"></i> Reject</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+                
+                <!-- Two Column Layout -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                    <!-- Left Column: Applicant Info -->
+                    <div>
+                        <div class="application-detail-section">
+                            <h4><i class="fas fa-user"></i> Applicant Information</h4>
+                            <div><span class="data-label">Name</span><div>${escapeHtml(app.client?.name || '—')}</div></div>
+                            <div><span class="data-label">Email</span><div>${escapeHtml(app.client?.email || '—')}</div></div>
+                            <div><span class="data-label">Phone</span><div>${escapeHtml(app.client?.phone || '—')}</div></div>
+                            <div><span class="data-label">Nationality</span><div>${escapeHtml(app.client?.nationality || '—')}</div></div>
+                        </div>
+                        
+                        <div class="application-detail-section">
+                            <h4><i class="fas fa-building"></i> Entity Details</h4>
+                            <div><span class="data-label">Company Name</span><div>${escapeHtml(app.client?.company || '—')}</div></div>
+                            <div><span class="data-label">Entity Type</span><div>${escapeHtml(app.client?.entityType || '—')}</div></div>
+                            <div><span class="data-label">Country of Incorporation</span><div>${escapeHtml(app.client?.countryIncorp || '—')}</div></div>
+                            <div><span class="data-label">Registration Number</span><div>${escapeHtml(app.client?.regNumber || '—')}</div></div>
+                            <div><span class="data-label">Registered Address</span><div style="white-space: pre-wrap;">${escapeHtml(app.client?.regAddress || '—')}</div></div>
+                        </div>
+                        
+                        ${app.applicationType === 'broker' ? `
+                            <div class="application-detail-section">
+                                <h4><i class="fas fa-handshake"></i> Broker Information</h4>
+                                <div><span class="data-label">Broker Name</span><div>${escapeHtml(app.broker?.name || '—')}</div></div>
+                                <div><span class="data-label">Firm</span><div>${escapeHtml(app.broker?.firm || '—')}</div></div>
+                                <div><span class="data-label">Email</span><div>${escapeHtml(app.broker?.email || '—')}</div></div>
+                                <div><span class="data-label">Phone</span><div>${escapeHtml(app.broker?.phone || '—')}</div></div>
+                                <div><span class="data-label">Authority Confirmed</span><div>${app.broker?.hasAuthority ? '✓ Yes' : '—'}</div></div>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <!-- Right Column: Project Info -->
+                    <div>
+                        <div class="application-detail-section">
+                            <h4><i class="fas fa-chart-line"></i> Project Details</h4>
+                            <div><span class="data-label">Project Name</span><div><strong>${escapeHtml(app.project?.name || '—')}</strong></div></div>
+                            <div><span class="data-label">Industry</span><div>${escapeHtml(app.project?.industry || '—')}</div></div>
+                            <div><span class="data-label">Location</span><div>${escapeHtml(app.project?.location || '—')}</div></div>
+                            <div><span class="data-label">Project Stage</span><div>${escapeHtml(app.project?.stage || '—')}</div></div>
+                            <div><span class="data-label">Exit Strategy</span><div>${escapeHtml(app.project?.exitStrategy || '—')}</div></div>
+                            <div><span class="data-label">Expected Close</span><div>${app.project?.expectedClose ? formatDate(app.project.expectedClose) : '—'}</div></div>
+                        </div>
+                        
+                        <div class="application-detail-section">
+                            <h4><i class="fas fa-dollar-sign"></i> Financial Information</h4>
+                            <div><span class="data-label">Total Project Cost</span><div>${formatCurrency(app.project?.totalCost)}</div></div>
+                            <div><span class="data-label">Funds Needed</span><div><strong>${formatCurrency(app.project?.fundsNeeded)}</strong></div></div>
+                            <div><span class="data-label">Sponsor Equity</span><div>${formatCurrency(app.project?.equity)}</div></div>
+                            <div><span class="data-label">Existing Debt</span><div>${formatCurrency(app.project?.existingDebt)}</div></div>
+                            <div><span class="data-label">Debt-to-Equity Ratio</span><div>${escapeHtml(app.project?.debtEquity || '—')}</div></div>
+                            <div><span class="data-label">Projected IRR</span><div>${escapeHtml(app.project?.projectedIRR || '—')}</div></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Full Width Sections -->
+                <div class="application-detail-section">
+                    <h4><i class="fas fa-align-left"></i> Project Description</h4>
+                    <div style="background: var(--gray-50); padding: 12px; border-radius: 6px; font-size: 13px; line-height: 1.6;">${escapeHtml(app.project?.description || '—')}</div>
+                </div>
+                
+                <div class="application-detail-section">
+                    <h4><i class="fas fa-shield-alt"></i> Collateral Offered</h4>
+                    <div style="background: var(--gray-50); padding: 12px; border-radius: 6px; font-size: 13px;">${escapeHtml(app.project?.collateral || '—')}</div>
+                </div>
+                
+                <!-- Risk Disclosures -->
+                ${riskFlags.length > 0 ? `
+                    <div class="application-detail-section">
+                        <h4 style="color: var(--error);"><i class="fas fa-exclamation-triangle"></i> Risk Disclosures</h4>
+                        <div style="margin-bottom: 12px;">${riskFlags.join(' ')}</div>
+                        ${app.disclosures?.litigationNotes ? `<div style="margin-top: 8px;"><span class="data-label">Litigation Details:</span><div style="font-size: 12px; margin-top: 4px;">${escapeHtml(app.disclosures.litigationNotes)}</div></div>` : ''}
+                        ${app.disclosures?.regulatoryNotes ? `<div style="margin-top: 8px;"><span class="data-label">Regulatory Details:</span><div style="font-size: 12px; margin-top: 4px;">${escapeHtml(app.disclosures.regulatoryNotes)}</div></div>` : ''}
+                        ${app.disclosures?.pepNotes ? `<div style="margin-top: 8px;"><span class="data-label">PEP Details:</span><div style="font-size: 12px; margin-top: 4px;">${escapeHtml(app.disclosures.pepNotes)}</div></div>` : ''}
+                        ${app.disclosures?.bankruptcyEvents?.length ? `<div style="margin-top: 8px;"><span class="data-label">Bankruptcy Events:</span><div style="font-size: 12px; margin-top: 4px;">${app.disclosures.bankruptcyEvents.length} event(s) disclosed</div></div>` : ''}
+                    </div>
+                ` : ''}
+                
+                <!-- Referral Info -->
+                ${app.referral?.source ? `
+                    <div class="application-detail-section">
+                        <h4><i class="fas fa-users"></i> Referral Information</h4>
+                        <div><span class="data-label">Source</span><div>${escapeHtml(app.referral.source)}${app.referral.other ? ' - ' + escapeHtml(app.referral.other) : ''}</div></div>
+                        ${app.referral.referrerName ? `<div><span class="data-label">Referrer Name</span><div>${escapeHtml(app.referral.referrerName)}</div></div>` : ''}
+                    </div>
+                ` : ''}
+                
+                <!-- Uploaded Documents -->
+                ${app.uploadedFiles ? `
+                    <div class="application-detail-section">
+                        <h4><i class="fas fa-paperclip"></i> Attached Documents</h4>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            ${Object.entries(app.uploadedFiles).map(([key, url]) => `
+                                <a href="${url}" target="_blank" class="btn btn-secondary btn-sm"><i class="fas fa-file-pdf"></i> Document ${key.replace('doc', '')}</a>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+                
+                <!-- Signature -->
+                <div class="application-detail-section">
+                    <h4><i class="fas fa-signature"></i> Electronic Signature</h4>
+                    <div><span class="data-label">Signed By</span><div>${escapeHtml(app.signature?.name || '—')}</div></div>
+                    <div><span class="data-label">Signed At</span><div>${app.signature?.timestamp ? formatDateTime(app.signature.timestamp) : '—'}</div></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-md" onclick="closeModal('applicationDetailModal')">Close</button>
+                ${app.status === 'pending' ? `
+                    <button class="btn btn-success btn-md" onclick="acceptApplication('${app.id}'); closeModal('applicationDetailModal');"><i class="fas fa-check"></i> Accept Application</button>
+                    <button class="btn btn-danger btn-md" onclick="rejectApplication('${app.id}'); closeModal('applicationDetailModal');"><i class="fas fa-times"></i> Reject Application</button>
+                ` : ''}
+            </div>
+        </div>
+    `;
+    
+    openModal('applicationDetailModal');
+}
+
+async function acceptApplication(appId) {
+    const app = applicationsList.find(a => a.id === appId);
+    if (!app) {
+        showToastError('Application not found');
+        return;
+    }
+    
+    if (!confirm(`Accept application from ${app.client?.name} for "${app.project?.name}" and send portal invitation?`)) return;
+    
+    const btn = document.querySelector(`button[onclick="acceptApplication('${appId}')"]`);
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="btn-spinner"></span> Processing...';
+    }
+    
+    try {
+        // Update application status in Firestore
+        await db.collection('applications').doc(appId).update({
+            status: 'accepted',
+            reviewedAt: new Date().toISOString(),
+            reviewedBy: auth.currentUser?.uid || 'admin'
+        });
+        
+        // Generate temporary password
+        const tempPassword = 'Croft' + Math.random().toString(36).slice(-4).toUpperCase() + 
+                            Math.random().toString(36).slice(-4).toUpperCase() + '!7';
+        
+        // Create Firebase Auth user using secondary auth
+        const secAuth = _getSecondaryAuth();
+        let cred;
+        try {
+            cred = await secAuth.createUserWithEmailAndPassword(app.client.email, tempPassword);
+        } catch(e) {
+            if (e.code === 'auth/email-already-in-use') {
+                // User already exists - try to get existing user
+                showToastError('Email already registered. Please check if this client already has portal access.');
+                if (btn) btn.disabled = false;
+                return;
+            }
+            throw e;
+        }
+        await secAuth.signOut();
+        
+        // Create client record
+        await db.collection('clients').doc(cred.user.uid).set({
+            id: cred.user.uid,
+            name: app.client.name,
+            email: app.client.email,
+            phone: app.client.phone || '',
+            company: app.client.company || '',
+            entityType: app.client.entityType || '',
+            countryIncorp: app.client.countryIncorp || '',
+            regAddress: app.client.regAddress || '',
+            status: 'active',
+            hasPortalAccess: true,
+            referredBy: app.applicationType === 'broker' ? app.broker?.name : null,
+            referredByEmail: app.applicationType === 'broker' ? app.broker?.email : null,
+            termsVersion: TERMS_VERSION,
+            termsAcceptedAt: new Date().toISOString(),
+            createdAt: new Date().toISOString(),
+            createdFromApplication: appId
+        });
+        
+        // Create project
+        const projectData = {
+            clientId: cred.user.uid,
+            name: app.project.name,
+            industry: app.project.industry,
+            location: app.project.location,
+            amount: app.project.fundsNeeded,
+            fundsNeeded: app.project.fundsNeeded,
+            sponsorEquity: app.project.equity || 0,
+            closeDate: app.project.expectedClose || null,
+            status: 'active',
+            step: 1,
+            applicationSource: appId,
+            applicationSourceId: appId,
+            createdAt: new Date().toISOString(),
+            projectDescription: app.project.description || '',
+            collateralOffered: app.project.collateral || '',
+            exitStrategy: app.project.exitStrategy || '',
+            dataRoomLink: app.project.dataRoom || ''
+        };
+        
+        // Add broker reference if applicable
+        if (app.applicationType === 'broker' && app.broker?.email) {
+            const broker = brokers.find(b => b.email === app.broker.email);
+            if (broker) {
+                projectData.brokerId = broker.id;
+                projectData.brokerEngagement = 'pending';
+            }
+        }
+        
+        await db.collection('projects').add(projectData);
+        
+        // Send invitation email with credentials
+        await sendEmailNotification({
+            to_name: app.client.name,
+            to_email: app.client.email,
+            from_name: 'Suzana Aleksić — Croft Finance',
+            subject: `Welcome to Croft Finance Client Portal — ${app.project.name}`,
+            message: `Dear ${app.client.name},\n\nWe are pleased to inform you that your application for "${app.project.name}" has been accepted.\n\nYour secure client portal has been set up with the following credentials:\n\n🔐 Portal Login Details:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nPortal URL: ${window.location.origin}\nEmail: ${app.client.email}\nTemporary Password: ${tempPassword}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n⚠️ IMPORTANT: Please log in immediately and change your password.\n\n📋 Next Steps:\n1. Log in using the credentials above\n2. Complete your onboarding profile\n3. Review the closing process steps\n4. Upload any requested documents\n\nI look forward to working with you on this project.\n\nBest regards,\nSuzana Aleksić\nPrincipal, Croft Finance\nsuzana.aleksic@croftfinance.com\n+381 69 288 0 191`,
+            project_name: app.project.name
+        });
+        
+        // Send notification to admin
+        await sendEmailNotification({
+            to_name: 'Croft Finance',
+            to_email: EMAILJS_CONFIG.adminEmail,
+            from_name: 'Croft Finance Portal',
+            subject: `Application Accepted — ${app.client.name}`,
+            message: `Application from ${app.client.name} for "${app.project.name}" has been accepted.\n\nClient portal credentials have been sent to ${app.client.email}.\n\nApplication ID: ${appId}`,
+            project_name: app.project.name
+        });
+        
+        // Update local application status
+        const localApp = applicationsList.find(a => a.id === appId);
+        if (localApp) localApp.status = 'invited';
+        
+        renderApplicationsTable();
+        showToastSuccess(`Client invited — portal credentials sent to ${app.client.email}`);
+        
+    } catch(e) {
+        console.error('Accept application error:', e);
+        showToastError(e.message || 'Failed to accept application. Please try again.');
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = 'Accept';
+        }
+    }
+}
+
+async function rejectApplication(appId) {
+    const app = applicationsList.find(a => a.id === appId);
+    if (!app) {
+        showToastError('Application not found');
+        return;
+    }
+    
+    const reason = prompt('Please provide a reason for rejecting this application:', 'Does not meet minimum facility requirements');
+    if (reason === null) return;
+    
+    if (!confirm(`Reject application from ${app.client?.name} for "${app.project?.name}"?`)) return;
+    
+    const btn = document.querySelector(`button[onclick="rejectApplication('${appId}')"]`);
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="btn-spinner"></span> Processing...';
+    }
+    
+    try {
+        // Update application status in Firestore
+        await db.collection('applications').doc(appId).update({
+            status: 'rejected',
+            rejectionReason: reason,
+            reviewedAt: new Date().toISOString(),
+            reviewedBy: auth.currentUser?.uid || 'admin'
+        });
+        
+        // Send rejection email to applicant
+        await sendEmailNotification({
+            to_name: app.client.name,
+            to_email: app.client.email,
+            from_name: 'Suzana Aleksić — Croft Finance',
+            subject: `Update on your application: ${app.project.name}`,
+            message: `Dear ${app.client.name},\n\nThank you for submitting your application for "${app.project.name}".\n\nAfter careful review, we are unable to proceed with this mandate at this time.\n\n📋 Reason for decision:\n${reason}\n\nThis decision is final and not subject to appeal. However, you are welcome to submit a new application for a different project that meets our criteria.\n\nThank you for your interest in Croft Finance.\n\nBest regards,\nSuzana Aleksić\nPrincipal, Croft Finance\nsuzana.aleksic@croftfinance.com\n+381 69 288 0 191`,
+            project_name: app.project.name
+        });
+        
+        // Send notification to admin
+        await sendEmailNotification({
+            to_name: 'Croft Finance',
+            to_email: EMAILJS_CONFIG.adminEmail,
+            from_name: 'Croft Finance Portal',
+            subject: `Application Rejected — ${app.client.name}`,
+            message: `Application from ${app.client.name} for "${app.project.name}" has been rejected.\n\nReason: ${reason}\n\nApplication ID: ${appId}`,
+            project_name: app.project.name
+        });
+        
+        // Update local application status
+        const localApp = applicationsList.find(a => a.id === appId);
+        if (localApp) localApp.status = 'rejected';
+        
+        renderApplicationsTable();
+        showToastSuccess(`Application rejected — applicant notified`);
+        
+    } catch(e) {
+        console.error('Reject application error:', e);
+        showToastError(e.message || 'Failed to reject application. Please try again.');
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = 'Reject';
+        }
+    }
+}
 
 function showView(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -2684,6 +3305,10 @@ function _bindAdminListeners() {
     brokerUpdateRequests = s.docs.map(d=>({id:d.id,...d.data()}));
     setupAdminNotifications();
   });
+  _sub(db.collection('applications').orderBy('submittedAt', 'desc'), s => {
+    applicationsList = s.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderApplicationsTable();
+});
   const auditUnsub = db.collection('activityLog').orderBy('timestamp','desc').limit(500)
     .onSnapshot(s => { activityLog = s.docs.map(d=>({id:d.id,...d.data()})); renderAuditLog(); },
     () => {
@@ -4029,6 +4654,7 @@ window.sendInboxReply = async function(recipientId, type) {
 // ============================================================
 function setupAdminNotifications() {
   const pClients  = clients.filter(c => c.status==='pending').length;
+  const pApps     = applicationsList.filter(a => a.status==='pending').length;
   const pUpdates  = brokerUpdateRequests.filter(r => r.status==='pending').length;
   const pMeetings = meetings.filter(m => m.status==='pending').length;
   const pSubs     = brokerSubmissions.filter(s => s.status==='pending').length;
