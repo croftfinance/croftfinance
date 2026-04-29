@@ -1053,6 +1053,62 @@ body.dark-mode .template-dropdown { background:var(--gray-200); border-color:var
   .client-page-title { font-size:22px; }
   .admin-page-title  { font-size:16px; }
 }
+
+/* ===== APPLICATION FORM ===== */
+.app-step { display: none; }
+.app-step.active { display: block; }
+.app-step-tab {
+  flex: 1; text-align: center; padding: 12px 8px;
+  font-size: 10px; font-weight: 500; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--gray-400);
+  border-bottom: 2px solid transparent; cursor: pointer;
+  transition: all 0.2s;
+}
+.app-step-tab.active { color: var(--navy); border-bottom-color: var(--blue); }
+.app-section-title {
+  font-size: 11px; font-weight: 600; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--blue);
+  padding: 20px 0 12px 0;
+  border-bottom: 0.5px solid var(--gray-200);
+  margin-bottom: 16px;
+}
+.app-risk-section {
+  background: var(--white); border: 0.5px solid var(--gray-200);
+  border-radius: 8px; padding: 16px; margin-bottom: 16px;
+}
+.app-risk-header {
+  display: flex; justify-content: space-between;
+  align-items: flex-start; flex-wrap: wrap; gap: 12px;
+}
+.app-yn-label {
+  display: inline-flex; align-items: center;
+  gap: 6px; font-size: 13px; cursor: pointer;
+}
+.app-yn-label input { margin: 0; }
+.app-upload-box {
+  border: 2px dashed var(--gray-300); border-radius: 12px;
+  padding: 24px; text-align: center; background: var(--gray-50);
+  transition: all 0.2s; cursor: pointer;
+}
+.app-upload-box:hover {
+  border-color: var(--blue);
+  background: rgba(44,95,138,0.05);
+}
+.app-upload-icon { font-size: 32px; color: var(--blue); margin-bottom: 12px; }
+.app-upload-label { font-weight: 500; font-size: 14px; color: var(--navy); }
+.app-upload-sub { font-size: 11px; color: var(--gray-400); margin-top: 4px; }
+.app-file-input { display: none; }
+.app-file-label { margin-top: 8px; font-size: 11px; color: var(--success); }
+.app-radio-label {
+  display: inline-flex; align-items: center;
+  gap: 8px; font-size: 13px; cursor: pointer;
+  padding: 8px 16px; border: 1px solid var(--gray-200);
+  border-radius: 6px; transition: all 0.2s;
+}
+.app-radio-label:hover { border-color: var(--blue); }
+.app-radio-label input[type="radio"]:checked + span {
+  color: var(--navy); font-weight: 500;
+}
 </style>
 </head>
 <body>
@@ -1091,11 +1147,6 @@ body.dark-mode .template-dropdown { background:var(--gray-200); border-color:var
       <button class="btn-hero" onclick="openLoginModal()">Access Client Portal</button>
       <button class="btn-hero-outline" onclick="openApplicationForm()"><i class="fas fa-file-alt"></i> Apply for Financing</button>
       <button class="btn-hero-outline" onclick="scrollToSection('contact-form')">Request a Conversation</button>
-    </div>
-    <div class="hero-stats">
-      <div class="hero-stat"><div class="hero-stat-num">$500M</div><div class="hero-stat-label">Maximum Facility</div><div class="hero-stat-div"></div></div>
-      <div class="hero-stat"><div class="hero-stat-num">14–21</div><div class="hero-stat-label">Days to Funding</div><div class="hero-stat-div"></div></div>
-      <div class="hero-stat"><div class="hero-stat-num">$30M+</div><div class="hero-stat-label">Minimum Facility</div></div>
     </div>
   </section>
 
@@ -2022,102 +2073,386 @@ body.dark-mode .template-dropdown { background:var(--gray-200); border-color:var
 </div><!-- end view-broker -->
 
 <!-- ============================================================
+     PUBLIC APPLICATION FORM MODAL
+     ============================================================ -->
+<div id="applicationModal" class="modal-overlay">
+  <div class="modal" style="max-width:780px;width:96%;">
+    <div class="modal-header">
+      <div>
+        <h3 id="applicationModalTitle">Project Finance Application</h3>
+        <div style="font-size:11px;color:var(--gray-400);margin-top:2px;">Confidential — protected under NDA terms</div>
+      </div>
+      <button class="modal-close" onclick="closeApplicationModal()">✕</button>
+    </div>
+    <!-- Progress bar -->
+    <div style="padding:0 24px;background:var(--white);border-bottom:0.5px solid var(--gray-200);">
+      <div style="display:flex;gap:0;margin:0 -24px;">
+        <div class="app-step-tab active" id="appTab1" data-step="1">1. Applicant</div>
+        <div class="app-step-tab" id="appTab2" data-step="2">2. Project</div>
+        <div class="app-step-tab" id="appTab3" data-step="3">3. Background</div>
+        <div class="app-step-tab" id="appTab4" data-step="4">4. Documents</div>
+        <div class="app-step-tab" id="appTab5" data-step="5">5. Declaration</div>
+      </div>
+    </div>
+    <div class="modal-body" style="max-height:65vh;overflow-y:auto;">
+
+      <!-- STEP 1: APPLICANT INFO -->
+      <div class="app-step active" id="appStep1">
+        <div class="app-section-title">Who is submitting this application?</div>
+        <div class="form-group">
+          <label class="form-label">Application Type *</label>
+          <div style="display:flex;gap:12px;margin-top:6px;">
+            <label class="app-radio-label">
+              <input type="radio" name="appType" value="client" checked onchange="toggleBrokerFields()">
+              <span>I am the client / project owner</span>
+            </label>
+            <label class="app-radio-label">
+              <input type="radio" name="appType" value="broker" onchange="toggleBrokerFields()">
+              <span>I am a broker representing a client</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Broker fields (hidden by default) -->
+        <div id="brokerApplicantFields" style="display:none;padding:16px;background:var(--gray-50);border-radius:8px;border:0.5px solid var(--gray-200);margin-bottom:16px;">
+          <div class="app-section-title" style="padding-top:0;border:none;color:var(--blue);">Broker Information</div>
+          <div class="form-grid-2">
+            <div class="form-group"><label class="form-label">Broker Full Name *</label><input type="text" id="appBrokerName" class="form-input" placeholder="Your full name"></div>
+            <div class="form-group"><label class="form-label">Brokerage Firm *</label><input type="text" id="appBrokerFirm" class="form-input" placeholder="Company name"></div>
+            <div class="form-group"><label class="form-label">Broker Email *</label><input type="email" id="appBrokerEmail" class="form-input"></div>
+            <div class="form-group"><label class="form-label">Broker Phone</label><input type="text" id="appBrokerPhone" class="form-input" placeholder="+1 555 000 0000"></div>
+          </div>
+          <div class="form-group">
+            <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;">
+              <input type="checkbox" id="appBrokerAuthority" style="margin-top:3px;flex-shrink:0;">
+              <span style="font-size:12px;color:var(--gray-600);">I confirm that the client named below has authorised me to submit this application on their behalf *</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="app-section-title">Client / Project Owner Details</div>
+        <div class="form-grid-2">
+          <div class="form-group"><label class="form-label">Full Legal Name *</label><input type="text" id="appClientName" class="form-input" placeholder="As per passport / ID"></div>
+          <div class="form-group"><label class="form-label">Email Address *</label><input type="email" id="appClientEmail" class="form-input"></div>
+          <div class="form-group"><label class="form-label">Phone Number *</label><input type="text" id="appClientPhone" class="form-input" placeholder="+1 555 000 0000"></div>
+          <div class="form-group"><label class="form-label">Nationality</label><input type="text" id="appClientNationality" class="form-input"></div>
+          <div class="form-group"><label class="form-label">Company / Entity Name *</label><input type="text" id="appClientCompany" class="form-input" placeholder="Legal entity name"></div>
+          <div class="form-group"><label class="form-label">Entity Type</label>
+            <select id="appEntityType" class="form-select">
+              <option value="">Select...</option>
+              <option>LLC / Limited Liability Company</option>
+              <option>Ltd / Private Limited Company</option>
+              <option>PLC / Public Limited Company</option>
+              <option>Partnership</option>
+              <option>Trust</option>
+              <option>SPV / Special Purpose Vehicle</option>
+              <option>Sole Proprietorship</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">Country of Incorporation *</label><input type="text" id="appCountryIncorp" class="form-input" placeholder="e.g. United Kingdom"></div>
+          <div class="form-group"><label class="form-label">Registration Number</label><input type="text" id="appRegNumber" class="form-input" placeholder="Company reg. number"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Registered Address *</label><textarea id="appRegAddress" rows="2" class="form-textarea" placeholder="Full registered address"></textarea></div>
+      </div>
+
+      <!-- STEP 2: PROJECT -->
+      <div class="app-step" id="appStep2">
+        <div class="app-section-title">Project Details</div>
+        <div class="form-grid-2">
+          <div class="form-group"><label class="form-label">Project Name *</label><input type="text" id="appProjectName" class="form-input"></div>
+          <div class="form-group"><label class="form-label">Industry Sector *</label>
+            <select id="appIndustry" class="form-select">
+              <option value="">Select...</option>
+              <option>Real Estate — Residential</option>
+              <option>Real Estate — Commercial</option>
+              <option>Real Estate — Mixed Use</option>
+              <option>Real Estate — Hospitality</option>
+              <option>Infrastructure</option>
+              <option>Energy &amp; Renewables — Solar</option>
+              <option>Energy &amp; Renewables — Wind</option>
+              <option>Energy &amp; Renewables — Hydro</option>
+              <option>Energy &amp; Renewables — Other</option>
+              <option>Mining — Gold</option>
+              <option>Mining — Copper</option>
+              <option>Mining — Other</option>
+              <option>Oil &amp; Gas — Upstream</option>
+              <option>Oil &amp; Gas — Midstream</option>
+              <option>Oil &amp; Gas — Downstream</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">Project Location / Jurisdiction *</label><input type="text" id="appProjectLocation" class="form-input" placeholder="City, Country"></div>
+          <div class="form-group"><label class="form-label">Project Stage *</label>
+            <select id="appProjectStage" class="form-select">
+              <option value="">Select...</option>
+              <option>Pre-Development / Concept</option>
+              <option>Planning &amp; Permitting</option>
+              <option>Under Construction</option>
+              <option>Operational</option>
+              <option>Stabilised / Income-Producing</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">Expected Close Date *</label><input type="date" id="appExpectedClose" class="form-input"></div>
+          <div class="form-group"><label class="form-label">Exit Strategy *</label>
+            <select id="appExitStrategy" class="form-select">
+              <option value="">Select...</option>
+              <option>Sale of Asset</option>
+              <option>Refinancing</option>
+              <option>IPO / Public Listing</option>
+              <option>Revenue / Ongoing Cash Flow</option>
+              <option>Buyout</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="app-section-title">Capital Structure (USD)</div>
+        <div class="form-grid-2">
+          <div class="form-group"><label class="form-label">Total Project Cost *</label><input type="number" id="appTotalCost" class="form-input" placeholder="e.g. 120000000" min="0" step="100000"></div>
+          <div class="form-group"><label class="form-label">Funds Needed from Croft Finance *</label><input type="number" id="appFundsNeeded" class="form-input" placeholder="e.g. 85000000" min="0" step="100000"></div>
+          <div class="form-group"><label class="form-label">Sponsor Equity Committed</label><input type="number" id="appEquity" class="form-input" placeholder="e.g. 25000000" min="0" step="100000"></div>
+          <div class="form-group"><label class="form-label">Existing Debt in Place</label><input type="number" id="appExistingDebt" class="form-input" placeholder="e.g. 10000000" min="0" step="100000"></div>
+          <div class="form-group"><label class="form-label">Debt-to-Equity Ratio</label><input type="text" id="appDebtEquity" class="form-input" placeholder="e.g. 70:30"></div>
+          <div class="form-group"><label class="form-label">Projected IRR</label><input type="text" id="appProjectedIRR" class="form-input" placeholder="e.g. 18%"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Have you approached other lenders? *</label>
+          <select id="appOtherLenders" class="form-select" onchange="toggleOtherLendersDetail()" style="margin-bottom:8px;">
+            <option value="">Select...</option>
+            <option value="no">No — Croft Finance is our first approach</option>
+            <option value="yes">Yes — other lenders have been approached</option>
+          </select>
+          <div id="appOtherLendersDetail" style="display:none;">
+            <textarea id="appOtherLendersNotes" rows="2" class="form-textarea" placeholder="Please provide details — which lenders, current status, any term sheets received..."></textarea>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Project Description *</label>
+          <textarea id="appProjectDescription" rows="4" class="form-textarea" placeholder="Describe the project, its purpose, revenue model, and what makes it compelling for private capital funding..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Collateral Offered</label>
+          <textarea id="appCollateral" rows="2" class="form-textarea" placeholder="Describe any collateral, guarantees, or security being offered..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Data Room Link (if available)</label>
+          <input type="url" id="appDataRoom" class="form-input" placeholder="https://...">
+        </div>
+      </div>
+
+      <!-- STEP 3: BACKGROUND & RISK -->
+      <div class="app-step" id="appStep3">
+        <div style="background:var(--info-light);border:0.5px solid var(--blue);border-radius:8px;padding:14px 18px;margin-bottom:20px;">
+          <div style="display:flex;gap:10px;align-items:flex-start;">
+            <i class="fas fa-info-circle" style="color:var(--blue);margin-top:2px;flex-shrink:0;"></i>
+            <div style="font-size:13px;color:var(--navy);line-height:1.6;">
+              This section is required for all applications. All information is strictly confidential and handled in accordance with our Privacy Policy. Disclosure of material information does not automatically disqualify an application — non-disclosure does.
+            </div>
+          </div>
+        </div>
+
+        <!-- Bankruptcy -->
+        <div class="app-risk-section" id="bankruptcySection">
+          <div class="app-risk-header">
+            <div>
+              <div style="font-size:14px;font-weight:600;color:var(--navy);">Bankruptcy, Insolvency &amp; Defaults</div>
+              <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">Personal and any associated companies — last 10 years</div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;">
+              <label class="app-yn-label"><input type="radio" name="hasBankruptcy" value="no" checked onchange="toggleRiskDetail('bankruptcy')"> No</label>
+              <label class="app-yn-label"><input type="radio" name="hasBankruptcy" value="yes" onchange="toggleRiskDetail('bankruptcy')"> Yes</label>
+            </div>
+          </div>
+          <div id="bankruptcyDetail" style="display:none;margin-top:16px;padding:16px;background:var(--error-light);border-radius:8px;border:0.5px solid var(--error);">
+            <div class="data-label" style="color:var(--error);margin-bottom:12px;">Please provide full details of each event:</div>
+            <div id="bankruptcyEntries"></div>
+            <button class="btn btn-secondary btn-sm" onclick="addBankruptcyEntry()" style="margin-top:8px;"><i class="fas fa-plus"></i> Add Another Event</button>
+          </div>
+        </div>
+
+        <!-- Litigation -->
+        <div class="app-risk-section">
+          <div class="app-risk-header">
+            <div>
+              <div style="font-size:14px;font-weight:600;color:var(--navy);">Current or Pending Litigation</div>
+              <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">Any legal proceedings involving the applicant or associated entities</div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;">
+              <label class="app-yn-label"><input type="radio" name="hasLitigation" value="no" checked onchange="toggleRiskDetail('litigation')"> No</label>
+              <label class="app-yn-label"><input type="radio" name="hasLitigation" value="yes" onchange="toggleRiskDetail('litigation')"> Yes</label>
+            </div>
+          </div>
+          <div id="litigationDetail" style="display:none;margin-top:16px;">
+            <textarea id="appLitigationNotes" rows="3" class="form-textarea" placeholder="Please describe: nature of proceedings, jurisdiction, parties involved, current status, estimated financial exposure..."></textarea>
+          </div>
+        </div>
+
+        <!-- Regulatory -->
+        <div class="app-risk-section">
+          <div class="app-risk-header">
+            <div>
+              <div style="font-size:14px;font-weight:600;color:var(--navy);">Regulatory or Criminal Proceedings</div>
+              <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">Any regulatory sanctions, investigations, or criminal matters</div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;">
+              <label class="app-yn-label"><input type="radio" name="hasRegulatory" value="no" checked onchange="toggleRiskDetail('regulatory')"> No</label>
+              <label class="app-yn-label"><input type="radio" name="hasRegulatory" value="yes" onchange="toggleRiskDetail('regulatory')"> Yes</label>
+            </div>
+          </div>
+          <div id="regulatoryDetail" style="display:none;margin-top:16px;">
+            <textarea id="appRegulatoryNotes" rows="3" class="form-textarea" placeholder="Please describe: nature of proceedings, regulatory body, jurisdiction, current status..."></textarea>
+          </div>
+        </div>
+
+        <!-- PEP -->
+        <div class="app-risk-section">
+          <div class="app-risk-header">
+            <div>
+              <div style="font-size:14px;font-weight:600;color:var(--navy);">Politically Exposed Person (PEP)</div>
+              <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">Are you, or any director / UBO, a politically exposed person?</div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;">
+              <label class="app-yn-label"><input type="radio" name="hasPEP" value="no" checked onchange="toggleRiskDetail('pep')"> No</label>
+              <label class="app-yn-label"><input type="radio" name="hasPEP" value="yes" onchange="toggleRiskDetail('pep')"> Yes</label>
+            </div>
+          </div>
+          <div id="pepDetail" style="display:none;margin-top:16px;">
+            <textarea id="appPEPNotes" rows="3" class="form-textarea" placeholder="Please provide name(s), role(s), and country of political exposure..."></textarea>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top:8px;">
+          <label class="form-label">Key Risks &amp; Proposed Mitigants</label>
+          <textarea id="appRisks" rows="4" class="form-textarea" placeholder="What are the main risks associated with this project and how are they mitigated?"></textarea>
+        </div>
+      </div>
+
+      <!-- STEP 4: DOCUMENTS -->
+      <div class="app-step" id="appStep4">
+        <div class="app-section-title">Supporting Documents</div>
+        <p style="font-size:13px;color:var(--gray-500);margin-bottom:20px;line-height:1.7;">All documents are encrypted and stored securely. Accepted formats: PDF. Maximum 20MB per file. Documents are optional at this stage but strengthen your application significantly.</p>
+
+        <div class="app-upload-box" id="uploadBox1">
+          <div class="app-upload-icon"><i class="fas fa-file-pdf"></i></div>
+          <div class="app-upload-label">Executive Summary / Information Memorandum</div>
+          <div class="app-upload-sub">Recommended — drag and drop or click to browse</div>
+          <input type="file" id="appDoc1" class="app-file-input" accept=".pdf" onchange="handleAppFileSelect(this,'uploadBox1','appDoc1Label')">
+          <label for="appDoc1" class="btn btn-secondary btn-sm" style="margin-top:12px;cursor:pointer;"><i class="fas fa-upload"></i> Choose File</label>
+          <div id="appDoc1Label" class="app-file-label"></div>
+        </div>
+
+        <div class="app-upload-box" id="uploadBox2" style="margin-top:12px;">
+          <div class="app-upload-icon"><i class="fas fa-chart-line"></i></div>
+          <div class="app-upload-label">Financial Projections</div>
+          <div class="app-upload-sub">Optional — 3–5 year pro forma or financial model</div>
+          <input type="file" id="appDoc2" class="app-file-input" accept=".pdf" onchange="handleAppFileSelect(this,'uploadBox2','appDoc2Label')">
+          <label for="appDoc2" class="btn btn-secondary btn-sm" style="margin-top:12px;cursor:pointer;"><i class="fas fa-upload"></i> Choose File</label>
+          <div id="appDoc2Label" class="app-file-label"></div>
+        </div>
+
+        <div class="app-upload-box" id="uploadBox3" style="margin-top:12px;">
+          <div class="app-upload-icon"><i class="fas fa-gavel"></i></div>
+          <div class="app-upload-label">Bankruptcy / Court Discharge Document</div>
+          <div class="app-upload-sub">Required only if bankruptcy was disclosed in Step 3</div>
+          <input type="file" id="appDoc3" class="app-file-input" accept=".pdf" onchange="handleAppFileSelect(this,'uploadBox3','appDoc3Label')">
+          <label for="appDoc3" class="btn btn-secondary btn-sm" style="margin-top:12px;cursor:pointer;"><i class="fas fa-upload"></i> Choose File</label>
+          <div id="appDoc3Label" class="app-file-label"></div>
+        </div>
+
+        <div class="form-group" style="margin-top:20px;">
+          <label class="form-label">How did you hear about Croft Finance?</label>
+          <select id="appReferralSource" class="form-select" onchange="toggleReferralOther()">
+            <option value="">Select...</option>
+            <option value="referral">Referred by a client or associate</option>
+            <option value="broker">Through a broker / intermediary</option>
+            <option value="linkedin">LinkedIn</option>
+            <option value="search">Internet search</option>
+            <option value="conference">Conference or industry event</option>
+            <option value="press">Press or media</option>
+            <option value="other">Other</option>
+          </select>
+          <input type="text" id="appReferralOther" class="form-input" style="margin-top:8px;display:none;" placeholder="Please specify...">
+          <input type="text" id="appReferralName" class="form-input" style="margin-top:8px;display:none;" placeholder="Referrer name (optional)">
+        </div>
+      </div>
+
+      <!-- STEP 5: DECLARATION -->
+      <div class="app-step" id="appStep5">
+        <div class="app-section-title">Review &amp; Declaration</div>
+
+        <!-- Summary -->
+        <div id="appSummaryBox" style="background:var(--gray-50);border:0.5px solid var(--gray-200);border-radius:8px;padding:20px;margin-bottom:24px;">
+          <div class="data-label" style="margin-bottom:12px;">Application Summary</div>
+          <div id="appSummaryContent" style="font-size:13px;line-height:1.9;"></div>
+        </div>
+
+        <!-- Risk flags -->
+        <div id="appRiskFlags" style="margin-bottom:20px;"></div>
+
+        <!-- Declarations -->
+        <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:24px;">
+          <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">
+            <input type="checkbox" id="appDeclAccuracy" style="margin-top:3px;flex-shrink:0;">
+            <span style="font-size:13px;color:var(--gray-700);line-height:1.6;">I confirm that all information provided in this application is accurate and complete to the best of my knowledge. I understand that providing false or misleading information may result in immediate disqualification. *</span>
+          </label>
+          <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">
+            <input type="checkbox" id="appDeclNoOmission" style="margin-top:3px;flex-shrink:0;">
+            <span style="font-size:13px;color:var(--gray-700);line-height:1.6;">I confirm that I have not wilfully omitted any material information that may be relevant to Croft Finance's assessment of this application. *</span>
+          </label>
+          <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">
+            <input type="checkbox" id="appDeclNDA" style="margin-top:3px;flex-shrink:0;">
+            <span style="font-size:13px;color:var(--gray-700);line-height:1.6;">I have read and agree to the <a href="#" onclick="openModal('termsModal');return false;" style="color:var(--navy);">Confidentiality &amp; Portal Access Terms</a> and understand that all information shared is strictly confidential. *</span>
+          </label>
+          <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">
+            <input type="checkbox" id="appDeclProcessing" style="margin-top:3px;flex-shrink:0;">
+            <span style="font-size:13px;color:var(--gray-700);line-height:1.6;">I consent to Croft Finance processing my personal data for the purpose of evaluating this application, in accordance with the <a href="#" onclick="openModal('privacyModal');return false;" style="color:var(--navy);">Privacy Policy</a>. *</span>
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Full Legal Name (signature) *</label>
+          <input type="text" id="appSignatureName" class="form-input" placeholder="Type your full legal name to sign this application">
+          <div class="form-hint">By entering your name you are electronically signing this application</div>
+        </div>
+
+        <div id="appSubmitError" style="color:var(--error);font-size:12px;margin-bottom:12px;display:none;padding:10px 14px;background:var(--error-light);border-radius:6px;"></div>
+      </div>
+
+    </div>
+    <!-- Footer -->
+    <div class="modal-footer" style="justify-content:space-between;">
+      <button class="btn btn-ghost btn-md" id="appPrevBtn" onclick="appNavigate(-1)" style="display:none;"><i class="fas fa-arrow-left"></i> Previous</button>
+      <div style="display:flex;gap:8px;margin-left:auto;">
+        <div id="appStepIndicator" style="font-size:11px;color:var(--gray-400);display:flex;align-items:center;margin-right:12px;">Step 1 of 5</div>
+        <button class="btn btn-primary btn-md" id="appNextBtn" onclick="appNavigate(1)">Next <i class="fas fa-arrow-right"></i></button>
+        <button class="btn btn-primary btn-md" id="appSubmitBtn" onclick="submitApplication()" style="display:none;"><i class="fas fa-paper-plane"></i> Submit Application</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     APPLICATION DETAIL MODAL (Admin)
+     ============================================================ -->
+<div id="applicationDetailModal" class="modal-overlay">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3>Application Details</h3>
+      <button class="modal-close" onclick="closeApplicationDetail()">✕</button>
+    </div>
+    <div class="modal-body" id="applicationDetailContent" style="max-height:70vh;overflow-y:auto;"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-md" onclick="closeModal('applicationDetailModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
      ALL MODALS
      ============================================================ -->
-
-/* ===== APPLICATION FORM CSS ===== */
-.app-step, .onb-step { display: none; }
-.app-step.active, .onb-step.active { display: block; }
-.app-step-tab, .onb-step-tab {
-  flex: 1;
-  text-align: center;
-  padding: 12px 8px;
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: var(--gray-400);
-  border-bottom: 2px solid transparent;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.app-step-tab.active, .onb-step-tab.active {
-  color: var(--navy);
-  border-bottom-color: var(--blue);
-}
-.app-section-title {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--blue);
-  padding: 20px 0 12px 0;
-  border-bottom: 0.5px solid var(--gray-200);
-  margin-bottom: 16px;
-}
-.app-risk-section {
-  background: var(--white);
-  border: 0.5px solid var(--gray-200);
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 16px;
-}
-.app-risk-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-.app-yn-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  cursor: pointer;
-}
-.app-yn-label input {
-  margin: 0;
-}
-.app-upload-box {
-  border: 2px dashed var(--gray-300);
-  border-radius: 12px;
-  padding: 24px;
-  text-align: center;
-  background: var(--gray-50);
-  transition: all 0.2s;
-  cursor: pointer;
-}
-.app-upload-box:hover {
-  border-color: var(--blue);
-  background: rgba(44,95,138,0.05);
-}
-.app-upload-icon {
-  font-size: 32px;
-  color: var(--blue);
-  margin-bottom: 12px;
-}
-.app-upload-label {
-  font-weight: 500;
-  font-size: 14px;
-  color: var(--navy);
-}
-.app-upload-sub {
-  font-size: 11px;
-  color: var(--gray-400);
-  margin-top: 4px;
-}
-.app-file-input {
-  display: none;
-}
-.app-file-label {
-  margin-top: 8px;
-  font-size: 11px;
-  color: var(--success);
-}
-.onb-director-entry {
-  transition: all 0.2s;
-}
 
 <!-- Upload Document -->
 <div id="uploadDocumentModal" class="modal-overlay"><div class="modal"><div class="modal-header"><h3>Upload Document</h3><button class="modal-close" onclick="closeModal('uploadDocumentModal')">✕</button></div><div class="modal-body"><div class="form-group"><label class="form-label">Client</label><select id="uploadClientId" class="form-select" onchange="updateProjectSelectForUpload(this.value)"></select></div><div class="form-group"><label class="form-label">Project</label><select id="uploadProjectId" class="form-select"></select></div><div class="form-group"><label class="form-label">Document Type</label><select id="documentType" class="form-select"><option>Funding Proposal</option><option>Term Sheet</option><option>Commitment Fee</option><option>Deed of Undertaking</option><option>ECF Confirmation</option><option>Credit Support Package</option><option>Other</option></select></div><div class="form-group"><label class="form-label">Expiry Date (Optional)</label><input type="date" id="documentExpiryDate" class="form-input"></div><div class="form-group"><label class="form-label">PDF File</label><input type="file" id="pdfFile" class="form-input" accept=".pdf,.doc,.docx"></div><button class="btn btn-primary btn-md" onclick="adminUploadDocument()" style="width:100%;justify-content:center;">Upload</button></div></div></div>
@@ -2444,6 +2779,22 @@ function filterApplications() {
         // Re-render the table with the new filter
         renderApplicationsTable();
     }
+}
+
+window.closeApplicationModal = function() {
+  closeModal('applicationModal');
+  // Restore footer in case it was hidden after successful submission
+  const footer = document.querySelector('#applicationModal .modal-footer');
+  if (footer) footer.style.display = '';
+  // Restore modal body in case it was replaced by success message
+  resetApplicationForm();
+  appCurrentStep = 1;
+  showAppStep(1);
+  updateAppNavigation();
+};
+
+function closeApplicationDetail() {
+    closeModal('applicationDetailModal');
 }
 
 function renderApplicationsTable() {
@@ -2995,6 +3346,43 @@ window.updateStrength = function(inputId, segPrefix, hintId) {
   }
 };
 
+async function cleanupUnverifiedAccounts() {
+  try {
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    
+    const stale = await db.collection('clients')
+      .where('status', '==', 'email_verification_pending')
+      .where('createdAt', '<', sevenDaysAgo.toISOString())
+      .get();
+    
+    let cleanedCount = 0;
+    
+    for (const doc of stale.docs) {
+      // Delete client document
+      await db.collection('clients').doc(doc.id).delete();
+      
+      // Delete associated projects
+      const projectsSnap = await db.collection('projects').where('clientId', '==', doc.id).get();
+      for (const project of projectsSnap.docs) {
+        await project.ref.delete();
+      }
+      
+      cleanedCount++;
+    }
+    
+    if (cleanedCount > 0) {
+      console.log(`🧹 Cleaned up ${cleanedCount} unverified accounts older than 7 days`);
+      await logActivity('system', 'Auto Cleanup', 'system', 'cleanup_unverified', null, `Removed ${cleanedCount} stale unverified accounts`);
+    }
+    
+    return cleanedCount;
+  } catch(e) {
+    console.warn('[Cleanup]', e.message);
+    return 0;
+  }
+}
+
 // ── Dark mode ─────────────────────────────────────────────────
 window.toggleDarkMode = function() {
   document.body.classList.toggle('dark-mode');
@@ -3156,6 +3544,15 @@ async function initFirebase() {
 
   if (!sessionStorage.getItem('croftSessionId')) sessionStorage.setItem('croftSessionId', generateId());
   initEmailJS();
+
+  handleEmailVerificationRedirect();
+
+  cleanupUnverifiedAccounts();
+  
+  // Also run cleanup once per day (optional)
+  setInterval(() => {
+    cleanupUnverifiedAccounts();
+  }, 24 * 60 * 60 * 1000); // Every 24 hours
 
   // Fade loading overlay
   const overlay = document.getElementById('loadingOverlay');
@@ -3400,6 +3797,8 @@ window.switchAdminTab = function(tabName) {
   if (tabName==='archive')     viewArchivedDeals();
   if (tabName==='feedback')    renderSurveyResults();
   if (tabName==='referrals')   { renderReferralReport(); updateReferralStats(); }
+  if (tabName==='applications') loadApplications();
+  if (tabName==='settings') { loadSettings(); renderTemplateManager(); renderBrokerTierSummary(); }
   saveActiveTab('admin', tabName);
   if (window.innerWidth<=768) toggleAdminSidebar();
 };
@@ -3461,19 +3860,104 @@ function _getSecondaryAuth() {
 // ============================================================
 window.login = async function() {
   if (checkLoginLockout()) return;
+  
   const email = document.getElementById('loginEmail')?.value.trim().toLowerCase();
-  const pass  = document.getElementById('loginPassword')?.value;
+  const pass = document.getElementById('loginPassword')?.value;
   const errEl = document.getElementById('loginError');
+  
   if (errEl) errEl.style.display = 'none';
-  if (!email||!pass) { if(errEl){errEl.textContent='Please enter email and password.';errEl.style.display='block';} return; }
+  if (!email || !pass) { 
+    if(errEl){ errEl.textContent = 'Please enter email and password.'; errEl.style.display = 'block'; } 
+    return; 
+  }
+  
   setButtonLoading('loginBtn', true, 'Signing in...');
+  
   try {
-    await auth.signInWithEmailAndPassword(email, pass);
-    resetLoginAttempts('client'); closeModal('loginModal');
+    const cred = await auth.signInWithEmailAndPassword(email, pass);
+    const user = cred.user;
+    
+    // Check if email is verified
+    if (!user.emailVerified) {
+      // Send new verification email
+      await user.sendEmailVerification();
+      
+      // Sign out immediately
+      await auth.signOut();
+      
+      if (errEl) {
+    errEl.style.cssText = 'display:block;padding:12px;background:var(--warning-light);border-left:3px solid var(--warning);';
+    errEl.innerHTML = `
+        <strong style="color:var(--warning);">⚠ Email Not Verified</strong><br>
+        Please check your inbox (${escapeHtml(email)}) and click the verification link.<br>
+        <div style="display:flex;gap:10px;margin-top:10px;">
+            <button class="btn btn-primary btn-xs" onclick="resendVerificationEmail('${escapeHtml(email)}')">
+                <i class="fas fa-paper-plane"></i> Resend Verification Email
+            </button>
+            <button class="btn btn-secondary btn-xs" onclick="location.reload()">
+                <i class="fas fa-sync"></i> Try Again Later
+            </button>
+        </div>
+    `;
+}
+      resetLoginAttempts('client');
+      return;
+    }
+    
+    // Check client document status
+    const clientDoc = await db.collection('clients').doc(user.uid).get();
+    
+    if (!clientDoc.exists) {
+      await auth.signOut();
+      if (errEl) { errEl.textContent = 'Account not found. Please register.'; errEl.style.display = 'block'; }
+      return;
+    }
+    
+    const clientData = clientDoc.data();
+    
+    // Check if email verification is still pending in Firestore
+    if (clientData.status === 'email_verification_pending') {
+      // Update status to pending review now that email is verified
+      await db.collection('clients').doc(user.uid).update({
+        status: 'pending',
+        emailVerified: true,
+        emailVerifiedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      
+      // Update projects
+      const projectsSnap = await db.collection('projects').where('clientId', '==', user.uid).get();
+      for (const doc of projectsSnap.docs) {
+        await doc.ref.update({ status: 'pending' });
+      }
+      
+      showToastSuccess('Email verified! Your application is now pending review.');
+    }
+    
+    // Check final status
+    if (clientData.status === 'pending') {
+      showToastError('Your account is pending review. You will be notified once approved.');
+      await auth.signOut();
+      return;
+    }
+    
+    if (clientData.status === 'declined') {
+      showToastError('Your application was not approved. Please contact Croft Finance directly.');
+      await auth.signOut();
+      return;
+    }
+    
+    resetLoginAttempts('client');
+    closeModal('loginModal');
+    
   } catch(e) {
     recordFailedLogin('client');
-    if (errEl) { errEl.textContent = friendlyError(e.code); errEl.style.display='block'; }
-  } finally { setButtonLoading('loginBtn', false, 'Sign In'); }
+    if (errEl) { 
+      errEl.textContent = friendlyError(e.code); 
+      errEl.style.display = 'block'; 
+    }
+  } finally { 
+    setButtonLoading('loginBtn', false, 'Sign In'); 
+  }
 };
 
 window.brokerLogin = async function() {
@@ -3532,44 +4016,227 @@ window.requestPasswordReset = async function() {
 // REGISTRATION
 // ============================================================
 window.register = async function() {
-  const name=document.getElementById('regName')?.value.trim(), email=document.getElementById('regEmail')?.value.trim().toLowerCase();
-  const pass=document.getElementById('regPassword')?.value, confirm=document.getElementById('regConfirmPassword')?.value;
-  const project=document.getElementById('regProject')?.value.trim(), nda=document.getElementById('ndaCheckbox')?.checked;
-  const errEl=document.getElementById('regError');
-  if (errEl) errEl.style.display='none';
-  if (!name||!email||!pass||!project) { if(errEl){errEl.textContent='Please fill all required fields.';errEl.style.display='block';} return; }
-  if (pass!==confirm)                  { if(errEl){errEl.textContent='Passwords do not match.';errEl.style.display='block';} return; }
-  if (checkPasswordStrength(pass)<2)   { if(errEl){errEl.textContent='Password is too weak.';errEl.style.display='block';} return; }
-  if (!nda)                            { if(errEl){errEl.textContent='Please accept the Confidentiality Terms.';errEl.style.display='block';} return; }
-  const btn=document.getElementById('regBtn');
-  if (btn) { btn.disabled=true; btn.innerHTML='<span class="btn-spinner"></span> Submitting...'; }
-  try {
-    const cred = await auth.createUserWithEmailAndPassword(email, pass);
-    await db.collection('clients').doc(cred.user.uid).set({
-      id:cred.user.uid, name, email, status:'pending', termsVersion:TERMS_VERSION,
-      termsAcceptedAt:new Date().toISOString(), createdAt:new Date().toISOString()
-    });
-    await db.collection('projects').add({
-      clientId:cred.user.uid, name:project, step:1, status:'pending', amount:0,
-      fundsNeeded:parseAmount(document.getElementById('regFundsNeeded')?.value),
-      createdAt:new Date().toISOString()
-    });
-    await logActivity(cred.user.uid, name, 'client', 'register', null, `Registered: ${project}`);
-    await sendEmailNotification({ to_name:name, to_email:email, from_name:'Croft Finance',
-      subject:'Your application has been received — Croft Finance',
-      message:`Dear ${name},\n\nThank you for registering. Your application for "${project}" is under review. You will be notified within 1 business day.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
-      project_name:project });
-    await sendEmailNotification({ to_name:'Croft Finance', to_email:EMAILJS_CONFIG.adminEmail, from_name:'Croft Finance Portal',
-      subject:`New Registration: ${name}`,
-      message:`Name: ${name}\nEmail: ${email}\nProject: ${project}\n\nPlease review in the admin portal.`,
-      project_name:project });
-    await auth.signOut();
-    const rc=document.getElementById('registerForm');
-    if (rc) rc.innerHTML=`<div style="text-align:center;padding:24px;"><i class="fas fa-check-circle" style="font-size:52px;color:var(--success);display:block;margin-bottom:16px;"></i><h3 style="font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--navy);">Application Submitted</h3><p style="margin-top:10px;color:var(--gray-500);font-size:13px;">You will receive an email once your account is approved.</p><button class="btn btn-primary btn-md" style="margin-top:20px;width:100%;justify-content:center;" onclick="closeModal('loginModal');location.reload();">Close</button></div>`;
-  } catch(e) {
-    if (errEl) { errEl.textContent=friendlyError(e.code); errEl.style.display='block'; }
-    if (btn) { btn.disabled=false; btn.innerHTML='Submit Registration'; }
+  const name = document.getElementById('regName')?.value.trim();
+  const email = document.getElementById('regEmail')?.value.trim().toLowerCase();
+  const pass = document.getElementById('regPassword')?.value;
+  const confirm = document.getElementById('regConfirmPassword')?.value;
+  const project = document.getElementById('regProject')?.value.trim();
+  const nda = document.getElementById('ndaCheckbox')?.checked;
+  const errEl = document.getElementById('regError');
+  
+  if (errEl) errEl.style.display = 'none';
+  
+  // Validation
+  if (!name || !email || !pass || !project) {
+    if(errEl){ errEl.textContent = 'Please fill all required fields.'; errEl.style.display = 'block'; }
+    return;
   }
+  if (pass !== confirm) {
+    if(errEl){ errEl.textContent = 'Passwords do not match.'; errEl.style.display = 'block'; }
+    return;
+  }
+  if (checkPasswordStrength(pass) < 2) {
+    if(errEl){ errEl.textContent = 'Password is too weak. Use 8+ chars with uppercase, number, and special character.'; errEl.style.display = 'block'; }
+    return;
+  }
+  if (!nda) {
+    if(errEl){ errEl.textContent = 'Please accept the Confidentiality Terms.'; errEl.style.display = 'block'; }
+    return;
+  }
+  
+  const btn = document.getElementById('regBtn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="btn-spinner"></span> Creating account...'; }
+  
+  try {
+    // Create user with Firebase Auth
+    const cred = await auth.createUserWithEmailAndPassword(email, pass);
+    const userId = cred.user.uid;
+    
+    // Send email verification
+    await cred.user.sendEmailVerification({
+    url: window.location.origin  // Just the base URL
+});
+    
+    // Store client data with email_verification_required status
+    await db.collection('clients').doc(userId).set({
+      id: userId,
+      name: name,
+      email: email,
+      status: 'email_verification_pending',  // CRITICAL: Not active yet
+      emailVerified: false,
+      emailVerificationSentAt: firebase.firestore.FieldValue.serverTimestamp(),
+      termsVersion: TERMS_VERSION,
+      termsAcceptedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString()
+    });
+    
+    // Store project with pending status
+    await db.collection('projects').add({
+      clientId: userId,
+      name: project,
+      step: 1,
+      status: 'email_verification_pending',  // Not active until email verified
+      amount: 0,
+      fundsNeeded: parseAmount(document.getElementById('regFundsNeeded')?.value),
+      industry: document.getElementById('regIndustry')?.value || '',
+      location: document.getElementById('regLocation')?.value || '',
+      totalCost: parseAmount(document.getElementById('regTotalCost')?.value),
+      createdAt: new Date().toISOString()
+    });
+    
+    // Sign out immediately - user must verify email first
+    await auth.signOut();
+    
+    // Send admin notification
+    await sendEmailNotification({
+      to_name: 'Croft Finance',
+      to_email: EMAILJS_CONFIG.adminEmail,
+      from_name: 'Croft Finance Portal',
+      subject: `New Registration Awaiting Email Verification: ${name}`,
+      message: `Name: ${name}\nEmail: ${email}\nProject: ${project}\n\nEmail verification required before account activation.\n\nUser will need to verify their email before accessing the portal.\n\nOnce verified, please review the application in the admin portal.`,
+      project_name: project
+    });
+    
+    // Show verification required message
+    const registerForm = document.getElementById('registerForm');
+    if (registerForm) {
+      registerForm.innerHTML = `
+        <div style="text-align:center;padding:24px;">
+          <i class="fas fa-envelope" style="font-size:52px;color:var(--blue);display:block;margin-bottom:16px;"></i>
+          <h3 style="font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--navy);">Verify Your Email Address</h3>
+          <p style="margin-top:10px;color:var(--gray-500);font-size:13px;line-height:1.6;">
+            We've sent a verification link to <strong>${escapeHtml(email)}</strong>.<br><br>
+            Please check your inbox and click the link to verify your email address.<br>
+            Once verified, your account will be reviewed for approval.<br><br>
+            <span style="font-size:12px;color:var(--gray-400);">Didn't receive the email? Check your spam folder or</span>
+          </p>
+          <button class="btn btn-primary btn-md" style="margin-top:20px;width:100%;justify-content:center;" onclick="resendVerificationEmail('${email}')">
+            <i class="fas fa-paper-plane"></i> Resend Verification Email
+          </button>
+          <button class="btn btn-secondary btn-md" style="margin-top:10px;width:100%;justify-content:center;" onclick="closeModal('loginModal');location.reload();">
+            Close
+          </button>
+        </div>
+      `;
+    }
+    
+    showToastSuccess(`Verification email sent to ${email}. Please verify before logging in.`);
+    
+  } catch(e) {
+    console.error('Registration error:', e);
+    if (errEl) { 
+      errEl.textContent = friendlyError(e.code); 
+      errEl.style.display = 'block'; 
+    }
+    if (btn) { btn.disabled = false; btn.innerHTML = 'Submit Registration'; }
+    
+    // If user was created but something else failed, clean up
+    if (e.code !== 'auth/email-already-in-use') {
+      try {
+        const user = auth.currentUser;
+        if (user) await user.delete();
+      } catch(cleanupErr) { console.warn('Cleanup failed:', cleanupErr); }
+    }
+  }
+};
+
+// ============================================================
+// RESEND VERIFICATION EMAIL
+// ============================================================
+window.resendVerificationEmail = async function(email) {
+    if (!email) {
+        showToastError('Email address is required');
+        return;
+    }
+    
+    const btn = document.querySelector('#loginError .btn-secondary');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="btn-spinner"></span> Sending...';
+    }
+    
+    try {
+        // Try to sign in temporarily to resend verification
+        // Note: This requires the user to exist but password can be wrong
+        // Alternative approach using Firebase Auth directly
+        
+        // Method 1: Use Firebase's built-in sendEmailVerification with currentUser
+        // But user isn't signed in, so we need a different approach
+        
+        // Method 2: Use Firebase Auth REST API to send verification email
+        // This is the most reliable method
+        
+        const apiKey = FIREBASE_CONFIG.apiKey;
+        const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                requestType: 'VERIFY_EMAIL',
+                email: email
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            // Also update the last sent timestamp in Firestore
+            try {
+                const userQuery = await db.collection('clients').where('email', '==', email).limit(1).get();
+                if (!userQuery.empty) {
+                    const doc = userQuery.docs[0];
+                    await db.collection('clients').doc(doc.id).update({
+                        emailVerificationSentAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        emailVerificationResentCount: firebase.firestore.FieldValue.increment(1)
+                    });
+                }
+            } catch(dbErr) {
+                console.warn('Could not update Firestore timestamp:', dbErr);
+            }
+            
+            showToastSuccess(`Verification email resent to ${email}`);
+            
+            // Clear the login error message and show success
+            const errEl = document.getElementById('loginError');
+            if (errEl) {
+                errEl.style.cssText = 'display:block;padding:12px;background:var(--success-light);border-left:3px solid var(--success);';
+                errEl.innerHTML = `
+                    <strong style="color:var(--success);">✓ Verification Email Sent!</strong><br>
+                    Please check your inbox (${escapeHtml(email)}) and click the verification link.<br>
+                    <span style="font-size:11px;color:var(--gray-500);">Didn't receive it? Check your spam folder.</span>
+                `;
+            }
+        } else {
+            // Handle specific Firebase Auth errors
+            if (data.error?.message === 'EMAIL_NOT_FOUND') {
+                showToastError('No account found with this email address. Please register first.');
+                // Optionally redirect to registration form
+                setTimeout(() => {
+                    showRegisterForm();
+                }, 2000);
+            } else {
+                showToastError('Failed to resend verification email. Please contact support.');
+                console.error('Resend error:', data.error);
+            }
+        }
+        
+    } catch(e) {
+        console.error('Resend verification error:', e);
+        showToastError('Unable to resend verification email. Please contact Croft Finance directly.');
+        
+        // Fallback: Show contact info
+        const errEl = document.getElementById('loginError');
+        if (errEl) {
+            errEl.innerHTML = `
+                <strong style="color:var(--error);">⚠ Unable to Send Automatically</strong><br>
+                Please contact Suzana directly at <strong>suzana.aleksic@croftfinance.com</strong> to request a new verification link.
+            `;
+        }
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = 'Resend Verification Email';
+        }
+    }
 };
 
 window.brokerRegister = async function() {
@@ -3973,8 +4640,31 @@ window.requestDataDeletion = async function() {
 // ============================================================
 // BOOT
 // ============================================================
-document.addEventListener('DOMContentLoaded', function() { initFirebase().then ? initFirebase() : initFirebase(); });
-document.addEventListener('DOMContentLoaded', function() { setTimeout(initGroup1Features, 3000); });
+document.addEventListener('DOMContentLoaded', function() { 
+    initFirebase().then ? initFirebase() : initFirebase(); 
+    handleEmailVerificationRedirect();
+    setTimeout(initGroup1Features, 3000); 
+});
+
+// Add the handler function BEFORE your DOMContentLoaded (around line 3580-3590)
+// ============================================================
+// HANDLE EMAIL VERIFICATION REDIRECT
+// ============================================================
+function handleEmailVerificationRedirect() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const verification = urlParams.get('verification');
+  const mode = urlParams.get('mode');
+  
+  if (mode === 'verifyEmail' || verification === 'true') {
+    showToastSuccess('Email verified successfully! You can now log in.');
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+}
+
+// Call it when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    handleEmailVerificationRedirect();
+});
 
 </script>
 <script>
@@ -3989,61 +4679,155 @@ document.addEventListener('DOMContentLoaded', function() { setTimeout(initGroup1
 // ============================================================
 function renderClientsTable(filteredClients) {
   const statusFilter = document.getElementById('clientStatusFilter')?.value || '';
-  const searchTerm   = document.getElementById('clientSearch')?.value.toLowerCase() || '';
+  const searchTerm = document.getElementById('clientSearch')?.value.toLowerCase() || '';
   let list = filteredClients !== undefined ? filteredClients : clients;
 
   if (statusFilter) list = list.filter(c => c.status === statusFilter);
-  if (searchTerm)   list = list.filter(c =>
-    (c.name||'').toLowerCase().includes(searchTerm) ||
-    (c.email||'').toLowerCase().includes(searchTerm) ||
-    (c.company||'').toLowerCase().includes(searchTerm)
+  if (searchTerm) list = list.filter(c =>
+    (c.name || '').toLowerCase().includes(searchTerm) ||
+    (c.email || '').toLowerCase().includes(searchTerm)
   );
 
   const tbody = document.getElementById('adminClientsTable');
   if (!tbody) return;
 
   if (!list.length) {
-    tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><i class="fas fa-users"></i><p>No clients found.</p></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state"><i class="fas fa-users"></i><p>No clients found.</p></div></tr></tr>`;
     return;
   }
 
   const newRowsHtml = list.map(c => {
     const projectCount = projects.filter(p => p.clientId === c.id).length;
-    const statusBadge  = { active:'badge-success', pending:'badge-warning', crm_only:'badge-info', declined:'badge-danger', archived:'badge-neutral' }[c.status] || 'badge-neutral';
-    const statusLabel  = c.status === 'crm_only' ? 'CRM' : c.status === 'archived' ? 'Archived' : (c.status || '—');
-    const cProject     = projects.find(p => p.clientId === c.id);
-    const healthScore  = cProject ? calculateDealHealthScore(cProject) : null;
-    const referralTag  = c.referredBy ? `<span class="referral-tag"><i class="fas fa-user-plus" style="font-size:9px;"></i> ${escapeHtml(c.referredBy)}</span>` : '';
-    const lastSeen     = c.lastSeenAt
-      ? formatDateTime(c.lastSeenAt)
-      : (c.createdAt ? 'Never' : '—');
+    
+    // Email verification badge
+    let verificationBadge = '';
+    if (c.emailVerified === false || c.status === 'email_verification_pending') {
+      verificationBadge = '<span class="badge badge-warning" title="Email not verified"><i class="fas fa-envelope"></i> Unverified</span>';
+    } else if (c.emailVerified === true) {
+      verificationBadge = '<span class="badge badge-success" title="Email verified"><i class="fas fa-check-circle"></i> Verified</span>';
+    }
+    
+    const statusBadge = { 
+      active: 'badge-success', 
+      pending: 'badge-warning', 
+      email_verification_pending: 'badge-danger',
+      crm_only: 'badge-info', 
+      declined: 'badge-danger', 
+      archived: 'badge-neutral' 
+    }[c.status] || 'badge-neutral';
+    
+    const statusLabel = c.status === 'email_verification_pending' ? '⏳ Verify Email' : 
+                        c.status === 'crm_only' ? 'CRM' : 
+                        c.status === 'archived' ? 'Archived' : (c.status || '—');
+    
     return `<tr>
       <td style="width:32px;"><input type="checkbox" class="bulk-checkbox bulk-cb-clients" onclick="toggleBulkSelect('clients','${c.id}',this.checked)"></td>
-      <td><strong>${escapeHtml(c.name)}</strong>${c.hasPortalAccess === false ? '<br><span class="data-label">No portal</span>' : ''}${referralTag?'<br>'+referralTag:''}</td>
-      <td style="font-size:12px;">${escapeHtml(c.email||'—')}</td>
+      <td><strong>${escapeHtml(c.name)}</strong>${c.hasPortalAccess === false ? '<br><span class="data-label">No portal</span>' : ''}<br>${verificationBadge}</td>
+      <td style="font-size:12px;">${escapeHtml(c.email || '—')}</td>
       <td style="text-align:center;">${projectCount}</td>
       <td><span class="badge ${statusBadge}">${statusLabel}</span></td>
-      <td style="font-size:11px;color:var(--gray-400);">${escapeHtml(lastSeen)}</td>
+      <td style="font-size:11px;color:var(--gray-400);">${escapeHtml(c.lastSeenAt ? formatDateTime(c.lastSeenAt) : (c.createdAt ? 'Never' : '—'))}</td>
+      <td style="font-size:11px;">${c.emailVerifiedAt ? formatDate(c.emailVerifiedAt) : (c.emailVerificationSentAt ? 'Sent: ' + formatDate(c.emailVerificationSentAt) : '—')}</td>
       <td style="font-size:11px;color:var(--gray-400);">${escapeHtml(c.termsVersion || '—')}</td>
       <td><input type="text" class="form-input" style="font-size:11px;padding:4px 8px;"
-          placeholder="Add note..." value="${escapeHtml(c.adminNote||'')}"
+          placeholder="Add note..." value="${escapeHtml(c.adminNote || '')}"
           onblur="saveClientNote('${c.id}',this.value)"></td>
-      <td style="font-size:11px;">${c.createdAt ? c.createdAt.split('T')[0] : '—'}</td>
       <td style="white-space:nowrap;">
-        ${c.status==='pending'
-          ? `<button class="btn btn-success btn-xs" onclick="approveClient('${c.id}')">Approve</button>
-             <button class="btn btn-danger btn-xs" onclick="declineClient('${c.id}')">Decline</button>`
-          : ''}
+        ${c.status === 'email_verification_pending' 
+          ? `<button class="btn btn-primary btn-xs" onclick="forceVerifyEmail('${c.id}')"><i class="fas fa-check"></i> Verify Manually</button>`
+          : c.status === 'pending' 
+            ? `<button class="btn btn-success btn-xs" onclick="approveClient('${c.id}')">Approve</button>
+               <button class="btn btn-danger btn-xs" onclick="declineClient('${c.id}')">Decline</button>`
+            : ''}
         <button class="btn btn-ghost btn-xs" onclick="editClientProject('${c.id}')"><i class="fas fa-edit"></i></button>
         <button class="btn btn-secondary btn-xs" onclick="impersonateClient('${c.id}')"><i class="fas fa-eye"></i> View</button>
-        <button class="btn btn-ghost btn-xs" onclick="showReferralModal('${c.id}')" title="Record referral"><i class="fas fa-user-plus"></i></button>
+        ${c.status !== 'email_verification_pending' ? 
+          `<button class="btn btn-ghost btn-xs" onclick="resendVerificationAdmin('${c.id}')" title="Resend verification email"><i class="fas fa-envelope"></i></button>` : ''}
         <button class="btn btn-danger btn-xs" onclick="deleteClient('${c.id}')"><i class="fas fa-trash"></i></button>
       </td>
     </tr>`;
   }).join('');
+  
   patchTable('adminClientsTable', newRowsHtml);
-  renderPaginationControls('adminClientsTable','clients',list.length, renderClientsTable);
+  renderPaginationControls('adminClientsTable', 'clients', list.length, renderClientsTable);
 }
+
+// ============================================================
+// ADMIN: FORCE VERIFY EMAIL
+// ============================================================
+window.forceVerifyEmail = async function(clientId) {
+  if (!confirmAction('Manually mark this client\'s email as verified? This will move them to pending review.')) return;
+  
+  try {
+    // Get the client's Firebase Auth user
+    const client = clients.find(c => c.id === clientId);
+    if (!client) return showToastError('Client not found');
+    
+    // Update Firestore
+    await db.collection('clients').doc(clientId).update({
+      status: 'pending',
+      emailVerified: true,
+      emailVerifiedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      emailVerifiedManually: true,
+      emailVerifiedBy: auth.currentUser?.uid
+    });
+    
+    // Update projects
+    const clientProjects = projects.filter(p => p.clientId === clientId);
+    for (const project of clientProjects) {
+      await db.collection('projects').doc(project.id).update({ status: 'pending' });
+    }
+    
+    // Send notification
+    await sendEmailNotification({
+      to_name: client.name,
+      to_email: client.email,
+      from_name: 'Croft Finance',
+      subject: 'Your Croft Finance Application is Now Under Review',
+      message: `Dear ${client.name},\n\nYour email has been verified and your application is now under review.\n\nYou will receive a notification once a decision has been made.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
+      project_name: 'Application Status'
+    });
+    
+    showToastSuccess(`Email marked as verified for ${client.name}`);
+  } catch(e) {
+    showToastError(e.message);
+  }
+};
+
+// ============================================================
+// ADMIN: RESEND VERIFICATION EMAIL
+// ============================================================
+window.resendVerificationAdmin = async function(clientId) {
+  const client = clients.find(c => c.id === clientId);
+  if (!client) return showToastError('Client not found');
+  
+  if (!confirmAction(`Resend verification email to ${client.email}?`)) return;
+  
+  try {
+    // Generate a custom verification link using Firebase
+    // Note: This requires Firebase Admin SDK on backend or using Firebase Functions
+    // Alternative: Use Firebase's built-in email verification link
+    
+    await sendEmailNotification({
+      to_name: client.name,
+      to_email: client.email,
+      from_name: 'Croft Finance',
+      subject: 'Email Verification Required - Croft Finance Portal',
+      message: `Dear ${client.name},\n\nPlease click the link below to verify your email address for the Croft Finance portal:\n\n${window.location.origin}/verify-email?uid=${client.id}\n\nIf you did not request this, please ignore this email.\n\nBest regards,\nSuzana Aleksić\nCroft Finance`,
+      project_name: 'Email Verification'
+    });
+    
+    // Update last verification sent timestamp
+    await db.collection('clients').doc(clientId).update({
+      emailVerificationSentAt: firebase.firestore.FieldValue.serverTimestamp(),
+      emailVerificationResentCount: firebase.firestore.FieldValue.increment(1)
+    });
+    
+    showToastSuccess(`Verification email sent to ${client.email}`);
+  } catch(e) {
+    showToastError(e.message);
+  }
+};
 
 function renderAdminTables() {
   renderClientsTable();
@@ -4699,7 +5483,11 @@ function renderBrokerAdminTable() {
     const estComm= funded.reduce((sum,p) => sum + parseAmount(p.amount)*((b.commissionRate||0)/100), 0);
     const pending= brokerUpdateRequests.filter(r => r.brokerId===b.id&&r.status==='pending').length;
     return `<tr>
-      <td><strong>${escapeHtml(b.name)}</strong><br><span class="data-label">${escapeHtml(b.email)}</span></td>
+      <td>
+        <strong>${escapeHtml(b.name)}</strong><br>
+        <span class="data-label">${escapeHtml(b.email)}</span><br>
+        ${getBrokerTierBadge(b.id)}
+      </td>
       <td>${escapeHtml(b.firm||'—')}</td>
       <td><strong>${b.commissionRate||0}%</strong></td>
       <td>${subs.length}</td>
@@ -6984,6 +7772,34 @@ window.saveNewTemplate = async function() {
   }
 };
 
+window.previewTemplate = function(id) {
+  const template = messageTemplates.find(t => t.id === id);
+  if (!template) return;
+  const existing = document.getElementById('templatePreviewModal');
+  if (existing) existing.remove();
+  const modal = document.createElement('div');
+  modal.id = 'templatePreviewModal';
+  modal.className = 'modal-overlay active';
+  modal.innerHTML = `
+    <div class="modal">
+      <div class="modal-header">
+        <h3>${escapeHtml(template.name)}</h3>
+        <button class="modal-close" onclick="document.getElementById('templatePreviewModal').remove()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="background:var(--gray-50);border-radius:8px;padding:20px;
+          font-size:13px;line-height:1.8;white-space:pre-wrap;color:var(--navy);">
+${escapeHtml(template.content)}
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-md"
+          onclick="document.getElementById('templatePreviewModal').remove()">Close</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+};
+
 window.deleteTemplate = async function(id) {
   if (!confirmAction('Delete this template?')) return;
   try {
@@ -6997,14 +7813,32 @@ window.deleteTemplate = async function(id) {
 function renderTemplateManager() {
   const el = document.getElementById('templateManagerList');
   if (!el) return;
-  if (!messageTemplates.length) { el.innerHTML = '<p class="data-label">No templates saved yet.</p>'; return; }
+
+  // Make sure templates are loaded first
+  if (!messageTemplates.length) {
+    loadMessageTemplates().then(() => renderTemplateManager());
+    return;
+  }
+
   el.innerHTML = messageTemplates.map(t => `
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:0.5px solid var(--gray-100);">
-      <div>
-        <div style="font-size:13px;font-weight:500;">${escapeHtml(t.name)}</div>
-        <div style="font-size:11px;color:var(--gray-400);">${escapeHtml((t.content||'').substring(0,60))}…</div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;
+      padding:12px 0;border-bottom:0.5px solid var(--gray-100);gap:12px;">
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:4px;">
+          ${escapeHtml(t.name)}
+        </div>
+        <div style="font-size:11px;color:var(--gray-400);line-height:1.5;">
+          ${escapeHtml((t.content||'').substring(0,80))}${(t.content||'').length > 80 ? '…' : ''}
+        </div>
       </div>
-      <button class="btn btn-danger btn-xs" onclick="deleteTemplate('${t.id}')"><i class="fas fa-trash"></i></button>
+      <div style="display:flex;gap:6px;flex-shrink:0;">
+        <button class="btn btn-ghost btn-xs" onclick="previewTemplate('${t.id}')" title="Preview">
+          <i class="fas fa-eye"></i>
+        </button>
+        <button class="btn btn-danger btn-xs" onclick="deleteTemplate('${t.id}')">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
     </div>`).join('');
 }
 
@@ -7414,6 +8248,444 @@ window.renderHealthScoreTable = function() {
       }).join('')}
     </tbody>
   </table></div>`;
+};
+
+// ============================================================
+// APPLICATION FORM — ALL MISSING FUNCTIONS
+// ============================================================
+
+let appCurrentStep = 1;
+
+window.openApplicationForm = function() {
+  appCurrentStep = 1;
+  showAppStep(1);
+  updateAppNavigation();
+  openModal('applicationModal');
+};
+
+window.resetApplicationForm = function() {
+  appCurrentStep = 1;
+  // Clear all text inputs and textareas in the formc
+  // Restore modal body HTML if it was replaced by success message
+const modalBody = document.querySelector('#applicationModal .modal-body');
+if (modalBody && !document.getElementById('appStep1')) {
+  location.reload();
+  return;
+}
+  document.querySelectorAll('#applicationModal input[type="text"]').forEach(el => el.value = '');
+  document.querySelectorAll('#applicationModal input[type="email"]').forEach(el => el.value = '');
+  document.querySelectorAll('#applicationModal input[type="number"]').forEach(el => el.value = '');
+  document.querySelectorAll('#applicationModal input[type="url"]').forEach(el => el.value = '');
+  document.querySelectorAll('#applicationModal textarea').forEach(el => el.value = '');
+  document.querySelectorAll('#applicationModal select').forEach(el => el.selectedIndex = 0);
+  document.querySelectorAll('#applicationModal input[type="checkbox"]').forEach(el => el.checked = false);
+  document.querySelectorAll('#applicationModal input[type="radio"]').forEach(el => {
+    if (el.value === 'no') el.checked = true;
+    else el.checked = false;
+  });
+  // Hide all risk detail sections
+  ['bankruptcyDetail','litigationDetail','regulatoryDetail','pepDetail'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  // Hide broker fields
+  const bf = document.getElementById('brokerApplicantFields');
+  if (bf) bf.style.display = 'none';
+  // Clear file labels
+  ['appDoc1Label','appDoc2Label','appDoc3Label'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = '';
+  });
+  // Clear error message
+  const errEl = document.getElementById('appSubmitError');
+  if (errEl) errEl.style.display = 'none';
+  // Clear summary
+  const sum = document.getElementById('appSummaryContent');
+  if (sum) sum.innerHTML = '';
+  showAppStep(1);
+  updateAppNavigation();
+};
+
+window.showAppStep = function(n) {
+  // Hide all steps
+  document.querySelectorAll('.app-step').forEach(el => el.classList.remove('active'));
+  // Show target step
+  const target = document.getElementById('appStep' + n);
+  if (target) target.classList.add('active');
+  // Update tab indicators
+  document.querySelectorAll('.app-step-tab').forEach(tab => {
+    tab.classList.remove('active');
+    if (parseInt(tab.dataset.step) === n) tab.classList.add('active');
+  });
+  // Update step indicator text
+  const indicator = document.getElementById('appStepIndicator');
+  if (indicator) indicator.textContent = 'Step ' + n + ' of 5';
+  appCurrentStep = n;
+};
+
+window.updateAppNavigation = function() {
+  const prevBtn   = document.getElementById('appPrevBtn');
+  const nextBtn   = document.getElementById('appNextBtn');
+  const submitBtn = document.getElementById('appSubmitBtn');
+  if (prevBtn)   prevBtn.style.display   = appCurrentStep > 1 ? 'inline-flex' : 'none';
+  if (nextBtn)   nextBtn.style.display   = appCurrentStep < 5 ? 'inline-flex' : 'none';
+  if (submitBtn) submitBtn.style.display = appCurrentStep === 5 ? 'inline-flex' : 'none';
+};
+
+window.appNavigate = function(direction) {
+  const newStep = appCurrentStep + direction;
+  if (newStep < 1 || newStep > 5) return;
+
+  // Basic validation before moving forward
+  if (direction > 0) {
+    if (appCurrentStep === 1) {
+      const name    = document.getElementById('appClientName')?.value.trim();
+      const email   = document.getElementById('appClientEmail')?.value.trim();
+      const phone   = document.getElementById('appClientPhone')?.value.trim();
+      const company = document.getElementById('appClientCompany')?.value.trim();
+      if (!name || !email || !phone || !company) {
+        showToastError('Please fill all required fields before continuing');
+        return;
+      }
+    }
+    if (appCurrentStep === 2) {
+      const projName    = document.getElementById('appProjectName')?.value.trim();
+      const industry    = document.getElementById('appIndustry')?.value;
+      const location    = document.getElementById('appProjectLocation')?.value.trim();
+      const fundsNeeded = document.getElementById('appFundsNeeded')?.value;
+      const description = document.getElementById('appProjectDescription')?.value.trim();
+      if (!projName || !industry || !location || !fundsNeeded || !description) {
+        showToastError('Please fill all required fields before continuing');
+        return;
+      }
+    }
+    // On reaching step 5, build the summary
+    if (newStep === 5) {
+      buildApplicationSummary();
+    }
+  }
+
+  showAppStep(newStep);
+  updateAppNavigation();
+  // Scroll modal body to top
+  const modalBody = document.querySelector('#applicationModal .modal-body');
+  if (modalBody) modalBody.scrollTop = 0;
+};
+
+function buildApplicationSummary() {
+  const get = id => document.getElementById(id)?.value || '—';
+  const content = document.getElementById('appSummaryContent');
+  if (!content) return;
+
+  const appType = document.querySelector('input[name="appType"]:checked')?.value || 'client';
+
+  content.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div><span class="data-label">Applicant Type</span><div>${appType === 'broker' ? 'Broker (representing client)' : 'Client / Project Owner'}</div></div>
+      <div><span class="data-label">Full Name</span><div>${escapeHtml(get('appClientName'))}</div></div>
+      <div><span class="data-label">Email</span><div>${escapeHtml(get('appClientEmail'))}</div></div>
+      <div><span class="data-label">Phone</span><div>${escapeHtml(get('appClientPhone'))}</div></div>
+      <div><span class="data-label">Company</span><div>${escapeHtml(get('appClientCompany'))}</div></div>
+      <div><span class="data-label">Country of Incorporation</span><div>${escapeHtml(get('appCountryIncorp'))}</div></div>
+      <div><span class="data-label">Project Name</span><div><strong>${escapeHtml(get('appProjectName'))}</strong></div></div>
+      <div><span class="data-label">Industry</span><div>${escapeHtml(get('appIndustry'))}</div></div>
+      <div><span class="data-label">Location</span><div>${escapeHtml(get('appProjectLocation'))}</div></div>
+      <div><span class="data-label">Funds Needed</span><div><strong>${formatCurrency(get('appFundsNeeded'))}</strong></div></div>
+      <div><span class="data-label">Total Project Cost</span><div>${formatCurrency(get('appTotalCost'))}</div></div>
+      <div><span class="data-label">Expected Close</span><div>${formatDate(get('appExpectedClose'))}</div></div>
+    </div>`;
+
+  // Risk flags summary
+  const riskFlags = document.getElementById('appRiskFlags');
+  if (riskFlags) {
+    const flags = [];
+    if (document.querySelector('input[name="hasBankruptcy"]:checked')?.value === 'yes') flags.push('<span class="badge badge-danger">⚠ Bankruptcy / Insolvency Disclosed</span>');
+    if (document.querySelector('input[name="hasLitigation"]:checked')?.value === 'yes')  flags.push('<span class="badge badge-warning">⚖ Litigation Disclosed</span>');
+    if (document.querySelector('input[name="hasRegulatory"]:checked')?.value === 'yes')  flags.push('<span class="badge badge-danger">🏛 Regulatory Disclosed</span>');
+    if (document.querySelector('input[name="hasPEP"]:checked')?.value === 'yes')         flags.push('<span class="badge badge-warning">👤 PEP Disclosed</span>');
+    riskFlags.innerHTML = flags.length
+      ? `<div style="margin-bottom:16px;"><div class="data-label" style="color:var(--error);margin-bottom:8px;">Risk Disclosures</div><div style="display:flex;gap:8px;flex-wrap:wrap;">${flags.join('')}</div></div>`
+      : '';
+  }
+}
+
+window.toggleBrokerFields = function() {
+  const appType = document.querySelector('input[name="appType"]:checked')?.value;
+  const bf = document.getElementById('brokerApplicantFields');
+  if (bf) bf.style.display = appType === 'broker' ? 'block' : 'none';
+};
+
+window.toggleOtherLendersDetail = function() {
+  const val = document.getElementById('appOtherLenders')?.value;
+  const el  = document.getElementById('appOtherLendersDetail');
+  if (el) el.style.display = val === 'yes' ? 'block' : 'none';
+};
+
+window.toggleReferralOther = function() {
+  const val     = document.getElementById('appReferralSource')?.value;
+  const other   = document.getElementById('appReferralOther');
+  const refName = document.getElementById('appReferralName');
+  if (other)   other.style.display   = val === 'other' ? 'block' : 'none';
+  if (refName) refName.style.display = val === 'referral' || val === 'broker' ? 'block' : 'none';
+};
+
+window.toggleRiskDetail = function(type) {
+  const radioName = {
+    bankruptcy: 'hasBankruptcy',
+    litigation: 'hasLitigation',
+    regulatory: 'hasRegulatory',
+    pep:        'hasPEP'
+  }[type];
+  const detailId = type + 'Detail';
+  const val = document.querySelector(`input[name="${radioName}"]:checked`)?.value;
+  const el  = document.getElementById(detailId);
+  if (el) el.style.display = val === 'yes' ? 'block' : 'none';
+};
+
+window.addBankruptcyEntry = function() {
+  const container = document.getElementById('bankruptcyEntries');
+  if (!container) return;
+  const entryId = 'bk_' + Date.now();
+  const entry   = document.createElement('div');
+  entry.className = 'onb-director-entry';
+  entry.style.cssText = 'background:white;border-radius:6px;padding:12px;margin-bottom:8px;border:0.5px solid var(--gray-200);';
+  entry.innerHTML = `
+    <div class="form-grid-2">
+      <div class="form-group">
+        <label class="form-label">Year</label>
+        <input type="text" class="form-input" placeholder="e.g. 2018">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Jurisdiction</label>
+        <input type="text" class="form-input" placeholder="e.g. United Kingdom">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Type of Event</label>
+        <select class="form-select">
+          <option>Personal Bankruptcy</option>
+          <option>Company Insolvency</option>
+          <option>Voluntary Arrangement</option>
+          <option>Receivership</option>
+          <option>Loan Default</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Current Status</label>
+        <select class="form-select">
+          <option>Discharged</option>
+          <option>Settled</option>
+          <option>Ongoing</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Brief Description</label>
+      <textarea rows="2" class="form-textarea" placeholder="Describe the circumstances..."></textarea>
+    </div>
+    <button type="button" class="btn btn-ghost btn-xs" style="color:var(--error);" onclick="this.parentElement.remove()">
+      <i class="fas fa-times"></i> Remove
+    </button>`;
+  container.appendChild(entry);
+};
+
+window.handleAppFileSelect = function(input, boxId, labelId) {
+  const file  = input.files[0];
+  const box   = document.getElementById(boxId);
+  const label = document.getElementById(labelId);
+  if (!file) return;
+  if (file.size > 20 * 1024 * 1024) {
+    showToastError('File must be under 20MB');
+    input.value = '';
+    return;
+  }
+  if (label) {
+    label.innerHTML = `<i class="fas fa-check-circle" style="color:var(--success);"></i> ${escapeHtml(file.name)} (${(file.size/1024/1024).toFixed(1)}MB)`;
+  }
+  if (box) {
+    box.style.borderColor = 'var(--success)';
+    box.style.background  = 'rgba(43,140,78,0.05)';
+  }
+};
+
+window.submitApplication = async function() {
+  // Validate declarations
+  const checks = ['appDeclAccuracy','appDeclNoOmission','appDeclNDA','appDeclProcessing'];
+  for (const id of checks) {
+    if (!document.getElementById(id)?.checked) {
+      showToastError('Please confirm all declarations before submitting');
+      return;
+    }
+  }
+  const signature = document.getElementById('appSignatureName')?.value.trim();
+  if (!signature) {
+    showToastError('Please enter your full legal name as your electronic signature');
+    return;
+  }
+
+  const errEl  = document.getElementById('appSubmitError');
+  const btn    = document.getElementById('appSubmitBtn');
+  if (errEl) errEl.style.display = 'none';
+  if (btn)   { btn.disabled = true; btn.innerHTML = '<span class="btn-spinner"></span> Submitting...'; }
+
+  try {
+    const get    = id => document.getElementById(id)?.value?.trim() || '';
+    const appType = document.querySelector('input[name="appType"]:checked')?.value || 'client';
+
+    // Build application data object
+    const applicationData = {
+      applicationType: appType,
+      submittedAt: new Date().toISOString(),
+      status: 'pending',
+
+      // Broker info (if applicable)
+      broker: appType === 'broker' ? {
+        name:         get('appBrokerName'),
+        firm:         get('appBrokerFirm'),
+        email:        get('appBrokerEmail'),
+        phone:        get('appBrokerPhone'),
+        hasAuthority: document.getElementById('appBrokerAuthority')?.checked || false
+      } : null,
+
+      // Client info
+      client: {
+        name:         get('appClientName'),
+        email:        get('appClientEmail'),
+        phone:        get('appClientPhone'),
+        nationality:  get('appClientNationality'),
+        company:      get('appClientCompany'),
+        entityType:   get('appEntityType'),
+        countryIncorp:get('appCountryIncorp'),
+        regNumber:    get('appRegNumber'),
+        regAddress:   get('appRegAddress')
+      },
+
+      // Project info
+      project: {
+        name:         get('appProjectName'),
+        industry:     get('appIndustry'),
+        location:     get('appProjectLocation'),
+        stage:        get('appProjectStage'),
+        expectedClose:get('appExpectedClose'),
+        exitStrategy: get('appExitStrategy'),
+        totalCost:    parseFloat(get('appTotalCost'))    || 0,
+        fundsNeeded:  parseFloat(get('appFundsNeeded'))  || 0,
+        equity:       parseFloat(get('appEquity'))       || 0,
+        existingDebt: parseFloat(get('appExistingDebt')) || 0,
+        debtEquity:   get('appDebtEquity'),
+        projectedIRR: get('appProjectedIRR'),
+        otherLenders: get('appOtherLenders'),
+        otherLendersNotes: get('appOtherLendersNotes'),
+        description:  get('appProjectDescription'),
+        collateral:   get('appCollateral'),
+        dataRoom:     get('appDataRoom'),
+        risks:        get('appRisks')
+      },
+
+      // Risk disclosures
+      disclosures: {
+        hasBankruptcy: document.querySelector('input[name="hasBankruptcy"]:checked')?.value === 'yes',
+        hasLitigation: document.querySelector('input[name="hasLitigation"]:checked')?.value === 'yes',
+        hasRegulatory: document.querySelector('input[name="hasRegulatory"]:checked')?.value === 'yes',
+        hasPEP:        document.querySelector('input[name="hasPEP"]:checked')?.value === 'yes',
+        litigationNotes: get('appLitigationNotes'),
+        regulatoryNotes: get('appRegulatoryNotes'),
+        pepNotes:        get('appPEPNotes')
+      },
+
+      // Referral
+      referral: {
+        source:       get('appReferralSource'),
+        other:        get('appReferralOther'),
+        referrerName: get('appReferralName')
+      },
+
+      // Electronic signature
+      signature: {
+        name:      signature,
+        timestamp: new Date().toISOString()
+      }
+    };
+
+    // Upload any attached files to Firebase Storage
+    const uploadedFiles = {};
+    const fileInputs = [
+      { inputId: 'appDoc1', key: 'doc1' },
+      { inputId: 'appDoc2', key: 'doc2' },
+      { inputId: 'appDoc3', key: 'doc3' }
+    ];
+    for (const fi of fileInputs) {
+      const input = document.getElementById(fi.inputId);
+      const file  = input?.files[0];
+      if (!file) continue;
+      try {
+        const filename = `applications/${Date.now()}_${fi.key}_${file.name.replace(/[^a-zA-Z0-9.-]/g,'_')}`;
+        const ref      = storage.ref(filename);
+        await ref.put(file);
+        uploadedFiles[fi.key] = await ref.getDownloadURL();
+      } catch(uploadErr) {
+        console.warn('File upload failed:', uploadErr.message);
+        // Continue without failing the whole submission
+      }
+    }
+    if (Object.keys(uploadedFiles).length) {
+      applicationData.uploadedFiles = uploadedFiles;
+    }
+
+    // Save to Firestore
+    const docRef = await db.collection('applications').add(applicationData);
+
+    // Send notification to admin
+    await sendEmailNotification({
+      to_name:  'Croft Finance',
+      to_email: EMAILJS_CONFIG.adminEmail,
+      from_name:'Croft Finance Portal',
+      subject:  `New Application Received — ${applicationData.client.name}`,
+      message:  `A new financing application has been submitted.\n\nApplicant: ${applicationData.client.name}\nCompany: ${applicationData.client.company}\nEmail: ${applicationData.client.email}\nProject: ${applicationData.project.name}\nIndustry: ${applicationData.project.industry}\nFunds Needed: $${applicationData.project.fundsNeeded.toLocaleString()}\nApplication Type: ${appType}\n\nPlease review in the admin portal under Applications.`,
+      project_name: applicationData.project.name
+    });
+
+    // Send confirmation to applicant
+    await sendEmailNotification({
+      to_name:  applicationData.client.name,
+      to_email: applicationData.client.email,
+      from_name:'Suzana Aleksić — Croft Finance',
+      subject:  'Your application has been received — Croft Finance',
+      message:  `Dear ${applicationData.client.name},\n\nThank you for submitting your financing application for "${applicationData.project.name}".\n\nWe have received your application and Suzana will review it personally within 2 business days. You will be notified of the outcome by email.\n\nIf you have any questions in the meantime, please do not hesitate to contact us directly.\n\nBest regards,\nSuzana Aleksić\nPrincipal, Croft Finance\nsuzana.aleksic@croftfinance.com\n+381 69 288 0 191`,
+      project_name: applicationData.project.name
+    });
+
+    // Show success message
+    const modalBody = document.querySelector('#applicationModal .modal-body');
+    if (modalBody) {
+      modalBody.innerHTML = `
+        <div style="text-align:center;padding:40px 20px;">
+          <i class="fas fa-check-circle" style="font-size:64px;color:var(--success);display:block;margin-bottom:20px;"></i>
+          <h3 style="font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--navy);margin-bottom:12px;">Application Submitted</h3>
+          <p style="font-size:14px;color:var(--gray-500);line-height:1.8;max-width:400px;margin:0 auto 24px;">
+            Thank you, ${escapeHtml(applicationData.client.name)}. Your application for
+            <strong>${escapeHtml(applicationData.project.name)}</strong> has been received.
+            Suzana will review it personally and respond within 2 business days.
+          </p>
+          <p style="font-size:12px;color:var(--gray-400);margin-bottom:24px;">A confirmation has been sent to ${escapeHtml(applicationData.client.email)}</p>
+          <button class="btn btn-primary btn-md" onclick="closeApplicationModal()" style="justify-content:center;">Close</button>
+        </div>`;
+    }
+
+    // Hide footer buttons
+    const footer = document.querySelector('#applicationModal .modal-footer');
+    if (footer) footer.style.display = 'none';
+
+  } catch(e) {
+    console.error('Application submit error:', e);
+    if (errEl) {
+      errEl.textContent = 'Submission failed: ' + (e.message || 'Please try again or contact Suzana directly.');
+      errEl.style.display = 'block';
+    }
+    showToastError('Submission failed — please try again');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Application'; }
+  }
 };
 
 window.updateReferralStats = function() {
