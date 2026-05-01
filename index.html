@@ -5926,41 +5926,233 @@ window.rejectSubmission=async function(id){try{await db.collection('brokerSubmis
 // ============================================================
 // ANALYTICS
 // ============================================================
-function renderAnalytics(){
-  const active=projects.filter(p=>p.status==='active'||p.status==='crm_only');
-  const pipeline=active.filter(p=>(parseInt(p.step)||1)<9).length,funded=active.filter(p=>(parseInt(p.step)||1)===9).length;
-  const totalCap=active.reduce((s,p)=>s+parseAmount(p.amount),0),totalFunded=active.filter(p=>(parseInt(p.step)||1)===9).reduce((s,p)=>s+parseAmount(p.amount),0);
-  const commission=totalCap*ADMIN_COMMISSION_RATE,avgFacility=active.length?totalCap/active.length:0;
-  const brokerVol=projects.filter(p=>p.brokerId&&p.brokerId!=='').reduce((s,p)=>s+parseAmount(p.amount),0);
-  const brokerPct=totalCap>0?Math.round((brokerVol/totalCap)*100):0;
-  const activeBrokers=brokers.filter(b=>b.status==='active'&&b.engagementStatus==='active').length;
-  const pending=clients.filter(c=>c.status==='pending').length+meetings.filter(m=>m.status==='pending').length+brokerSubmissions.filter(s=>s.status==='pending').length;
-  const kpiContainer=document.getElementById('analyticsKPI');
-  if(kpiContainer){
-    const kpis=[{label:'Pipeline Projects',value:pipeline,isCurr:false,sub:'Active deals in progress',cls:'navy'},{label:'Funded Projects',value:funded,isCurr:false,sub:'Successfully closed',cls:'success'},{label:'Total Capital Committed',value:totalCap,isCurr:true,sub:'All active deals',cls:'blue'},{label:'Total Capital Funded',value:totalFunded,isCurr:true,sub:'Deployed (Step 9 only)',cls:'success'},{label:"Net Commission (2%)",value:commission,isCurr:true,sub:'On all active deals',cls:'warning'},{label:'Average Facility',value:avgFacility,isCurr:true,sub:'Per active project',cls:'navy'},{label:'Broker-Originated',value:brokerPct,isCurr:false,sub:'% of total pipeline volume',cls:'blue',suffix:'%'},{label:'Active Brokers',value:activeBrokers,isCurr:false,sub:'With signed engagement',cls:'success'},{label:'Pending Actions',value:pending,isCurr:false,sub:'Require your attention',cls:'warning'}];
-    kpiContainer.innerHTML=kpis.map((k,i)=>`<div class="kpi-card ${k.cls}"><span class="kpi-label">${k.label}</span><div class="kpi-value" id="kpi-${i}">—</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
-    kpis.forEach((k,i)=>{const el=document.getElementById(`kpi-${i}`);if(!el)return;if(k.suffix){el.innerHTML=formatNumber(k.value)+k.suffix;}else animateNumber(el,k.value,k.isCurr);});
+function renderAnalytics() {
+  // ============================================================
+  // KPI CARDS
+  // ============================================================
+  const active = projects.filter(p => p.status === 'active' || p.status === 'crm_only');
+  const pipeline = active.filter(p => (parseInt(p.step) || 1) < 9).length;
+  const funded = active.filter(p => (parseInt(p.step) || 1) === 9).length;
+  const totalCap = active.reduce((s, p) => s + parseAmount(p.amount), 0);
+  const totalFunded = active.filter(p => (parseInt(p.step) || 1) === 9).reduce((s, p) => s + parseAmount(p.amount), 0);
+  const commission = totalCap * ADMIN_COMMISSION_RATE;
+  const avgFacility = active.length ? totalCap / active.length : 0;
+  const brokerVol = projects.filter(p => p.brokerId && p.brokerId !== '').reduce((s, p) => s + parseAmount(p.amount), 0);
+  const brokerPct = totalCap > 0 ? Math.round((brokerVol / totalCap) * 100) : 0;
+  const activeBrokers = brokers.filter(b => b.status === 'active' && b.engagementStatus === 'active').length;
+  const pending = clients.filter(c => c.status === 'pending').length + meetings.filter(m => m.status === 'pending').length + brokerSubmissions.filter(s => s.status === 'pending').length;
+
+  const kpiContainer = document.getElementById('analyticsKPI');
+  if (kpiContainer) {
+    const kpis = [
+      { label: 'Pipeline Projects', value: pipeline, isCurr: false, sub: 'Active deals in progress', cls: 'navy' },
+      { label: 'Funded Projects', value: funded, isCurr: false, sub: 'Successfully closed', cls: 'success' },
+      { label: 'Total Capital Committed', value: totalCap, isCurr: true, sub: 'All active deals', cls: 'blue' },
+      { label: 'Total Capital Funded', value: totalFunded, isCurr: true, sub: 'Deployed (Step 9 only)', cls: 'success' },
+      { label: "Net Commission (2%)", value: commission, isCurr: true, sub: 'On all active deals', cls: 'warning' },
+      { label: 'Average Facility', value: avgFacility, isCurr: true, sub: 'Per active project', cls: 'navy' },
+      { label: 'Broker-Originated', value: brokerPct, isCurr: false, sub: '% of total pipeline volume', cls: 'blue', suffix: '%' },
+      { label: 'Active Brokers', value: activeBrokers, isCurr: false, sub: 'With signed engagement', cls: 'success' },
+      { label: 'Pending Actions', value: pending, isCurr: false, sub: 'Require your attention', cls: 'warning' }
+    ];
+    kpiContainer.innerHTML = kpis.map((k, i) => `<div class="kpi-card ${k.cls}"><span class="kpi-label">${k.label}</span><div class="kpi-value" id="kpi-${i}">—</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
+    kpis.forEach((k, i) => {
+      const el = document.getElementById(`kpi-${i}`);
+      if (!el) return;
+      if (k.suffix) {
+        el.innerHTML = formatNumber(k.value) + k.suffix;
+      } else {
+        animateNumber(el, k.value, k.isCurr);
+      }
+    });
   }
-  const stepCounts=Array(9).fill(0);projects.forEach(p=>{const s=(parseInt(p.step)||1)-1;if(s>=0&&s<9)stepCounts[s]++;});
-  let cum=0;const fv=document.getElementById('funnelVisualization');
-  if(fv)fv.innerHTML=STEP_NAMES.slice(1).map((name,i)=>{cum+=stepCounts[i];const w=projects.length>0?Math.max(15,Math.min(100,Math.round((cum/projects.length)*100))):15;const opacity=Math.max(0.2,1-i*0.09);return `<div style="display:flex;align-items:center;gap:16px;margin-bottom:10px;"><div style="width:140px;font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:var(--platinum);">${name}</div><div style="flex:1;height:28px;background:rgba(10,15,30,${opacity});border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:flex-end;padding-right:12px;color:white;font-size:12px;font-weight:500;min-width:20px;">${cum}</div><div style="width:36px;text-align:right;font-weight:700;color:var(--ink);font-size:12px;">${cum}</div></div>`;}).join('');
-  const industryCounts={};projects.forEach(p=>{const k=p.industry||'Other';industryCounts[k]=(industryCounts[k]||0)+1;});
-  updateOrCreateChart('industryChart','bar',{labels:Object.keys(industryCounts),datasets:[{label:'Projects',data:Object.values(industryCounts),backgroundColor:'#334155',borderRadius:4,barPercentage:0.7}]},{responsive:true,maintainAspectRatio:true,scales:{y:{grid:{display:false}},x:{grid:{display:false}}},plugins:{legend:{display:false}}});
-  updateOrCreateChart('pipelineStageChart','doughnut',{labels:STEP_NAMES.slice(1),datasets:[{data:stepCounts,backgroundColor:['#0f172a','#1e293b','#334155','#475569','#64748b','#94a3b8','#cbd5e1','#e2e8f0','#059669'],borderWidth:0}]},{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'right'}}});
-  const quarters={};projects.forEach(p=>{if(!p.createdAt)return;const d=new Date(p.createdAt);const q=`${d.getFullYear()}-Q${Math.floor(d.getMonth()/3)+1}`;if(!quarters[q])quarters[q]={entered:0,funded:0};quarters[q].entered++;if((parseInt(p.step)||1)===9)quarters[q].funded++;});
-  const last6=Object.keys(quarters).sort().slice(-6);
-  updateOrCreateChart('quarterlyTrendChart','bar',{labels:last6,datasets:[{label:'Deals Entered',data:last6.map(q=>quarters[q]?.entered||0),backgroundColor:'#334155',borderRadius:4},{label:'Deals Funded',data:last6.map(q=>quarters[q]?.funded||0),backgroundColor:'#059669',borderRadius:4}]},{responsive:true,maintainAspectRatio:true,scales:{y:{grid:{display:false}},x:{grid:{display:false}}}});
-  const commProjects=projects.filter(p=>(parseInt(p.step)||1)>=2&&p.status==='active').sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
-  let totFac=0,totBroker=0,totCroft=0;
-  const commRows=commProjects.map(p=>{const client=clients.find(c=>c.id===p.clientId),broker=brokers.find(b=>b.id===p.brokerId),amt=parseAmount(p.amount),bComm=amt*((broker?.commissionRate||0)/100),cComm=amt*ADMIN_COMMISSION_RATE;totFac+=amt;totBroker+=bComm;totCroft+=cComm;const step=parseInt(p.step)||1;return `<tr><td><strong>${escapeHtml(client?.name||'Unknown')}</strong></td><td><strong>${escapeHtml(p.name)}</strong></td><td>${escapeHtml(p.industry||'—')}</td><td>${escapeHtml(p.location||'—')}</td>
-  <td style="text-align:right;font-weight:600;">${amt?formatCurrencyFull(amt):'—'}</td>
-  <td style="text-align:right;">${bComm?formatCurrency(bComm):'—'}${broker?.commissionRate?`<br><span class="label-xs">@${broker.commissionRate}%</span>`:''}</td>
-  <td style="text-align:right;font-weight:600;color:var(--emerald);">${cComm?formatCurrency(cComm):'—'}</td>
-  <td><span class="badge ${step===9?'badge-success':step>=7?'badge-warning':'badge-info'}">${step===9?'✓ Funded':`Step ${step}/9`}</span></td>
-  <td>${formatDate(p.createdAt)}</td>
-</tr>`;
-  if(ctBody){ctBody.innerHTML=commProjects.length?commRows+`<tr style="background:var(--surface-1);border-top:1px solid var(--border-mid);"><td colspan="4"><strong>TOTAL</strong></td><td style="text-align:right;font-weight:700;">${formatCurrencyFull(totFac)}</td><td style="text-align:right;font-weight:700;color:var(--sapphire);">${formatCurrency(totBroker)}</td><td style="text-align:right;font-weight:700;color:var(--emerald);">${formatCurrency(totCroft)}</td><td colspan="2"></td></tr>`:`<tr><td colspan="8"><div class="empty-state"><i class="fas fa-chart-line"></i><p>No active projects at Step 2+.</p></div></td></tr>`;}
-  renderBrokerPerformance(); renderBrokerLeaderboard();
+
+  // ============================================================
+  // FUNNEL CHART
+  // ============================================================
+  const stepCounts = Array(9).fill(0);
+  projects.forEach(p => {
+    const s = (parseInt(p.step) || 1) - 1;
+    if (s >= 0 && s < 9) stepCounts[s]++;
+  });
+  let cum = 0;
+  const fv = document.getElementById('funnelVisualization');
+  if (fv) {
+    fv.innerHTML = STEP_NAMES.slice(1).map((name, i) => {
+      cum += stepCounts[i];
+      const opacity = Math.max(0.2, 1 - i * 0.09);
+      return `<div style="display:flex;align-items:center;gap:16px;margin-bottom:10px;">
+        <div style="width:140px;font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:var(--platinum);">${name}</div>
+        <div style="flex:1;height:28px;background:rgba(10,15,30,${opacity});border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:flex-end;padding-right:12px;color:white;font-size:12px;font-weight:500;min-width:20px;">${cum}</div>
+        <div style="width:36px;text-align:right;font-weight:700;color:var(--ink);font-size:12px;">${cum}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // ============================================================
+  // CHARTS
+  // ============================================================
+  const industryCounts = {};
+  projects.forEach(p => {
+    const k = p.industry || 'Other';
+    industryCounts[k] = (industryCounts[k] || 0) + 1;
+  });
+  updateOrCreateChart('industryChart', 'bar', {
+    labels: Object.keys(industryCounts),
+    datasets: [{
+      label: 'Projects',
+      data: Object.values(industryCounts),
+      backgroundColor: '#334155',
+      borderRadius: 4,
+      barPercentage: 0.7
+    }]
+  }, {
+    responsive: true,
+    maintainAspectRatio: true,
+    scales: { y: { grid: { display: false } }, x: { grid: { display: false } } },
+    plugins: { legend: { display: false } }
+  });
+
+  updateOrCreateChart('pipelineStageChart', 'doughnut', {
+    labels: STEP_NAMES.slice(1),
+    datasets: [{
+      data: stepCounts,
+      backgroundColor: ['#0f172a', '#1e293b', '#334155', '#475569', '#64748b', '#94a3b8', '#cbd5e1', '#e2e8f0', '#059669'],
+      borderWidth: 0
+    }]
+  }, {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: { legend: { position: 'right' } }
+  });
+
+  const quarters = {};
+  projects.forEach(p => {
+    if (!p.createdAt) return;
+    const d = new Date(p.createdAt);
+    const q = `${d.getFullYear()}-Q${Math.floor(d.getMonth() / 3) + 1}`;
+    if (!quarters[q]) quarters[q] = { entered: 0, funded: 0 };
+    quarters[q].entered++;
+    if ((parseInt(p.step) || 1) === 9) quarters[q].funded++;
+  });
+  const last6 = Object.keys(quarters).sort().slice(-6);
+  updateOrCreateChart('quarterlyTrendChart', 'bar', {
+    labels: last6,
+    datasets: [
+      { label: 'Deals Entered', data: last6.map(q => quarters[q]?.entered || 0), backgroundColor: '#334155', borderRadius: 4 },
+      { label: 'Deals Funded', data: last6.map(q => quarters[q]?.funded || 0), backgroundColor: '#059669', borderRadius: 4 }
+    ]
+  }, {
+    responsive: true,
+    maintainAspectRatio: true,
+    scales: { y: { grid: { display: false } }, x: { grid: { display: false } } }
+  });
+
+  // ============================================================
+  // COMMISSION BREAKDOWN TABLE - PERFECTLY ALIGNED
+  // ============================================================
+  const commProjects = projects.filter(p => (parseInt(p.step) || 1) >= 2 && p.status === 'active')
+    .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+  let totalFacility = 0;
+  let totalBrokerComm = 0;
+  let totalCroftComm = 0;
+
+  // ⭐ THIS IS THE CRITICAL PART - 8 COLUMNS IN PERFECT ORDER ⭐
+  const commissionRows = commProjects.map(p => {
+    const client = clients.find(c => c.id === p.clientId);
+    const broker = brokers.find(b => b.id === p.brokerId);
+    const amount = parseAmount(p.amount);
+    const step = parseInt(p.step) || 1;
+
+    // Calculate broker commission (only if broker exists and has rate > 0)
+    let brokerCommission = null;
+    let brokerRateDisplay = '';
+    if (broker && broker.commissionRate && broker.commissionRate > 0) {
+      brokerCommission = amount * (broker.commissionRate / 100);
+      brokerRateDisplay = `<br><span class="label-xs">@ ${broker.commissionRate}%</span>`;
+      totalBrokerComm += brokerCommission;
+    }
+
+    const croftCommission = amount * ADMIN_COMMISSION_RATE;
+    totalFacility += amount;
+    totalCroftComm += croftCommission;
+
+    // ⭐ 8 COLUMNS - ORDER MUST MATCH HTML HEADERS ⭐
+    return `<tr>
+      <!-- COLUMN 1: Client Name -->
+      <td style="padding: 12px 16px;"><strong>${escapeHtml(client?.name || 'Unknown')}</strong></td>
+      
+      <!-- COLUMN 2: Project Name -->
+      <td style="padding: 12px 16px;"><strong>${escapeHtml(p.name)}</strong></td>
+      
+      <!-- COLUMN 3: Industry -->
+      <td style="padding: 12px 16px;">${escapeHtml(p.industry || '—')}</td>
+      
+      <!-- COLUMN 4: Location -->
+      <td style="padding: 12px 16px;">${escapeHtml(p.location || '—')}</td>
+      
+      <!-- COLUMN 5: Facility Amount -->
+      <td style="padding: 12px 16px; text-align: right; font-weight: 600;">${amount ? formatCurrencyFull(amount) : '—'}</td>
+      
+      <!-- COLUMN 6: Broker Commission -->
+      <td style="padding: 12px 16px; text-align: right;">
+        ${brokerCommission !== null 
+          ? `<strong>${formatCurrency(brokerCommission)}</strong>${brokerRateDisplay}`
+          : '<span class="label-xs" style="color: var(--platinum);">—</span>'
+        }
+      </td>
+      
+      <!-- COLUMN 7: Croft Commission (2%) -->
+      <td style="padding: 12px 16px; text-align: right; font-weight: 600; color: var(--emerald);">
+        ${formatCurrency(croftCommission)}<br>
+        <span class="label-xs">@ 2%</span>
+      </td>
+      
+      <!-- COLUMN 8: Step -->
+      <td style="padding: 12px 16px; text-align: center;">
+        <span class="badge ${step === 9 ? 'badge-success' : step >= 7 ? 'badge-warning' : 'badge-info'}">
+          ${step === 9 ? '✓ Funded' : `Step ${step}/9`}
+        </span>
+      </td>
+    </tr>`;
+  }).join('');
+
+  // ⭐ TOTALS ROW - MUST HAVE SAME NUMBER OF COLUMNS ⭐
+  const totalsRow = `
+    <tr style="background: var(--surface-1); border-top: 1px solid var(--border-mid); font-weight: 600;">
+      <td colspan="4" style="padding: 12px 16px;"><strong>TOTAL</strong></td>
+      <td style="padding: 12px 16px; text-align: right; font-weight: 700;">${formatCurrencyFull(totalFacility)}</td>
+      <td style="padding: 12px 16px; text-align: right;">
+        ${totalBrokerComm > 0 ? formatCurrency(totalBrokerComm) : '<span class="label-xs">—</span>'}
+      </td>
+      <td style="padding: 12px 16px; text-align: right; font-weight: 700; color: var(--emerald);">
+        ${formatCurrency(totalCroftComm)}
+      </td>
+      <td style="padding: 12px 16px;"></td>
+    </tr>
+  `;
+
+  // ⭐ INSERT INTO TABLE ⭐
+  const tableBody = document.getElementById('commissionTableBody');
+  if (tableBody) {
+    if (commProjects.length) {
+      tableBody.innerHTML = commissionRows + totalsRow;
+    } else {
+      tableBody.innerHTML = `<tr><td colspan="8" style="padding: 40px; text-align: center;">
+        <div class="empty-state">
+          <i class="fas fa-chart-line"></i>
+          <p>No active projects at Step 2+.</p>
+        </div>
+      </td></tr>`;
+    }
+  }
+
+  // ============================================================
+  // BROKER PERFORMANCE & LEADERBOARD
+  // ============================================================
+  renderBrokerPerformance();
+  renderBrokerLeaderboard();
 }
 
 // ============================================================
