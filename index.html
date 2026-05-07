@@ -4203,7 +4203,7 @@ async function login() {
     const uid  = cred.user.uid;
 
     // Check if admin
-    const adminSnap = await db.collection('admin').doc(uid).get();
+    const adminSnap = await db.collection('admins').doc(uid).get();
     if (adminSnap.exists) {
       resetLoginAttempts(email);
       await handleAdminLogin(uid, cred.user.email);
@@ -4290,20 +4290,54 @@ async function doAdminLogin() {
   const pw    = document.getElementById('adminPassword').value;
   const errEl = document.getElementById('adminLoginError');
   const btn   = document.getElementById('adminLoginBtn');
+  
   errEl.style.display = 'none';
-  if (!email || !pw) { errEl.textContent='Enter credentials.'; errEl.style.display='block'; return; }
-  btn.disabled=true; btn.innerHTML='<span class="btn-spinner"></span> Signing in...';
+  if (!email || !pw) { 
+    errEl.textContent='Enter credentials.'; 
+    errEl.style.display='block'; 
+    return; 
+  }
+  
+  btn.disabled=true; 
+  btn.innerHTML='<span class="btn-spinner"></span> Signing in...';
+  
   try {
+    // 1. Sign in with Firebase Auth
     const cred = await auth.signInWithEmailAndPassword(email, pw);
-    const snap = await db.collection('admin').doc(cred.user.uid).get();
-    if (!snap.exists) throw new Error('No admin account found.');
-    await handleAdminLogin(cred.user.uid, email);
+    const uid = cred.user.uid;
+    
+    // 2. Check for admin document in 'admins' collection (PLURAL)
+    const adminDoc = await db.collection('admins').doc(uid).get();
+    
+    if (!adminDoc.exists) {
+      throw new Error('Admin account not found. Please contact support.');
+    }
+    
+    // 3. Handle successful admin login
+    currentUser = auth.currentUser;
+    currentUserRole = 'admin';
+    
+    closeModal('loginModal');
+    await loadAdminData();
+    showView('admin');
+    
+    const hour = new Date().getHours();
+    const greet = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+    const greetEl = document.getElementById('adminGreeting');
+    if (greetEl) greetEl.textContent = `${greet}, Suzana.`;
+    
+    startSessionMonitor();
+    addAuditLog('Admin signed in', 'login', 'admin');
+    showToastSuccess('Welcome back, Suzana.');
+    
   } catch(err) {
     let msg = err.message || 'Admin sign in failed.';
-    if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') msg = 'Invalid credentials.';
+    if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') 
+      msg = 'Invalid credentials.';
     errEl.textContent = msg;
     errEl.style.display = 'block';
-    btn.disabled=false; btn.textContent='Sign In as Admin';
+    btn.disabled=false; 
+    btn.textContent='Sign In as Admin';
   }
 }
 
@@ -4523,7 +4557,7 @@ auth.onAuthStateChanged(async user => {
   if (user && !currentUser) {
     // Auto-restore session
     try {
-      const adminDoc = await db.collection('admin').doc(user.uid).get();
+      const adminDoc = await db.collection('admins').doc(user.uid).get();
       if (adminDoc.exists) {
         await handleAdminLogin(user.uid, user.email);
         return;
