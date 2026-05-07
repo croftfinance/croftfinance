@@ -60,10 +60,43 @@
 <style>
 
 /* ============================================================
-   COMPREHENSIVE MOBILE FIXES v2.0
+   CROFT FINANCE - CLEAN MOBILE CSS
    ============================================================ */
 
-/* Ensure all touch targets are at least 44x44px */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --obsidian: #050810;
+  --ink: #0d1220;
+  --ink-soft: #1c2640;
+  --slate-mid: #4a5d7a;
+  --platinum: #8a9bb8;
+  --parchment: #f4f5f8;
+  --white: #ffffff;
+  --sapphire: #1a5fd4;
+  --emerald: #0d9061;
+  --crimson: #c42a2a;
+  --amber: #c4820a;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --nav-h: 68px;
+  --sidebar-w: 264px;
+}
+
+/* Mobile First - Base styles for ALL devices */
+body {
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--ink);
+  background: var(--parchment);
+}
+
+/* ALL buttons must be tappable */
 button, 
 .btn, 
 .nav-item, 
@@ -73,157 +106,188 @@ button,
 .hamburger,
 .quick-action-btn,
 .pipeline-card,
-.filter-chip,
-.inbox-thread-header,
-.doc-action-btn,
-.onboarding-cta {
-  min-height: 44px;
-  min-width: 44px;
+.filter-chip {
+  min-height: 48px;
+  min-width: 48px;
+  cursor: pointer;
 }
 
-/* Better touch feedback */
-button:active, 
-.btn:active, 
-.nav-item:active,
-.pipeline-card:active {
-  opacity: 0.7;
-  transform: scale(0.98);
+/* Prevent zoom on inputs */
+input, select, textarea {
+  font-size: 16px !important;
 }
 
-/* Prevent horizontal overflow */
-body {
-  overflow-x: hidden;
-  width: 100%;
+/* ============================================================
+   DESKTOP LAYOUT (default)
+   ============================================================ */
+.portal-layout {
+  display: flex;
+  min-height: 100vh;
+  padding-top: var(--nav-h);
 }
 
-* {
-  max-width: 100%;
-  box-sizing: border-box;
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--white);
+  border-right: 1px solid rgba(0,0,0,0.1);
+  position: fixed;
+  top: var(--nav-h);
+  bottom: 0;
+  overflow-y: auto;
+  z-index: 100;
 }
 
-/* Improve text readability on mobile */
+.main-content {
+  flex: 1;
+  margin-left: var(--sidebar-w);
+  padding: 24px;
+  min-height: calc(100vh - var(--nav-h));
+}
+
+/* ============================================================
+   MOBILE LAYOUT (max-width: 768px)
+   ============================================================ */
 @media (max-width: 768px) {
-  body {
-    font-size: 16px; /* Prevent zoom on input focus */
-    -webkit-text-size-adjust: 100%;
+  
+  /* Hamburger menu - hidden on desktop, visible on mobile */
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  margin-right: 8px;
+}
+
+@media (max-width: 768px) {
+  .hamburger {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
   }
   
-  input, 
-  select, 
-  textarea, 
-  button {
-    font-size: 16px !important; /* Prevents iOS zoom on focus */
+  .hamburger span {
+    width: 22px;
+    height: 2px;
+    background: var(--ink);
+    border-radius: 2px;
   }
+}
   
-  /* Fix KPI grid on small screens */
-  .kpi-grid {
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
-    gap: 10px !important;
-  }
-  
-  /* Fix pipeline board for mobile */
-  .pipeline-board-grid {
+  /* ALL grids become single column */
+  .kpi-grid,
+  .dashboard-grid,
+  [style*="grid-template-columns"] {
     grid-template-columns: 1fr !important;
-    gap: 16px !important;
+    display: grid !important;
   }
   
-  .pipeline-col {
+  /* ALL flex containers wrap */
+  .flex-row,
+  [style*="display: flex"] {
+    flex-direction: column !important;
+  }
+  
+  /* Fix cards */
+  .card {
     margin-bottom: 16px;
   }
   
-  /* Fix forms on mobile */
-  .form-grid-2 {
-    grid-template-columns: 1fr !important;
-    gap: 12px !important;
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
   
-  /* Fix tables - make scrollable */
+  /* Fix tables - scroll horizontally */
   .table-wrap {
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    display: block;
   }
   
-  .admin-table {
+  table {
     min-width: 600px;
   }
   
-  /* Fix modal on mobile */
+  /* Fix modals */
   .modal {
     width: 95% !important;
-    max-width: 95% !important;
-    margin: 10px auto;
-    border-radius: 16px !important;
+    margin: 10px auto !important;
+    max-height: 90vh !important;
   }
   
   .modal-body {
     max-height: 60vh !important;
-    padding: 16px !important;
+    overflow-y: auto;
   }
   
-  /* Fix doc builder layout */
-  .doc-builder-layout {
-    grid-template-columns: 1fr !important;
-    gap: 16px !important;
-  }
-  
-  .doc-preview-body {
-    padding: 20px !important;
-  }
-  
-  /* Fix meeting cards */
-  .quick-actions {
-    flex-wrap: wrap;
-  }
-  
-  .quick-action-btn {
-    min-width: calc(33% - 8px);
-    flex: none;
-  }
-  
-  /* Fix hero section */
-  .hero {
-    padding: 80px 20px 40px !important;
-    min-height: auto;
-  }
-  
-  .hero-h1 {
-    font-size: 36px !important;
-  }
-  
-  .hero-desc {
-    font-size: 14px !important;
-  }
-  
-  .hero-ctas {
+  .modal-footer {
     flex-direction: column;
-    gap: 12px;
   }
   
-  .btn-hero, .btn-hero-outline {
+  .modal-footer .btn {
     width: 100%;
-    justify-content: center;
-    padding: 14px 20px;
   }
   
   /* Fix dashboard hero */
   .dash-hero {
     grid-template-columns: 1fr !important;
     padding: 20px !important;
+    text-align: center;
   }
   
-  .dash-hero-right {
-    margin-top: 16px;
+  /* Fix progress circle */
+  .progress-circle {
+    margin: 0 auto;
   }
   
-  /* Fix sidebar - make it slide from left properly */
-  .sidebar {
-    width: 280px !important;
-    left: -280px !important;
+  /* Fix forms */
+  .form-grid-2 {
+    grid-template-columns: 1fr !important;
+    gap: 12px;
   }
   
-  .sidebar.open {
+  /* Fix buttons to full width when needed */
+  .btn-group {
+    flex-direction: column;
+  }
+  
+  .btn-group .btn {
+    width: 100%;
+    margin: 4px 0;
+  }
+  
+  /* Fix quick actions */
+  .quick-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .quick-action-btn {
+    width: 100%;
+  }
+  
+  /* Fix pipeline board */
+  .pipeline-board-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Fix command centre - hide on mobile */
+  .command-centre {
+    display: none !important;
+  }
+  
+  /* Fix notification center */
+  .notification-center {
+    position: fixed !important;
+    bottom: 0 !important;
+    top: auto !important;
     left: 0 !important;
-    box-shadow: 2px 0 20px rgba(0,0,0,0.2);
+    right: 0 !important;
+    width: 100% !important;
+    max-height: 70vh !important;
+    border-radius: 20px 20px 0 0 !important;
   }
   
   /* Fix toast notifications */
@@ -232,443 +296,82 @@ body {
     right: 16px !important;
     bottom: 16px !important;
     width: auto !important;
-    max-width: none !important;
   }
   
-  /* Fix notification center */
-  .notification-center {
-    position: fixed !important;
-    top: auto !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    width: 100% !important;
-    max-height: 70vh !important;
-    border-radius: 20px 20px 0 0 !important;
+  /* Fix portal nav */
+  .portal-nav-brand {
+    font-size: 14px !important;
+    letter-spacing: 0.08em !important;
+    padding: 0 12px !important;
   }
   
-  /* Fix progress circle */
-  .progress-circle {
-    width: 80px !important;
-    height: 80px !important;
+  .portal-nav-user {
+    display: none !important;
   }
   
-  /* Fix stats cards */
-  .kpi-card .kpi-value {
-    font-size: 24px !important;
+  /* Fix home page sections */
+  .hero {
+    padding: 80px 20px 40px !important;
   }
   
-  /* Fix step accordion */
-  .step-header {
+  .hero-h1 {
+    font-size: 32px !important;
+  }
+  
+  .hero-stats {
+    display: none !important;
+  }
+  
+  .hero-panel {
+    display: none !important;
+  }
+  
+  .trust-strip {
     flex-wrap: wrap;
+    gap: 12px !important;
+    padding: 12px 16px !important;
   }
   
-  /* Fix document library */
-  .doc-library {
-    grid-template-columns: 1fr !important;
-  }
-  
-  /* Fix CTA section */
   .section-cta {
     padding: 60px 20px !important;
   }
   
   .section-cta h2 {
-    font-size: 36px !important;
+    font-size: 32px !important;
   }
   
-  /* Fix trust strip */
-  .trust-strip {
-    gap: 16px !important;
-    padding: 12px 16px !important;
-    flex-wrap: wrap;
-  }
-  
-  .trust-item {
-    font-size: 10px;
-  }
-  
-  /* Fix about section */
-  #about {
-    padding: 48px 20px !important;
-  }
-  
-  #about [style*="display:grid"] {
-    grid-template-columns: 1fr !important;
-    gap: 32px !important;
-  }
-  
-  /* Fix terms section */
-  #terms-section {
-    padding: 48px 20px !important;
-  }
-  
-  #terms-section [style*="display:grid"] {
-    grid-template-columns: 1fr 1fr !important;
-    gap: 16px !important;
-  }
-  
-  /* Fix contact section */
-  #contact {
-    padding: 48px 20px !important;
-  }
-  
-  #contact [style*="display:grid"] {
-    grid-template-columns: 1fr !important;
-    gap: 40px !important;
-  }
-  
-  /* Fix contact form section */
-  #contact-form {
-    padding: 48px 20px !important;
-  }
-  
-  #contact-form > div {
-    padding: 32px 20px !important;
-  }
-  
-  /* Fix footer */
   footer {
-    padding: 20px !important;
     flex-direction: column;
     text-align: center;
-  }
-  
-  /* Fix command centre visibility */
-  .command-centre {
-    display: none !important;
-  }
-  
-  /* Adjust main content padding */
-  .main-content, 
-  .admin-main-content {
-    padding: 16px !important;
-  }
-  
-  .admin-tab-body {
-    padding: 16px !important;
-  }
-  
-  /* Fix pipeline search bar */
-  .pipeline-search-bar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .pipeline-search-input,
-  .pipeline-search-bar select {
-    max-width: none !important;
-    width: 100%;
-  }
-  
-  /* Fix modal footer buttons */
-  .modal-footer {
-    flex-direction: column;
-    gap: 8px;
-  }
-  
-  .modal-footer .btn {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  /* Fix inbox threads */
-  .inbox-thread-header {
-    flex-wrap: wrap;
-  }
-  
-  .admin-reply-box {
-    flex-wrap: wrap;
-  }
-  
-  /* Fix doc type pills */
-  .doc-type-pills {
-    flex-wrap: wrap;
-  }
-  
-  .doc-type-pill {
-    flex: 1;
-    min-width: 100px;
-  }
-  
-  /* Fix filter chips */
-  .inbox-filter {
-    flex-wrap: wrap;
-  }
-  
-  .filter-chip {
-    font-size: 11px;
-    padding: 6px 12px;
-  }
-  
-  /* Fix meeting request form */
-  #meetingRequestForm .form-grid-2 {
-    grid-template-columns: 1fr !important;
+    padding: 20px !important;
   }
 }
 
-/* Extra small devices (phones under 400px) */
+/* ============================================================
+   EXTRA SMALL (max-width: 480px)
+   ============================================================ */
 @media (max-width: 480px) {
   .page-title {
     font-size: 20px !important;
   }
   
-  .hero-h1 {
-    font-size: 28px !important;
-  }
-  
-  .kpi-grid {
+  .quick-actions {
     grid-template-columns: 1fr !important;
   }
   
-  .quick-action-btn {
-    min-width: calc(50% - 6px);
+  .kpi-card .kpi-value {
+    font-size: 24px !important;
   }
   
   .message-bubble {
-    max-width: 85% !important;
-  }
-  
-  .modal-header h3 {
-    font-size: 18px !important;
+    max-width: 90% !important;
   }
   
   .dash-welcome {
-    font-size: 22px !important;
-  }
-  
-  .dash-close-date {
-    font-size: 16px !important;
-  }
-  
-  .dash-days-num {
-    font-size: 32px !important;
-  }
-}
-
-/* Fix for iOS input zoom */
-@media (max-width: 768px) {
-  input[type="text"],
-  input[type="email"],
-  input[type="password"],
-  input[type="number"],
-  input[type="tel"],
-  input[type="url"],
-  select,
-  textarea {
-    font-size: 16px !important;
-  }
-}
-
-/* Better scroll behavior for modals on mobile */
-.modal-body {
-  -webkit-overflow-scrolling: touch;
-}
-
-/* Fix fullcalendar on mobile */
-@media (max-width: 768px) {
-  .fc .fc-toolbar {
-    flex-direction: column;
-    gap: 8px;
-  }
-  
-  .fc .fc-toolbar-title {
-    font-size: 1.2em;
-  }
-  
-  .fc .fc-button {
-    padding: 4px 8px;
-    font-size: 12px;
-  }
-}
-
-/* Hide sidebar overlay when not needed */
-.sidebar-overlay {
-  transition: opacity 0.3s ease;
-}
-
-.sidebar-overlay.show {
-  display: block;
-  opacity: 1;
-}
-
-@media (min-width: 769px) {
-  .sidebar-overlay {
-    display: none !important;
-  }
-}
-
-/* Ensure buttons have adequate spacing on mobile */
-.btn + .btn {
-  margin-left: 0;
-}
-
-@media (max-width: 768px) {
-  .btn-group {
-    flex-direction: column;
-    gap: 8px;
-  }
-  
-  .btn-group .btn {
-    width: 100%;
+    font-size: 20px !important;
   }
 }
   
-/* ============================================================
-   CROFT FINANCE — INSTITUTIONAL DESIGN SYSTEM v4.0
-   
-   Aesthetic: Refined Private Bank · Geneva / Zurich sensibility
-   Typography: Cormorant Garamond (display) · DM Sans (body)
-   Palette: Deep Obsidian · Slate · Platinum · Parchment
-   ============================================================ */
-
-:root {
-  /* ── Core Palette ── */
-  --obsidian:    #050810;
-  --ink:         #0d1220;
-  --ink-mid:     #141b2e;
-  --ink-soft:    #1c2640;
-  --slate-deep:  #253044;
-  --slate:       #354560;
-  --slate-mid:   #4a5d7a;
-  --slate-light: #6b7fa0;
-  --platinum:    #8a9bb8;
-  --silver:      #b4c0d4;
-  --mist:        #d4dbe8;
-  --frost:       #e8ecf4;
-  --parchment:   #f4f5f8;
-  --white:       #ffffff;
-
-  /* ── Semantic Colours ── */
-  --emerald:      #0d9061;
-  --emerald-light:#10a870;
-  --emerald-dim:  rgba(13,144,97,0.10);
-  --amber:        #c4820a;
-  --amber-dim:    rgba(196,130,10,0.10);
-  --crimson:      #c42a2a;
-  --crimson-dim:  rgba(196,42,42,0.09);
-  --sapphire:     #1a5fd4;
-  --sapphire-light:#2070e8;
-  --sapphire-dim: rgba(26,95,212,0.10);
-  --gold:         #b8962a;
-  --gold-dim:     rgba(184,150,42,0.10);
-
-  /* ── Surfaces ── */
-  --surface-0:   var(--white);
-  --surface-1:   var(--parchment);
-  --surface-2:   var(--frost);
-  --surface-dark: var(--ink);
-
-  /* ── Borders ── */
-  --border:       rgba(13,18,32,0.07);
-  --border-mid:   rgba(13,18,32,0.12);
-  --border-strong:rgba(13,18,32,0.20);
-  --border-white: rgba(255,255,255,0.08);
-  --border-white-mid: rgba(255,255,255,0.14);
-
-  /* ── Shadows ── */
-  --shadow-xs: 0 1px 2px rgba(5,8,16,0.04);
-  --shadow-sm: 0 1px 4px rgba(5,8,16,0.06), 0 2px 8px rgba(5,8,16,0.04);
-  --shadow-md: 0 4px 16px rgba(5,8,16,0.08), 0 1px 3px rgba(5,8,16,0.05);
-  --shadow-lg: 0 12px 32px rgba(5,8,16,0.12), 0 3px 8px rgba(5,8,16,0.06);
-  --shadow-xl: 0 24px 56px rgba(5,8,16,0.18), 0 8px 16px rgba(5,8,16,0.08);
-  --shadow-modal: 0 32px 72px rgba(5,8,16,0.32), 0 8px 20px rgba(5,8,16,0.14);
-  --shadow-inset: inset 0 1px 3px rgba(5,8,16,0.08);
-
-  /* ── Typography ── */
-  --font-display: 'Cormorant Garamond', Georgia, serif;
-  --font-body:    'DM Sans', system-ui, sans-serif;
-  --font-mono:    'DM Mono', 'Courier New', monospace;
-
-  /* ── Geometry ── */
-  --radius-xs:  2px;
-  --radius-sm:  4px;
-  --radius-md:  8px;
-  --radius-lg:  12px;
-  --radius-xl:  18px;
-  --radius-2xl: 28px;
-
-  /* ── Motion ── */
-  --ease:    cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in: cubic-bezier(0.4, 0, 1, 1);
-  --ease-out:cubic-bezier(0, 0, 0.2, 1);
-  --dur:     200ms;
-  --dur-lg:  360ms;
-
-  /* ── Layout ── */
-  --nav-h:      68px;
-  --cc-h:       48px;
-  --sidebar-w:  264px;
-}
-
-/* ── Dark Mode ─────────────────────────────────────────────── */
-body.dark-mode {
-  --ink:         #e8ecf4;
-  --ink-mid:     #d4dbe8;
-  --ink-soft:    #b4c0d4;
-  --slate-mid:   #8a9bb8;
-  --surface-0:   #0d1220;
-  --surface-1:   #141b2e;
-  --surface-2:   #1c2640;
-  --border:      rgba(232,236,244,0.06);
-  --border-mid:  rgba(232,236,244,0.10);
-  --border-strong:rgba(232,236,244,0.18);
-  --parchment:   #141b2e;
-  --frost:       #1c2640;
-  --white:       #0d1220;
-  --sapphire-dim: rgba(26,95,212,0.18);
-  --emerald-dim:  rgba(13,144,97,0.16);
-  --amber-dim:    rgba(196,130,10,0.16);
-  --crimson-dim:  rgba(196,42,42,0.14);
-}
-
-/* ── Reset ─────────────────────────────────────────────────── */
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior:smooth; font-size:15px; }
-body {
-  font-family: var(--font-body);
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--ink);
-  background: var(--parchment);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
-}
-
-/* ── View System ─────────────────────────────────────────────── */
-.view { display:none; min-height:100vh; }
-.view.active { display:block; }
-.portal-tab, .admin-tab { display:none; }
-.portal-tab.active, .admin-tab.active { display:block; }
-
-/* ============================================================
-   TYPOGRAPHY
-   ============================================================ */
-.display-serif {
-  font-family: var(--font-display);
-  font-weight: 400;
-  letter-spacing: -0.01em;
-}
-.label-caps {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--slate-light);
-  font-family: var(--font-body);
-}
-.label-caps-sm {
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--platinum);
-  font-family: var(--font-body);
-}
-/* Alias */
-.label-xs { font-size:10px; font-weight:500; letter-spacing:0.12em; text-transform:uppercase; color:var(--slate-light); font-family:var(--font-body); }
-
 /* ============================================================
    BADGES
    ============================================================ */
@@ -1992,7 +1695,7 @@ body.dark-mode .admin-table th { background:var(--surface-1); }
   .pipeline-board-grid { grid-template-columns:repeat(2,1fr); }
 }
 @media (max-width: 768px) {
-  :root { --nav-h:60px; --cc-h:0px; --sidebar-w:0px; }
+  :root { --nav-h:60px; --cc-h:0px; --sidebar-w:280px; }
   .home-nav { padding:0 20px; }
   .nav-links { display:none; }
   .hero { padding:100px 24px 60px; min-height:auto; }
