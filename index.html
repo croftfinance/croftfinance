@@ -5570,25 +5570,25 @@ async function loadAdminData() {
       db.collection('messageTemplates').get(),
       db.collection('generatedDocuments').get(),
       db.collection('applications').get()
-      
-    console.log('Raw projects snapshot size:', pSnap.size);  
+    ]); 
+
+    console.log('Raw projects snapshot size:', pSnap.size);
     
     clients = cSnap.docs.map(d => ({ id: d.id, ...d.data() }));
     projects = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
     
-    console.log('Mapped projects count:', projects.length); 
-    console.log('First project:', projects[0]); 
+    console.log('Mapped projects count:', projects.length);
+    console.log('First project:', projects[0]);
     
-    clients           = cSnap.docs.map(d=>({ id:d.id, ...d.data() }));
-    projects          = pSnap.docs.map(d=>({ id:d.id, ...d.data() }));
-    documents         = dSnap.docs.map(d=>({ id:d.id, ...d.data() }));
-    meetings          = mSnap.docs.map(d=>({ id:d.id, ...d.data() }));
-    brokers           = bSnap.docs.map(d=>({ id:d.id, ...d.data() }));
-    brokerSubmissions = bsSnap.docs.map(d=>({ id:d.id, ...d.data() }));
-    brokerUpdateRequests = burSnap.docs.map(d=>({ id:d.id, ...d.data() }));
-    messageTemplates  = tSnap.docs.map(d=>({ id:d.id, ...d.data() }));
-    generatedDocuments= gdSnap.docs.map(d=>({ id:d.id, ...d.data() }));
-    applications      = appSnap.docs.map(d=>({ id:d.id, ...d.data() }));
+    documents = dSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    meetings = mSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    brokers = bSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    brokerSubmissions = bsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    brokerUpdateRequests = burSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    messageTemplates = tSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    generatedDocuments = gdSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    applications = appSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    
     await runAutoArchive();
     updateDashboardWidgets();
     renderPipeline();
@@ -5596,7 +5596,10 @@ async function loadAdminData() {
     initCalendar();
     updateCommandCentre();
     loadSettings();
-  } catch(e) { showToastError('Failed to load data: '+e.message); }
+  } catch(e) { 
+    console.error('loadAdminData error:', e);
+    showToastError('Failed to load data: ' + e.message); 
+  }
 }
 
 // ── Dashboard widgets ─────────────────────────────────────────
@@ -8791,7 +8794,102 @@ document.querySelectorAll('.app-step-tab').forEach(tab=>{
 function getSelectedIds(type) {
   return [...document.querySelectorAll(`.bulk-checkbox[data-id]:checked`)].map(cb=>cb.dataset.id);
 }
-</script>
+
+async function clientUploadDocument() {
+  const docType = document.getElementById('clientUploadDocType')?.value;
+  const file = document.getElementById('clientUploadFile')?.files?.[0];
+  const statusEl = document.getElementById('clientUploadStatus');
+  
+  if (!docType) {
+    showToastError('Please select a document type.');
+    return;
+  }
+  if (!file) {
+    showToastError('Please select a file to upload.');
+    return;
+  }
+  
+  statusEl.style.display = 'block';
+  statusEl.innerHTML = '<span class="btn-spinner" style="display:inline-block;margin-right:8px;"></span> Uploading...';
+  
+  try {
+    const fileName = `${Date.now()}_${file.name}`;
+    const storageRef = storage.ref(`client_uploads/${currentClientId}/${fileName}`);
+    await storageRef.put(file);
+    const url = await storageRef.getDownloadURL();
+    
+    await db.collection('documents').add({
+      clientId: currentClientId,
+      type: docType,
+      url: url,
+      name: file.name,
+      uploadedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      approved: false
+    });
+    
+    statusEl.innerHTML = '<span style="color:var(--emerald);">✓ Upload successful!</span>';
+    setTimeout(() => { statusEl.style.display = 'none'; }, 3000);
+    renderDocuments();
+    showToastSuccess('Document uploaded for review.');
+  } catch(e) {
+    statusEl.innerHTML = `<span style="color:var(--crimson);">Error: ${e.message}</span>`;
+    showToastError(e.message);
+  }
+}
+
+async function exportClientDocPDF(docId) {
+  const snap = await db.collection('generatedDocuments').doc(docId).get();
+  if (!snap.exists) return;
+  const doc = snap.data();
+  exportDocPDF(doc.content, doc.docType);
+}
+
+async function inviteApplicantAsClient(appId) {
+  const app = applications.find(a => a.id === appId);
+  if (!app) return;
+  
+  const tempPw = Math.random().toString(36).slice(-10) + 'A1!';
+  
+  try {
+    const cred = await auth.createUserWithEmailAndPassword(app.clientEmail, tempPw);
+    await db.collection('clients').doc(cred.user.uid).set({
+      uid: cred.user.uid,
+      name: app.clientName,
+      email: app.clientEmail,
+      status: 'active',
+      termsVersion: TERMS_VERSION,
+      registeredAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    
+    await db.collection('projects').add({
+      clientId: cred.user.uid,
+      clientName: app.clientName,
+      clientEmail: app.clientEmail,
+      name: app.projectName,
+      industry: app.industry,
+      location: app.projectLocation,
+      fundsNeeded: app.fundsNeeded,
+      step: 1,
+      status: 'active',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    
+    emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
+      to_email: app.clientEmail,
+      to_name: app.clientName,
+      subject: 'Your Croft Finance Portal Access',
+      message: `Dear ${app.clientName},\n\nYour portal access has been created.\n\nLogin: ${app.clientEmail}\nTemporary Password: ${tempPw}\n\nPlease sign in and change your password immediately.\n\nWarm regards,\nSuzana Aleksić`
+    }).catch(() => {});
+    
+    await db.collection('applications').doc(appId).update({ status: 'invited' });
+    closeModal('applicationDetailModal');
+    loadApplications();
+    showToastSuccess(`Portal account created for ${app.clientName}.`);
+  } catch(e) {
+    showToastError('Failed to create account: ' + e.message);
+  }
+}
+  
 </script>
 
 <!-- ============================================================
@@ -8801,30 +8899,3 @@ function getSelectedIds(type) {
 
 </body>
 </html>
-
-<!--
-=================================================================
-CROFT FINANCE v4.0 — FULL ASSEMBLY INSTRUCTIONS
-=================================================================
-
-To create the complete single HTML file, concatenate in order:
-
-1. croft-v4-part1.html   → DOCTYPE, head, CSS, home view, legal modals
-2. croft-v4-part2.html   → Login modal, client portal, admin portal, broker portal, session warning
-3. croft-v4-part3.html   → All modals (upload, schedule, edit project, add client, etc.)
-4. croft-v4-part4.html   → Core JS (Firebase, auth, utilities, session, navigation, PWA, command centre)
-5. croft-v4-part5a.html  → Admin JS (pipeline, clients, analytics, inbox, meetings, steps)
-6. croft-v4-part5b.html  → Doc Builder JS, broker portal JS, application form JS
-7. croft-v4-part6.html   → This file (closing tags)
-
-Command (Linux/Mac):
-  cat croft-v4-part1.html croft-v4-part2.html croft-v4-part3.html croft-v4-part4.html croft-v4-part5a.html croft-v4-part5b.html croft-v4-part6.html > croft-finance-complete.html
-
-Also save these two companion files in the SAME folder as the HTML:
-
-─── manifest.json ───────────────────────────────────────────────
-─── sw.js ───────────────────────────────────────────────────────
-
-Contents below.
-=================================================================
--->
