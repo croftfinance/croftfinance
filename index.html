@@ -5570,7 +5570,15 @@ async function loadAdminData() {
       db.collection('messageTemplates').get(),
       db.collection('generatedDocuments').get(),
       db.collection('applications').get()
-    ]);
+      
+    console.log('Raw projects snapshot size:', pSnap.size);  
+    
+    clients = cSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    projects = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    
+    console.log('Mapped projects count:', projects.length); 
+    console.log('First project:', projects[0]); 
+    
     clients           = cSnap.docs.map(d=>({ id:d.id, ...d.data() }));
     projects          = pSnap.docs.map(d=>({ id:d.id, ...d.data() }));
     documents         = dSnap.docs.map(d=>({ id:d.id, ...d.data() }));
