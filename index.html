@@ -2,12 +2,20 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Croft Finance">
+<meta name="format-detection" content="telephone=no">
+<meta name="theme-color" content="#050810">
+<link rel="manifest" href="manifest.json">
 <title>Croft Finance — Private Structured Capital</title>
 
 <!-- PWA -->
 <meta name="theme-color" content="#050810">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Croft Finance">
 <link rel="manifest" href="manifest.json">
@@ -21,9 +29,18 @@
   gtag('config', 'G-0TV8J132M1');
 </script>
 
-<!-- Favicon -->
+<!-- Favicon and Mobile Icons -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23050810'/%3E%3Ctext x='50' y='68' font-size='44' text-anchor='middle' fill='%23e2e8f0' font-family='Georgia' font-weight='bold'%3ECF%3C/text%3E%3C/svg%3E">
 
+<!-- High Quality SVG Logo for Mobile (direct embed) -->
+<link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 500'%3E%3Cdefs%3E%3ClinearGradient id='bgGrad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23050810'/%3E%3Cstop offset='100%25' style='stop-color:%231a2d52'/%3E%3C/linearGradient%3E%3ClinearGradient id='textGrad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23e2e8f0'/%3E%3Cstop offset='100%25' style='stop-color:%238a9bb8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='500' height='500' rx='100' fill='url(%23bgGrad)'/%3E%3Cpolygon points='250,80 380,250 250,420 120,250' fill='none' stroke='rgba(26,95,212,0.3)' stroke-width='2'/%3E%3Cpolygon points='250,140 330,250 250,360 170,250' fill='none' stroke='rgba(26,95,212,0.15)' stroke-width='1'/%3E%3Ctext x='250' y='310' font-family='Georgia, Cormorant Garamond, serif' font-size='220' font-weight='bold' fill='url(%23textGrad)' text-anchor='middle' letter-spacing='20'%3ECF%3C/text%3E%3Cline x1='140' y1='370' x2='360' y2='370' stroke='rgba(26,95,212,0.5)' stroke-width='2'/%3E%3Ctext x='250' y='405' font-family='DM Sans, sans-serif' font-size='14' font-weight='600' fill='rgba(138,155,184,0.6)' text-anchor='middle' letter-spacing='8'%3ECROFT FINANCE%3C/text%3E%3C/svg%3E">
+
+<!-- Additional mobile icon sizes using the same SVG -->
+<link rel="icon" type="image/png" sizes="72x72" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 500'%3E%3Crect width='500' height='500' fill='%23050810'/%3E%3Ctext x='250' y='340' font-family='Georgia' font-size='280' font-weight='bold' fill='%23e2e8f0' text-anchor='middle'%3ECF%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="96x96" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 500'%3E%3Crect width='500' height='500' fill='%23050810'/%3E%3Ctext x='250' y='340' font-family='Georgia' font-size='280' font-weight='bold' fill='%23e2e8f0' text-anchor='middle'%3ECF%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="144x144" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 500'%3E%3Crect width='500' height='500' fill='%23050810'/%3E%3Ctext x='250' y='340' font-family='Georgia' font-size='280' font-weight='bold' fill='%23e2e8f0' text-anchor='middle'%3ECF%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="192x192" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 500'%3E%3Crect width='500' height='500' fill='%23050810'/%3E%3Ctext x='250' y='340' font-family='Georgia' font-size='280' font-weight='bold' fill='%23e2e8f0' text-anchor='middle'%3ECF%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="512x512" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 500'%3E%3Crect width='500' height='500' fill='%23050810'/%3E%3Ctext x='250' y='340' font-family='Georgia' font-size='280' font-weight='bold' fill='%23e2e8f0' text-anchor='middle'%3ECF%3C/text%3E%3C/svg%3E">
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -48,6 +65,462 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
 <style>
+
+/* ============================================================
+   COMPREHENSIVE MOBILE FIXES v2.0
+   ============================================================ */
+
+/* Ensure all touch targets are at least 44x44px */
+button, 
+.btn, 
+.nav-item, 
+.nav-link, 
+.nav-cta,
+.modal-close,
+.hamburger,
+.quick-action-btn,
+.pipeline-card,
+.filter-chip,
+.inbox-thread-header,
+.doc-action-btn,
+.onboarding-cta {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Better touch feedback */
+button:active, 
+.btn:active, 
+.nav-item:active,
+.pipeline-card:active {
+  opacity: 0.7;
+  transform: scale(0.98);
+}
+
+/* Prevent horizontal overflow */
+body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+* {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Improve text readability on mobile */
+@media (max-width: 768px) {
+  body {
+    font-size: 16px; /* Prevent zoom on input focus */
+    -webkit-text-size-adjust: 100%;
+  }
+  
+  input, 
+  select, 
+  textarea, 
+  button {
+    font-size: 16px !important; /* Prevents iOS zoom on focus */
+  }
+  
+  /* Fix KPI grid on small screens */
+  .kpi-grid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+    gap: 10px !important;
+  }
+  
+  /* Fix pipeline board for mobile */
+  .pipeline-board-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  
+  .pipeline-col {
+    margin-bottom: 16px;
+  }
+  
+  /* Fix forms on mobile */
+  .form-grid-2 {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  
+  /* Fix tables - make scrollable */
+  .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .admin-table {
+    min-width: 600px;
+  }
+  
+  /* Fix modal on mobile */
+  .modal {
+    width: 95% !important;
+    max-width: 95% !important;
+    margin: 10px auto;
+    border-radius: 16px !important;
+  }
+  
+  .modal-body {
+    max-height: 60vh !important;
+    padding: 16px !important;
+  }
+  
+  /* Fix doc builder layout */
+  .doc-builder-layout {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  
+  .doc-preview-body {
+    padding: 20px !important;
+  }
+  
+  /* Fix meeting cards */
+  .quick-actions {
+    flex-wrap: wrap;
+  }
+  
+  .quick-action-btn {
+    min-width: calc(33% - 8px);
+    flex: none;
+  }
+  
+  /* Fix hero section */
+  .hero {
+    padding: 80px 20px 40px !important;
+    min-height: auto;
+  }
+  
+  .hero-h1 {
+    font-size: 36px !important;
+  }
+  
+  .hero-desc {
+    font-size: 14px !important;
+  }
+  
+  .hero-ctas {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .btn-hero, .btn-hero-outline {
+    width: 100%;
+    justify-content: center;
+    padding: 14px 20px;
+  }
+  
+  /* Fix dashboard hero */
+  .dash-hero {
+    grid-template-columns: 1fr !important;
+    padding: 20px !important;
+  }
+  
+  .dash-hero-right {
+    margin-top: 16px;
+  }
+  
+  /* Fix sidebar - make it slide from left properly */
+  .sidebar {
+    width: 280px !important;
+    left: -280px !important;
+  }
+  
+  .sidebar.open {
+    left: 0 !important;
+    box-shadow: 2px 0 20px rgba(0,0,0,0.2);
+  }
+  
+  /* Fix toast notifications */
+  .toast {
+    left: 16px !important;
+    right: 16px !important;
+    bottom: 16px !important;
+    width: auto !important;
+    max-width: none !important;
+  }
+  
+  /* Fix notification center */
+  .notification-center {
+    position: fixed !important;
+    top: auto !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-height: 70vh !important;
+    border-radius: 20px 20px 0 0 !important;
+  }
+  
+  /* Fix progress circle */
+  .progress-circle {
+    width: 80px !important;
+    height: 80px !important;
+  }
+  
+  /* Fix stats cards */
+  .kpi-card .kpi-value {
+    font-size: 24px !important;
+  }
+  
+  /* Fix step accordion */
+  .step-header {
+    flex-wrap: wrap;
+  }
+  
+  /* Fix document library */
+  .doc-library {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Fix CTA section */
+  .section-cta {
+    padding: 60px 20px !important;
+  }
+  
+  .section-cta h2 {
+    font-size: 36px !important;
+  }
+  
+  /* Fix trust strip */
+  .trust-strip {
+    gap: 16px !important;
+    padding: 12px 16px !important;
+    flex-wrap: wrap;
+  }
+  
+  .trust-item {
+    font-size: 10px;
+  }
+  
+  /* Fix about section */
+  #about {
+    padding: 48px 20px !important;
+  }
+  
+  #about [style*="display:grid"] {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+  
+  /* Fix terms section */
+  #terms-section {
+    padding: 48px 20px !important;
+  }
+  
+  #terms-section [style*="display:grid"] {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 16px !important;
+  }
+  
+  /* Fix contact section */
+  #contact {
+    padding: 48px 20px !important;
+  }
+  
+  #contact [style*="display:grid"] {
+    grid-template-columns: 1fr !important;
+    gap: 40px !important;
+  }
+  
+  /* Fix contact form section */
+  #contact-form {
+    padding: 48px 20px !important;
+  }
+  
+  #contact-form > div {
+    padding: 32px 20px !important;
+  }
+  
+  /* Fix footer */
+  footer {
+    padding: 20px !important;
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  /* Fix command centre visibility */
+  .command-centre {
+    display: none !important;
+  }
+  
+  /* Adjust main content padding */
+  .main-content, 
+  .admin-main-content {
+    padding: 16px !important;
+  }
+  
+  .admin-tab-body {
+    padding: 16px !important;
+  }
+  
+  /* Fix pipeline search bar */
+  .pipeline-search-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .pipeline-search-input,
+  .pipeline-search-bar select {
+    max-width: none !important;
+    width: 100%;
+  }
+  
+  /* Fix modal footer buttons */
+  .modal-footer {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .modal-footer .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  /* Fix inbox threads */
+  .inbox-thread-header {
+    flex-wrap: wrap;
+  }
+  
+  .admin-reply-box {
+    flex-wrap: wrap;
+  }
+  
+  /* Fix doc type pills */
+  .doc-type-pills {
+    flex-wrap: wrap;
+  }
+  
+  .doc-type-pill {
+    flex: 1;
+    min-width: 100px;
+  }
+  
+  /* Fix filter chips */
+  .inbox-filter {
+    flex-wrap: wrap;
+  }
+  
+  .filter-chip {
+    font-size: 11px;
+    padding: 6px 12px;
+  }
+  
+  /* Fix meeting request form */
+  #meetingRequestForm .form-grid-2 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Extra small devices (phones under 400px) */
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 20px !important;
+  }
+  
+  .hero-h1 {
+    font-size: 28px !important;
+  }
+  
+  .kpi-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .quick-action-btn {
+    min-width: calc(50% - 6px);
+  }
+  
+  .message-bubble {
+    max-width: 85% !important;
+  }
+  
+  .modal-header h3 {
+    font-size: 18px !important;
+  }
+  
+  .dash-welcome {
+    font-size: 22px !important;
+  }
+  
+  .dash-close-date {
+    font-size: 16px !important;
+  }
+  
+  .dash-days-num {
+    font-size: 32px !important;
+  }
+}
+
+/* Fix for iOS input zoom */
+@media (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="url"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Better scroll behavior for modals on mobile */
+.modal-body {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Fix fullcalendar on mobile */
+@media (max-width: 768px) {
+  .fc .fc-toolbar {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .fc .fc-toolbar-title {
+    font-size: 1.2em;
+  }
+  
+  .fc .fc-button {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+}
+
+/* Hide sidebar overlay when not needed */
+.sidebar-overlay {
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.show {
+  display: block;
+  opacity: 1;
+}
+
+@media (min-width: 769px) {
+  .sidebar-overlay {
+    display: none !important;
+  }
+}
+
+/* Ensure buttons have adequate spacing on mobile */
+.btn + .btn {
+  margin-left: 0;
+}
+
+@media (max-width: 768px) {
+  .btn-group {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .btn-group .btn {
+    width: 100%;
+  }
+}
+  
 /* ============================================================
    CROFT FINANCE — INSTITUTIONAL DESIGN SYSTEM v4.0
    
@@ -1612,6 +2085,62 @@ body.dark-mode .admin-table th { background:var(--surface-1); }
 .hs-good      { color:var(--emerald); }
 .hs-fair      { color:var(--amber); }
 .hs-risk      { color:var(--crimson); }
+
+/* Essential mobile fixes */
+@media (max-width: 768px) {
+  /* Make all touch targets at least 44px */
+  button, 
+  .btn, 
+  .nav-item, 
+  .nav-link,
+  .nav-cta,
+  .hamburger,
+  .quick-action-btn,
+  .pipeline-card,
+  .filter-chip {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Prevent zoom on input focus */
+  input, select, textarea, button {
+    font-size: 16px !important;
+  }
+  
+  /* Fix KPI grids - single column on mobile */
+  .kpi-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Fix pipeline board - single column */
+  .pipeline-board-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Make tables scrollable horizontally */
+  .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Fix modals for mobile */
+  .modal {
+    width: 95% !important;
+    margin: 10px auto !important;
+  }
+  
+  .modal-body {
+    max-height: 60vh !important;
+  }
+  
+  /* Fix sidebar close button */
+  .mobile-close-btn {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+}
+  
 </style>
 </head>
 <body>
@@ -8889,6 +9418,86 @@ async function inviteApplicantAsClient(appId) {
     showToastError('Failed to create account: ' + e.message);
   }
 }
+
+// ============================================================
+// MOBILE TOUCH OPTIMIZATIONS
+// ============================================================
+
+// Prevent 300ms delay on touch events
+document.addEventListener('touchstart', function(e) {
+  // Allow passive touch events for better scrolling performance
+}, { passive: true });
+
+// Close sidebar when tapping overlay (already exists, but ensure it works)
+document.querySelectorAll('.sidebar-overlay').forEach(overlay => {
+  overlay.addEventListener('click', function(e) {
+    if (this.classList.contains('show')) {
+      toggleSidebar();
+    }
+  });
+});
+
+// Ensure modals close when tapping outside on mobile
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', function(e) {
+    if (e.target === this) {
+      this.classList.remove('active');
+    }
+  });
+});
+
+// Fix for iOS momentum scrolling on modals
+document.querySelectorAll('.modal-body, .messages-list, .notification-list').forEach(el => {
+  el.style.webkitOverflowScrolling = 'touch';
+});
+
+// Fix for iOS input field zoom
+const inputs = document.querySelectorAll('input, select, textarea');
+inputs.forEach(input => {
+  input.addEventListener('focus', function() {
+    if (window.innerWidth < 768) {
+      // Small delay to allow keyboard to appear
+      setTimeout(() => {
+        this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 300);
+    }
+  });
+});
+
+// Improve sidebar close button visibility on mobile
+const mobileCloseBtns = document.querySelectorAll('.mobile-close-btn');
+mobileCloseBtns.forEach(btn => {
+  btn.style.display = 'flex';
+  btn.style.alignItems = 'center';
+  btn.style.justifyContent = 'center';
+});
+
+// Fix iOS input zoom - this is CRITICAL!
+document.querySelectorAll('input, select, textarea').forEach(el => {
+  el.addEventListener('focus', function() {
+    if (window.innerWidth < 768) {
+      setTimeout(() => this.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+    }
+  });
+});
+
+// Ensure mobile close buttons work
+document.querySelectorAll('.mobile-close-btn').forEach(btn => {
+  btn.style.display = 'flex';
+  btn.addEventListener('click', function(e) {
+    document.getElementById('clientSidebar')?.classList.remove('open');
+    document.getElementById('adminSidebar')?.classList.remove('open');
+    document.getElementById('brokerSidebar')?.classList.remove('open');
+    document.querySelectorAll('.sidebar-overlay').forEach(o => o.classList.remove('show'));
+  });
+});
+
+// Fix modal close on outside tap for mobile
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('active');
+  });
+});
   
 </script>
 
@@ -8896,6 +9505,29 @@ async function inviteApplicantAsClient(appId) {
      END OF ALL JAVASCRIPT
      Close body and html
      ============================================================ -->
-
+<!-- Hidden SVG logo definitions for mobile -->
+<div style="display: none;">
+  <svg xmlns="http://www.w3.org/2000/svg" id="croft-logo-svg">
+    <defs>
+      <linearGradient id="croftBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#050810"/>
+        <stop offset="100%" stop-color="#1a2d52"/>
+      </linearGradient>
+      <linearGradient id="croftTextGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#e2e8f0"/>
+        <stop offset="100%" stop-color="#8a9bb8"/>
+      </linearGradient>
+      <symbol id="croft-logo" viewBox="0 0 500 500">
+        <rect width="500" height="500" rx="100" fill="url(#croftBgGrad)"/>
+        <polygon points="250,80 380,250 250,420 120,250" fill="none" stroke="rgba(26,95,212,0.3)" stroke-width="2"/>
+        <polygon points="250,140 330,250 250,360 170,250" fill="none" stroke="rgba(26,95,212,0.15)" stroke-width="1"/>
+        <text x="250" y="310" font-family="Georgia, 'Cormorant Garamond', serif" font-size="220" font-weight="bold" fill="url(#croftTextGrad)" text-anchor="middle" letter-spacing="20">C F</text>
+        <line x1="140" y1="370" x2="360" y2="370" stroke="rgba(26,95,212,0.5)" stroke-width="2"/>
+        <text x="250" y="405" font-family="'DM Sans', sans-serif" font-size="14" font-weight="600" fill="rgba(138,155,184,0.6)" text-anchor="middle" letter-spacing="8">CROFT FINANCE</text>
+      </symbol>
+    </defs>
+  </svg>
+</div>
+  
 </body>
 </html>
