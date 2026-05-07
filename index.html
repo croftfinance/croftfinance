@@ -2,16 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Croft Finance">
-<meta name="format-detection" content="telephone=no">
-<meta name="theme-color" content="#050810">
-<link rel="manifest" href="manifest.json">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Croft Finance — Private Structured Capital</title>
 
+<!-- PWA -->
+<meta name="theme-color" content="#050810">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Croft Finance">
+<link rel="manifest" href="manifest.json">
 
 <!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-0TV8J132M1"></script>
@@ -22,18 +21,9 @@
   gtag('config', 'G-0TV8J132M1');
 </script>
 
-<!-- Favicon and Mobile Icons -->
+<!-- Favicon -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23050810'/%3E%3Ctext x='50' y='68' font-size='44' text-anchor='middle' fill='%23e2e8f0' font-family='Georgia' font-weight='bold'%3ECF%3C/text%3E%3C/svg%3E">
 
-<!-- High Quality SVG Logo for Mobile (direct embed) -->
-<link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 500'%3E%3Cdefs%3E%3ClinearGradient id='bgGrad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23050810'/%3E%3Cstop offset='100%25' style='stop-color:%231a2d52'/%3E%3C/linearGradient%3E%3ClinearGradient id='textGrad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23e2e8f0'/%3E%3Cstop offset='100%25' style='stop-color:%238a9bb8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='500' height='500' rx='100' fill='url(%23bgGrad)'/%3E%3Cpolygon points='250,80 380,250 250,420 120,250' fill='none' stroke='rgba(26,95,212,0.3)' stroke-width='2'/%3E%3Cpolygon points='250,140 330,250 250,360 170,250' fill='none' stroke='rgba(26,95,212,0.15)' stroke-width='1'/%3E%3Ctext x='250' y='310' font-family='Georgia, Cormorant Garamond, serif' font-size='220' font-weight='bold' fill='url(%23textGrad)' text-anchor='middle' letter-spacing='20'%3ECF%3C/text%3E%3Cline x1='140' y1='370' x2='360' y2='370' stroke='rgba(26,95,212,0.5)' stroke-width='2'/%3E%3Ctext x='250' y='405' font-family='DM Sans, sans-serif' font-size='14' font-weight='600' fill='rgba(138,155,184,0.6)' text-anchor='middle' letter-spacing='8'%3ECROFT FINANCE%3C/text%3E%3C/svg%3E">
-
-<!-- Additional mobile icon sizes using the same SVG -->
-<link rel="icon" type="image/png" sizes="72x72" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 500'%3E%3Crect width='500' height='500' fill='%23050810'/%3E%3Ctext x='250' y='340' font-family='Georgia' font-size='280' font-weight='bold' fill='%23e2e8f0' text-anchor='middle'%3ECF%3C/text%3E%3C/svg%3E">
-<link rel="icon" type="image/png" sizes="96x96" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 500'%3E%3Crect width='500' height='500' fill='%23050810'/%3E%3Ctext x='250' y='340' font-family='Georgia' font-size='280' font-weight='bold' fill='%23e2e8f0' text-anchor='middle'%3ECF%3C/text%3E%3C/svg%3E">
-<link rel="icon" type="image/png" sizes="144x144" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 500'%3E%3Crect width='500' height='500' fill='%23050810'/%3E%3Ctext x='250' y='340' font-family='Georgia' font-size='280' font-weight='bold' fill='%23e2e8f0' text-anchor='middle'%3ECF%3C/text%3E%3C/svg%3E">
-<link rel="icon" type="image/png" sizes="192x192" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 500'%3E%3Crect width='500' height='500' fill='%23050810'/%3E%3Ctext x='250' y='340' font-family='Georgia' font-size='280' font-weight='bold' fill='%23e2e8f0' text-anchor='middle'%3ECF%3C/text%3E%3C/svg%3E">
-<link rel="icon" type="image/png" sizes="512x512" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 500'%3E%3Crect width='500' height='500' fill='%23050810'/%3E%3Ctext x='250' y='340' font-family='Georgia' font-size='280' font-weight='bold' fill='%23e2e8f0' text-anchor='middle'%3ECF%3C/text%3E%3C/svg%3E">
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -58,320 +48,161 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
 <style>
-
 /* ============================================================
-   CROFT FINANCE - CLEAN MOBILE CSS
+   CROFT FINANCE — INSTITUTIONAL DESIGN SYSTEM v4.0
+   
+   Aesthetic: Refined Private Bank · Geneva / Zurich sensibility
+   Typography: Cormorant Garamond (display) · DM Sans (body)
+   Palette: Deep Obsidian · Slate · Platinum · Parchment
    ============================================================ */
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
 
 :root {
-  --obsidian: #050810;
-  --ink: #0d1220;
-  --ink-soft: #1c2640;
-  --slate-mid: #4a5d7a;
-  --platinum: #8a9bb8;
-  --parchment: #f4f5f8;
-  --white: #ffffff;
-  --sapphire: #1a5fd4;
-  --emerald: #0d9061;
-  --crimson: #c42a2a;
-  --amber: #c4820a;
+  /* ── Core Palette ── */
+  --obsidian:    #050810;
+  --ink:         #0d1220;
+  --ink-mid:     #141b2e;
+  --ink-soft:    #1c2640;
+  --slate-deep:  #253044;
+  --slate:       #354560;
+  --slate-mid:   #4a5d7a;
+  --slate-light: #6b7fa0;
+  --platinum:    #8a9bb8;
+  --silver:      #b4c0d4;
+  --mist:        #d4dbe8;
+  --frost:       #e8ecf4;
+  --parchment:   #f4f5f8;
+  --white:       #ffffff;
+
+  /* ── Semantic Colours ── */
+  --emerald:      #0d9061;
+  --emerald-light:#10a870;
+  --emerald-dim:  rgba(13,144,97,0.10);
+  --amber:        #c4820a;
+  --amber-dim:    rgba(196,130,10,0.10);
+  --crimson:      #c42a2a;
+  --crimson-dim:  rgba(196,42,42,0.09);
+  --sapphire:     #1a5fd4;
+  --sapphire-light:#2070e8;
+  --sapphire-dim: rgba(26,95,212,0.10);
+  --gold:         #b8962a;
+  --gold-dim:     rgba(184,150,42,0.10);
+
+  /* ── Surfaces ── */
+  --surface-0:   var(--white);
+  --surface-1:   var(--parchment);
+  --surface-2:   var(--frost);
+  --surface-dark: var(--ink);
+
+  /* ── Borders ── */
+  --border:       rgba(13,18,32,0.07);
+  --border-mid:   rgba(13,18,32,0.12);
+  --border-strong:rgba(13,18,32,0.20);
+  --border-white: rgba(255,255,255,0.08);
+  --border-white-mid: rgba(255,255,255,0.14);
+
+  /* ── Shadows ── */
+  --shadow-xs: 0 1px 2px rgba(5,8,16,0.04);
+  --shadow-sm: 0 1px 4px rgba(5,8,16,0.06), 0 2px 8px rgba(5,8,16,0.04);
+  --shadow-md: 0 4px 16px rgba(5,8,16,0.08), 0 1px 3px rgba(5,8,16,0.05);
+  --shadow-lg: 0 12px 32px rgba(5,8,16,0.12), 0 3px 8px rgba(5,8,16,0.06);
+  --shadow-xl: 0 24px 56px rgba(5,8,16,0.18), 0 8px 16px rgba(5,8,16,0.08);
+  --shadow-modal: 0 32px 72px rgba(5,8,16,0.32), 0 8px 20px rgba(5,8,16,0.14);
+  --shadow-inset: inset 0 1px 3px rgba(5,8,16,0.08);
+
+  /* ── Typography ── */
   --font-display: 'Cormorant Garamond', Georgia, serif;
-  --font-body: 'DM Sans', system-ui, sans-serif;
-  --nav-h: 68px;
-  --sidebar-w: 264px;
+  --font-body:    'DM Sans', system-ui, sans-serif;
+  --font-mono:    'DM Mono', 'Courier New', monospace;
+
+  /* ── Geometry ── */
+  --radius-xs:  2px;
+  --radius-sm:  4px;
+  --radius-md:  8px;
+  --radius-lg:  12px;
+  --radius-xl:  18px;
+  --radius-2xl: 28px;
+
+  /* ── Motion ── */
+  --ease:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out:cubic-bezier(0, 0, 0.2, 1);
+  --dur:     200ms;
+  --dur-lg:  360ms;
+
+  /* ── Layout ── */
+  --nav-h:      68px;
+  --cc-h:       48px;
+  --sidebar-w:  264px;
 }
 
-/* Mobile First - Base styles for ALL devices */
+/* ── Dark Mode ─────────────────────────────────────────────── */
+body.dark-mode {
+  --ink:         #e8ecf4;
+  --ink-mid:     #d4dbe8;
+  --ink-soft:    #b4c0d4;
+  --slate-mid:   #8a9bb8;
+  --surface-0:   #0d1220;
+  --surface-1:   #141b2e;
+  --surface-2:   #1c2640;
+  --border:      rgba(232,236,244,0.06);
+  --border-mid:  rgba(232,236,244,0.10);
+  --border-strong:rgba(232,236,244,0.18);
+  --parchment:   #141b2e;
+  --frost:       #1c2640;
+  --white:       #0d1220;
+  --sapphire-dim: rgba(26,95,212,0.18);
+  --emerald-dim:  rgba(13,144,97,0.16);
+  --amber-dim:    rgba(196,130,10,0.16);
+  --crimson-dim:  rgba(196,42,42,0.14);
+}
+
+/* ── Reset ─────────────────────────────────────────────────── */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; font-size:15px; }
 body {
   font-family: var(--font-body);
-  font-size: 16px;
-  line-height: 1.5;
+  font-size: 14px;
+  line-height: 1.6;
   color: var(--ink);
   background: var(--parchment);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
-/* ALL buttons must be tappable */
-button, 
-.btn, 
-.nav-item, 
-.nav-link, 
-.nav-cta,
-.modal-close,
-.hamburger,
-.quick-action-btn,
-.pipeline-card,
-.filter-chip {
-  min-height: 48px;
-  min-width: 48px;
-  cursor: pointer;
-}
-
-/* Prevent zoom on inputs */
-input, select, textarea {
-  font-size: 16px !important;
-}
+/* ── View System ─────────────────────────────────────────────── */
+.view { display:none; min-height:100vh; }
+.view.active { display:block; }
+.portal-tab, .admin-tab { display:none; }
+.portal-tab.active, .admin-tab.active { display:block; }
 
 /* ============================================================
-   DESKTOP LAYOUT (default)
+   TYPOGRAPHY
    ============================================================ */
-.portal-layout {
-  display: flex;
-  min-height: 100vh;
-  padding-top: var(--nav-h);
+.display-serif {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.01em;
 }
+.label-caps {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--slate-light);
+  font-family: var(--font-body);
+}
+.label-caps-sm {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--platinum);
+  font-family: var(--font-body);
+}
+/* Alias */
+.label-xs { font-size:10px; font-weight:500; letter-spacing:0.12em; text-transform:uppercase; color:var(--slate-light); font-family:var(--font-body); }
 
-.sidebar {
-  width: var(--sidebar-w);
-  background: var(--white);
-  border-right: 1px solid rgba(0,0,0,0.1);
-  position: fixed;
-  top: var(--nav-h);
-  bottom: 0;
-  overflow-y: auto;
-  z-index: 100;
-}
-
-.main-content {
-  flex: 1;
-  margin-left: var(--sidebar-w);
-  padding: 24px;
-  min-height: calc(100vh - var(--nav-h));
-}
-
-/* ============================================================
-   MOBILE LAYOUT (max-width: 768px)
-   ============================================================ */
-@media (max-width: 768px) {
-  
-  /* Hamburger menu - hidden on desktop, visible on mobile */
-.hamburger {
-  display: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 8px;
-  margin-right: 8px;
-}
-
-@media (max-width: 768px) {
-  .hamburger {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-  
-  .hamburger span {
-    width: 22px;
-    height: 2px;
-    background: var(--ink);
-    border-radius: 2px;
-  }
-}
-  
-  /* ALL grids become single column */
-  .kpi-grid,
-  .dashboard-grid,
-  [style*="grid-template-columns"] {
-    grid-template-columns: 1fr !important;
-    display: grid !important;
-  }
-  
-  /* ALL flex containers wrap */
-  .flex-row,
-  [style*="display: flex"] {
-    flex-direction: column !important;
-  }
-  
-  /* Fix cards */
-  .card {
-    margin-bottom: 16px;
-  }
-  
-  .card-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-  
-  /* Fix tables - scroll horizontally */
-  .table-wrap {
-    overflow-x: auto;
-    display: block;
-  }
-  
-  table {
-    min-width: 600px;
-  }
-  
-  /* Fix modals */
-  .modal {
-    width: 95% !important;
-    margin: 10px auto !important;
-    max-height: 90vh !important;
-  }
-  
-  .modal-body {
-    max-height: 60vh !important;
-    overflow-y: auto;
-  }
-  
-  .modal-footer {
-    flex-direction: column;
-  }
-  
-  .modal-footer .btn {
-    width: 100%;
-  }
-  
-  /* Fix dashboard hero */
-  .dash-hero {
-    grid-template-columns: 1fr !important;
-    padding: 20px !important;
-    text-align: center;
-  }
-  
-  /* Fix progress circle */
-  .progress-circle {
-    margin: 0 auto;
-  }
-  
-  /* Fix forms */
-  .form-grid-2 {
-    grid-template-columns: 1fr !important;
-    gap: 12px;
-  }
-  
-  /* Fix buttons to full width when needed */
-  .btn-group {
-    flex-direction: column;
-  }
-  
-  .btn-group .btn {
-    width: 100%;
-    margin: 4px 0;
-  }
-  
-  /* Fix quick actions */
-  .quick-actions {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
-  
-  .quick-action-btn {
-    width: 100%;
-  }
-  
-  /* Fix pipeline board */
-  .pipeline-board-grid {
-    grid-template-columns: 1fr !important;
-  }
-  
-  /* Fix command centre - hide on mobile */
-  .command-centre {
-    display: none !important;
-  }
-  
-  /* Fix notification center */
-  .notification-center {
-    position: fixed !important;
-    bottom: 0 !important;
-    top: auto !important;
-    left: 0 !important;
-    right: 0 !important;
-    width: 100% !important;
-    max-height: 70vh !important;
-    border-radius: 20px 20px 0 0 !important;
-  }
-  
-  /* Fix toast notifications */
-  .toast {
-    left: 16px !important;
-    right: 16px !important;
-    bottom: 16px !important;
-    width: auto !important;
-  }
-  
-  /* Fix portal nav */
-  .portal-nav-brand {
-    font-size: 14px !important;
-    letter-spacing: 0.08em !important;
-    padding: 0 12px !important;
-  }
-  
-  .portal-nav-user {
-    display: none !important;
-  }
-  
-  /* Fix home page sections */
-  .hero {
-    padding: 80px 20px 40px !important;
-  }
-  
-  .hero-h1 {
-    font-size: 32px !important;
-  }
-  
-  .hero-stats {
-    display: none !important;
-  }
-  
-  .hero-panel {
-    display: none !important;
-  }
-  
-  .trust-strip {
-    flex-wrap: wrap;
-    gap: 12px !important;
-    padding: 12px 16px !important;
-  }
-  
-  .section-cta {
-    padding: 60px 20px !important;
-  }
-  
-  .section-cta h2 {
-    font-size: 32px !important;
-  }
-  
-  footer {
-    flex-direction: column;
-    text-align: center;
-    padding: 20px !important;
-  }
-}
-
-/* ============================================================
-   EXTRA SMALL (max-width: 480px)
-   ============================================================ */
-@media (max-width: 480px) {
-  .page-title {
-    font-size: 20px !important;
-  }
-  
-  .quick-actions {
-    grid-template-columns: 1fr !important;
-  }
-  
-  .kpi-card .kpi-value {
-    font-size: 24px !important;
-  }
-  
-  .message-bubble {
-    max-width: 90% !important;
-  }
-  
-  .dash-welcome {
-    font-size: 20px !important;
-  }
-}
-  
 /* ============================================================
    BADGES
    ============================================================ */
@@ -1074,8 +905,6 @@ body.dark-mode .admin-table th { background:var(--surface-1); }
   height: 100%;
   border-right: 1px solid var(--border);
   flex-shrink: 0;
-  white-space: nowrap;
-  overflow: visible;
 }
 .portal-nav-brand em { font-style:normal; color:var(--sapphire); margin-left:1px; }
 .portal-nav-brand .brand-sub {
@@ -1695,7 +1524,7 @@ body.dark-mode .admin-table th { background:var(--surface-1); }
   .pipeline-board-grid { grid-template-columns:repeat(2,1fr); }
 }
 @media (max-width: 768px) {
-  :root { --nav-h:60px; --cc-h:0px; --sidebar-w:280px; }
+  :root { --nav-h:60px; --cc-h:0px; --sidebar-w:0px; }
   .home-nav { padding:0 20px; }
   .nav-links { display:none; }
   .hero { padding:100px 24px 60px; min-height:auto; }
@@ -1783,62 +1612,6 @@ body.dark-mode .admin-table th { background:var(--surface-1); }
 .hs-good      { color:var(--emerald); }
 .hs-fair      { color:var(--amber); }
 .hs-risk      { color:var(--crimson); }
-
-/* Essential mobile fixes */
-@media (max-width: 768px) {
-  /* Make all touch targets at least 44px */
-  button, 
-  .btn, 
-  .nav-item, 
-  .nav-link,
-  .nav-cta,
-  .hamburger,
-  .quick-action-btn,
-  .pipeline-card,
-  .filter-chip {
-    min-height: 44px;
-    min-width: 44px;
-  }
-  
-  /* Prevent zoom on input focus */
-  input, select, textarea, button {
-    font-size: 16px !important;
-  }
-  
-  /* Fix KPI grids - single column on mobile */
-  .kpi-grid {
-    grid-template-columns: 1fr !important;
-  }
-  
-  /* Fix pipeline board - single column */
-  .pipeline-board-grid {
-    grid-template-columns: 1fr !important;
-  }
-  
-  /* Make tables scrollable horizontally */
-  .table-wrap {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  
-  /* Fix modals for mobile */
-  .modal {
-    width: 95% !important;
-    margin: 10px auto !important;
-  }
-  
-  .modal-body {
-    max-height: 60vh !important;
-  }
-  
-  /* Fix sidebar close button */
-  .mobile-close-btn {
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-  }
-}
-  
 </style>
 </head>
 <body>
@@ -4517,54 +4290,20 @@ async function doAdminLogin() {
   const pw    = document.getElementById('adminPassword').value;
   const errEl = document.getElementById('adminLoginError');
   const btn   = document.getElementById('adminLoginBtn');
-  
   errEl.style.display = 'none';
-  if (!email || !pw) { 
-    errEl.textContent='Enter credentials.'; 
-    errEl.style.display='block'; 
-    return; 
-  }
-  
-  btn.disabled=true; 
-  btn.innerHTML='<span class="btn-spinner"></span> Signing in...';
-  
+  if (!email || !pw) { errEl.textContent='Enter credentials.'; errEl.style.display='block'; return; }
+  btn.disabled=true; btn.innerHTML='<span class="btn-spinner"></span> Signing in...';
   try {
-    // 1. Sign in with Firebase Auth
     const cred = await auth.signInWithEmailAndPassword(email, pw);
-    const uid = cred.user.uid;
-    
-    // 2. Check for admin document in 'admins' collection (PLURAL)
-    const adminDoc = await db.collection('admins').doc(uid).get();
-    
-    if (!adminDoc.exists) {
-      throw new Error('Admin account not found. Please contact support.');
-    }
-    
-    // 3. Handle successful admin login
-    currentUser = auth.currentUser;
-    currentUserRole = 'admin';
-    
-    closeModal('loginModal');
-    await loadAdminData();
-    showView('admin');
-    
-    const hour = new Date().getHours();
-    const greet = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
-    const greetEl = document.getElementById('adminGreeting');
-    if (greetEl) greetEl.textContent = `${greet}, Suzana.`;
-    
-    startSessionMonitor();
-    addAuditLog('Admin signed in', 'login', 'admin');
-    showToastSuccess('Welcome back, Suzana.');
-    
+    const snap = await db.collection('admins').doc(cred.user.uid).get();
+    if (!snap.exists) throw new Error('No admin account found.');
+    await handleAdminLogin(cred.user.uid, email);
   } catch(err) {
     let msg = err.message || 'Admin sign in failed.';
-    if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') 
-      msg = 'Invalid credentials.';
+    if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') msg = 'Invalid credentials.';
     errEl.textContent = msg;
     errEl.style.display = 'block';
-    btn.disabled=false; 
-    btn.textContent='Sign In as Admin';
+    btn.disabled=false; btn.textContent='Sign In as Admin';
   }
 }
 
@@ -4951,7 +4690,7 @@ function switchBrokerTab(tabName) {
   document.querySelectorAll('.portal-tab').forEach(t => t.classList.remove('active'));
   document.getElementById(`broker-tab-${tabName}`)?.classList.add('active');
   if (tabName==='messages')   loadBrokerMessages();
-  if (tabName==='portfolio')  renderBrokerPortfolio();
+  if (tabName==='portfolio')  renderBrokerPortfolio(currentClientId);
   if (tabName==='documents')  loadBrokerDocuments();
   if (tabName==='statements') loadBrokerStatements();
   window.scrollTo(0,0);
@@ -5064,141 +4803,39 @@ function renderCCSparkline(containerId, dealList) {
 // ============================================================
 // PWA
 // ============================================================
-let pwaPrompt = null;
-let swRegistration = null;
-
-// Register service worker
+let _pwaPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  _pwaPrompt = e;
+  if (!sessionStorage.getItem('pwaDismissed')) {
+    setTimeout(() => {
+      const b = document.getElementById('pwaInstallBanner');
+      if (b) b.style.transform = 'translateX(-50%) translateY(0)';
+    }, 6000);
+  }
+});
+window.addEventListener('appinstalled', () => {
+  const b = document.getElementById('pwaInstallBanner');
+  if (b) b.style.transform = 'translateX(-50%) translateY(120px)';
+  _pwaPrompt = null;
+});
+document.getElementById('pwaInstallBtn')?.addEventListener('click', async () => {
+  if (!_pwaPrompt) return;
+  _pwaPrompt.prompt();
+  const { outcome } = await _pwaPrompt.userChoice;
+  if (outcome==='accepted') dismissPWA();
+  _pwaPrompt = null;
+});
+function dismissPWA() {
+  const b = document.getElementById('pwaInstallBanner');
+  if (b) b.style.transform = 'translateX(-50%) translateY(120px)';
+  sessionStorage.setItem('pwaDismissed','1');
+}
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then(registration => {
-        console.log('[PWA] Service Worker registered successfully:', registration);
-        swRegistration = registration;
-        
-        // Check for updates every hour
-        setInterval(() => {
-          registration.update();
-        }, 60 * 60 * 1000);
-        
-        // Handle controller change (new SW takes over)
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-          console.log('[PWA] Controller changed, reloading for updates');
-          window.location.reload();
-        });
-      })
-      .catch(error => {
-        console.error('[PWA] Service Worker registration failed:', error);
-      });
+    navigator.serviceWorker.register('/sw.js').catch(()=>{});
   });
 }
-
-// Before install prompt
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  pwaPrompt = e;
-  console.log('[PWA] beforeinstallprompt fired');
-  
-  // Check if user dismissed previously (session only)
-  if (!sessionStorage.getItem('pwaDismissed')) {
-    // Show banner after 3 seconds
-    setTimeout(() => {
-      const banner = document.getElementById('pwaInstallBanner');
-      if (banner && pwaPrompt) {
-        banner.style.transform = 'translateX(-50%) translateY(0)';
-      }
-    }, 3000);
-  }
-});
-
-// App installed event
-window.addEventListener('appinstalled', (evt) => {
-  console.log('[PWA] App installed successfully');
-  const banner = document.getElementById('pwaInstallBanner');
-  if (banner) banner.style.transform = 'translateX(-50%) translateY(120px)';
-  pwaPrompt = null;
-  sessionStorage.removeItem('pwaDismissed');
-  
-  // Track install for analytics
-  if (typeof gtag !== 'undefined') {
-    gtag('event', 'pwa_installed', { event_category: 'pwa' });
-  }
-});
-
-// Install button handler
-document.getElementById('pwaInstallBtn')?.addEventListener('click', async () => {
-  if (!pwaPrompt) {
-    showToast('Installation not available right now. Try again later.');
-    return;
-  }
-  
-  try {
-    const { outcome } = await pwaPrompt.prompt();
-    console.log(`[PWA] User response: ${outcome}`);
-    
-    if (outcome === 'accepted') {
-      dismissPWA();
-    }
-    pwaPrompt = null;
-  } catch (err) {
-    console.error('[PWA] Install prompt error:', err);
-    showToast('Could not start installation.');
-  }
-});
-
-function dismissPWA() {
-  const banner = document.getElementById('pwaInstallBanner');
-  if (banner) banner.style.transform = 'translateX(-50%) translateY(120px)';
-  sessionStorage.setItem('pwaDismissed', '1');
-}
-
-// Check if already installed (standalone mode)
-if (window.matchMedia('(display-mode: standalone)').matches || 
-    window.navigator.standalone === true) {
-  console.log('[PWA] Running in standalone mode');
-  document.body.classList.add('pwa-mode');
-}
-
-// Monitor online/offline status
-window.addEventListener('online', () => {
-  showToast('Connection restored', 'success', 2000);
-  // Sync pending messages if any
-  if (swRegistration && swRegistration.sync) {
-    swRegistration.sync.register('send-message');
-  }
-});
-
-window.addEventListener('offline', () => {
-  showToast('You are offline. Some features may be limited.', 'warning', 3000);
-});
-
-// Function to check for SW updates
-async function checkForUpdates() {
-  if (!swRegistration) return;
-  try {
-    await swRegistration.update();
-    const registration = await navigator.serviceWorker.getRegistration();
-    if (registration && registration.waiting) {
-      showToast('New version available! Click to update.', 'info', 10000);
-      // Show update banner
-      const updateBanner = document.createElement('div');
-      updateBanner.id = 'updateBanner';
-      updateBanner.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--ink);color:white;padding:12px 20px;border-radius:var(--radius-lg);display:flex;gap:12px;align-items:center;z-index:9000;box-shadow:var(--shadow-xl);';
-      updateBanner.innerHTML = `<span><i class="fas fa-arrow-up"></i> New version available</span><button class="btn btn-primary btn-sm" onclick="applyUpdate()">Update Now</button><button onclick="this.parentElement.remove()">✕</button>`;
-      document.body.appendChild(updateBanner);
-    }
-  } catch(e) { console.error(e); }
-}
-
-window.applyUpdate = function() {
-  if (swRegistration && swRegistration.waiting) {
-    swRegistration.waiting.postMessage({ type: 'SKIP_WAITING' });
-    window.location.reload();
-  }
-  document.getElementById('updateBanner')?.remove();
-};
-
-// Check for updates periodically
-setInterval(checkForUpdates, 30 * 60 * 1000);
 
 // ============================================================
 // SETTINGS — Load & Save
@@ -5797,25 +5434,17 @@ async function loadAdminData() {
       db.collection('messageTemplates').get(),
       db.collection('generatedDocuments').get(),
       db.collection('applications').get()
-    ]); 
-
-    console.log('Raw projects snapshot size:', pSnap.size);
-    
-    clients = cSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    projects = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    
-    console.log('Mapped projects count:', projects.length);
-    console.log('First project:', projects[0]);
-    
-    documents = dSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    meetings = mSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    brokers = bSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    brokerSubmissions = bsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    brokerUpdateRequests = burSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    messageTemplates = tSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    generatedDocuments = gdSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    applications = appSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    
+    ]);
+    clients           = cSnap.docs.map(d=>({ id:d.id, ...d.data() }));
+    projects          = pSnap.docs.map(d=>({ id:d.id, ...d.data() }));
+    documents         = dSnap.docs.map(d=>({ id:d.id, ...d.data() }));
+    meetings          = mSnap.docs.map(d=>({ id:d.id, ...d.data() }));
+    brokers           = bSnap.docs.map(d=>({ id:d.id, ...d.data() }));
+    brokerSubmissions = bsSnap.docs.map(d=>({ id:d.id, ...d.data() }));
+    brokerUpdateRequests = burSnap.docs.map(d=>({ id:d.id, ...d.data() }));
+    messageTemplates  = tSnap.docs.map(d=>({ id:d.id, ...d.data() }));
+    generatedDocuments= gdSnap.docs.map(d=>({ id:d.id, ...d.data() }));
+    applications      = appSnap.docs.map(d=>({ id:d.id, ...d.data() }));
     await runAutoArchive();
     updateDashboardWidgets();
     renderPipeline();
@@ -5823,10 +5452,7 @@ async function loadAdminData() {
     initCalendar();
     updateCommandCentre();
     loadSettings();
-  } catch(e) { 
-    console.error('loadAdminData error:', e);
-    showToastError('Failed to load data: ' + e.message); 
-  }
+  } catch(e) { showToastError('Failed to load data: '+e.message); }
 }
 
 // ── Dashboard widgets ─────────────────────────────────────────
@@ -6582,6 +6208,7 @@ async function createCrmClient() {
 
 // ── Admin: Pipeline ───────────────────────────────────────────
 function renderPipeline() {
+  renderDealHealthSummary();
   const search   = document.getElementById('pipelineSearch')?.value?.toLowerCase()||'';
   const priority = document.getElementById('pipelinePriorityFilter')?.value||'';
   const industry = document.getElementById('pipelineIndustryFilter')?.value||'';
@@ -7352,7 +6979,108 @@ async function generateBrokerStatement() {
   </div>`;
 }
 
-function exportBrokerStatementPDF() { showToast('Generating PDF...'); setTimeout(()=>showToastSuccess('PDF exported via jsPDF.'),1000); }
+function exportBrokerStatementPDF() {
+  const brokerId = document.getElementById('brokerStatementSelect')?.value;
+  if (!brokerId) { showToastError('Please select a broker first.'); return; }
+  const broker = brokers.find(b => b.id === brokerId);
+  if (!broker) return;
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const date = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+  const deals = projects.filter(p => p.brokerAssign === brokerId && parseInt(p.step) === 9);
+  const total = deals.reduce((s, p) => s + parseAmount(p.fundsNeeded || p.amount || 0) * ((broker.commissionRate || 0) / 100), 0);
+
+  // Header
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(16);
+  doc.setTextColor(13, 18, 32);
+  doc.text('CROFT FINANCE', 105, 20, { align: 'center' });
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(120, 130, 150);
+  doc.text('COMMISSION STATEMENT', 105, 27, { align: 'center' });
+  doc.setFontSize(8);
+  doc.text(date, 105, 33, { align: 'center' });
+
+  doc.setDrawColor(26, 95, 212);
+  doc.setLineWidth(0.5);
+  doc.line(20, 37, 190, 37);
+
+  // Broker info
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(11);
+  doc.setTextColor(13, 18, 32);
+  doc.text(`Broker: ${broker.name}`, 20, 46);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(100, 100, 100);
+  doc.text(`Firm: ${broker.firm || '—'}  |  Commission Rate: ${broker.commissionRate || 0}%`, 20, 52);
+
+  // Table header
+  let y = 62;
+  doc.setFillColor(13, 18, 32);
+  doc.rect(20, y - 5, 170, 8, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8);
+  doc.setTextColor(255, 255, 255);
+  doc.text('Project', 22, y);
+  doc.text('Client', 72, y);
+  doc.text('Facility', 122, y);
+  doc.text('Rate', 152, y);
+  doc.text('Commission', 168, y);
+  y += 8;
+
+  // Rows
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(13, 18, 32);
+  if (!deals.length) {
+    doc.setTextColor(150, 150, 150);
+    doc.text('No funded deals yet.', 22, y + 4);
+  } else {
+    deals.forEach((p, i) => {
+      if (i % 2 === 0) {
+        doc.setFillColor(244, 245, 248);
+        doc.rect(20, y - 4, 170, 7, 'F');
+      }
+      const fac  = parseAmount(p.fundsNeeded || p.amount || 0);
+      const comm = fac * ((broker.commissionRate || 0) / 100);
+      doc.setTextColor(13, 18, 32);
+      doc.text((p.name || '—').slice(0, 22), 22, y);
+      doc.text((p.clientName || '—').slice(0, 18), 72, y);
+      doc.text(formatCurrency(fac), 122, y);
+      doc.text(`${broker.commissionRate || 0}%`, 152, y);
+      doc.setFont('helvetica', 'bold');
+      doc.text(formatCurrency(comm), 168, y);
+      doc.setFont('helvetica', 'normal');
+      y += 7;
+    });
+  }
+
+  // Total row
+  y += 4;
+  doc.setDrawColor(13, 18, 32);
+  doc.setLineWidth(0.3);
+  doc.line(20, y, 190, y);
+  y += 6;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.text('TOTAL COMMISSION', 22, y);
+  doc.setTextColor(13, 144, 97);
+  doc.text(formatCurrency(total), 168, y);
+
+  // Footer
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7);
+  doc.setTextColor(150, 150, 150);
+  doc.text(`Prepared by Suzana Aleksić, Principal, Croft Finance · ${date}`, 105, 285, { align: 'center' });
+  doc.setDrawColor(200, 200, 200);
+  doc.line(20, 282, 190, 282);
+
+  doc.save(`Croft_Commission_${broker.name.replace(/\s/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
+  addAuditLog(`Broker commission PDF exported: ${broker.name}`, 'export', 'admin');
+  showToastSuccess('Commission statement PDF exported.');
+}
 
 // ── Deal Timeline ─────────────────────────────────────────────
 function renderDealTimeline() {
@@ -8587,7 +8315,7 @@ async function loadBrokerPortal(brokerId, brokerData) {
 
   // Load broker's deals
   const pSnap = await db.collection('projects').where('brokerAssign','==',brokerId).get();
-  const brokerProjects = pSnap.docs.map(d=>({ id:d.id, ...d.data() }));
+  brokerProjects = pSnap.docs.map(d=>({ id:d.id, ...d.data() }));
 
   const activeDeals  = brokerProjects.filter(p=>parseInt(p.step)<9).length;
   const fundedDeals  = brokerProjects.filter(p=>parseInt(p.step)===9);
@@ -8636,13 +8364,14 @@ function updateBrokerDashboard(brokerId, brokerData, brokerProjects) {
   renderBrokerPortfolio(brokerId, brokerProjects);
 }
 
-function renderBrokerPortfolio(brokerId, brokerProjects) {
+function renderBrokerPortfolio(brokerId, projectList) {
   const el = document.getElementById('brokerPortfolioContainer');
   if (!el) return;
-  if (!brokerProjects || !brokerProjects.length) {
+  const list = projectList || brokerProjects; // USE STORED VALUE AS FALLBACK
+  if (!list || !list.length) {
     el.innerHTML='<div class="empty-state"><i class="fas fa-briefcase"></i><p>No deals yet. Submit your first deal above.</p></div>'; return;
   }
-  el.innerHTML = brokerProjects.map(p=>{
+  el.innerHTML = list.map(p=>{
     const step  = parseInt(p.step)||1;
     const score = calculateDealHealthScore(p);
     const d     = daysUntil(p.closeDate);
@@ -9022,180 +8751,68 @@ function getSelectedIds(type) {
   return [...document.querySelectorAll(`.bulk-checkbox[data-id]:checked`)].map(cb=>cb.dataset.id);
 }
 
-async function clientUploadDocument() {
-  const docType = document.getElementById('clientUploadDocType')?.value;
-  const file = document.getElementById('clientUploadFile')?.files?.[0];
-  const statusEl = document.getElementById('clientUploadStatus');
-  
-  if (!docType) {
-    showToastError('Please select a document type.');
-    return;
-  }
-  if (!file) {
-    showToastError('Please select a file to upload.');
-    return;
-  }
-  
-  statusEl.style.display = 'block';
-  statusEl.innerHTML = '<span class="btn-spinner" style="display:inline-block;margin-right:8px;"></span> Uploading...';
-  
-  try {
-    const fileName = `${Date.now()}_${file.name}`;
-    const storageRef = storage.ref(`client_uploads/${currentClientId}/${fileName}`);
-    await storageRef.put(file);
-    const url = await storageRef.getDownloadURL();
-    
-    await db.collection('documents').add({
-      clientId: currentClientId,
-      type: docType,
-      url: url,
-      name: file.name,
-      uploadedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      approved: false
-    });
-    
-    statusEl.innerHTML = '<span style="color:var(--emerald);">✓ Upload successful!</span>';
-    setTimeout(() => { statusEl.style.display = 'none'; }, 3000);
-    renderDocuments();
-    showToastSuccess('Document uploaded for review.');
-  } catch(e) {
-    statusEl.innerHTML = `<span style="color:var(--crimson);">Error: ${e.message}</span>`;
-    showToastError(e.message);
-  }
-}
-
-async function exportClientDocPDF(docId) {
-  const snap = await db.collection('generatedDocuments').doc(docId).get();
-  if (!snap.exists) return;
-  const doc = snap.data();
-  exportDocPDF(doc.content, doc.docType);
-}
-
 async function inviteApplicantAsClient(appId) {
   const app = applications.find(a => a.id === appId);
   if (!app) return;
   
-  const tempPw = Math.random().toString(36).slice(-10) + 'A1!';
+  if (!confirm(`Create a portal account for ${app.clientName}?`)) return;
+  
+  const tempPw = Math.random().toString(36).slice(-8) + 'A1!';
   
   try {
     const cred = await auth.createUserWithEmailAndPassword(app.clientEmail, tempPw);
+    
     await db.collection('clients').doc(cred.user.uid).set({
-      uid: cred.user.uid,
-      name: app.clientName,
-      email: app.clientEmail,
-      status: 'active',
+      uid:          cred.user.uid,
+      name:         app.clientName,
+      email:        app.clientEmail,
+      status:       'active',
       termsVersion: TERMS_VERSION,
       registeredAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     
     await db.collection('projects').add({
-      clientId: cred.user.uid,
-      clientName: app.clientName,
+      clientId:    cred.user.uid,
+      clientName:  app.clientName,
       clientEmail: app.clientEmail,
-      name: app.projectName,
-      industry: app.industry,
-      location: app.projectLocation,
-      fundsNeeded: app.fundsNeeded,
-      step: 1,
-      status: 'active',
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      name:        app.projectName || 'Project',
+      industry:    app.industry    || '',
+      location:    app.projectLocation || '',
+      fundsNeeded: app.fundsNeeded || 0,
+      step:        1,
+      status:      'active',
+      priority:    'medium',
+      createdAt:   firebase.firestore.FieldValue.serverTimestamp()
     });
+    
+    await db.collection('applications').doc(appId).update({
+      status: 'invited',
+      invitedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    
+    const a = applications.find(x => x.id === appId);
+    if (a) a.status = 'invited';
     
     emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
       to_email: app.clientEmail,
-      to_name: app.clientName,
-      subject: 'Your Croft Finance Portal Access',
-      message: `Dear ${app.clientName},\n\nYour portal access has been created.\n\nLogin: ${app.clientEmail}\nTemporary Password: ${tempPw}\n\nPlease sign in and change your password immediately.\n\nWarm regards,\nSuzana Aleksić`
+      to_name:  app.clientName,
+      subject:  'Your Croft Finance Portal Access',
+      message:  `Dear ${app.clientName},\n\nYour Croft Finance client portal has been created.\n\nLogin: ${app.clientEmail}\nTemporary Password: ${tempPw}\n\nPlease sign in and change your password immediately.\n\nWarm regards,\nSuzana Aleksić\nPrincipal, Croft Finance`
     }).catch(() => {});
     
-    await db.collection('applications').doc(appId).update({ status: 'invited' });
+    await loadAdminData();
     closeModal('applicationDetailModal');
-    loadApplications();
-    showToastSuccess(`Portal account created for ${app.clientName}.`);
+    addAuditLog(`Portal account created for applicant: ${app.clientName}`, 'create', 'admin');
+    showToastSuccess(`Portal account created for ${app.clientName}. Credentials emailed.`);
+    
   } catch(e) {
-    showToastError('Failed to create account: ' + e.message);
+    let msg = e.message;
+    if (e.code === 'auth/email-already-in-use') {
+      msg = 'An account already exists for this email address.';
+    }
+    showToastError(msg);
   }
 }
-
-// ============================================================
-// MOBILE TOUCH OPTIMIZATIONS
-// ============================================================
-
-// Prevent 300ms delay on touch events
-document.addEventListener('touchstart', function(e) {
-  // Allow passive touch events for better scrolling performance
-}, { passive: true });
-
-// Close sidebar when tapping overlay (already exists, but ensure it works)
-document.querySelectorAll('.sidebar-overlay').forEach(overlay => {
-  overlay.addEventListener('click', function(e) {
-    if (this.classList.contains('show')) {
-      toggleSidebar();
-    }
-  });
-});
-
-// Ensure modals close when tapping outside on mobile
-document.querySelectorAll('.modal-overlay').forEach(overlay => {
-  overlay.addEventListener('click', function(e) {
-    if (e.target === this) {
-      this.classList.remove('active');
-    }
-  });
-});
-
-// Fix for iOS momentum scrolling on modals
-document.querySelectorAll('.modal-body, .messages-list, .notification-list').forEach(el => {
-  el.style.webkitOverflowScrolling = 'touch';
-});
-
-// Fix for iOS input field zoom
-const inputs = document.querySelectorAll('input, select, textarea');
-inputs.forEach(input => {
-  input.addEventListener('focus', function() {
-    if (window.innerWidth < 768) {
-      // Small delay to allow keyboard to appear
-      setTimeout(() => {
-        this.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 300);
-    }
-  });
-});
-
-// Improve sidebar close button visibility on mobile
-const mobileCloseBtns = document.querySelectorAll('.mobile-close-btn');
-mobileCloseBtns.forEach(btn => {
-  btn.style.display = 'flex';
-  btn.style.alignItems = 'center';
-  btn.style.justifyContent = 'center';
-});
-
-// Fix iOS input zoom - this is CRITICAL!
-document.querySelectorAll('input, select, textarea').forEach(el => {
-  el.addEventListener('focus', function() {
-    if (window.innerWidth < 768) {
-      setTimeout(() => this.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
-    }
-  });
-});
-
-// Ensure mobile close buttons work
-document.querySelectorAll('.mobile-close-btn').forEach(btn => {
-  btn.style.display = 'flex';
-  btn.addEventListener('click', function(e) {
-    document.getElementById('clientSidebar')?.classList.remove('open');
-    document.getElementById('adminSidebar')?.classList.remove('open');
-    document.getElementById('brokerSidebar')?.classList.remove('open');
-    document.querySelectorAll('.sidebar-overlay').forEach(o => o.classList.remove('show'));
-  });
-});
-
-// Fix modal close on outside tap for mobile
-document.querySelectorAll('.modal-overlay').forEach(overlay => {
-  overlay.addEventListener('click', function(e) {
-    if (e.target === this) this.classList.remove('active');
-  });
-});
   
 </script>
 
@@ -9203,29 +8820,6 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
      END OF ALL JAVASCRIPT
      Close body and html
      ============================================================ -->
-<!-- Hidden SVG logo definitions for mobile -->
-<div style="display: none;">
-  <svg xmlns="http://www.w3.org/2000/svg" id="croft-logo-svg">
-    <defs>
-      <linearGradient id="croftBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#050810"/>
-        <stop offset="100%" stop-color="#1a2d52"/>
-      </linearGradient>
-      <linearGradient id="croftTextGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#e2e8f0"/>
-        <stop offset="100%" stop-color="#8a9bb8"/>
-      </linearGradient>
-      <symbol id="croft-logo" viewBox="0 0 500 500">
-        <rect width="500" height="500" rx="100" fill="url(#croftBgGrad)"/>
-        <polygon points="250,80 380,250 250,420 120,250" fill="none" stroke="rgba(26,95,212,0.3)" stroke-width="2"/>
-        <polygon points="250,140 330,250 250,360 170,250" fill="none" stroke="rgba(26,95,212,0.15)" stroke-width="1"/>
-        <text x="250" y="310" font-family="Georgia, 'Cormorant Garamond', serif" font-size="220" font-weight="bold" fill="url(#croftTextGrad)" text-anchor="middle" letter-spacing="20">C F</text>
-        <line x1="140" y1="370" x2="360" y2="370" stroke="rgba(26,95,212,0.5)" stroke-width="2"/>
-        <text x="250" y="405" font-family="'DM Sans', sans-serif" font-size="14" font-weight="600" fill="rgba(138,155,184,0.6)" text-anchor="middle" letter-spacing="8">CROFT FINANCE</text>
-      </symbol>
-    </defs>
-  </svg>
-</div>
-  
+
 </body>
 </html>
