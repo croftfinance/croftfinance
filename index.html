@@ -3820,7 +3820,9 @@ const firebaseConfig = {
   messagingSenderId: "718693826553",
   appId:             "1:718693826553:web:c764558447a34cccd74728"
 };
-firebase.initializeApp(firebaseConfig);
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 const db      = firebase.firestore();
 const auth    = firebase.auth();
 const storage = firebase.storage();
@@ -3952,6 +3954,17 @@ function parseAmount(v) {
   if (!v && v !== 0) return 0;
   const s = String(v).replace(/[^0-9.]/g,'');
   return parseFloat(s) || 0;
+}
+/** Facility notional for reporting: prefers the larger of booked amount vs application funds-needed. */
+function facilityPrincipal(p) {
+  if (!p) return 0;
+  return Math.max(parseAmount(p.amount), parseAmount(p.fundsNeeded));
+}
+/** Unified broker linkage on deals (Firestore may use brokerAssign or legacy brokerId). */
+function projectBrokerId(p) {
+  if (!p) return '';
+  const v = p.brokerAssign ?? p.brokerId;
+  return v != null && v !== '' ? String(v).trim() : '';
 }
 function formatDate(d) {
   if (!d) return '—';
@@ -5189,7 +5202,7 @@ function calculateDealHealthScore(project) {
   if (project.commitFee==='paid')              score += 12;
   if (project.ecfStatus==='escrowed')          score += 12;
   if (project.dataRoomLink)                    score += 6;
-  if (project.brokerAssign)                    score += 6;
+  if (projectBrokerId(project))                score += 6;
   if (project.rate)                            score += 6;
   return Math.min(Math.round(score/10*10)/10, 10);
 }
@@ -5303,10 +5316,10 @@ function exportBrokerPerformanceCSV() {
 }
 function exportCommissionCSV() {
   const rows = projects.filter(p=>p.status==='active'||parseInt(p.step)===9).map(p=>{
-    const br = brokers.find(b=>b.id===p.brokerAssign);
-    const fac = parseAmount(p.amount||p.fundsNeeded);
+    const br = brokers.find(b=>b.id===projectBrokerId(p));
+    const fac = facilityPrincipal(p);
     return {
-      Client:       p.clientName||'',
+      Client:       p.clientName||clients.find(c=>c.id===p.clientId)?.name||'',
       Project:      p.name||'',
       Industry:     p.industry||'',
       Location:     p.location||'',
@@ -5370,21 +5383,29 @@ async function renderSurveyResults() {
 // ── Broker Engagement ─────────────────────────────────────────
 async function updateBrokerEngagement(brokerId, engagement) {
   try {
-    await db.collection('brokers').doc(brokerId).update({ engagement });
+    await db.collection('brokers').doc(brokerId).update({ engagement, engagementStatus: engagement });
     const br = brokers.find(b=>b.id===brokerId);
-    if (br) br.engagement = engagement;
+    if (br) { br.engagement = engagement; br.engagementStatus = engagement; }
+    showToastSuccess('Engagement updated.');
   } catch(e) { showToastError(e.message); }
 }
-async function setBrokerCommission(brokerId) {
-  const rate = prompt('New commission rate (%):');
-  if (rate===null) return;
-  const r = parseFloat(rate);
-  if (isNaN(r)||r<0||r>20) { showToastError('Invalid rate.'); return; }
+async function setBrokerCommission(brokerId, valueFromInput) {
+  let r;
+  if (valueFromInput !== undefined && valueFromInput !== null && String(valueFromInput).trim() !== '') {
+    r = parseFloat(String(valueFromInput).replace(',', '.'));
+  } else {
+    const rate = prompt('New commission rate (%):');
+    if (rate===null) return;
+    r = parseFloat(String(rate).replace(',', '.'));
+  }
+  if (isNaN(r)||r<0||r>20) { showToastError('Enter a valid rate between 0 and 20%.'); return; }
+  r = Math.round(r * 1000) / 1000;
   try {
     await db.collection('brokers').doc(brokerId).update({ commissionRate: r });
     const br = brokers.find(b=>b.id===brokerId);
     if (br) br.commissionRate = r;
     renderBrokerAdminTable();
+    renderAnalytics();
     showToastSuccess(`Commission rate set to ${r}%.`);
   } catch(e) { showToastError(e.message); }
 }
@@ -5552,10 +5573,26 @@ async function loadAdminData() {
       db.collection('applications').get()
     ]);
     clients           = cSnap.docs.map(d=>({ id:d.id, ...d.data() }));
-    projects          = pSnap.docs.map(d=>({ id:d.id, ...d.data() }));
+    projects          = pSnap.docs.map(d=>{
+      const x = { id:d.id, ...d.data() };
+      if (!x.brokerAssign && x.brokerId) x.brokerAssign = x.brokerId;
+      return x;
+    });
     documents         = dSnap.docs.map(d=>({ id:d.id, ...d.data() }));
     meetings          = mSnap.docs.map(d=>({ id:d.id, ...d.data() }));
-    brokers           = bSnap.docs.map(d=>({ id:d.id, ...d.data() }));
+    brokers           = bSnap.docs.map(d=>{
+      const x = { id:d.id, ...d.data() };
+      const eng = x.engagement ?? x.engagementStatus;
+      x.engagement = eng || 'none';
+      if (!x.engagementStatus) x.engagementStatus = x.engagement;
+      return x;
+    });
+    brokers.forEach(b=>{
+      const bid = b.id;
+      const fundedProj = projects.filter(p=>projectBrokerId(p)===bid && parseInt(p.step,10)===9);
+      b.fundedCount = fundedProj.length;
+      b.fundedVolume = fundedProj.reduce((s,p)=>s+facilityPrincipal(p),0);
+    });
     brokerSubmissions = bsSnap.docs.map(d=>({ id:d.id, ...d.data() }));
     brokerUpdateRequests = burSnap.docs.map(d=>({ id:d.id, ...d.data() }));
     messageTemplates  = tSnap.docs.map(d=>({ id:d.id, ...d.data() }));
@@ -6455,7 +6492,7 @@ function renderAdminTables() {
   if (!tbody) return;
   if (!projects.length) { tbody.innerHTML='<tr><td colspan="11"><div class="empty-state"><p>No projects.</p></div></td></tr>'; return; }
   tbody.innerHTML = projects.filter(p=>!p.archived).map(p=>{
-    const br = brokers.find(b=>b.id===p.brokerAssign);
+    const br = brokers.find(b=>b.id===projectBrokerId(p));
     return `<tr>
       <td>${escapeHtml(p.clientName||'—')}</td>
       <td>${escapeHtml(p.name||'—')}</td>
@@ -6647,13 +6684,15 @@ function renderAnalytics() {
   // Commission Breakdown
   const commBody = document.getElementById('commissionTableBody');
   if (commBody) {
-    const rows = projects.filter(p=>p.status==='active'||parseInt(p.step)===9).map(p=>{
-      const br  = brokers.find(b=>b.id===p.brokerAssign);
-      const fac = parseAmount(p.fundsNeeded||p.amount||0);
+    const listed = projects.filter(p=>p.status==='active'||parseInt(p.step)===9);
+    const rows = listed.map(p=>{
+      const br  = brokers.find(b=>b.id===projectBrokerId(p));
+      const fac = facilityPrincipal(p);
+      const clientNm = p.clientName || clients.find(c=>c.id===p.clientId)?.name || '—';
       const brokerComm = br ? fac*((br.commissionRate||0)/100) : 0;
       const netComm    = fac*ADMIN_COMMISSION_RATE;
       return `<tr>
-        <td>${escapeHtml(p.clientName||'—')}</td>
+        <td>${escapeHtml(clientNm)}</td>
         <td>${escapeHtml(p.name||'—')}</td>
         <td>${escapeHtml(p.industry||'—')}</td>
         <td>${escapeHtml(p.location||'—')}</td>
@@ -6663,9 +6702,14 @@ function renderAnalytics() {
         <td>${getStepName(p.step)}</td>
       </tr>`;
     });
-    const totalFac  = projects.reduce((s,p)=>s+parseAmount(p.fundsNeeded||p.amount||0),0);
+    const totalFac  = listed.reduce((s,p)=>s+facilityPrincipal(p),0);
+    let totalBrokerComm = 0;
+    listed.forEach(p=>{
+      const br = brokers.find(b=>b.id===projectBrokerId(p));
+      if (br) totalBrokerComm += facilityPrincipal(p)*((br.commissionRate||0)/100);
+    });
     const totalComm = totalFac*ADMIN_COMMISSION_RATE;
-    commBody.innerHTML = rows.join('')+`<tr class="tfoot"><td colspan="4" style="font-weight:700;">TOTALS</td><td style="font-weight:700;">${formatCurrency(totalFac)}</td><td>—</td><td style="font-weight:700;color:var(--emerald);">${formatCurrency(totalComm)}</td><td>—</td></tr>`;
+    commBody.innerHTML = rows.join('')+`<tr class="tfoot"><td colspan="4" style="font-weight:700;">TOTALS</td><td style="font-weight:700;">${formatCurrency(totalFac)}</td><td style="font-weight:700;">${totalBrokerComm>0?formatCurrency(totalBrokerComm):'—'}</td><td style="font-weight:700;color:var(--emerald);">${formatCurrency(totalComm)}</td><td>—</td></tr>`;
   }
 
   // Broker performance
@@ -6673,8 +6717,8 @@ function renderAnalytics() {
   if (bpBody) {
     bpBody.innerHTML = brokers.map(b=>{
       const subs   = brokerSubmissions.filter(s=>s.brokerId===b.id).length;
-      const funded = projects.filter(p=>p.brokerAssign===b.id&&parseInt(p.step)===9).length;
-      const vol    = projects.filter(p=>p.brokerAssign===b.id&&parseInt(p.step)===9).reduce((s,p)=>s+parseAmount(p.fundsNeeded||p.amount||0),0);
+      const funded = projects.filter(p=>projectBrokerId(p)===b.id&&parseInt(p.step,10)===9).length;
+      const vol    = projects.filter(p=>projectBrokerId(p)===b.id&&parseInt(p.step,10)===9).reduce((s,p)=>s+facilityPrincipal(p),0);
       const conv   = subs>0?Math.round((funded/subs)*100):0;
       const comm   = vol*((b.commissionRate||0)/100);
       return `<tr>
@@ -6695,13 +6739,13 @@ function renderBrokerLeaderboard() {
   const el = document.getElementById('brokerLeaderboard');
   if (!el) return;
   const sorted = [...brokers].sort((a,b)=>{
-    const va = projects.filter(p=>p.brokerAssign===a.id&&parseInt(p.step)===9).reduce((s,p)=>s+parseAmount(p.fundsNeeded||p.amount||0),0);
-    const vb = projects.filter(p=>p.brokerAssign===b.id&&parseInt(p.step)===9).reduce((s,p)=>s+parseAmount(p.fundsNeeded||p.amount||0),0);
+    const va = projects.filter(p=>projectBrokerId(p)===a.id&&parseInt(p.step,10)===9).reduce((s,p)=>s+facilityPrincipal(p),0);
+    const vb = projects.filter(p=>projectBrokerId(p)===b.id&&parseInt(p.step,10)===9).reduce((s,p)=>s+facilityPrincipal(p),0);
     return vb-va;
   }).slice(0,5);
   if (!sorted.length) { el.innerHTML='<div class="empty-state"><p>No broker data.</p></div>'; return; }
   el.innerHTML = sorted.map((b,i)=>{
-    const vol = projects.filter(p=>p.brokerAssign===b.id&&parseInt(p.step)===9).reduce((s,p)=>s+parseAmount(p.fundsNeeded||p.amount||0),0);
+    const vol = projects.filter(p=>projectBrokerId(p)===b.id&&parseInt(p.step,10)===9).reduce((s,p)=>s+facilityPrincipal(p),0);
     return `<div style="display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--border);">
       <div style="width:28px;height:28px;border-radius:50%;background:${i===0?'var(--gold)':i===1?'var(--silver)':i===2?'#cd7f32':'var(--parchment)'};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:${i<3?'white':'var(--slate-mid)'};">${i+1}</div>
       <div style="flex:1;"><div style="font-weight:600;font-size:13px;">${escapeHtml(b.name)}</div><div style="font-size:11px;color:var(--platinum);">${escapeHtml(b.firm||'')}</div></div>
@@ -6917,9 +6961,10 @@ function renderBrokerAdminTable() {
   if (!brokers.length) { tbody.innerHTML='<tr><td colspan="9"><div class="empty-state"><p>No brokers.</p></div></td></tr>'; return; }
   tbody.innerHTML = brokers.map(b=>{
     const subs   = brokerSubmissions.filter(s=>s.brokerId===b.id).length;
-    const funded = projects.filter(p=>p.brokerAssign===b.id&&parseInt(p.step)===9).length;
-    const vol    = projects.filter(p=>p.brokerAssign===b.id&&parseInt(p.step)===9).reduce((s,p)=>s+parseAmount(p.fundsNeeded||p.amount||0),0);
+    const funded = projects.filter(p=>projectBrokerId(p)===b.id&&parseInt(p.step,10)===9).length;
+    const vol    = projects.filter(p=>projectBrokerId(p)===b.id&&parseInt(p.step,10)===9).reduce((s,p)=>s+facilityPrincipal(p),0);
     const comm   = vol*((b.commissionRate||0)/100);
+    const engVal = (b.engagement || b.engagementStatus || 'none');
     return `<tr>
       <td><div style="font-weight:600;">${escapeHtml(b.name||'—')}</div>${getBrokerTierBadge(b)}</td>
       <td>${escapeHtml(b.firm||'—')}</td>
@@ -6927,10 +6972,10 @@ function renderBrokerAdminTable() {
       <td>${subs}</td><td>${funded}</td>
       <td>${formatCurrency(comm)}</td>
       <td><span class="badge badge-${b.status==='active'?'success':b.status==='pending'?'warning':'danger'}">${b.status||'pending'}</span></td>
-      <td><select class="form-select" style="max-width:130px;font-size:11px;" onchange="updateBrokerEngagement('${b.id}',this.value)"><option value="none" ${b.engagement==='none'?'selected':''}>None</option><option value="pending" ${b.engagement==='pending'?'selected':''}>Pending</option><option value="active" ${b.engagement==='active'?'selected':''}>Active</option></select></td>
+      <td><select class="form-select" style="max-width:130px;font-size:11px;" onchange="updateBrokerEngagement('${b.id}',this.value)"><option value="none" ${engVal==='none'?'selected':''}>None</option><option value="pending" ${engVal==='pending'?'selected':''}>Pending</option><option value="active" ${engVal==='active'?'selected':''}>Active</option></select></td>
       <td style="display:flex;gap:4px;flex-wrap:wrap;">
-        ${b.status==='pending'?`<button class="btn btn-success btn-xs" onclick="approveBroker('${b.id}')">Approve</button>`:''}
-        <button class="btn btn-danger btn-xs" onclick="deleteBroker('${b.id}')"><i class="fas fa-trash"></i></button>
+        ${b.status==='pending'?`<button type="button" class="btn btn-success btn-xs" onclick="approveBroker('${b.id}')">Approve</button><button type="button" class="btn btn-danger btn-xs" onclick="declineBroker('${b.id}')">Decline</button>`:''}
+        <button type="button" class="btn btn-danger btn-xs" onclick="deleteBroker('${b.id}')"><i class="fas fa-trash"></i></button>
       </td>
     </tr>`;
   }).join('');
@@ -6939,16 +6984,19 @@ function renderBrokerAdminTable() {
   const urEl = document.getElementById('brokerUpdateRequestsList');
   if (urEl) {
     const pending = brokerUpdateRequests.filter(r=>r.status==='pending');
-    if (!pending.length) { urEl.innerHTML='<div class="empty-state" style="padding:20px;"><p>No pending update requests.</p></div>'; return; }
-    urEl.innerHTML = pending.map(r=>`<div style="padding:14px;border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:8px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+    if (!pending.length) {
+      urEl.innerHTML='<div class="empty-state" style="padding:20px;"><p>No pending update requests.</p></div>';
+    } else {
+      urEl.innerHTML = pending.map(r=>`<div style="padding:14px;border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:8px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
       <div><div style="font-size:13px;font-weight:600;">${escapeHtml(r.projectName||'—')}</div><div style="font-size:12px;color:var(--slate-mid);margin-top:4px;">${escapeHtml(r.requestedChanges||'')}</div><div style="font-size:10px;color:var(--platinum);margin-top:6px;">${formatDate(r.createdAt)}</div></div>
-      <div style="display:flex;gap:6px;"><button class="btn btn-success btn-sm" onclick="approveBrokerUpdate('${r.id}')">Approve</button><button class="btn btn-danger btn-sm" onclick="rejectBrokerUpdate('${r.id}')">Reject</button></div>
+      <div style="display:flex;gap:6px;"><button type="button" class="btn btn-success btn-sm" onclick="approveBrokerUpdate('${r.id}')">Approve</button><button type="button" class="btn btn-danger btn-sm" onclick="rejectBrokerUpdate('${r.id}')">Reject</button></div>
     </div>`).join('');
+    }
   }
 
   // Broker statement select
   const bSel = document.getElementById('brokerStatementSelect');
-  if (bSel) bSel.innerHTML = brokers.map(b=>`<option value="${b.id}">${escapeHtml(b.name)}</option>`).join('');
+  if (bSel) bSel.innerHTML = '<option value="">— Select broker —</option>'+brokers.filter(b=>b.status==='active').map(b=>`<option value="${b.id}">${escapeHtml(b.name)}</option>`).join('');
 }
 
 async function approveBroker(brokerId) {
@@ -6964,7 +7012,20 @@ async function approveBroker(brokerId) {
       }).catch(()=>{});
     }
     renderBrokerAdminTable();
+    renderAnalytics();
     showToastSuccess('Broker approved.');
+  } catch(e) { showToastError(e.message); }
+}
+
+async function declineBroker(id) {
+  if (!confirm('Decline this broker registration?')) return;
+  try {
+    await db.collection('brokers').doc(id).update({ status:'declined' });
+    const b = brokers.find(x=>x.id===id);
+    if (b) b.status = 'declined';
+    renderBrokerAdminTable();
+    renderAnalytics();
+    showToastSuccess('Broker declined.');
   } catch(e) { showToastError(e.message); }
 }
 
@@ -7005,26 +7066,33 @@ function renderSubmissionsTable() {
   const filter = document.getElementById('submissionFilter')?.value||'all';
   const filtered = filter==='all' ? brokerSubmissions : brokerSubmissions.filter(s=>s.status===filter);
   if (!filtered.length) { tbody.innerHTML='<tr><td colspan="8"><div class="empty-state"><p>No submissions.</p></div></td></tr>'; return; }
-  tbody.innerHTML = filtered.map(s=>`<tr>
+  tbody.innerHTML = filtered.map(s=>{
+    const st = s.status || 'pending';
+    const actionable = st === 'pending';
+    const badgeCls = st==='accepted'?'success':st==='pending'?'warning':'danger';
+    return `<tr>
     <td style="font-size:11px;">${formatDate(s.createdAt)}</td>
     <td>${escapeHtml(s.brokerName||'—')}</td>
     <td>${escapeHtml(s.clientName||'—')}</td>
     <td>${escapeHtml(s.projectName||'—')}</td>
     <td>${formatCurrency(s.fundsNeeded||0)}</td>
-    <td>${s.dataRoomLink?`<a href="${escapeHtml(s.dataRoomLink)}" target="_blank" class="btn btn-ghost btn-xs"><i class="fas fa-external-link-alt"></i></a>`:'—'}</td>
-    <td><span class="badge badge-${s.status==='accepted'?'success':s.status==='pending'?'warning':'danger'}">${s.status||'pending'}</span></td>
+    <td>${s.dataRoomLink?`<a href="${escapeHtml(s.dataRoomLink)}" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-xs"><i class="fas fa-external-link-alt"></i></a>`:'—'}</td>
+    <td><span class="badge badge-${badgeCls}">${escapeHtml(st)}</span></td>
     <td style="display:flex;gap:4px;flex-wrap:wrap;">
-      <button class="btn btn-secondary btn-xs" onclick="viewSubmissionDetail('${s.id}')">View</button>
-      ${s.status==='pending'?`<button class="btn btn-success btn-xs" onclick="acceptSubmission('${s.id}')">Accept</button><button class="btn btn-danger btn-xs" onclick="rejectSubmission('${s.id}')">Reject</button>`:''}
+      <button type="button" class="btn btn-secondary btn-xs" onclick="viewSubmissionDetail('${s.id}')">View</button>
+      ${actionable?`<button type="button" class="btn btn-success btn-xs" onclick="acceptSubmission('${s.id}')">Accept</button><button type="button" class="btn btn-danger btn-xs" onclick="rejectSubmission('${s.id}')">Reject</button>`:'<span class="label-xs" style="opacity:0.7;">Resolved</span>'}
     </td>
-  </tr>`).join('');
+  </tr>`;
+  }).join('');
 }
 
 async function acceptSubmission(id) {
   try {
+    const row = brokerSubmissions.find(x=>x.id===id);
+    if (!row) { showToastError('Submission not found.'); return; }
+    if ((row.status||'pending')!=='pending') { showToastError('This submission has already been processed.'); return; }
     await db.collection('brokerSubmissions').doc(id).update({ status:'accepted', reviewedAt: firebase.firestore.FieldValue.serverTimestamp() });
-    const s = brokerSubmissions.find(x=>x.id===id);
-    if (s) s.status='accepted';
+    row.status='accepted';
     renderSubmissionsTable();
     showToastSuccess('Submission accepted.');
   } catch(e) { showToastError(e.message); }
@@ -7032,9 +7100,11 @@ async function acceptSubmission(id) {
 
 async function rejectSubmission(id) {
   try {
-    await db.collection('brokerSubmissions').doc(id).update({ status:'rejected' });
-    const s = brokerSubmissions.find(x=>x.id===id);
-    if (s) s.status='rejected';
+    const row = brokerSubmissions.find(x=>x.id===id);
+    if (!row) { showToastError('Submission not found.'); return; }
+    if ((row.status||'pending')!=='pending') { showToastError('This submission has already been processed.'); return; }
+    await db.collection('brokerSubmissions').doc(id).update({ status:'rejected', reviewedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    row.status='rejected';
     renderSubmissionsTable();
     showToastSuccess('Submission rejected.');
   } catch(e) { showToastError(e.message); }
@@ -7043,16 +7113,22 @@ async function rejectSubmission(id) {
 async function viewSubmissionDetail(id) {
   const s = brokerSubmissions.find(x=>x.id===id);
   if (!s) return;
+  const st = s.status||'pending';
+  const actionable = st==='pending';
   const el = document.getElementById('submissionDetailPanel');
   if (!el) return;
+  const actions = actionable
+    ? `<div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;"><button type="button" class="btn btn-success btn-md" onclick="acceptSubmission('${s.id}')"><i class="fas fa-check"></i> Accept</button><button type="button" class="btn btn-danger btn-md" onclick="rejectSubmission('${s.id}')"><i class="fas fa-times"></i> Reject</button></div>`
+    : `<div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;"><span class="badge badge-${st==='accepted'?'success':'danger'}">${escapeHtml(st)}</span><p style="margin:0;font-size:13px;color:var(--platinum);line-height:1.5;">This submission is closed. Details are retained above for audit.</p></div>`;
   el.style.display='block';
-  el.innerHTML=`<div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-file-alt"></i> Submission Detail</div><button class="btn btn-ghost btn-sm" onclick="document.getElementById('submissionDetailPanel').style.display='none'">Close</button></div>
+  el.innerHTML=`<div class="card"><div class="card-header" style="display:flex;justify-content:space-between;align-items:flex-start;"><div class="card-title"><i class="fas fa-file-alt"></i> Submission Detail</div><button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('submissionDetailPanel').style.display='none'">Close</button></div>
   <div class="card-body">
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
       ${[['Broker',s.brokerName],['Client',s.clientName],['Project',s.projectName],['Funds Needed',formatCurrency(s.fundsNeeded||0)],['Industry',s.industry||'—'],['Location',s.location||'—'],['Sponsor Equity',formatCurrency(s.sponsorEquity||0)],['D:E',s.debtEquity||'—'],['Exit',s.exitStrategy||'—']].map(([k,v])=>`<div><div class="label-caps">${k}</div><div style="font-size:13px;font-weight:600;margin-top:4px;">${escapeHtml(String(v||'—'))}</div></div>`).join('')}
     </div>
     <div style="margin-top:16px;"><div class="label-caps" style="margin-bottom:8px;">Description</div><p style="font-size:13px;color:var(--slate-mid);line-height:1.7;">${escapeHtml(s.description||'—')}</p></div>
     ${s.risks?`<div style="margin-top:12px;"><div class="label-caps" style="margin-bottom:8px;">Risks</div><p style="font-size:13px;color:var(--slate-mid);line-height:1.7;">${escapeHtml(s.risks)}</p></div>`:''}
+    ${actions}
   </div></div>`;
   el.scrollIntoView({ behavior:'smooth' });
 }
@@ -7063,13 +7139,18 @@ async function exportCommissionStatement() {
   const modal = document.getElementById('statementModal');
   if (!el||!modal) return;
   const date = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
-  const rows  = projects.filter(p=>p.status==='active'||parseInt(p.step)===9);
-  const total = rows.reduce((s,p)=>s+parseAmount(p.fundsNeeded||p.amount||0)*ADMIN_COMMISSION_RATE,0);
+  const rows  = projects.filter(p=>p.status==='active'||parseInt(p.step,10)===9);
+  const total = rows.reduce((s,p)=>s+facilityPrincipal(p)*ADMIN_COMMISSION_RATE,0);
   el.innerHTML=`<div style="font-family:Georgia,serif;padding:20px;">
     <div style="text-align:center;margin-bottom:24px;"><div style="font-size:24px;font-weight:400;letter-spacing:0.16em;text-transform:uppercase;">CROFT FINANCE</div><div style="font-size:11px;color:var(--platinum);letter-spacing:0.12em;margin-top:4px;">COMMISSION STATEMENT · ${date}</div></div>
     <table style="width:100%;border-collapse:collapse;font-size:12px;">
       <thead><tr style="border-bottom:1px solid #ccc;">${['Client','Project','Facility','Rate','Commission'].map(h=>`<th style="padding:8px;text-align:left;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;">${h}</th>`).join('')}</tr></thead>
-      <tbody>${rows.map(p=>`<tr style="border-bottom:1px solid #eee;">${[p.clientName||'—',p.name||'—',formatCurrency(p.fundsNeeded||p.amount||0),'2%',formatCurrency(parseAmount(p.fundsNeeded||p.amount||0)*ADMIN_COMMISSION_RATE)].map(v=>`<td style="padding:8px;">${v}</td>`).join('')}</tr>`).join('')}</tbody>
+      <tbody>${rows.map(p=>{
+        const cn = escapeHtml(String(p.clientName||clients.find(c=>c.id===p.clientId)?.name||'—'));
+        const pn = escapeHtml(String(p.name||'—'));
+        const fp = facilityPrincipal(p);
+        return `<tr style="border-bottom:1px solid #eee;"><td style="padding:8px;">${cn}</td><td style="padding:8px;">${pn}</td><td style="padding:8px;">${formatCurrency(fp)}</td><td style="padding:8px;">2%</td><td style="padding:8px;">${formatCurrency(fp*ADMIN_COMMISSION_RATE)}</td></tr>`;
+      }).join('')}</tbody>
       <tfoot><tr style="border-top:2px solid #333;"><td colspan="4" style="padding:8px;font-weight:700;">TOTAL</td><td style="padding:8px;font-weight:700;">${formatCurrency(total)}</td></tr></tfoot>
     </table>
     <div style="margin-top:20px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#888;">Prepared by Suzana Aleksić, Principal, Croft Finance · ${date}</div>
@@ -7079,18 +7160,18 @@ async function exportCommissionStatement() {
 
 async function generateBrokerStatement() {
   const brokerId = document.getElementById('brokerStatementSelect')?.value;
-  if (!brokerId) return;
+  if (!brokerId) { showToastError('Please select a broker.'); return; }
   const broker = brokers.find(b=>b.id===brokerId);
   if (!broker) return;
-  const deals = projects.filter(p=>p.brokerAssign===brokerId&&parseInt(p.step)===9);
-  const total = deals.reduce((s,p)=>s+parseAmount(p.fundsNeeded||p.amount||0)*((broker.commissionRate||0)/100),0);
+  const deals = projects.filter(p=>projectBrokerId(p)===brokerId&&parseInt(p.step,10)===9);
+  const total = deals.reduce((s,p)=>s+facilityPrincipal(p)*((broker.commissionRate||0)/100),0);
   const el = document.getElementById('brokerStatementPreview');
   if (!el) return;
   el.innerHTML=`<div style="padding:20px;background:var(--parchment);border-radius:var(--radius-md);">
     <div style="font-weight:700;margin-bottom:12px;">Statement for ${escapeHtml(broker.name)} (${escapeHtml(broker.firm||'')})</div>
     ${deals.length?`<table style="width:100%;font-size:12px;border-collapse:collapse;">
       <thead><tr style="border-bottom:1px solid var(--border);">${['Project','Facility','Rate','Commission'].map(h=>`<th style="padding:6px;text-align:left;font-size:10px;text-transform:uppercase;">${h}</th>`).join('')}</tr></thead>
-      <tbody>${deals.map(p=>`<tr>${[p.name,formatCurrency(p.fundsNeeded||p.amount||0),(broker.commissionRate||0)+'%',formatCurrency(parseAmount(p.fundsNeeded||p.amount||0)*((broker.commissionRate||0)/100))].map(v=>`<td style="padding:6px;">${v}</td>`).join('')}</tr>`).join('')}</tbody>
+      <tbody>${deals.map(p=>{const fp=facilityPrincipal(p);return `<tr>${[escapeHtml(p.name||'—'),formatCurrency(fp),(broker.commissionRate||0)+'%',formatCurrency(fp*((broker.commissionRate||0)/100))].map(v=>`<td style="padding:6px;">${v}</td>`).join('')}</tr>`;}).join('')}</tbody>
     </table><div style="margin-top:12px;font-weight:700;">Total: ${formatCurrency(total)}</div>`:'<p style="color:var(--platinum);">No funded deals yet.</p>'}
   </div>`;
 }
@@ -7104,8 +7185,8 @@ function exportBrokerStatementPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const date = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
-  const deals = projects.filter(p => p.brokerAssign === brokerId && parseInt(p.step) === 9);
-  const total = deals.reduce((s, p) => s + parseAmount(p.fundsNeeded || p.amount || 0) * ((broker.commissionRate || 0) / 100), 0);
+  const deals = projects.filter(p => projectBrokerId(p)===brokerId && parseInt(p.step,10) === 9);
+  const total = deals.reduce((s, p) => s + facilityPrincipal(p) * ((broker.commissionRate || 0) / 100), 0);
 
   // Header
   doc.setFont('helvetica', 'bold');
@@ -7159,7 +7240,7 @@ function exportBrokerStatementPDF() {
         doc.setFillColor(244, 245, 248);
         doc.rect(20, y - 4, 170, 7, 'F');
       }
-      const fac  = parseAmount(p.fundsNeeded || p.amount || 0);
+      const fac  = facilityPrincipal(p);
       const comm = fac * ((broker.commissionRate || 0) / 100);
       doc.setTextColor(13, 18, 32);
       doc.text((p.name || '—').slice(0, 22), 22, y);
@@ -7259,7 +7340,7 @@ function editProject(projectId) {
 
   // Broker select
   const brSel = document.getElementById('editBrokerAssign');
-  if (brSel) brSel.innerHTML = '<option value="">None</option>'+brokers.filter(b=>b.status==='active').map(b=>`<option value="${b.id}" ${p.brokerAssign===b.id?'selected':''}>${escapeHtml(b.name)}</option>`).join('');
+  if (brSel) brSel.innerHTML = '<option value="">None</option>'+brokers.filter(b=>b.status==='active').map(b=>`<option value="${b.id}" ${projectBrokerId(p)===b.id?'selected':''}>${escapeHtml(b.name)}</option>`).join('');
 
   // Populate form
   const fields = {
@@ -7741,7 +7822,7 @@ function autoPopulateDocFromDeal() {
   if (!projectId) return;
   const p = projects.find(x => x.id === projectId);
   if (!p) return;
-  const br = brokers.find(b => b.id === p.brokerAssign);
+  const br = brokers.find(b => b.id === projectBrokerId(p));
 
   const setField = (suffix, val) => {
     const el = document.getElementById(`${prefix}-${suffix}`);
@@ -8420,6 +8501,23 @@ async function deleteLibraryDoc(docId) {
 // ============================================================
 // BROKER PORTAL
 // ============================================================
+async function fetchProjectsAssignedToBroker(brokerId) {
+  if (!brokerId) return [];
+  try {
+    const [snapAssign, snapLegacy] = await Promise.all([
+      db.collection('projects').where('brokerAssign','==',brokerId).get(),
+      db.collection('projects').where('brokerId','==',brokerId).get()
+    ]);
+    const byId = new Map();
+    [...snapAssign.docs, ...snapLegacy.docs].forEach(d => {
+      if (!byId.has(d.id)) byId.set(d.id, { id: d.id, ...d.data() });
+    });
+    return [...byId.values()];
+  } catch(e) {
+    console.warn('[fetchProjectsAssignedToBroker]', e.message);
+    return [];
+  }
+}
 async function loadBrokerPortal(brokerId, brokerData) {
   const greetEl = document.getElementById('brokerDashGreeting');
   const hour = new Date().getHours();
@@ -8429,14 +8527,13 @@ async function loadBrokerPortal(brokerId, brokerData) {
   const commRateEl = document.getElementById('brokerCommRate');
   if (commRateEl) commRateEl.textContent = `${brokerData.commissionRate||1.5}%`;
 
-  // Load broker's deals
-  const pSnap = await db.collection('projects').where('brokerAssign','==',brokerId).get();
-  brokerProjects = pSnap.docs.map(d=>({ id:d.id, ...d.data() }));
+  // Load broker's deals (brokerAssign + legacy brokerId)
+  brokerProjects = await fetchProjectsAssignedToBroker(brokerId);
 
-  const activeDeals  = brokerProjects.filter(p=>parseInt(p.step)<9).length;
-  const fundedDeals  = brokerProjects.filter(p=>parseInt(p.step)===9);
-  const pipelineVol  = brokerProjects.reduce((s,p)=>s+parseAmount(p.fundsNeeded||p.amount||0),0);
-  const fundedVol    = fundedDeals.reduce((s,p)=>s+parseAmount(p.fundsNeeded||p.amount||0),0);
+  const activeDeals  = brokerProjects.filter(p=>parseInt(p.step,10)<9).length;
+  const fundedDeals  = brokerProjects.filter(p=>parseInt(p.step,10)===9);
+  const pipelineVol  = brokerProjects.reduce((s,p)=>s+facilityPrincipal(p),0);
+  const fundedVol    = fundedDeals.reduce((s,p)=>s+facilityPrincipal(p),0);
   const pipelineComm = pipelineVol * ((brokerData.commissionRate||1.5)/100);
   const earnedComm   = fundedVol   * ((brokerData.commissionRate||1.5)/100);
 
@@ -8451,9 +8548,9 @@ async function loadBrokerPortal(brokerId, brokerData) {
     if (!fundedDeals.length) { histEl.innerHTML='<tr><td colspan="6"><div class="empty-state" style="padding:16px;"><p>No funded deals yet.</p></div></td></tr>'; }
     else histEl.innerHTML = fundedDeals.map(p=>`<tr>
       <td>${escapeHtml(p.name||'—')}</td><td>${escapeHtml(p.clientName||'—')}</td>
-      <td>${formatDate(p.fundedDate)}</td><td>${formatCurrency(p.fundsNeeded||p.amount||0)}</td>
+      <td>${formatDate(p.fundedDate)}</td><td>${formatCurrency(facilityPrincipal(p))}</td>
       <td>${brokerData.commissionRate||1.5}%</td>
-      <td style="font-weight:600;color:var(--emerald);">${formatCurrency(parseAmount(p.fundsNeeded||p.amount||0)*((brokerData.commissionRate||1.5)/100))}</td>
+      <td style="font-weight:600;color:var(--emerald);">${formatCurrency(facilityPrincipal(p)*((brokerData.commissionRate||1.5)/100))}</td>
     </tr>`).join('');
   }
 
@@ -8495,7 +8592,7 @@ function renderBrokerPortfolio(brokerId, projectList) {
       <div class="card-body">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:14px;">
           <div><div style="font-family:var(--font-display);font-size:20px;font-weight:400;">${escapeHtml(p.clientName||'—')}</div><div style="font-size:12px;color:var(--platinum);margin-top:2px;">${escapeHtml(p.name||'')} · ${escapeHtml(p.industry||'')} · ${escapeHtml(p.location||'')}</div></div>
-          <div style="text-align:right;"><div style="font-family:var(--font-display);font-size:22px;">${formatCurrency(p.fundsNeeded||p.amount||0)}</div>${score!==null?getHealthScoreBadge(score):''}</div>
+          <div style="text-align:right;"><div style="font-family:var(--font-display);font-size:22px;">${formatCurrency(facilityPrincipal(p))}</div>${score!==null?getHealthScoreBadge(score):''}</div>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
           <span class="badge badge-info">${getStepName(step)}</span>
@@ -8504,7 +8601,7 @@ function renderBrokerPortfolio(brokerId, projectList) {
         <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${getProgressPercent(step)}%"></div></div>
         <div style="font-size:10px;color:var(--platinum);margin-top:4px;">${getProgressPercent(step)}% complete</div>
         <div style="margin-top:12px;display:flex;gap:6px;">
-          <button class="btn btn-ghost btn-xs" onclick="showBrokerUpdateRequest('${p.id}','${escapeHtml(p.name||'')}')"><i class="fas fa-edit"></i> Request Update</button>
+          <button type="button" class="btn btn-ghost btn-xs" onclick="showBrokerUpdateRequest('${p.id}')"><i class="fas fa-edit"></i> Request Update</button>
         </div>
       </div>
     </div>`;
@@ -8515,9 +8612,8 @@ async function loadBrokerDocuments() {
   const el = document.getElementById('brokerDocumentsList');
   if (!el || !currentClientId) return;
   try {
-    // Get projects assigned to this broker
-    const pSnap = await db.collection('projects').where('brokerAssign','==',currentClientId).get();
-    const bProjectIds = pSnap.docs.map(d=>d.id);
+    const plist = await fetchProjectsAssignedToBroker(currentClientId);
+    const bProjectIds = plist.map(p=>p.id);
     if (!bProjectIds.length) { el.innerHTML='<div class="empty-state"><i class="fas fa-file-alt"></i><p>No documents available.</p></div>'; return; }
     const docs = [];
     for (const pid of bProjectIds) {
@@ -8629,8 +8725,16 @@ async function submitDeal() {
 }
 
 function showBrokerUpdateRequest(projectId, projectName) {
-  document.getElementById('updateProjectName').value = projectName;
-  document.getElementById('updateProjectName').dataset.projectId = projectId;
+  const nameEl = document.getElementById('updateProjectName');
+  if (!nameEl) return;
+  let nm = projectName;
+  if (nm === undefined || nm === null || nm === '') {
+    const list = typeof brokerProjects !== 'undefined' ? brokerProjects : null;
+    const proj = Array.isArray(list) ? list.find(x=>x.id===projectId) : null;
+    nm = proj?.name || '';
+  }
+  nameEl.value = nm || '';
+  nameEl.dataset.projectId = projectId;
   openModal('requestUpdateModal');
 }
 
