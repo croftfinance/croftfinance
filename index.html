@@ -4984,7 +4984,16 @@ if (installBtn) {
 // Helper Functions
 function dismissPWA() {
   const banner = document.getElementById('pwaInstallBanner');
-  if (banner) banner.style.transform = 'translateX(-50%) translateY(120px)';
+  if (banner) {
+    banner.style.transform = 'translateX(-50%) translateY(120px)';
+    banner.style.opacity = '0';
+    banner.style.transition = 'transform 0.4s ease, opacity 0.3s ease';
+    
+    // Actually remove/hide the banner after animation completes
+    setTimeout(() => {
+      banner.style.display = 'none';
+    }, 400);
+  }
   localStorage.setItem('pwaDismissed', '1');
 }
 
