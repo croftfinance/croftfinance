@@ -4436,21 +4436,26 @@ async function handleClientPortal(uid, docSnap) {
   showToastSuccess('Welcome back.');
 }
 
-async function handleBrokerPortal(uid, bDoc) {
-  currentUser     = auth.currentUser;
+async function handleBrokerPortal(uid, brokerDoc) {
+  currentUser = auth.currentUser;
   currentUserRole = 'broker';
-  currentClientId = uid;
-  const bd        = bDoc.data();
+  currentClientId = uid;  // ← Use UID as broker identifier
+  const bd = brokerDoc.data();
+  
   closeModal('loginModal');
-  const nameEl  = document.getElementById('brokerNavUser');
-  const avatarEl= document.getElementById('brokerAvatar');
+  
+  // Set UI elements
+  const nameEl = document.getElementById('brokerNavUser');
+  const avatarEl = document.getElementById('brokerAvatar');
   const unameEl = document.getElementById('brokerUserName');
-  const uemailEl= document.getElementById('brokerUserEmail');
-  if (nameEl)   nameEl.textContent  = bd.name || 'Broker';
-  if (avatarEl) avatarEl.textContent= initials(bd.name||'B');
-  if (unameEl)  unameEl.textContent = bd.name || 'Broker';
-  if (uemailEl) uemailEl.textContent= bd.email || '';
-  await loadBrokerPortal(bDoc.id, bd);
+  const uemailEl = document.getElementById('brokerUserEmail');
+  
+  if (nameEl) nameEl.textContent = bd.name || 'Broker';
+  if (avatarEl) avatarEl.textContent = initials(bd.name || 'B');
+  if (unameEl) unameEl.textContent = bd.name || 'Broker';
+  if (uemailEl) uemailEl.textContent = bd.email || '';
+  
+  await loadBrokerPortal(uid, bd);
   showView('broker');
   startSessionMonitor();
   addAuditLog('Broker signed in', 'login', 'broker');
@@ -4517,44 +4522,78 @@ async function register() {
 }
 
 async function brokerRegister() {
-  const name  = document.getElementById('brokerRegName').value.trim();
+  const name = document.getElementById('brokerRegName').value.trim();
   const email = document.getElementById('brokerRegEmail').value.trim();
-  const pw    = document.getElementById('brokerRegPassword').value;
-  const cpw   = document.getElementById('brokerRegConfirmPassword').value;
-  const firm  = document.getElementById('brokerRegFirm').value.trim();
-  const nda   = document.getElementById('brokerNdaCheckbox').checked;
+  const pw = document.getElementById('brokerRegPassword').value;
+  const cpw = document.getElementById('brokerRegConfirmPassword').value;
+  const firm = document.getElementById('brokerRegFirm').value.trim();
+  const nda = document.getElementById('brokerNdaCheckbox').checked;
   const errEl = document.getElementById('brokerRegError');
-  const btn   = document.getElementById('brokerRegBtn');
-  errEl.style.display='none';
-  if (!name||!email||!pw||!cpw||!firm) { errEl.textContent='All required fields needed.'; errEl.style.display='block'; return; }
-  if (pw!==cpw) { errEl.textContent='Passwords do not match.'; errEl.style.display='block'; return; }
-  if (!nda) { errEl.textContent='You must agree to the Terms.'; errEl.style.display='block'; return; }
-  btn.disabled=true; btn.innerHTML='<span class="btn-spinner"></span> Registering...';
+  const btn = document.getElementById('brokerRegBtn');
+  
+  errEl.style.display = 'none';
+  
+  if (!name || !email || !pw || !cpw || !firm) {
+    errEl.textContent = 'All required fields needed.';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (pw !== cpw) {
+    errEl.textContent = 'Passwords do not match.';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (!nda) {
+    errEl.textContent = 'You must agree to the Terms.';
+    errEl.style.display = 'block';
+    return;
+  }
+  
+  btn.disabled = true;
+  btn.innerHTML = '<span class="btn-spinner"></span> Registering...';
+  
   try {
+    // Create Firebase Auth user
     const cred = await auth.createUserWithEmailAndPassword(email, pw);
-    await db.collection('brokers').doc(cred.user.uid).set({
-      uid: cred.user.uid, name, email, firm,
-      country:     document.getElementById('brokerRegCountry')?.value||'',
-      phone:       document.getElementById('brokerRegPhone')?.value||'',
-      experience:  document.getElementById('brokerRegExperience')?.value||'',
-      status:      'pending',
+    const uid = cred.user.uid;  // ← Get UID
+    
+    // Create broker document using UID as document ID
+    await db.collection('brokers').doc(uid).set({
+      uid: uid,
+      name: name,
+      email: email,
+      firm: firm,
+      country: document.getElementById('brokerRegCountry')?.value || '',
+      phone: document.getElementById('brokerRegPhone')?.value || '',
+      experience: document.getElementById('brokerRegExperience')?.value || '',
+      status: 'pending',  // Requires admin approval
       commissionRate: 1.5,
-      submissionsCount:0, fundedCount:0,
+      submissionsCount: 0,
+      fundedCount: 0,
       registeredAt: firebase.firestore.FieldValue.serverTimestamp()
     });
+    
+    // Notify admin
     emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
-      to_email: ADMIN_EMAIL, to_name: 'Suzana Aleksić',
+      to_email: ADMIN_EMAIL,
+      to_name: 'Suzana Aleksić',
       subject: `New Broker Registration: ${name}`,
       message: `New broker registration:\n\nName: ${name}\nEmail: ${email}\nFirm: ${firm}\n\nReview in admin portal → Brokers.`
-    }).catch(()=>{});
-    btn.textContent='Registered ✓';
-    errEl.style.cssText='display:block;background:var(--emerald-dim);color:var(--emerald);padding:12px;border-radius:var(--radius-sm);';
-    errEl.textContent='✓ Broker registration submitted. Suzana will review your application shortly.';
+    }).catch(() => {});
+    
+    btn.textContent = 'Registered ✓';
+    errEl.style.cssText = 'display:block;background:var(--emerald-dim);color:var(--emerald);padding:12px;border-radius:var(--radius-sm);';
+    errEl.textContent = '✓ Broker registration submitted. Suzana will review your application shortly.';
+    
   } catch(err) {
-    let msg = err.message||'Registration failed.';
-    if (err.code==='auth/email-already-in-use') msg='An account already exists.';
-    errEl.textContent=msg; errEl.style.display='block';
-    btn.disabled=false; btn.textContent='Register as Broker';
+    let msg = err.message || 'Registration failed.';
+    if (err.code === 'auth/email-already-in-use') {
+      msg = 'An account already exists with this email.';
+    }
+    errEl.textContent = msg;
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Register as Broker';
   }
 }
 
